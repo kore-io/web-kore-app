@@ -22,11 +22,13 @@ describe('SignInEmailStep', () => {
     renderStep();
     expect(screen.getByRole('heading', { level: 1, name: 'Entre no Kore' })).toBeInTheDocument();
     expect(
-      screen.getByText('Use sua conta Google ou receba um código no seu e-mail. Não tem senha.'),
+      screen.getByText(
+        'Use sua conta Google ou receba um código no seu e-\u2060mail. Não tem senha.',
+      ),
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Continuar com Google' })).toBeInTheDocument();
     expect(screen.getByText('ou')).toBeInTheDocument();
-    const email = screen.getByRole('textbox', { name: 'E-mail' });
+    const email = screen.getByRole('textbox', { name: 'E-\u2060mail' });
     expect(email).toHaveAttribute('placeholder', 'seu@email.com');
     expect(email).toHaveAttribute('autocomplete', 'email');
     expect(screen.getByRole('link', { name: 'Criar meu site' })).toHaveAttribute(
@@ -39,19 +41,19 @@ describe('SignInEmailStep', () => {
     );
   });
 
-  it('Google e Receber código chamam o app, com o e-mail sem espaços', async () => {
+  it('Google e Receber código chamam o app, com o e-\u2060mail sem espaços', async () => {
     const user = userEvent.setup();
     const props = renderStep();
     await user.click(screen.getByRole('button', { name: 'Continuar com Google' }));
     expect(props.onContinueWithGoogle).toHaveBeenCalledTimes(1);
-    await user.type(screen.getByRole('textbox', { name: 'E-mail' }), '  ana@exemplo.com ');
+    await user.type(screen.getByRole('textbox', { name: 'E-\u2060mail' }), '  ana@exemplo.com ');
     await user.click(screen.getByRole('button', { name: 'Receber código' }));
     expect(props.onSubmit).toHaveBeenCalledWith({ email: 'ana@exemplo.com' });
   });
 
   it('erro do campo: aria-invalid e mensagem ligada ao campo', () => {
     renderStep({ emailError: 'Mensagem de erro' });
-    const email = screen.getByRole('textbox', { name: 'E-mail' });
+    const email = screen.getByRole('textbox', { name: 'E-\u2060mail' });
     expect(email).toHaveAttribute('aria-invalid', 'true');
     expect(email).toHaveAccessibleDescription('Mensagem de erro');
   });

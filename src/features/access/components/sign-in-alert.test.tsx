@@ -13,17 +13,17 @@ describe('SignInAlert (Voz, decisão 150)', () => {
     [
       { kind: 'wrong-code', attemptsLeft: 2 },
       'Esse código não confere',
-      'Confira os números no e-mail e tente de novo. Você ainda tem 2 tentativas; depois disso, pedimos um código novo para você.',
+      'Confira os números no e-\u2060mail e tente de novo. Você ainda tem 2 tentativas; depois disso, pedimos um código novo para você.',
     ],
     [
       { kind: 'wrong-code', attemptsLeft: 1 },
       'Esse código não confere',
-      'Confira os números no e-mail e tente de novo. Você ainda tem 1 tentativa; depois disso, pedimos um código novo para você.',
+      'Confira os números no e-\u2060mail e tente de novo. Você ainda tem 1 tentativa; depois disso, pedimos um código novo para você.',
     ],
     [
       { kind: 'code-expired' },
       'Esse código não vale mais',
-      'Peça um novo em Reenviar código. Se você pediu mais de um, use o do e-mail mais recente.',
+      'Peça um novo em Reenviar código. Se você pediu mais de um, use o do e-\u2060mail mais recente.',
     ],
     [
       { kind: 'too-many-requests', minutes: 12 },
@@ -38,7 +38,7 @@ describe('SignInAlert (Voz, decisão 150)', () => {
     [
       { kind: 'new-code-sent', email: 'ana@exemplo.com' },
       'Pedimos um código novo para você',
-      'Depois de 5 tentativas, enviamos outro para ana@exemplo.com. Use o código do e-mail mais recente.',
+      'Depois de 5 tentativas, enviamos outro para ana@exemplo.com. Use o código do e-\u2060mail mais recente.',
     ],
     [
       { kind: 'locked', minutes: 3 },
@@ -47,13 +47,13 @@ describe('SignInAlert (Voz, decisão 150)', () => {
     ],
     [
       { kind: 'google-unverified' },
-      'O Google não confirmou seu e-mail',
-      'Para entrar, receba um código no seu e-mail.',
+      'O Google não confirmou seu e-\u2060mail',
+      'Para entrar, receba um código no seu e-\u2060mail.',
     ],
     [
       { kind: 'google-failed' },
       'Não foi possível entrar com o Google',
-      'Tente de novo ou receba um código no seu e-mail.',
+      'Tente de novo ou receba um código no seu e-\u2060mail.',
     ],
   ])('%o', (notice, title, description) => {
     render(<SignInAlert notice={notice} />);
@@ -61,7 +61,7 @@ describe('SignInAlert (Voz, decisão 150)', () => {
     expect(screen.getByText(description)).toHaveClass('kore-alert__description');
   });
 
-  it('bloqueado: texto sem dizer o motivo e o e-mail do suporte como link', () => {
+  it('bloqueado: texto sem dizer o motivo e o e-\u2060mail do suporte como link', () => {
     render(<SignInAlert notice={{ kind: 'blocked' }} />);
     expect(screen.getByRole('alert')).toHaveTextContent(
       'Não foi possível entrar com esta contaEscreva para suporte@kore.com.br.',

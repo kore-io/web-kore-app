@@ -17,14 +17,14 @@ function props(overrides: Partial<SignInCodeStepProps> = {}): SignInCodeStepProp
 }
 
 describe('SignInCodeStep', () => {
-  it('textos do Penpot com o e-mail e as 6 casas rotuladas (decisão 151)', () => {
+  it('textos do Penpot com o e-\u2060mail e as 6 casas rotuladas (decisão 151)', () => {
     render(<SignInCodeStep {...props()} />);
     expect(
-      screen.getByRole('heading', { level: 1, name: 'Confira seu e-mail' }),
+      screen.getByRole('heading', { level: 1, name: 'Confira seu e-\u2060mail' }),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        'Enviamos um código de 6 números para ana@exemplo.com. Você também pode entrar pelo botão que está no mesmo e-mail.',
+        'Enviamos um código de 6 números para ana@exemplo.com. Você também pode entrar pelo botão que está no mesmo e-\u2060mail.',
       ),
     ).toBeInTheDocument();
     expect(screen.getByRole('group', { name: 'Código de 6 números' })).toBeInTheDocument();
@@ -61,11 +61,11 @@ describe('SignInCodeStep', () => {
     expect(screen.getByRole('button', { name: 'Reenviar código' })).toBeDisabled();
   });
 
-  it('Usar outro e-mail volta ao passo do e-mail', async () => {
+  it('Usar outro e-\u2060mail volta ao passo do e-\u2060mail', async () => {
     const user = userEvent.setup();
     const stepProps = props();
     render(<SignInCodeStep {...stepProps} />);
-    await user.click(screen.getByRole('button', { name: 'Usar outro e-mail' }));
+    await user.click(screen.getByRole('button', { name: 'Usar outro e-\u2060mail' }));
     expect(stepProps.onUseAnotherEmail).toHaveBeenCalledTimes(1);
   });
 
