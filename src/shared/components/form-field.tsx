@@ -8,7 +8,8 @@ export interface FormFieldProps {
   /** Marca de opcional ao lado do rótulo, vinda da Voz. */
   optionalText?: string;
   /** Ajuda abaixo do campo (Penpot "Ajuda": caption gray.700; success.text; danger.text). */
-  hint?: string;
+  /** Texto de ajuda ou de erro; pode ter marcação (ex.: endereço que não quebra). */
+  hint?: ReactNode;
   hintTone?: FormFieldHintTone;
   /**
    * O campo, recebendo o id (para o rótulo) e o id da ajuda (para o aria-describedby) e

@@ -133,8 +133,8 @@
     "state": "UF",
     "statePlaceholder": "UF",
     "slug": "Endereço do site",
-    "slugAvailable": "Disponível: kore.com.br/{{slug}}",
-    "slugTaken": "kore.com.br/{{slug}} já está em uso. Que tal kore.com.br/{{suggestion}}?",
+    "slugAvailable": "Disponível: <address>kore.com.br/{{slug}}</address>",
+    "slugTaken": "<address>kore.com.br/{{slug}}</address> já está em uso. Que tal <address>kore.com.br/{{suggestion}}</address>?",
     "submit": "Criar nosso site",
     "errors": {
       "myName": "Informe seu nome.",

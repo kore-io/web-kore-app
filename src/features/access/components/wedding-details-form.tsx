@@ -1,6 +1,6 @@
 import { Button, DateField, Input, Radio, Select } from '@kore-io/design';
 import { useId, type FormEvent } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { BRAZIL_STATES } from '../../../shared/brazil-states';
 import { FormField } from '../../../shared/components/form-field';
 
@@ -51,6 +51,9 @@ function read({ form }: { form: HTMLFormElement }): WeddingDetailsValues {
  * Cadastro — Dados do casamento (Área do Casal, Penpot), com o estado Endereço em uso.
  * Visual por props: a validação e a checagem do endereço ficam com a página.
  */
+/** O endereço do site não quebra no meio (decisão 161): kore.com.br/ana-e-marcos-2026. */
+const ADDRESS = <span className="kore-wedding-details__address" />;
+
 export function WeddingDetailsForm({
   defaultValues = {},
   errors = {},
@@ -72,15 +75,26 @@ export function WeddingDetailsForm({
       ? { hint: errors.slug, hintTone: 'danger' as const }
       : slugStatus?.kind === 'taken'
         ? {
-            hint: t('weddingDetails.slugTaken', {
-              slug: slugStatus.slug,
-              suggestion: slugStatus.suggestion,
-            }),
+            hint: (
+              <Trans
+                t={t}
+                i18nKey="weddingDetails.slugTaken"
+                values={{ slug: slugStatus.slug, suggestion: slugStatus.suggestion }}
+                components={{ address: ADDRESS }}
+              />
+            ),
             hintTone: 'danger' as const,
           }
         : slugStatus?.kind === 'available'
           ? {
-              hint: t('weddingDetails.slugAvailable', { slug: slugStatus.slug }),
+              hint: (
+                <Trans
+                  t={t}
+                  i18nKey="weddingDetails.slugAvailable"
+                  values={{ slug: slugStatus.slug }}
+                  components={{ address: ADDRESS }}
+                />
+              ),
               hintTone: 'success' as const,
             }
           : {};
@@ -197,7 +211,13 @@ export function WeddingDetailsForm({
             />
           )}
         </FormField>
-        <Button type="submit" size="lg" className="kore-sign-in__submit" disabled={submitting}>
+        {/* Com o endereço em uso, Criar nosso site fica desabilitado (Penpot, decisão 161). */}
+        <Button
+          type="submit"
+          size="lg"
+          className="kore-sign-in__submit"
+          disabled={submitting || slugStatus?.kind === 'taken'}
+        >
           {t('weddingDetails.submit')}
         </Button>
       </form>

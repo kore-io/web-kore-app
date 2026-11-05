@@ -63,3 +63,8 @@
 .kore-invite-partner__note {
   @apply type-caption text-center text-gray-700;
 }
+
+/* Endereço do site inteiro na mesma linha (decisão 161): não quebra em "ana-e- / marcos". */
+.kore-wedding-details__address {
+  @apply whitespace-nowrap;
+}

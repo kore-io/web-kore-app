@@ -51,9 +51,12 @@ describe('Cadastro — Dados do casamento', () => {
         slugStatus={{ kind: 'available', slug: 'ana-e-marcos' }}
       />,
     );
-    expect(screen.getByText('Disponível: kore.com.br/ana-e-marcos')).toHaveClass(
+    const available = screen.getByRole('textbox', { name: 'Endereço do site' });
+    expect(available).toHaveAccessibleDescription('Disponível: kore.com.br/ana-e-marcos');
+    expect(screen.getByText('kore.com.br/ana-e-marcos').closest('p')).toHaveClass(
       'kore-form-field__hint--success',
     );
+    expect(screen.getByRole('button', { name: 'Criar nosso site' })).toBeEnabled();
     rerender(
       <WeddingDetailsForm
         onSubmit={vi.fn()}
@@ -65,6 +68,11 @@ describe('Cadastro — Dados do casamento', () => {
     expect(slug).toHaveAccessibleDescription(
       'kore.com.br/ana-e-marcos já está em uso. Que tal kore.com.br/ana-e-marcos-2026?',
     );
+    // Decisão 161: o endereço não quebra no meio, e o botão espera um endereço livre.
+    expect(screen.getByText('kore.com.br/ana-e-marcos-2026')).toHaveClass(
+      'kore-wedding-details__address',
+    );
+    expect(screen.getByRole('button', { name: 'Criar nosso site' })).toBeDisabled();
   });
 
   it('erros por campo (decisão 155), inclusive no grupo noivo/noiva', () => {
