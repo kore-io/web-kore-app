@@ -1,0 +1,24 @@
+/*
+ * Destaque de indicação do Cadastro — Início (Penpot): fundo accent.tint, raio md, 16 px
+ * de respiro, 12 px entre o presente (24 px, gray.700) e os textos (título em type.label,
+ * apoio em body.md, ambos em ink, com 2 px entre eles).
+ */
+.kore-referral {
+  @apply flex items-start gap-3 rounded-md bg-accent-tint p-4;
+}
+
+.kore-referral__icon {
+  @apply size-6 shrink-0 text-gray-700;
+}
+
+.kore-referral__text {
+  @apply flex min-w-0 flex-col gap-0.5;
+}
+
+.kore-referral__title {
+  @apply type-label text-ink;
+}
+
+.kore-referral__description {
+  @apply type-body-md text-ink;
+}

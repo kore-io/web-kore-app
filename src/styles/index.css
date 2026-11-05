@@ -13,3 +13,4 @@
 @import '../features/access/components/sign-in-email-step.css' layer(components);
 @import '../features/access/components/profile-option.css' layer(components);
 @import '../shared/components/form-field.css' layer(components);
+@import '../features/access/components/sign-up.css' layer(components);

@@ -105,5 +105,18 @@
       "alertDescription": "Quem convidou você pode reenviar o convite pelo Kore em poucos segundos.",
       "signIn": "Entrar no Kore"
     }
+  },
+  "brandPanelCouple": {
+    "headline": "A lista de convidados organizada sozinha.",
+    "description": "Um link por grupo, a família responde por cada pessoa, e vocês veem o número real de convidados sem perguntar para ninguém."
+  },
+  "signUp": {
+    "title": "Crie o site do casamento",
+    "description": "É grátis para montar. Vocês só pagam quando publicarem.",
+    "referralTitle": "Indicação de {{name}}",
+    "referralDescription": "Vocês ganham {{percent}}% de desconto na ativação do site.",
+    "submit": "Continuar",
+    "signInPrompt": "Já tem conta?",
+    "signInLink": "Entrar"
   }
 }
