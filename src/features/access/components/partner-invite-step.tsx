@@ -50,7 +50,7 @@ export function PartnerInviteStep({
       />
       <button
         type="button"
-        className="kore-sign-in__link kore-invite-partner__later"
+        className="kore-sign-in__link kore-sign-in__link--standalone kore-invite-partner__later"
         onClick={onDecline}
       >
         {t('partnerInvite.decline')}
