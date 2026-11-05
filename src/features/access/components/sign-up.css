@@ -1,0 +1,70 @@
+/*
+ * Destaque de indicação do Cadastro — Início (Penpot): fundo accent.tint, raio md, 16 px
+ * de respiro, 12 px entre o presente (24 px, gray.700) e os textos (título em type.label,
+ * apoio em body.md, ambos em ink, com 2 px entre eles).
+ */
+.kore-referral {
+  @apply flex items-start gap-3 rounded-md bg-accent-tint p-4;
+}
+
+.kore-referral__icon {
+  @apply size-6 shrink-0 text-gray-700;
+}
+
+.kore-referral__text {
+  @apply flex min-w-0 flex-col gap-0.5;
+}
+
+.kore-referral__title {
+  @apply type-label text-ink;
+}
+
+.kore-referral__description {
+  @apply type-body-md text-ink;
+}
+
+/*
+ * Dados do casamento (Penpot): a escolha noivo/noiva com 8 px até as opções e 24 px entre
+ * elas; Cidade e UF lado a lado com 12 px, a UF com 96 px.
+ */
+.kore-wedding-details__choice {
+  @apply m-0 min-w-0 border-0 p-0;
+}
+
+.kore-wedding-details__legend {
+  @apply type-label mb-2 p-0 text-ink;
+}
+
+.kore-wedding-details__options {
+  @apply flex gap-6;
+}
+
+.kore-wedding-details__choice > .kore-form-field__hint {
+  @apply mt-1.5;
+}
+
+.kore-wedding-details__place {
+  @apply flex gap-3;
+}
+
+.kore-wedding-details__place > .kore-form-field:first-child {
+  @apply flex-1;
+}
+
+.kore-wedding-details__state {
+  @apply w-24;
+}
+
+/* Convidar o parceiro (Penpot): "Fazer isso depois" e a nota, centralizados. */
+.kore-invite-partner__later {
+  @apply self-center;
+}
+
+.kore-invite-partner__note {
+  @apply type-caption text-center text-gray-700;
+}
+
+/* Endereço do site inteiro na mesma linha (decisão 161): não quebra em "ana-e- / marcos". */
+.kore-wedding-details__address {
+  @apply whitespace-nowrap;
+}

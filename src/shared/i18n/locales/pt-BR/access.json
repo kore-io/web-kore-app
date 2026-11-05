@@ -105,5 +105,59 @@
       "alertDescription": "Quem convidou você pode reenviar o convite pelo Kore em poucos segundos.",
       "signIn": "Entrar no Kore"
     }
+  },
+  "brandPanelCouple": {
+    "headline": "A lista de convidados organizada sozinha.",
+    "description": "Um link por grupo, a família responde por cada pessoa, e vocês veem o número real de convidados sem perguntar para ninguém."
+  },
+  "signUp": {
+    "title": "Crie o site do casamento",
+    "description": "É grátis para montar. Vocês só pagam quando publicarem.",
+    "referralTitle": "Indicação de {{name}}",
+    "referralDescription": "Vocês ganham {{percent}}% de desconto na ativação do site.",
+    "submit": "Continuar",
+    "signInPrompt": "Já tem conta?",
+    "signInLink": "Entrar"
+  },
+  "weddingDetails": {
+    "title": "Conte sobre o casamento",
+    "description": "Só o essencial. Dá para mudar tudo depois.",
+    "myName": "Seu nome",
+    "myTitle": "Você é o noivo ou a noiva?",
+    "bride": "Noiva",
+    "groom": "Noivo",
+    "partnerName": "Com quem você vai casar?",
+    "eventDate": "Data do casamento",
+    "eventDateHint": "Opcional. Se ainda não tiverem a data, deixem em branco.",
+    "city": "Cidade",
+    "state": "UF",
+    "statePlaceholder": "UF",
+    "slug": "Endereço do site",
+    "slugAvailable": "Disponível: <address>kore.com.br/{{slug}}</address>",
+    "slugTaken": "<address>kore.com.br/{{slug}}</address> já está em uso. Que tal <address>kore.com.br/{{suggestion}}</address>?",
+    "submit": "Criar nosso site",
+    "errors": {
+      "myName": "Informe seu nome.",
+      "myTitle": "Escolha noivo ou noiva.",
+      "partnerName": "Informe o nome de quem vai casar com você.",
+      "city": "Informe a cidade.",
+      "state": "Escolha a UF.",
+      "slug": "Informe o endereço do site.",
+      "slugFormat": "Use só letras minúsculas, números e hífen.",
+      "email": "Informe um e-mail válido."
+    }
+  },
+  "alreadyOwner": {
+    "title": "Você já tem um casamento no Kore.",
+    "description": "Cada pessoa é dona de um casamento por vez. O rascunho do simulador continua só neste navegador.",
+    "open": "Abrir meu casamento"
+  },
+  "invitePartner": {
+    "title": "Convide {{name}}",
+    "description": "{{name}} vai ter o próprio login, com as mesmas permissões que você. O convite vale por 30 dias.",
+    "emailLabel": "E-mail de {{name}}",
+    "submit": "Enviar convite",
+    "later": "Fazer isso depois",
+    "laterNote": "Dá para convidar depois pelo Dashboard."
   }
 }

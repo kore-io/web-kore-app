@@ -34,14 +34,6 @@
   @apply type-caption shrink-0 text-gray-700;
 }
 
-.kore-sign-in__field {
-  @apply flex flex-col gap-1.5;
-}
-
-.kore-sign-in__error {
-  @apply type-caption text-danger-text;
-}
-
 .kore-sign-in__links {
   @apply flex flex-col items-center gap-2;
 }

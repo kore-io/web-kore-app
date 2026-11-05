@@ -10,20 +10,24 @@ import { useTranslation } from 'react-i18next';
 export function AccessLayout({
   children,
   showLegal = true,
+  pitch = 'default',
 }: {
   children: ReactNode;
   /** A Seleção de perfil não tem a linha legal (Penpot e Voz). */
   showLegal?: boolean;
+  /** Texto do painel da marca: o do Acessos ou o do casal, no Cadastro (decisão 154). */
+  pitch?: 'default' | 'couple';
 }) {
   const { t } = useTranslation('access');
+  const panel = pitch === 'couple' ? 'brandPanelCouple' : 'brandPanel';
   const { t: tCommon } = useTranslation('common');
   return (
     <div className="kore-access">
       <aside className="kore-access__brand">
         <Logo variant="white" label={tCommon('appName')} />
         <div className="kore-access__pitch">
-          <p className="kore-access__headline">{t('brandPanel.headline')}</p>
-          <p className="kore-access__description">{t('brandPanel.description')}</p>
+          <p className="kore-access__headline">{t(`${panel}.headline`)}</p>
+          <p className="kore-access__description">{t(`${panel}.description`)}</p>
         </div>
         <p className="kore-access__site">{t('brandPanel.site')}</p>
       </aside>
