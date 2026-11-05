@@ -1,3 +1,4 @@
+export * from './access-invitations/access-invitations';
 export * from './auth/auth';
 export * from './health/health';
 export * from './me/me';
