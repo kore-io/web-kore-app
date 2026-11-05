@@ -21,9 +21,23 @@ env "npm_config_//npm.pkg.github.com/:_authToken=$(gh auth token)" pnpm install
 | `pnpm dev`                          | servidor de desenvolvimento (Vite)                |
 | `pnpm build`                        | checa os tipos e gera `dist/`                     |
 | `pnpm test`                         | testes (Vitest + Testing Library, jsdom)          |
+| `pnpm test:e2e`                     | E2E (Playwright) contra a API local; ver abaixo   |
 | `pnpm typecheck`                    | checagem de tipos                                 |
 | `pnpm lint`                         | ESLint                                            |
 | `pnpm format` / `pnpm format:check` | Prettier                                          |
+
+## E2E (Playwright)
+
+`pnpm test:e2e` roda os testes de `e2e/` contra a API local de verdade, no tamanho de
+celular. Antes, deixe de pé:
+
+- o `api-kore-api` (API e worker) em `http://localhost:3000`, com `GOOGLE_PROVIDER=dev`,
+  `ALLOWED_ORIGINS=http://localhost:5173` e `RATE_LIMIT_AUTH_PER_MINUTE` alto o bastante
+  para a suíte (ex.: 200; o padrão de 10 por minuto barra a suíte com 429);
+- o Mailpit do compose da API em `http://localhost:8025`, de onde os testes leem o código.
+
+O app sobe sozinho na 5173 (ou o teste reaproveita o que já estiver rodando). Na primeira
+vez, instale o navegador com `pnpm exec playwright install chromium`.
 
 Commits em Conventional Commits (commitlint no `commit-msg`); lint-staged no `pre-commit`.
 
