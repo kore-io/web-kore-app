@@ -1,5 +1,5 @@
 import { Button, DateField, Input, Radio, Select } from '@kore-io/design';
-import { useId, type FormEvent } from 'react';
+import { useId, type FormEvent, type ReactNode } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { BRAZIL_STATES } from '../../../shared/brazil-states';
 import { FormField } from '../../../shared/components/form-field';
@@ -23,7 +23,13 @@ export type SlugStatus =
   { kind: 'available'; slug: string } | { kind: 'taken'; slug: string; suggestion: string };
 
 export interface WeddingDetailsFormProps {
+  /** Aviso acima do título (ex.: rede fora), um Alert da lib. */
+  notice?: ReactNode;
   defaultValues?: Partial<WeddingDetailsValues>;
+  /** Endereço controlado pela página (a sugestão dos nomes, RN04); sem ele, livre. */
+  slugValue?: string;
+  /** Todos os valores a cada mudança (para sugerir e checar o endereço). */
+  onValuesChange?: (values: WeddingDetailsValues) => void;
   /** Mensagens por campo (textos da decisão 155), vindas da validação. */
   errors?: Partial<Record<WeddingDetailsField, string>>;
   slugStatus?: SlugStatus;
@@ -51,11 +57,17 @@ function read({ form }: { form: HTMLFormElement }): WeddingDetailsValues {
  * Cadastro — Dados do casamento (Área do Casal, Penpot), com o estado Endereço em uso.
  * Visual por props: a validação e a checagem do endereço ficam com a página.
  */
+/** Limite dos nomes e da cidade no POST /v1/weddings (decisão 166). */
+const TEXT_MAX_LENGTH = 80;
+
 /** O endereço do site não quebra no meio (decisão 161): kore.com.br/ana-e-marcos-2026. */
 const ADDRESS = <span className="kore-wedding-details__address" />;
 
 export function WeddingDetailsForm({
+  notice,
   defaultValues = {},
+  slugValue,
+  onValuesChange,
   errors = {},
   slugStatus,
   onSlugChange,
@@ -103,16 +115,23 @@ export function WeddingDetailsForm({
 
   return (
     <div className="kore-sign-in">
+      {notice}
       <div className="kore-sign-in__heading">
         <h1 className="kore-sign-in__title">{t('weddingDetails.title')}</h1>
         <p className="kore-sign-in__description">{t('weddingDetails.description')}</p>
       </div>
-      <form className="kore-sign-in__form" onSubmit={handleSubmit} noValidate>
+      <form
+        className="kore-sign-in__form"
+        onSubmit={handleSubmit}
+        onChange={(event) => onValuesChange?.(read({ form: event.currentTarget }))}
+        noValidate
+      >
         <FormField label={t('weddingDetails.myName')} {...error('myName')}>
           {({ id, describedBy, invalid }) => (
             <Input
               id={id}
               name="myName"
+              maxLength={TEXT_MAX_LENGTH}
               autoComplete="name"
               defaultValue={defaultValues.myName}
               invalid={invalid}
@@ -144,6 +163,7 @@ export function WeddingDetailsForm({
             <Input
               id={id}
               name="partnerName"
+              maxLength={TEXT_MAX_LENGTH}
               defaultValue={defaultValues.partnerName}
               invalid={invalid}
               {...(describedBy !== undefined && { 'aria-describedby': describedBy })}
@@ -170,6 +190,7 @@ export function WeddingDetailsForm({
               <Input
                 id={id}
                 name="city"
+                maxLength={TEXT_MAX_LENGTH}
                 autoComplete="address-level2"
                 defaultValue={defaultValues.city}
                 invalid={invalid}
@@ -204,19 +225,21 @@ export function WeddingDetailsForm({
               name="slug"
               autoCapitalize="none"
               spellCheck={false}
-              defaultValue={defaultValues.slug}
+              {...(slugValue === undefined
+                ? { defaultValue: defaultValues.slug }
+                : { value: slugValue })}
               invalid={invalid}
               onChange={(event) => onSlugChange?.({ slug: event.target.value.trim() })}
               {...(describedBy !== undefined && { 'aria-describedby': describedBy })}
             />
           )}
         </FormField>
-        {/* Com o endereço em uso, Criar nosso site fica desabilitado (Penpot, decisão 161). */}
+        {/* Só com um endereço livre (RN05; Penpot e decisão 161 no Endereço em uso). */}
         <Button
           type="submit"
           size="lg"
           className="kore-sign-in__submit"
-          disabled={submitting || slugStatus?.kind === 'taken'}
+          disabled={submitting || slugStatus?.kind !== 'available'}
         >
           {t('weddingDetails.submit')}
         </Button>
