@@ -40,6 +40,7 @@
     "@fontsource/nunito-sans": "^5.3.0",
     "@kore-io/design": "0.1.0-homolog.10",
     "i18next": "^26.7.2",
+    "lucide-react": "^1.69.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-i18next": "^17.1.13",
