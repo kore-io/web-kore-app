@@ -118,5 +118,33 @@
     "submit": "Continuar",
     "signInPrompt": "Já tem conta?",
     "signInLink": "Entrar"
+  },
+  "weddingDetails": {
+    "title": "Conte sobre o casamento",
+    "description": "Só o essencial. Dá para mudar tudo depois.",
+    "myName": "Seu nome",
+    "myTitle": "Você é o noivo ou a noiva?",
+    "bride": "Noiva",
+    "groom": "Noivo",
+    "partnerName": "Com quem você vai casar?",
+    "eventDate": "Data do casamento",
+    "eventDateHint": "Opcional. Se ainda não tiverem a data, deixem em branco.",
+    "city": "Cidade",
+    "state": "UF",
+    "statePlaceholder": "UF",
+    "slug": "Endereço do site",
+    "slugAvailable": "Disponível: kore.com.br/{{slug}}",
+    "slugTaken": "kore.com.br/{{slug}} já está em uso. Que tal kore.com.br/{{suggestion}}?",
+    "submit": "Criar nosso site",
+    "errors": {
+      "myName": "Informe seu nome.",
+      "myTitle": "Escolha noivo ou noiva.",
+      "partnerName": "Informe o nome de quem vai casar com você.",
+      "city": "Informe a cidade.",
+      "state": "Escolha a UF.",
+      "slug": "Informe o endereço do site.",
+      "slugFormat": "Use só letras minúsculas, números e hífen.",
+      "email": "Informe um e-mail válido."
+    }
   }
 }

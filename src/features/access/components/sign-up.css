@@ -22,3 +22,35 @@
 .kore-referral__description {
   @apply type-body-md text-ink;
 }
+
+/*
+ * Dados do casamento (Penpot): a escolha noivo/noiva com 8 px até as opções e 24 px entre
+ * elas; Cidade e UF lado a lado com 12 px, a UF com 96 px.
+ */
+.kore-wedding-details__choice {
+  @apply m-0 min-w-0 border-0 p-0;
+}
+
+.kore-wedding-details__legend {
+  @apply type-label mb-2 p-0 text-ink;
+}
+
+.kore-wedding-details__options {
+  @apply flex gap-6;
+}
+
+.kore-wedding-details__choice > .kore-form-field__hint {
+  @apply mt-1.5;
+}
+
+.kore-wedding-details__place {
+  @apply flex gap-3;
+}
+
+.kore-wedding-details__place > .kore-form-field:first-child {
+  @apply flex-1;
+}
+
+.kore-wedding-details__state {
+  @apply w-24;
+}
