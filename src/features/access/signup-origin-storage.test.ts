@@ -36,6 +36,21 @@ describe('origem do cadastro (decisões 135 e 169(2))', () => {
     expect(storedSignupOrigin({ now: new Date(now.getTime() + 30 * day) })).toEqual({});
   });
 
+  it('descarta da leitura o que o POST não aceita (Crivo)', () => {
+    const now = new Date('2026-11-05T12:00:00Z');
+    window.localStorage.setItem(
+      'kore.signupOrigin',
+      JSON.stringify({
+        signupSource: 'tiktok',
+        utmSource: 42,
+        utmMedium: 'x'.repeat(201),
+        utmCampaign: 'lancamento',
+        savedAt: now.toISOString(),
+      }),
+    );
+    expect(storedSignupOrigin({ now })).toEqual({ utmCampaign: 'lancamento' });
+  });
+
   it('sem nada na URL, não guarda', () => {
     saveSignupOrigin({ origin: {} });
     expect(window.localStorage.getItem('kore.signupOrigin')).toBeNull();

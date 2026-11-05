@@ -1,4 +1,4 @@
-import type { CreateWeddingBodySignupSource } from '../../shared/api/generated/model';
+import { CreateWeddingBodySignupSource } from '../../shared/api/generated/model';
 
 /**
  * Origem do cadastro guardada no aparelho (decisões 135 e 169(2)): as UTM e o
@@ -38,12 +38,28 @@ export function storedSignupOrigin({ now = new Date() }: { now?: Date } = {}): S
   if (!stored) return {};
   const age = now.getTime() - new Date(stored.savedAt).getTime();
   if (age < 0 || age >= VALID_FOR_MS) return {};
+  // O aparelho pode ter qualquer coisa guardada: só volta o que o POST aceita, para um valor
+  // estragado não dar 400 em todo cadastro por 30 dias.
+  const signupSource = validSignupSource({ value: stored.signupSource });
+  const utmSource = validUtm({ value: stored.utmSource });
+  const utmMedium = validUtm({ value: stored.utmMedium });
+  const utmCampaign = validUtm({ value: stored.utmCampaign });
   return {
-    ...(stored.signupSource && { signupSource: stored.signupSource }),
-    ...(stored.utmSource && { utmSource: stored.utmSource }),
-    ...(stored.utmMedium && { utmMedium: stored.utmMedium }),
-    ...(stored.utmCampaign && { utmCampaign: stored.utmCampaign }),
+    ...(signupSource && { signupSource }),
+    ...(utmSource && { utmSource }),
+    ...(utmMedium && { utmMedium }),
+    ...(utmCampaign && { utmCampaign }),
   };
+}
+
+function validSignupSource({ value }: { value: unknown }) {
+  return Object.values(CreateWeddingBodySignupSource).find((source) => source === value);
+}
+
+function validUtm({ value }: { value: unknown }) {
+  return typeof value === 'string' && value.trim() !== '' && value.length <= UTM_MAX_LENGTH
+    ? value
+    : undefined;
 }
 
 function utm({ value }: { value: string | null }) {
