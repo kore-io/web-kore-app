@@ -1,0 +1,44 @@
+/*
+ * Cartão de perfil (Acessos, Penpot): cartão branco, borda border de 1 px, raio md, 16 px
+ * de respiro e 12 px entre o ícone (círculo de 40 px em primary.tint, ícone de 24 px em
+ * primary.dark), o texto e a seta (24 px, gray.700). O último usado: 2 px em
+ * primary.base (borda mais anel interno, sem mudar o tamanho) e shadow.sm. O respiro é
+ * de 15 px mais a borda de 1 px, porque o traço do Penpot é interno.
+ */
+.kore-profile-option {
+  @apply flex w-full cursor-pointer items-center gap-3 rounded-md border border-border bg-card p-3.75 text-left transition;
+  @apply focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}
+
+.kore-profile-option--highlighted {
+  @apply border-primary-base shadow-sm inset-ring inset-ring-primary-base;
+}
+
+.kore-profile-option__icon {
+  @apply flex size-10 shrink-0 items-center justify-center rounded-full bg-primary-tint text-primary-dark;
+}
+
+.kore-profile-option__icon > svg {
+  @apply size-6;
+}
+
+.kore-profile-option__text {
+  @apply flex min-w-0 flex-1 flex-col items-start gap-0.5;
+}
+
+.kore-profile-option__title {
+  @apply type-label text-ink;
+}
+
+.kore-profile-option__description {
+  @apply type-caption text-gray-700;
+}
+
+.kore-profile-option__chevron {
+  @apply size-6 shrink-0 text-gray-700;
+}
+
+/* Lista dos cartões: 12 px entre eles. */
+.kore-profiles {
+  @apply flex flex-col gap-3;
+}

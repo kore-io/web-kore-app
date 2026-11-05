@@ -7,7 +7,14 @@ import { useTranslation } from 'react-i18next';
  * no pé; no tablet, um cartão de 480 px centralizado; no computador, o painel da marca à
  * esquerda e a coluna de 400 px à direita, sem o logo de cima.
  */
-export function AccessLayout({ children }: { children: ReactNode }) {
+export function AccessLayout({
+  children,
+  showLegal = true,
+}: {
+  children: ReactNode;
+  /** A Seleção de perfil não tem a linha legal (Penpot e Voz). */
+  showLegal?: boolean;
+}) {
   const { t } = useTranslation('access');
   const { t: tCommon } = useTranslation('common');
   return (
@@ -27,7 +34,7 @@ export function AccessLayout({ children }: { children: ReactNode }) {
           </div>
           {children}
         </div>
-        <p className="kore-access__legal">{t('legal')}</p>
+        {showLegal && <p className="kore-access__legal">{t('legal')}</p>}
       </main>
     </div>
   );
