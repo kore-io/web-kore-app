@@ -11,3 +11,4 @@
 @import '../app/layout/app-shell.css' layer(components);
 @import '../features/access/components/access-layout.css' layer(components);
 @import '../features/access/components/sign-in-email-step.css' layer(components);
+@import '../features/access/components/profile-option.css' layer(components);

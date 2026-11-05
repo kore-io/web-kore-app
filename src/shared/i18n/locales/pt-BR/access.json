@@ -69,5 +69,24 @@
       "title": "Não foi possível entrar com o Google",
       "description": "Tente de novo ou receba um código no seu e-mail."
     }
+  },
+  "profiles": {
+    "chooseTitle": "Com qual perfil você quer entrar?",
+    "chooseDescription": "{{name}}, sua conta tem dois perfis. Você pode trocar depois pelo menu, sem sair.",
+    "noneTitle": "Como você quer usar o Kore?",
+    "noneDescription": "Ainda não há nenhum perfil com {{email}}. Escolha um para começar; dá para criar outro depois.",
+    "lastUsed": "Último usado",
+    "useAnotherAccount": "Entrar com outra conta",
+    "planner": "Cerimonialista",
+    "createWedding": "Criar o site do casamento",
+    "createWeddingDescription": "Para o casal: site, lista de convidados e confirmações",
+    "partner": "Quero fazer parceria",
+    "partnerDescription": "Para cerimonialistas: todos os casamentos num painel e comissão por casal",
+    "plannerWeddings_zero": "{{organization}} · Nenhum casamento ainda",
+    "plannerWeddings_one": "{{organization}} · {{count}} casamento",
+    "plannerWeddings_other": "{{organization}} · {{count}} casamentos",
+    "weddingTitle": "Casamento {{couple}}",
+    "weddingPlace": "{{city}} ({{state}})",
+    "dateToBeDefined": "Data a definir"
   }
 }
