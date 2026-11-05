@@ -9,6 +9,8 @@ on:
 
 permissions:
   contents: read
+  # O @kore-io/design vem do GitHub Packages da org.
+  packages: read
 
 # Um push novo cancela o anterior na mesma branch, menos em homolog e production.
 concurrency:
@@ -39,8 +41,14 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: pnpm
+          # Grava um .npmrc de usuário (fora do repositório) com o token do job para o
+          # GitHub Packages; o pnpm não expande variável em credencial do .npmrc do projeto.
+          registry-url: https://npm.pkg.github.com
+          scope: '@kore-io'
 
       - run: pnpm install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: pnpm format:check
       - run: pnpm lint
       - run: pnpm typecheck

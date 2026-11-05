@@ -10,7 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint .",
+    "lint": "eslint . && stylelint \"src/**/*.css\" --allow-empty-input",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky"
@@ -29,9 +29,16 @@
       "eslint --fix",
       "prettier --write"
     ],
-    "*.{json,md,css,yml,html}": "prettier --write"
+    "*.css": [
+      "stylelint",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,html}": "prettier --write"
   },
   "dependencies": {
+    "@fontsource/cormorant-garamond": "^5.3.0",
+    "@fontsource/nunito-sans": "^5.3.0",
+    "@kore-io/design": "0.1.0-homolog.10",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-router": "^8.5.1"
@@ -40,6 +47,7 @@
     "@commitlint/cli": "^21.2.4",
     "@commitlint/config-conventional": "^21.2.4",
     "@eslint/js": "^10.0.1",
+    "@tailwindcss/vite": "^4.3.4",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
@@ -56,6 +64,8 @@
     "jsdom": "^31.0.0",
     "lint-staged": "^17.6.0",
     "prettier": "^3.9.10",
+    "stylelint": "^18.0.0",
+    "tailwindcss": "^4.3.4",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.72.1",
     "vite": "^8.3.6",
