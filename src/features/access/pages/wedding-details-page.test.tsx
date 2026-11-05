@@ -138,11 +138,11 @@ describe('Dados do casamento ligados à API (decisões 155, 166 e 169)', () => {
       expect(screen.getByRole('button', { name: 'Criar nosso site' })).toBeEnabled(),
     );
     await user.click(screen.getByRole('button', { name: 'Criar nosso site' }));
-    // O primeiro nome, e só o Fazer isso depois até a rota de convites (169(3)).
+    // O primeiro nome; com a rota de convites, o envio aparece (RN10).
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Convide Marcos' }),
     ).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Enviar convite' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Enviar convite' })).toBeInTheDocument();
     expect(created).toEqual({
       myName: 'Ana Beatriz',
       myTitle: 'bride',
@@ -224,5 +224,97 @@ describe('Dados do casamento ligados à API (decisões 155, 166 e 169)', () => {
     await submitWith(apiError({ status: 500, body: { error: 'Internal Server Error' } }));
     expect(await screen.findByText('Não foi possível continuar')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Conte sobre o casamento' })).toBeInTheDocument();
+  });
+
+  async function createdWith(invite: (request: { body: unknown }) => Response) {
+    const user = userEvent.setup();
+    const sent: unknown[] = [];
+    api((request) => {
+      if (request.method === 'POST' && request.path === '/v1/weddings')
+        return Response.json(
+          {
+            weddingId: 'w1',
+            slug: 'ana-e-marcos',
+            status: 'draft',
+            timezone: 'America/Sao_Paulo',
+            referrer: null,
+          },
+          { status: 201 },
+        );
+      if (request.path === '/v1/weddings/w1/access-invitations') {
+        sent.push(request.body);
+        return invite(request);
+      }
+      return available(request);
+    });
+    const view = renderRoute({ url: '/cadastro' });
+    await fillForm(user);
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Criar nosso site' })).toBeEnabled(),
+    );
+    await user.click(screen.getByRole('button', { name: 'Criar nosso site' }));
+    await screen.findByRole('heading', { name: 'Convide Marcos' });
+    return { user, sent, ...view };
+  }
+
+  it('envia o convite do parceiro, avisa no Toast e segue (RN10, decisão 170)', async () => {
+    const { user, sent, router } = await createdWith(() =>
+      Response.json(
+        {
+          invitations: [
+            {
+              id: 'i1',
+              email: 'marcos@exemplo.com',
+              kind: 'partner',
+              expiresAt: '2026-12-05T12:00:00Z',
+              resent: false,
+            },
+          ],
+        },
+        { status: 201 },
+      ),
+    );
+    await user.type(
+      screen.getByRole('textbox', { name: 'E-\u2060mail de Marcos' }),
+      'marcos@exemplo.com',
+    );
+    await user.click(screen.getByRole('button', { name: 'Enviar convite' }));
+    expect(await screen.findByText('Convite enviado para marcos@exemplo.com.')).toBeInTheDocument();
+    expect(sent).toEqual([{ kind: 'partner', emails: ['marcos@exemplo.com'] }]);
+    await waitFor(() => expect(router.state.location.pathname).not.toBe('/cadastro'));
+  });
+
+  it('e-mail inválido no convite: o erro da 155, sem enviar; o 400 da API também', async () => {
+    const { user, sent } = await createdWith(() =>
+      apiError({
+        status: 400,
+        body: { error: 'Bad Request', message: ['emails.0 must be an email'] },
+      }),
+    );
+    const email = screen.getByRole('textbox', { name: 'E-\u2060mail de Marcos' });
+    await user.type(email, 'marcos@');
+    await user.click(screen.getByRole('button', { name: 'Enviar convite' }));
+    expect(email).toHaveAccessibleDescription('Informe um e-\u2060mail válido.');
+    expect(sent).toEqual([]);
+    await user.clear(email);
+    await user.type(email, 'marcos@exemplo.com');
+    await user.click(screen.getByRole('button', { name: 'Enviar convite' }));
+    await waitFor(() => expect(sent).toHaveLength(1));
+    await waitFor(() =>
+      expect(email).toHaveAccessibleDescription('Informe um e-\u2060mail válido.'),
+    );
+  });
+
+  it('erro da API no convite: o aviso genérico e a tela fica', async () => {
+    const { user } = await createdWith(() =>
+      apiError({ status: 409, body: { error: 'OWNERS_FULL' } }),
+    );
+    await user.type(
+      screen.getByRole('textbox', { name: 'E-\u2060mail de Marcos' }),
+      'marcos@exemplo.com',
+    );
+    await user.click(screen.getByRole('button', { name: 'Enviar convite' }));
+    expect(await screen.findByText('Não foi possível continuar')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Convide Marcos' })).toBeInTheDocument();
   });
 });

@@ -167,7 +167,8 @@
     "emailLabel": "E-mail de {{name}}",
     "submit": "Enviar convite",
     "later": "Fazer isso depois",
-    "laterNote": "Dá para convidar depois pelo Dashboard."
+    "laterNote": "Dá para convidar depois pelo Dashboard.",
+    "sent": "Convite enviado para {{email}}."
   },
   "whoAreYou": {
     "title": "Quem é você?",

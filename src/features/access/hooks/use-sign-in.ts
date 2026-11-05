@@ -11,14 +11,13 @@ import { apiUrl } from '../../../shared/api/http-client';
 import { redirectTo } from '../../../shared/browser/redirect';
 import { useCountdown } from '../../../shared/hooks/use-countdown';
 import type { SignInNotice } from '../components/sign-in-alert';
+import { isValidEmail } from '../email';
 import { requestCodeOutcome, verifyOutcome } from '../login-errors';
 import { destinationAfterLogin } from '../login-navigation';
 import { useGoToDestination } from './use-go-to-destination';
 
 /** RN04 do Login: 60 s entre pedidos (o reinício depois do código novo da RN05). */
 const RESEND_INTERVAL_MS = 60_000;
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export interface UseSignInOptions {
   /** De onde a pessoa veio (RN06); padrão none (tela Entrar do site). */
@@ -93,7 +92,7 @@ export function useSignIn({
     codeInvalid,
     submitEmail({ email: typed }: { email: string }) {
       const value = typed.trim();
-      if (!EMAIL_PATTERN.test(value)) {
+      if (!isValidEmail({ email: value })) {
         setEmailError(t('signIn.emailInvalid'));
         return;
       }
