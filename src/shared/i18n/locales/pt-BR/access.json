@@ -16,7 +16,8 @@
     "couplePrompt": "Vão casar?",
     "coupleLink": "Criar meu site",
     "plannerPrompt": "É cerimonialista?",
-    "plannerLink": "Fazer parceria"
+    "plannerLink": "Fazer parceria",
+    "emailInvalid": "Informe um e-mail válido."
   },
   "sessionExpired": {
     "title": "Sua sessão terminou",
@@ -68,6 +69,14 @@
     "googleFailed": {
       "title": "Não foi possível entrar com o Google",
       "description": "Tente de novo ou receba um código no seu e-mail."
+    },
+    "rateLimited": {
+      "title": "Você pediu muitos códigos",
+      "description": "Espere um pouco e tente de novo."
+    },
+    "generic": {
+      "title": "Não foi possível continuar",
+      "description": "Confira sua conexão e tente de novo."
     }
   },
   "profiles": {

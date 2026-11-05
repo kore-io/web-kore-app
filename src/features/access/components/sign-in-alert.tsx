@@ -17,7 +17,11 @@ export type SignInNotice =
   | { kind: 'locked'; minutes: number }
   | { kind: 'google-unverified' }
   | { kind: 'blocked' }
-  | { kind: 'google-failed' };
+  | { kind: 'google-failed' }
+  /** 429 RATE_LIMITED, o limite por IP (decisões 142(2) e 157(2)). */
+  | { kind: 'rate-limited' }
+  /** Rede fora, 5xx ou origem recusada (decisão 157(3)). */
+  | { kind: 'generic' };
 
 /** O Alert da lib com os textos da Voz para cada situação do login. */
 export function SignInAlert({ notice }: { notice: SignInNotice }) {
@@ -86,6 +90,18 @@ export function SignInAlert({ notice }: { notice: SignInNotice }) {
       return (
         <Alert tone="danger" role="alert" title={t('alerts.googleFailed.title')}>
           {t('alerts.googleFailed.description')}
+        </Alert>
+      );
+    case 'rate-limited':
+      return (
+        <Alert tone="danger" role="alert" title={t('alerts.rateLimited.title')}>
+          {t('alerts.rateLimited.description')}
+        </Alert>
+      );
+    case 'generic':
+      return (
+        <Alert tone="danger" role="alert" title={t('alerts.generic.title')}>
+          {t('alerts.generic.description')}
         </Alert>
       );
   }

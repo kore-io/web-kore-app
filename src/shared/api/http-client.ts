@@ -1,6 +1,11 @@
 /** Endereço da API (ex.: http://localhost:3000); vem do VITE_API_URL. */
 const API_URL = import.meta.env.VITE_API_URL;
 
+/** Endereço completo de um caminho da API (ex.: o início do login com Google). */
+export function apiUrl({ path }: { path: string }) {
+  return `${API_URL}${path}`;
+}
+
 /** Resposta de erro da API: o status e o corpo (`error` é o código, ex.: TOO_SOON). */
 export class ApiError<TBody = unknown> extends Error {
   readonly status: number;
@@ -43,7 +48,7 @@ async function readBody(response: Response): Promise<unknown> {
  * ficam em subdomínios do mesmo site, SameSite=Lax) e erro tipado em ApiError.
  */
 export async function httpClient<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const response = await fetch(`${API_URL}${path}`, {
+  const response = await fetch(apiUrl({ path }), {
     ...init,
     credentials: 'include',
     headers: { Accept: 'application/json', ...init.headers },
