@@ -8,7 +8,14 @@ describe('Cadastro — Dados do casamento', () => {
   it('envia os valores nos nomes do contrato', async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
-    render(<WeddingDetailsForm onSubmit={onSubmit} />);
+    const onValuesChange = vi.fn();
+    render(
+      <WeddingDetailsForm
+        onSubmit={onSubmit}
+        onValuesChange={onValuesChange}
+        slugStatus={{ kind: 'available', slug: 'ana-e-marcos' }}
+      />,
+    );
     expect(
       screen.getByRole('heading', { level: 1, name: 'Conte sobre o casamento' }),
     ).toBeInTheDocument();
@@ -31,6 +38,27 @@ describe('Cadastro — Dados do casamento', () => {
       state: 'SP',
       slug: 'ana-e-marcos',
     });
+    expect(onValuesChange).toHaveBeenLastCalledWith(expect.objectContaining({ city: 'Campinas' }));
+  });
+
+  it('Criar nosso site só habilita com o endereço livre (RN05)', () => {
+    const { rerender } = render(<WeddingDetailsForm onSubmit={vi.fn()} />);
+    expect(screen.getByRole('button', { name: 'Criar nosso site' })).toBeDisabled();
+    rerender(
+      <WeddingDetailsForm
+        onSubmit={vi.fn()}
+        slugStatus={{ kind: 'available', slug: 'ana-e-marcos' }}
+      />,
+    );
+    expect(screen.getByRole('button', { name: 'Criar nosso site' })).toBeEnabled();
+  });
+
+  it('nomes e cidade com até 80 caracteres (decisão 166); o endereço pode vir de fora', () => {
+    render(<WeddingDetailsForm onSubmit={vi.fn()} slugValue="ana-e-marcos" />);
+    for (const name of ['Seu nome', 'Com quem você vai casar?', 'Cidade']) {
+      expect(screen.getByRole('textbox', { name })).toHaveAttribute('maxlength', '80');
+    }
+    expect(screen.getByRole('textbox', { name: 'Endereço do site' })).toHaveValue('ana-e-marcos');
   });
 
   it('a pergunta noivo/noiva é um grupo com nome, e a UF tem as 27 siglas', () => {

@@ -6,7 +6,9 @@ import { FormField } from '../../../shared/components/form-field';
 export interface InvitePartnerStepProps {
   /** Nome de quem casa com a pessoa, como digitado no cadastro. */
   partnerName: string;
-  onSubmit: (values: { email: string }) => void;
+  /** Envio do convite; sem ele (antes da rota de convites, decisão 169(3)), a tela mostra
+   * só o Fazer isso depois, sem o campo e sem o Enviar convite. */
+  onSubmit?: (values: { email: string }) => void;
   onSkip: () => void;
   emailError?: string;
   submitting?: boolean;
@@ -28,7 +30,7 @@ export function InvitePartnerStep({
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const email = new FormData(event.currentTarget).get('email');
-    onSubmit({ email: typeof email === 'string' ? email.trim() : '' });
+    onSubmit?.({ email: typeof email === 'string' ? email.trim() : '' });
   }
 
   return (
@@ -39,27 +41,29 @@ export function InvitePartnerStep({
           {t('invitePartner.description', { name: partnerName })}
         </p>
       </div>
-      <form className="kore-sign-in__form" onSubmit={handleSubmit} noValidate>
-        <FormField
-          label={t('invitePartner.emailLabel', { name: partnerName })}
-          {...(emailError !== undefined && { hint: emailError, hintTone: 'danger' as const })}
-        >
-          {({ id, describedBy, invalid }) => (
-            <Input
-              id={id}
-              name="email"
-              type="email"
-              autoComplete="off"
-              inputMode="email"
-              invalid={invalid}
-              {...(describedBy !== undefined && { 'aria-describedby': describedBy })}
-            />
-          )}
-        </FormField>
-        <Button type="submit" size="lg" className="kore-sign-in__submit" disabled={submitting}>
-          {t('invitePartner.submit')}
-        </Button>
-      </form>
+      {onSubmit && (
+        <form className="kore-sign-in__form" onSubmit={handleSubmit} noValidate>
+          <FormField
+            label={t('invitePartner.emailLabel', { name: partnerName })}
+            {...(emailError !== undefined && { hint: emailError, hintTone: 'danger' as const })}
+          >
+            {({ id, describedBy, invalid }) => (
+              <Input
+                id={id}
+                name="email"
+                type="email"
+                autoComplete="off"
+                inputMode="email"
+                invalid={invalid}
+                {...(describedBy !== undefined && { 'aria-describedby': describedBy })}
+              />
+            )}
+          </FormField>
+          <Button type="submit" size="lg" className="kore-sign-in__submit" disabled={submitting}>
+            {t('invitePartner.submit')}
+          </Button>
+        </form>
+      )}
       <button
         type="button"
         className="kore-sign-in__link kore-sign-in__link--standalone kore-invite-partner__later"

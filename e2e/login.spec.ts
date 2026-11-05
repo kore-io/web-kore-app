@@ -136,4 +136,51 @@ test.describe('Login sem senha (Login sem senha e sessão)', () => {
     await expect(page).toHaveURL(/\/cadastro$/);
     await expectSignedIn({ page, email });
   });
+
+  test('Cadastro completo: cria o casamento e oferece convidar o parceiro; de novo, já é dono (RN06, RN07, RN10)', async ({
+    page,
+  }) => {
+    const email = newEmail({ label: 'casamento' });
+    const unique = String(Date.now()).slice(-6);
+    await page.goto('/cadastro');
+    await page.getByRole('textbox', { name: 'E-\u2060mail' }).fill(email);
+    await page.getByRole('button', { name: 'Continuar', exact: true }).click();
+    const code = codeFrom({ email: await latestEmail({ request: page.request, to: email }) });
+    await page.keyboard.type(code);
+    await page.getByRole('button', { name: 'Entrar' }).click();
+    await expect(page.getByRole('heading', { name: 'Conte sobre o casamento' })).toBeVisible();
+
+    await page.getByRole('textbox', { name: 'Seu nome' }).fill(`Ana${unique} Moreira`);
+    await page
+      .locator('label')
+      .filter({ hasText: /^Noiva$/ })
+      .click();
+    await page.getByRole('textbox', { name: 'Com quem você vai casar?' }).fill('Marcos Rocha');
+    await page.getByRole('textbox', { name: 'Cidade' }).fill('Campinas');
+    await page.getByRole('combobox', { name: 'UF' }).selectOption('SP');
+    // RN04: o endereço vem dos primeiros nomes; RN05: checado e livre.
+    await expect(page.getByRole('textbox', { name: 'Endereço do site' })).toHaveValue(
+      `ana${unique}-e-marcos`,
+    );
+    await expect(page.getByRole('button', { name: 'Criar nosso site' })).toBeEnabled();
+    await page.getByRole('button', { name: 'Criar nosso site' }).click();
+
+    // RN10: depois de criar, convidar o parceiro (opcional). A ida ao Dashboard pelo
+    // "Fazer isso depois" depende do perfil do casal ativo na sessão (pendente com a API).
+    await expect(page.getByRole('heading', { name: /Marcos/ })).toBeVisible();
+
+    // RN06: dono de um casamento ativo não cria outro.
+    await page.goto('/cadastro');
+    await page.getByRole('textbox', { name: 'Seu nome' }).fill(`Ana${unique} Moreira`);
+    await page
+      .locator('label')
+      .filter({ hasText: /^Noivo$/ })
+      .click();
+    await page.getByRole('textbox', { name: 'Com quem você vai casar?' }).fill('Paula');
+    await page.getByRole('textbox', { name: 'Cidade' }).fill('Campinas');
+    await page.getByRole('combobox', { name: 'UF' }).selectOption('SP');
+    await expect(page.getByRole('button', { name: 'Criar nosso site' })).toBeEnabled();
+    await page.getByRole('button', { name: 'Criar nosso site' }).click();
+    await expect(page.getByText('Você já tem um casamento no Kore.')).toBeVisible();
+  });
 });

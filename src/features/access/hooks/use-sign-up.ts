@@ -47,6 +47,7 @@ export function useSignUp() {
     stage: stageOf({ me }),
     retry: () => void me.refetch(),
     referral: referralBox,
+    referralCode: code,
     signIn,
   };
 }
