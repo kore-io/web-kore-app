@@ -5,7 +5,7 @@ import kore from '@kore-io/design/eslint';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['dist', 'dev-dist', 'node_modules', '.maestri'] },
+  { ignores: ['dist', 'dev-dist', 'node_modules', '.maestri', 'src/shared/api/generated'] },
   js.configs.recommended,
   ...tseslint.configs.strict,
   {

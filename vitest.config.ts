@@ -7,5 +7,6 @@ export default defineConfig({
     environment: 'jsdom',
     include: ['src/**/*.test.{ts,tsx}', 'tests/**/*.test.{ts,tsx}'],
     setupFiles: ['tests/setup.ts'],
+    env: { VITE_API_URL: 'http://api.test' },
   },
 });
