@@ -78,12 +78,26 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
     expect(requests).toContain('POST /v1/auth/logout');
   });
 
-  it('se o Sair falhar, avisa no Toast e fica na área (decisão 163(5))', async () => {
+  it('Sair com a sessão já encerrada (401) vale como saído', async () => {
     const user = userEvent.setup();
-    mockApi(({ path }) => {
-      if (path === '/v1/auth/logout') throw new TypeError('Failed to fetch');
-      return Response.json(me());
-    });
+    mockApi(({ path }) =>
+      path === '/v1/auth/logout'
+        ? apiError({ status: 401, body: { error: 'SESSION_EXPIRED' } })
+        : Response.json(me()),
+    );
+    const { router } = renderRoute({ url: '/app' });
+    await user.click(await screen.findByRole('button', { name: 'Menu do usuário' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Sair' }));
+    await waitFor(() => expect(router.state.location.pathname).toBe('/entrar'));
+    expect(screen.queryByText(/Não foi possível continuar/)).toBeNull();
+  });
+
+  it.each([
+    ['rede', () => Promise.reject(new TypeError('Failed to fetch'))],
+    ['5xx', () => apiError({ status: 503, body: { error: 'Service Unavailable' } })],
+  ])('se o Sair falhar (%s), avisa no Toast e fica na área (decisão 163(5))', async (_, fail) => {
+    const user = userEvent.setup();
+    mockApi(({ path }) => (path === '/v1/auth/logout' ? fail() : Response.json(me())));
     const { router } = renderRoute({ url: '/app' });
     await user.click(await screen.findByRole('button', { name: 'Menu do usuário' }));
     await user.click(await screen.findByRole('menuitem', { name: 'Sair' }));

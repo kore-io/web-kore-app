@@ -26,7 +26,11 @@ function splitUrl(url: string) {
   return { pathname: parsed.pathname, search: parsed.search };
 }
 
-type Handler = (request: { method: string; path: string; body: unknown }) => Response;
+type Handler = (request: {
+  method: string;
+  path: string;
+  body: unknown;
+}) => Response | Promise<Response>;
 
 /** Troca o fetch por um que responde pela rota (método e caminho da API). */
 export function mockApi(handler: Handler) {
