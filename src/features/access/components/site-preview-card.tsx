@@ -1,5 +1,9 @@
 import type { SiteBackgroundName, SiteColorsName, SiteFontsName } from '@kore-io/design';
 import { useTranslation } from 'react-i18next';
+// Corpo do tema padrão do site (romântico: Lato), usado no rótulo, na data e na pílula; o
+// título usa a Cormorant, já carregada pelo app. Os outros temas entram com o site.
+import '@fontsource/lato/400.css';
+import '@fontsource/lato/700.css';
 
 export interface SitePreviewCardProps {
   couple: string;
