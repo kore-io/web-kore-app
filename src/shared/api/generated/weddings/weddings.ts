@@ -232,7 +232,9 @@ export const getWeddingsControllerCreateV1Url = () => {
 };
 
 /**
- * @summary Cria o casamento em rascunho, com a pessoa como dona (RN02 a RN09, RN11 de Cadastro).
+ * @summary Cria o casamento em rascunho, com a pessoa como dona (RN02 a RN09, RN11 de
+Cadastro), e passa a sessão ao perfil de casal (activeProfile couple,
+decisão 171). Nos erros, a sessão não muda.
  */
 export const weddingsControllerCreateV1 = async (
   createWeddingBody: CreateWeddingBody,
@@ -328,7 +330,9 @@ export type WeddingsControllerCreateV1MutationError = ErrorType<
 export type WeddingsControllerCreateV1MutationVariables = { data: CreateWeddingBody };
 
 /**
- * @summary Cria o casamento em rascunho, com a pessoa como dona (RN02 a RN09, RN11 de Cadastro).
+ * @summary Cria o casamento em rascunho, com a pessoa como dona (RN02 a RN09, RN11 de
+Cadastro), e passa a sessão ao perfil de casal (activeProfile couple,
+decisão 171). Nos erros, a sessão não muda.
  */
 export const useWeddingsControllerCreateV1 = <
   TError = ErrorType<
