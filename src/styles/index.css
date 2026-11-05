@@ -10,3 +10,4 @@
 /* CSS do app, na camada components, depois do da lib. */
 @import '../app/layout/app-shell.css' layer(components);
 @import '../features/access/components/access-layout.css' layer(components);
+@import '../features/access/components/sign-in-email-step.css' layer(components);

@@ -4,5 +4,22 @@
     "description": "Lista de convidados, site e confirmações num lugar só. O casal acompanha tudo, e quem faz o cerimonial acompanha todos os casamentos num painel.",
     "site": "kore.com.br"
   },
-  "legal": "Ao continuar, você concorda com os Termos de uso e a Política de privacidade do Kore."
+  "legal": "Ao continuar, você concorda com os Termos de uso e a Política de privacidade do Kore.",
+  "signIn": {
+    "title": "Entre no Kore",
+    "description": "Use sua conta Google ou receba um código no seu e-mail. Não tem senha.",
+    "google": "Continuar com Google",
+    "or": "ou",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "seu@email.com",
+    "submit": "Receber código",
+    "couplePrompt": "Vão casar?",
+    "coupleLink": "Criar meu site",
+    "plannerPrompt": "É cerimonialista?",
+    "plannerLink": "Fazer parceria"
+  },
+  "sessionExpired": {
+    "title": "Sua sessão terminou",
+    "description": "Entre de novo para continuar. Suas informações estão salvas."
+  }
 }
