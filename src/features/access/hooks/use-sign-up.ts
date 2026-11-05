@@ -2,8 +2,21 @@ import { useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { useMeControllerMeV1 } from '../../../shared/api/generated/me/me';
 import { useReferralControllerReferralV1 } from '../../../shared/api/generated/referrals/referrals';
+import { ApiError } from '../../../shared/api/http-client';
 import { currentReferralCode } from '../referral-storage';
 import { useSignIn } from './use-sign-in';
+
+/**
+ * Em que passo o Cadastro abre: só o 401 (sem sessão) leva ao Início; com a rede fora ou
+ * 5xx, quem já estava conectado não pode cair no login: a tela mostra o aviso (decisão 164).
+ */
+function stageOf({ me }: { me: { isPending: boolean; data?: unknown; error: unknown } }) {
+  if (me.isPending) return 'loading' as const;
+  if (me.data) return 'details' as const;
+  return me.error instanceof ApiError && me.error.status === 401
+    ? ('start' as const)
+    : ('failed' as const);
+}
 
 /**
  * Cadastro do casal (/cadastro, decisão 165): sem sessão, o Início com o login do Entrar
@@ -31,11 +44,8 @@ export function useSignUp() {
       : undefined;
 
   return {
-    stage: me.isPending
-      ? ('loading' as const)
-      : me.data
-        ? ('details' as const)
-        : ('start' as const),
+    stage: stageOf({ me }),
+    retry: () => void me.refetch(),
     referral: referralBox,
     signIn,
   };

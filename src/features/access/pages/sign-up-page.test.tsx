@@ -121,4 +121,33 @@ describe('Cadastro ligado à API (decisão 165)', () => {
       }),
     );
   });
+
+  it.each([
+    ['rede', () => Promise.reject(new TypeError('Failed to fetch'))],
+    ['5xx', () => apiError({ status: 503, body: { error: 'Service Unavailable' } })],
+  ])(
+    'com o /me falhando (%s), o aviso com o Tentar de novo, e não o login (decisão 164)',
+    async (_, fail) => {
+      const user = userEvent.setup();
+      let meCalls = 0;
+      mockApi(({ path }) => {
+        if (path !== '/v1/me') return noSession();
+        meCalls += 1;
+        return meCalls === 1
+          ? fail()
+          : Response.json({
+              user: { id: 'u1', name: null, email: 'ana@exemplo.com', platformRole: 'none' },
+              activeProfile: null,
+              authenticatedAt: '2026-11-05T12:00:00Z',
+            });
+      });
+      renderRoute({ url: '/cadastro' });
+      expect(await screen.findByText('Não foi possível continuar')).toBeInTheDocument();
+      expect(screen.queryByRole('heading', { name: 'Crie o site do casamento' })).toBeNull();
+      await user.click(screen.getByRole('button', { name: 'Tentar de novo' }));
+      expect(
+        await screen.findByRole('heading', { name: 'Conte sobre o casamento' }),
+      ).toBeInTheDocument();
+    },
+  );
 });

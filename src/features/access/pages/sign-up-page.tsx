@@ -1,4 +1,5 @@
 import { externalUrls, paths } from '../../../app/paths';
+import { LoadError } from '../../../shared/components/load-error';
 import { AccessLayout } from '../components/access-layout';
 import { SignInAlert } from '../components/sign-in-alert';
 import { SignInCodeStep } from '../components/sign-in-code-step';
@@ -11,8 +12,9 @@ import { useSignUp } from '../hooks/use-sign-up';
  * de indicação), o passo do código do Entrar e, com sessão, os Dados do casamento.
  */
 export function SignUpPage() {
-  const { stage, referral, signIn } = useSignUp();
+  const { stage, referral, signIn, retry } = useSignUp();
   if (stage === 'loading') return null;
+  if (stage === 'failed') return <LoadError onRetry={retry} />;
 
   if (stage === 'details') {
     return (
