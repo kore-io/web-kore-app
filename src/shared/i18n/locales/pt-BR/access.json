@@ -21,5 +21,53 @@
   "sessionExpired": {
     "title": "Sua sessão terminou",
     "description": "Entre de novo para continuar. Suas informações estão salvas."
+  },
+  "code": {
+    "title": "Confira seu e-mail",
+    "description": "Enviamos um código de 6 números para {{email}}. Você também pode entrar pelo botão que está no mesmo e-mail.",
+    "submit": "Entrar",
+    "resendIn": "Reenviar código em {{time}}",
+    "resend": "Reenviar código",
+    "useAnotherEmail": "Usar outro e-mail",
+    "resent": "Enviamos um código novo para {{email}}.",
+    "inputLabel": "Código de 6 números",
+    "digitLabel": "Número {{n}} de {{length}}"
+  },
+  "alerts": {
+    "wrongCode": {
+      "title": "Esse código não confere",
+      "description_one": "Confira os números no e-mail e tente de novo. Você ainda tem {{count}} tentativa; depois disso, pedimos um código novo para você.",
+      "description_other": "Confira os números no e-mail e tente de novo. Você ainda tem {{count}} tentativas; depois disso, pedimos um código novo para você."
+    },
+    "codeExpired": {
+      "title": "Esse código não vale mais",
+      "description": "Peça um novo em Reenviar código. Se você pediu mais de um, use o do e-mail mais recente."
+    },
+    "tooManyRequests": {
+      "title": "Você pediu muitos códigos",
+      "description_one": "Tente de novo em {{count}} minuto.",
+      "description_other": "Tente de novo em {{count}} minutos."
+    },
+    "newCodeSent": {
+      "title": "Pedimos um código novo para você",
+      "description": "Depois de 5 tentativas, enviamos outro para {{email}}. Use o código do e-mail mais recente."
+    },
+    "locked": {
+      "title": "Esse código não vale mais",
+      "description_one": "Você pediu muitos códigos. Tente de novo em {{count}} minuto.",
+      "description_other": "Você pediu muitos códigos. Tente de novo em {{count}} minutos."
+    },
+    "googleUnverified": {
+      "title": "O Google não confirmou seu e-mail",
+      "description": "Para entrar, receba um código no seu e-mail."
+    },
+    "blocked": {
+      "title": "Não foi possível entrar com esta conta",
+      "description": "Escreva para <supportLink>{{supportEmail}}</supportLink>."
+    },
+    "googleFailed": {
+      "title": "Não foi possível entrar com o Google",
+      "description": "Tente de novo ou receba um código no seu e-mail."
+    }
   }
 }

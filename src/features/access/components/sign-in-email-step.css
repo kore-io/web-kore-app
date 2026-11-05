@@ -57,3 +57,14 @@
 .kore-sign-in__or > .kore-divider {
   @apply flex-1;
 }
+
+/* Controle único de reenviar (decisão 150): contagem em body.md gray.700, link no zero. */
+.kore-sign-in__resend {
+  @apply type-body-md text-gray-700;
+  @apply enabled:type-link enabled:cursor-pointer enabled:text-primary-dark;
+}
+
+.kore-sign-in__link {
+  @apply cursor-pointer;
+  @apply focus-visible:rounded-sm focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}
