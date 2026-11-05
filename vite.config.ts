@@ -1,3 +1,4 @@
+import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
@@ -5,7 +6,7 @@ import { defineConfig } from 'vite';
 export const securityHeaders = { 'Referrer-Policy': 'no-referrer' };
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), tailwindcss()],
   server: { headers: securityHeaders },
   preview: { headers: securityHeaders },
 });

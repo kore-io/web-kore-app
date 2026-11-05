@@ -1,0 +1,8 @@
+/*
+ * Entrada do CSS do app (decisão 131): o Tailwind, o preset e o CSS dos componentes do
+ * @kore-io/design. O CSS das features entra aqui por @import, na camada components;
+ * nele só vale @apply das utilitárias do preset (regras do Stylelint da lib).
+ */
+@import 'tailwindcss';
+@import '@kore-io/design/tailwind.css';
+@import '@kore-io/design/components.css';
