@@ -1,8 +1,8 @@
 import { Outlet } from 'react-router';
-import { useCaptureReferral } from '../features/access/hooks/use-capture-referral';
+import { useCaptureArrival } from '../features/access/hooks/use-capture-arrival';
 
-/** Raiz das rotas: o que vale em qualquer página (o código de indicação da URL). */
+/** Raiz das rotas: o que vale em qualquer página (a indicação e a origem da chegada). */
 export function AppRoot() {
-  useCaptureReferral();
+  useCaptureArrival();
   return <Outlet />;
 }
