@@ -1,6 +1,7 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { expectNoA11yViolations } from '../../../tests/a11y';
 import { apiError, mockApi, renderRoute } from '../../../tests/render-route';
 
 afterEach(() => {
@@ -106,4 +107,26 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
     ).toBeInTheDocument();
     expect(router.state.location.pathname).toBe('/app');
   });
+
+  it.each([
+    ['rede', () => Promise.reject(new TypeError('Failed to fetch'))],
+    ['5xx', () => apiError({ status: 503, body: { error: 'Service Unavailable' } })],
+  ])(
+    'o /me falhando (%s): aviso com o Tentar de novo, que refaz o /me (decisão 164)',
+    async (_, fail) => {
+      const user = userEvent.setup();
+      let calls = 0;
+      mockApi(() => {
+        calls += 1;
+        return calls === 1 ? fail() : Response.json(me());
+      });
+      const { container } = renderRoute({ url: '/app' });
+      expect(await screen.findByText('Não foi possível continuar')).toBeInTheDocument();
+      expect(screen.getByText('Confira sua conexão e tente de novo.')).toBeInTheDocument();
+      await expectNoA11yViolations({ container });
+      await user.click(screen.getByRole('button', { name: 'Tentar de novo' }));
+      expect(await screen.findByRole('button', { name: 'Menu do usuário' })).toBeInTheDocument();
+      expect(calls).toBe(2);
+    },
+  );
 });
