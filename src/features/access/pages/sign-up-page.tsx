@@ -8,6 +8,7 @@ import { SignInAlert } from '../components/sign-in-alert';
 import { SignInCodeStep } from '../components/sign-in-code-step';
 import { SignUpStartStep } from '../components/sign-up-start-step';
 import { WeddingDetailsForm } from '../components/wedding-details-form';
+import { useInvitePartner } from '../hooks/use-invite-partner';
 import { useSignUp } from '../hooks/use-sign-up';
 import { useWeddingDetails } from '../hooks/use-wedding-details';
 
@@ -67,12 +68,13 @@ function WeddingDetailsStage({ referralCode }: { referralCode: string | undefine
       </AccessLayout>
     );
   }
-  if (details.stage === 'invite-partner') {
+  if (details.stage === 'invite-partner' && details.weddingId) {
     return (
-      <AccessLayout pitch="couple" showLegal={false}>
-        {/* Sem o envio até a rota de convites: só o Fazer isso depois (169(3)). */}
-        <InvitePartnerStep partnerName={firstName(details.partnerName)} onSkip={openWedding} />
-      </AccessLayout>
+      <InvitePartnerStage
+        weddingId={details.weddingId}
+        partnerName={firstName(details.partnerName)}
+        onDone={openWedding}
+      />
     );
   }
   return (
@@ -94,4 +96,29 @@ function WeddingDetailsStage({ referralCode }: { referralCode: string | undefine
 /** "Convide Marcos", e não "Convide Marcos Rocha": o primeiro nome, como nos outros textos. */
 function firstName(name: string) {
   return name.trim().split(/\s+/)[0] ?? name;
+}
+
+/** Convidar o parceiro depois de criar (RN10): o envio ou o Fazer isso depois. */
+function InvitePartnerStage({
+  weddingId,
+  partnerName,
+  onDone,
+}: {
+  weddingId: string;
+  partnerName: string;
+  onDone: () => void;
+}) {
+  const invite = useInvitePartner({ weddingId, onDone });
+  return (
+    <AccessLayout pitch="couple" showLegal={false}>
+      <InvitePartnerStep
+        {...(invite.notice && { notice: <SignInAlert notice={invite.notice} /> })}
+        partnerName={partnerName}
+        onSubmit={invite.submit}
+        onSkip={onDone}
+        {...(invite.emailError !== undefined && { emailError: invite.emailError })}
+        submitting={invite.submitting}
+      />
+    </AccessLayout>
+  );
 }

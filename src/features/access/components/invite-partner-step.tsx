@@ -1,9 +1,11 @@
 import { Button, Input } from '@kore-io/design';
-import type { FormEvent } from 'react';
+import type { FormEvent, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FormField } from '../../../shared/components/form-field';
 
 export interface InvitePartnerStepProps {
+  /** Aviso acima do título (ex.: rede fora), um Alert da lib. */
+  notice?: ReactNode;
   /** Nome de quem casa com a pessoa, como digitado no cadastro. */
   partnerName: string;
   /** Envio do convite; sem ele (antes da rota de convites, decisão 169(3)), a tela mostra
@@ -19,6 +21,7 @@ export interface InvitePartnerStepProps {
  * não sabe o gênero de quem casa com a pessoa. Sem a linha legal.
  */
 export function InvitePartnerStep({
+  notice,
   partnerName,
   onSubmit,
   onSkip,
@@ -35,6 +38,7 @@ export function InvitePartnerStep({
 
   return (
     <div className="kore-sign-in">
+      {notice}
       <div className="kore-sign-in__heading">
         <h1 className="kore-sign-in__title">{t('invitePartner.title', { name: partnerName })}</h1>
         <p className="kore-sign-in__description">

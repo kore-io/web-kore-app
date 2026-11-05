@@ -61,6 +61,7 @@ export function useWeddingDetails({ referralCode }: { referralCode?: string | un
   const [notice, setNotice] = useState<SignInNotice>();
   const [conflict, setConflict] = useState<{ slug: string; suggestion: string }>();
   const [stage, setStage] = useState<'form' | 'invite-partner' | 'already-owner'>('form');
+  const [weddingId, setWeddingId] = useState<string>();
   const create = useWeddingsControllerCreateV1();
 
   const slug = typedSlug ?? suggestSlug(values);
@@ -112,7 +113,8 @@ export function useWeddingDetails({ referralCode }: { referralCode?: string | un
         },
       },
       {
-        onSuccess: () => {
+        onSuccess: (created) => {
+          setWeddingId(created.weddingId);
           // O casamento nasceu e o perfil do casal também: a sessão é lida de novo, sem
           // descartar a atual (zerar faria a tela voltar ao carregando e perder este passo).
           void queryClient.invalidateQueries({ queryKey: getMeControllerMeV1QueryKey() });
@@ -151,6 +153,7 @@ export function useWeddingDetails({ referralCode }: { referralCode?: string | un
       await queryClient.refetchQueries({ queryKey: getMeControllerMeV1QueryKey() });
     },
     stage,
+    weddingId,
     partnerName: values.partnerName,
     slugValue: slug,
     slugStatus,
