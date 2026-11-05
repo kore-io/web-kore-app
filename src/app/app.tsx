@@ -1,4 +1,9 @@
-/** Raiz do app. Rotas, provedores e layout entram nos próximos PRs da Fase 0. */
+import { createBrowserRouter, RouterProvider } from 'react-router';
+import { routes } from './routes';
+
+const router = createBrowserRouter(routes);
+
+/** Raiz do app. Provedores e layout entram nos próximos PRs da Fase 0. */
 export function App() {
-  return null;
+  return <RouterProvider router={router} />;
 }
