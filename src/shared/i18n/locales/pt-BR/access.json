@@ -88,5 +88,22 @@
     "weddingTitle": "Casamento {{couple}}",
     "weddingPlace": "{{city}} ({{state}})",
     "dateToBeDefined": "Data a definir"
+  },
+  "invite": {
+    "otherAccount": {
+      "title": "Confira a conta",
+      "description": "O convite foi enviado para {{invitedEmail}}, mas você entrou como {{currentEmail}}.",
+      "alertTitle": "O casamento vai ficar nesta conta",
+      "alertDescription": "Para entrar depois, use sempre {{currentEmail}}.",
+      "confirm": "Sim, usar {{currentEmail}}",
+      "useAnotherAccount": "Entrar com outra conta"
+    },
+    "invalid": {
+      "title": "Este convite não vale mais",
+      "description": "Convites valem por 30 dias e só podem ser usados uma vez. Este expirou, já foi usado ou foi cancelado por quem convidou.",
+      "alertTitle": "Peça um convite novo",
+      "alertDescription": "Quem convidou você pode reenviar o convite pelo Kore em poucos segundos.",
+      "signIn": "Entrar no Kore"
+    }
   }
 }
