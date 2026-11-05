@@ -1,8 +1,11 @@
+import type { ReactNode } from 'react';
 import { Gift } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { GoogleOrEmail } from './google-or-email';
 
 export interface SignUpStartStepProps {
+  /** Aviso acima do título (ex.: muitos pedidos, rede fora), um Alert da lib. */
+  notice?: ReactNode;
   /** Quem indicou e o desconto, vindos da API (referrer); sem indicação, sem o destaque. */
   referral?: { name: string; discountPercent: number };
   onContinueWithGoogle: () => void;
@@ -15,6 +18,7 @@ export interface SignUpStartStepProps {
 
 /** Cadastro — Início (Área do Casal, Penpot; quadro do Acessos pela decisão 154). */
 export function SignUpStartStep({
+  notice,
   referral,
   onContinueWithGoogle,
   onSubmit,
@@ -26,6 +30,7 @@ export function SignUpStartStep({
   const { t } = useTranslation('access');
   return (
     <div className="kore-sign-in">
+      {notice}
       <div className="kore-sign-in__heading">
         <h1 className="kore-sign-in__title">{t('signUp.title')}</h1>
         <p className="kore-sign-in__description">{t('signUp.description')}</p>

@@ -1,10 +1,11 @@
-import { Button, EmptyState, NavItem } from '@kore-io/design';
-import { LayoutDashboard, WifiOff } from 'lucide-react';
+import { NavItem } from '@kore-io/design';
+import { LayoutDashboard } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, Outlet } from 'react-router';
 import { useCoupleSession } from '../../features/access/hooks/use-couple-session';
 import { useSignOut } from '../../features/access/hooks/use-sign-out';
 import { menuUser } from '../../features/access/session-user';
+import { LoadError } from '../../shared/components/load-error';
 import { paths } from '../paths';
 import { AppShell } from './app-shell';
 
@@ -16,24 +17,11 @@ import { AppShell } from './app-shell';
  */
 export function CoupleAreaLayout() {
   const { t } = useTranslation('layout');
-  const { t: tAccess } = useTranslation('access');
-  const { t: tCommon } = useTranslation('common');
   const { me, failed, retry } = useCoupleSession();
   const signOut = useSignOut();
 
-  if (failed) {
-    // Sem os dados da pessoa, sem o AppShell: o aviso no meio da tela (decisão 164).
-    return (
-      <main className="kore-app-error">
-        <EmptyState
-          icon={<WifiOff />}
-          title={tAccess('alerts.generic.title')}
-          description={tAccess('alerts.generic.description')}
-          action={<Button onClick={retry}>{tCommon('retry')}</Button>}
-        />
-      </main>
-    );
-  }
+  // Sem os dados da pessoa, sem o AppShell: o aviso no meio da tela (decisão 164).
+  if (failed) return <LoadError onRetry={retry} />;
   if (!me) return null;
 
   return (

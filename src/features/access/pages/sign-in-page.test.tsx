@@ -195,4 +195,46 @@ describe('Entrar ligado à API (Login sem senha e sessão; decisões 150, 151 e 
     expect(screen.getByText('Sua sessão terminou')).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 1, name: 'Entre no Kore' })).toBeInTheDocument();
   });
+
+  it('depois de entrar, a sessão é lida de novo: nada do 401 de antes do login fica no cache', async () => {
+    const user = userEvent.setup();
+    let signedIn = false;
+    const meCalls: number[] = [];
+    mockApi(({ path }) => {
+      if (path === '/v1/me') {
+        meCalls.push(Date.now());
+        return signedIn
+          ? Response.json({
+              user: { id: 'u1', name: null, email: 'ana@exemplo.com', platformRole: 'none' },
+              activeProfile: null,
+              authenticatedAt: '2026-11-05T12:00:00Z',
+            })
+          : apiError({ status: 401, body: { error: 'SESSION_EXPIRED' } });
+      }
+      if (path === '/v1/auth/login-challenges')
+        return Response.json(
+          { email: 'ana@exemplo.com', resendAvailableAt: inAMinute() },
+          { status: 202 },
+        );
+      signedIn = true;
+      return Response.json({
+        user: { id: 'u1', email: 'ana@exemplo.com', isNew: true },
+        next: 'couple_signup',
+      });
+    });
+    // O /cadastro sem sessão lê o /me (401) e mostra o Início; o login acontece ali mesmo.
+    renderRoute({ url: '/cadastro' });
+    await user.type(
+      await screen.findByRole('textbox', { name: 'E-\u2060mail' }),
+      'ana@exemplo.com',
+    );
+    await user.click(screen.getByRole('button', { name: 'Continuar' }));
+    await screen.findByRole('heading', { name: 'Confira seu e-\u2060mail' });
+    await user.keyboard('481905');
+    await user.click(screen.getByRole('button', { name: 'Entrar' }));
+    expect(
+      await screen.findByRole('heading', { name: 'Conte sobre o casamento' }),
+    ).toBeInTheDocument();
+    expect(meCalls.length).toBeGreaterThanOrEqual(2);
+  });
 });
