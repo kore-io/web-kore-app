@@ -18,3 +18,8 @@
 .kore-app-shell__content {
   @apply flex-1 p-4 md:p-6 lg:p-8;
 }
+
+/* /app quando o GET /v1/me falha (decisão 164): o aviso no meio da tela, sem o AppShell. */
+.kore-app-error {
+  @apply flex min-h-dvh items-center justify-center bg-background p-4;
+}

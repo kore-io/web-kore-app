@@ -7,6 +7,7 @@ import { SignInGooglePage } from '../features/access/pages/sign-in-google-page';
 import { SignInPage } from '../features/access/pages/sign-in-page';
 import { SignUpPage } from '../features/access/pages/sign-up-page';
 import { DashboardPage } from '../features/dashboard/pages/dashboard-page';
+import { CoupleAreaLayout } from './layout/couple-area-layout';
 import { paths } from './paths';
 
 export const routes: RouteObject[] = [
@@ -18,7 +19,12 @@ export const routes: RouteObject[] = [
   { id: 'profiles', path: paths.profiles, element: <ProfilesPage /> },
   { id: 'sign-up', path: paths.signUp, element: <SignUpPage /> },
   { id: 'session-expired', path: paths.sessionExpired, element: <SessionExpiredPage /> },
-  { id: 'couple-area', path: paths.coupleArea, element: <DashboardPage /> },
+  {
+    id: 'couple-area',
+    path: paths.coupleArea,
+    element: <CoupleAreaLayout />,
+    children: [{ id: 'dashboard', index: true, element: <DashboardPage /> }],
+  },
   // Sem página de "não encontrado" no DS: o caminho desconhecido volta para a área.
   { path: '*', element: <Navigate to={paths.coupleArea} replace /> },
 ];

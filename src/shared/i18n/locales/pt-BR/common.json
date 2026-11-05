@@ -3,5 +3,6 @@
   "notifications": {
     "label": "Avisos",
     "dismiss": "Fechar"
-  }
+  },
+  "retry": "Tentar de novo"
 }
