@@ -159,5 +159,25 @@
     "submit": "Enviar convite",
     "later": "Fazer isso depois",
     "laterNote": "Dá para convidar depois pelo Dashboard."
+  },
+  "whoAreYou": {
+    "title": "Quem é você?",
+    "description": "Escolha o seu nome para entrar no casamento.",
+    "submit": "Continuar"
+  },
+  "partnerInvite": {
+    "title": "{{inviter}} convidou você para o casamento",
+    "description": "Entre para montar o site e a lista junto com {{inviter}}. Vocês terão as mesmas permissões.",
+    "accept": "Aceitar convite",
+    "decline": "Recusar convite"
+  },
+  "coupleInvite": {
+    "title": "{{organization}} preparou este site para vocês.",
+    "description": "Confiram tudo antes de aceitar. Ao aceitar, vocês viram os donos do casamento, e {{planner}} continua ajudando na organização.",
+    "previewLabel": "Prévia do site",
+    "rsvp": "Confirmar presença",
+    "accept": "Aceitar e virar dono",
+    "viewSite": "Ver o site completo",
+    "emailNote": "Vocês entram com o Google ou com um código no e-mail {{email}}."
   }
 }

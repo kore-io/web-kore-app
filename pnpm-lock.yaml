@@ -11,6 +11,9 @@ importers:
       '@fontsource/cormorant-garamond':
         specifier: ^5.3.0
         version: 5.3.0
+      '@fontsource/lato':
+        specifier: ^5.3.0
+        version: 5.3.0
       '@fontsource/nunito-sans':
         specifier: ^5.3.0
         version: 5.3.0
@@ -830,6 +833,9 @@ packages:
 
   '@fontsource/cormorant-garamond@5.3.0':
     resolution: {integrity: sha512-weuGsCirGVWBWqpt6YUp0yLThTe4G8YO45noq8wxeJCRvEpq5lFrxNMFSTxcyOyV5k5otzJ8guDzYegdYlcLMQ==}
+
+  '@fontsource/lato@5.3.0':
+    resolution: {integrity: sha512-0WhF/4rhrw+ErIyneKvhHn2YAl+xf8GDtllgOgOzDmeaSlLQtjpChXaQOpWhG2BchQW0WJy2zLV12Hdg0ndOMw==}
 
   '@fontsource/nunito-sans@5.3.0':
     resolution: {integrity: sha512-CctNhebQ2YYJUwVMCAkHexQg7yedfz9s8JzaETALyc9QIQuDFRlNTWXux9H5PsNLgptPkrzRDomAdLJt1sDFpQ==}
@@ -4479,6 +4485,8 @@ snapshots:
   '@floating-ui/utils@0.2.12': {}
 
   '@fontsource/cormorant-garamond@5.3.0': {}
+
+  '@fontsource/lato@5.3.0': {}
 
   '@fontsource/nunito-sans@5.3.0': {}
 

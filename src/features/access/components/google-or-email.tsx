@@ -10,6 +10,8 @@ export interface GoogleOrEmailProps {
   submitLabel: string;
   emailError?: string;
   submitting?: boolean;
+  /** E-mail já conhecido (ex.: o do convite), preenchido no campo. */
+  defaultEmail?: string;
 }
 
 /** O miolo comum do Entrar e do Cadastro (Penpot): Google, "ou", E-mail e o botão. */
@@ -19,6 +21,7 @@ export function GoogleOrEmail({
   submitLabel,
   emailError,
   submitting = false,
+  defaultEmail,
 }: GoogleOrEmailProps) {
   const { t } = useTranslation('access');
 
@@ -51,6 +54,7 @@ export function GoogleOrEmail({
               autoComplete="email"
               inputMode="email"
               placeholder={t('signIn.emailPlaceholder')}
+              defaultValue={defaultEmail}
               invalid={invalid}
               {...(describedBy !== undefined && { 'aria-describedby': describedBy })}
             />
