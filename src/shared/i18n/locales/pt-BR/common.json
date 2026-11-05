@@ -1,3 +1,7 @@
 {
-  "appName": "Kore"
+  "appName": "Kore",
+  "notifications": {
+    "label": "Avisos",
+    "dismiss": "Fechar"
+  }
 }
