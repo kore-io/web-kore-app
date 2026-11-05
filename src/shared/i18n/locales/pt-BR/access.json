@@ -159,5 +159,10 @@
     "submit": "Enviar convite",
     "later": "Fazer isso depois",
     "laterNote": "Dá para convidar depois pelo Dashboard."
+  },
+  "whoAreYou": {
+    "title": "Quem é você?",
+    "description": "Escolha o seu nome para entrar no casamento.",
+    "submit": "Continuar"
   }
 }
