@@ -19,3 +19,9 @@ export const paths = {
   /** Área do casal; o Dashboard é a raiz. */
   coupleArea: '/app',
 } as const;
+
+/** Endereços fora do app. */
+export const externalUrls = {
+  /** "Fazer parceria" na F0 (decisões 150(4) e 157(4)); na F6, o cadastro do cerimonialista. */
+  plannerPartnership: 'https://kore.com.br/cerimonialistas',
+} as const;
