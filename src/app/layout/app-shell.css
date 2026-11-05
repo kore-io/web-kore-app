@@ -1,0 +1,20 @@
+/*
+ * Layout base do app: Sidebar à esquerda (a partir de 1024 px), Topbar e conteúdo. O
+ * respiro do conteúdo é a margem lateral do Brand Kit: 16 px no celular, 24 px no tablet
+ * e 32 px no computador.
+ */
+.kore-app-shell {
+  @apply flex min-h-dvh bg-background;
+}
+
+.kore-app-shell > .kore-sidebar {
+  @apply sticky top-0 h-dvh;
+}
+
+.kore-app-shell__main {
+  @apply flex min-w-0 flex-1 flex-col;
+}
+
+.kore-app-shell__content {
+  @apply flex-1 p-4 md:p-6 lg:p-8;
+}

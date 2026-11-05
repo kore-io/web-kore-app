@@ -1,0 +1,12 @@
+{
+  "mainMenu": "Menu principal",
+  "openMenu": "Abrir menu",
+  "closeMenu": "Fechar menu",
+  "userMenu": "Menu do usuário",
+  "notifications": "Notificações",
+  "notificationsUnread_one": "Notificações, {{count}} não lida",
+  "notificationsUnread_other": "Notificações, {{count}} não lidas",
+  "nav": {
+    "dashboard": "Dashboard"
+  }
+}

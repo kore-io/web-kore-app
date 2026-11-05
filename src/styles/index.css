@@ -6,3 +6,6 @@
 @import 'tailwindcss';
 @import '@kore-io/design/tailwind.css';
 @import '@kore-io/design/components.css';
+
+/* CSS do app, na camada components, depois do da lib. */
+@import '../app/layout/app-shell.css' layer(components);
