@@ -25,7 +25,11 @@ export function ProfilesStep({
       </div>
       <div className="kore-profiles">{children}</div>
       <div className="kore-sign-in__links">
-        <button type="button" className="kore-sign-in__link" onClick={onUseAnotherAccount}>
+        <button
+          type="button"
+          className="kore-sign-in__link kore-sign-in__link--standalone"
+          onClick={onUseAnotherAccount}
+        >
           {t('profiles.useAnotherAccount')}
         </button>
       </div>

@@ -40,16 +40,16 @@ export function SignInEmailStep({
         {...(emailError !== undefined && { emailError })}
         submitting={submitting}
       />
-      <div className="kore-sign-in__links">
+      <div className="kore-sign-in__links kore-sign-in__links--actions">
         <p className="kore-sign-in__link-row">
           {t('signIn.couplePrompt')}{' '}
-          <a className="kore-sign-in__link" href={signUpHref}>
+          <a className="kore-sign-in__link kore-sign-in__link--standalone" href={signUpHref}>
             {t('signIn.coupleLink')}
           </a>
         </p>
         <p className="kore-sign-in__link-row">
           {t('signIn.plannerPrompt')}{' '}
-          <a className="kore-sign-in__link" href={plannerHref}>
+          <a className="kore-sign-in__link kore-sign-in__link--standalone" href={plannerHref}>
             {t('signIn.plannerLink')}
           </a>
         </p>

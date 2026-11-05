@@ -86,7 +86,7 @@ export function SignInCodeStep({
           {t('code.submit')}
         </Button>
       </form>
-      <div className="kore-sign-in__links">
+      <div className="kore-sign-in__links kore-sign-in__links--actions">
         {/* Um só controle: desabilitado com a contagem, link no zero. A contagem não é
             anunciada a cada segundo (sem aria-live). */}
         <button
@@ -99,7 +99,11 @@ export function SignInCodeStep({
             ? t('code.resend')
             : t('code.resendIn', { time: formatCountdown({ seconds: resendSecondsLeft }) })}
         </button>
-        <button type="button" className="kore-sign-in__link" onClick={onUseAnotherEmail}>
+        <button
+          type="button"
+          className="kore-sign-in__link kore-sign-in__link--standalone"
+          onClick={onUseAnotherEmail}
+        >
           {t('code.useAnotherEmail')}
         </button>
       </div>
