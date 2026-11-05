@@ -44,3 +44,13 @@ export function plannerProfileDescription({
 }) {
   return t('profiles.plannerWeddings', { organization, count: weddingCount });
 }
+
+/** Data por extenso na prévia do site: "14 de novembro de 2026". */
+export function formatLongDate({ isoDate }: { isoDate: string }) {
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(`${isoDate}T12:00:00Z`));
+}

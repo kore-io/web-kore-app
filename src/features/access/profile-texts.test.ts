@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { i18n } from '../../shared/i18n/i18n';
 import {
+  formatLongDate,
   formatWeddingDate,
   plannerProfileDescription,
   weddingProfileDescription,
@@ -29,5 +30,11 @@ describe('textos dos cartões de perfil (Voz; decisão 152)', () => {
     expect(plannerProfileDescription({ t, organization: 'Prado Assessoria', weddingCount })).toBe(
       text,
     );
+  });
+});
+
+describe('data por extenso da prévia do site', () => {
+  it('formata como no Penpot', () => {
+    expect(formatLongDate({ isoDate: '2026-11-14' })).toBe('14 de novembro de 2026');
   });
 });

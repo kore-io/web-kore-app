@@ -81,3 +81,28 @@
 .kore-wedding-summary__details {
   @apply type-body-md text-gray-700;
 }
+
+/*
+ * Prévia do site (Penpot): fundo site.background, borda border, raio lg, 28/24 de
+ * respiro, 8 px entre as linhas, tudo centralizado; rótulo em overline na fonte do site;
+ * nomes em display.md; data em body.md na fonte do site; pílula em site.primary.
+ */
+.kore-site-preview {
+  @apply flex flex-col items-center gap-2 rounded-lg border border-border bg-site-background px-6 py-7 text-center;
+}
+
+.kore-site-preview__label {
+  @apply font-site-body text-overline uppercase text-site-muted-foreground;
+}
+
+.kore-site-preview__couple {
+  @apply type-display-md text-site-foreground;
+}
+
+.kore-site-preview__details {
+  @apply font-site-body text-body-md font-normal text-site-foreground;
+}
+
+.kore-site-preview__rsvp {
+  @apply font-site-body text-label rounded-full bg-site-primary px-5 py-2.5 font-bold text-site-primary-foreground;
+}
