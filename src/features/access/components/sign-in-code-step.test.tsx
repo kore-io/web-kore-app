@@ -85,6 +85,27 @@ describe('SignInCodeStep', () => {
     expect(formatCountdown({ seconds: 5 })).toBe('0:05');
   });
 
+  it('código errado: o aviso fica entre as casas e o Entrar, e os números ficam (decisão 161)', async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(<SignInCodeStep {...props()} />);
+    await user.keyboard('481905');
+    rerender(
+      <SignInCodeStep
+        {...props({
+          invalid: true,
+          notice: <SignInAlert notice={{ kind: 'wrong-code', attemptsLeft: 2 }} />,
+        })}
+      />,
+    );
+    const alert = screen.getByRole('alert');
+    const group = screen.getByRole('group', { name: 'Código de 6 números' });
+    const submit = screen.getByRole('button', { name: 'Entrar' });
+    expect(group.compareDocumentPosition(alert) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(alert.compareDocumentPosition(submit) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByRole('textbox', { name: 'Número 1 de 6' })).toHaveValue('4');
+    expect(submit).toBeEnabled();
+  });
+
   it('é acessível, com o aviso de código errado', async () => {
     const { container } = render(
       <main>

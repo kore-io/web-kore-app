@@ -7,7 +7,7 @@ export const CODE_LENGTH = 6;
 
 export interface SignInCodeStepProps {
   email: string;
-  /** Aviso acima do título (SignInAlert: código errado, vencido, muitos pedidos…). */
+  /** Aviso abaixo das casas (SignInAlert: código errado, vencido, muitos pedidos…). */
   notice?: ReactNode;
   onSubmit: (values: { code: string }) => void;
   submitting?: boolean;
@@ -60,7 +60,6 @@ export function SignInCodeStep({
 
   return (
     <div className="kore-sign-in">
-      {notice}
       <div className="kore-sign-in__heading">
         <h1 className="kore-sign-in__title">{t('code.title')}</h1>
         <p className="kore-sign-in__description">{t('code.description', { email })}</p>
@@ -75,6 +74,9 @@ export function SignInCodeStep({
           invalid={invalid}
           autoFocus
         />
+        {/* Penpot (Código incorreto, decisão 161): o aviso fica abaixo das casas e acima do
+            Entrar; os números ficam nas casas e o Entrar segue habilitado. */}
+        {notice}
         <Button
           type="submit"
           size="lg"
