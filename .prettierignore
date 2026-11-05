@@ -3,3 +3,5 @@ dev-dist
 node_modules
 pnpm-lock.yaml
 .maestri
+# Cópia fiel do OpenAPI da API (decisão 149); não reformatar.
+api/openapi.json

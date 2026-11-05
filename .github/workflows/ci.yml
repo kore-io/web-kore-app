@@ -49,6 +49,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # O client gerado (Orval) tem que bater com a cópia do OpenAPI (decisão 149).
+      - run: pnpm api:check
       - run: pnpm format:check
       - run: pnpm lint
       - run: pnpm typecheck
