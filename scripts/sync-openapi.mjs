@@ -1,5 +1,6 @@
 // Copia o openapi.json do api-kore-api vizinho (decisão 149) e gera o client com o Orval.
 // Uso: pnpm api:sync [caminho do openapi.json]; padrão ../api-kore-api/openapi.json.
+import { execFileSync } from 'node:child_process';
 import { copyFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -10,3 +11,5 @@ if (!existsSync(source)) {
 }
 copyFileSync(source, resolve('api/openapi.json'));
 console.log(`api/openapi.json atualizado a partir de ${source}`);
+// Gera aqui (e não com && no script do pnpm): o pnpm passaria o caminho ao Orval.
+execFileSync('pnpm', ['api:generate'], { stdio: 'inherit' });
