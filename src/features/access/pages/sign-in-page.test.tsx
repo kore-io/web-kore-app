@@ -89,6 +89,9 @@ describe('Entrar ligado à API (Login sem senha e sessão; decisões 150, 151 e 
     await user.keyboard('000000');
     await user.click(screen.getByRole('button', { name: 'Entrar' }));
     expect(await screen.findByText(/Você ainda tem 1 tentativa;/)).toBeInTheDocument();
+    // Decisão 161 (Penpot, Código incorreto): os números ficam e o Entrar segue habilitado.
+    expect(screen.getByRole('textbox', { name: 'Número 6 de 6' })).toHaveValue('0');
+    expect(screen.getByRole('button', { name: 'Entrar' })).toBeEnabled();
   });
 
   it('5 erros com código novo: avisa e reinicia a contagem (RN05)', async () => {
