@@ -6,6 +6,13 @@ App do Kore (PWA): casal, cerimonialista e backoffice, com os componentes do `@k
 
 Node.js 24 (`.nvmrc`) e pnpm 10 (`packageManager`).
 
+O `@kore-io/design` vem do GitHub Packages da org (`.npmrc`). O token precisa do escopo
+`read:packages` e não fica gravado em arquivo: passe-o só no comando, por exemplo
+
+```sh
+env "npm_config_//npm.pkg.github.com/:_authToken=$(gh auth token)" pnpm install
+```
+
 ## Comandos
 
 | Comando                             | O que faz                                         |
