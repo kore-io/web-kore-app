@@ -70,12 +70,8 @@ function WeddingDetailsStage({ referralCode }: { referralCode: string | undefine
   if (details.stage === 'invite-partner') {
     return (
       <AccessLayout pitch="couple" showLegal={false}>
-        {/* O envio do convite entra com a rota do Bigorna; por ora, só o Fazer isso depois (169(3)). */}
-        <InvitePartnerStep
-          partnerName={details.partnerName}
-          onSubmit={() => undefined}
-          onSkip={openWedding}
-        />
+        {/* Sem o envio até a rota de convites: só o Fazer isso depois (169(3)). */}
+        <InvitePartnerStep partnerName={firstName(details.partnerName)} onSkip={openWedding} />
       </AccessLayout>
     );
   }
@@ -93,4 +89,9 @@ function WeddingDetailsStage({ referralCode }: { referralCode: string | undefine
       />
     </AccessLayout>
   );
+}
+
+/** "Convide Marcos", e não "Convide Marcos Rocha": o primeiro nome, como nos outros textos. */
+function firstName(name: string) {
+  return name.trim().split(/\s+/)[0] ?? name;
 }

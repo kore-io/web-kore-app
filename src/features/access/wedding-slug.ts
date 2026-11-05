@@ -13,7 +13,7 @@ function firstNameSlug({ name }: { name: string }) {
   const first = name.trim().split(/\s+/)[0] ?? '';
   return first
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9]/g, '');
 }

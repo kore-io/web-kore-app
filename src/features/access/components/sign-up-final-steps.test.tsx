@@ -64,4 +64,12 @@ describe('Convidar o parceiro (textos neutros, decisão 155)', () => {
     );
     await expectNoA11yViolations({ container });
   });
+
+  it('sem o envio (antes da rota de convites), só o Fazer isso depois (decisão 169(3))', () => {
+    render(<InvitePartnerStep partnerName="Marcos" onSkip={vi.fn()} />);
+    expect(screen.getByRole('heading', { level: 1, name: 'Convide Marcos' })).toBeInTheDocument();
+    expect(screen.queryByRole('textbox')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Enviar convite' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Fazer isso depois' })).toBeInTheDocument();
+  });
 });

@@ -47,7 +47,10 @@ const available = ({ path }: { path: string }) =>
 async function fillForm(user: ReturnType<typeof userEvent.setup>) {
   await user.type(await screen.findByRole('textbox', { name: 'Seu nome' }), 'Ana Beatriz');
   await user.click(screen.getByRole('radio', { name: 'Noiva' }));
-  await user.type(screen.getByRole('textbox', { name: 'Com quem você vai casar?' }), 'Marcos');
+  await user.type(
+    screen.getByRole('textbox', { name: 'Com quem você vai casar?' }),
+    'Marcos Rocha',
+  );
   await user.type(screen.getByRole('textbox', { name: 'Cidade' }), 'Campinas');
   await user.selectOptions(screen.getByRole('combobox', { name: 'UF' }), 'SP');
 }
@@ -135,11 +138,15 @@ describe('Dados do casamento ligados à API (decisões 155, 166 e 169)', () => {
       expect(screen.getByRole('button', { name: 'Criar nosso site' })).toBeEnabled(),
     );
     await user.click(screen.getByRole('button', { name: 'Criar nosso site' }));
-    expect(await screen.findByRole('heading', { level: 1, name: /Marcos/ })).toBeInTheDocument();
+    // O primeiro nome, e só o Fazer isso depois até a rota de convites (169(3)).
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Convide Marcos' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Enviar convite' })).toBeNull();
     expect(created).toEqual({
       myName: 'Ana Beatriz',
       myTitle: 'bride',
-      partnerName: 'Marcos',
+      partnerName: 'Marcos Rocha',
       city: 'Campinas',
       state: 'SP',
       slug: 'ana-e-marcos',
