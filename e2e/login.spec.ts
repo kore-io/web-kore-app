@@ -137,7 +137,7 @@ test.describe('Login sem senha (Login sem senha e sessão)', () => {
     await expectSignedIn({ page, email });
   });
 
-  test('Cadastro completo: cria o casamento e convida o parceiro; de novo, já é dono (RN06, RN07, RN10)', async ({
+  test('Cadastro completo: cria o casamento, convida o parceiro e abre o Dashboard; de novo, já é dono (RN06, RN07, RN10)', async ({
     page,
   }) => {
     const email = newEmail({ label: 'casamento' });
@@ -165,8 +165,8 @@ test.describe('Login sem senha (Login sem senha e sessão)', () => {
     await expect(page.getByRole('button', { name: 'Criar nosso site' })).toBeEnabled();
     await page.getByRole('button', { name: 'Criar nosso site' }).click();
 
-    // RN10: depois de criar, convidar o parceiro (opcional): o convite sai e o e-mail chega.
-    // A ida ao Dashboard depende do perfil do casal ativo na sessão (pendente com a API).
+    // RN10: depois de criar, convidar o parceiro (opcional): o convite sai, o e-mail chega e
+    // a pessoa vai ao Dashboard, já com o perfil do casal ativo (decisão 171).
     await expect(page.getByRole('heading', { name: /Marcos/ })).toBeVisible();
     const partnerEmail = newEmail({ label: 'parceiro' });
     await page.getByRole('textbox', { name: 'E-\u2060mail de Marcos' }).fill(partnerEmail);
@@ -176,6 +176,9 @@ test.describe('Login sem senha (Login sem senha e sessão)', () => {
     ).toBeVisible();
     const invite = await latestEmail({ request: page.request, to: partnerEmail });
     expect(invite.HTML).toContain('/convite/');
+    await expect(page).toHaveURL(/\/app$/);
+    await page.getByRole('button', { name: 'Menu do usuário' }).click();
+    await expect(page.getByText('Perfil ativo: Casal')).toBeVisible();
 
     // RN06: dono de um casamento ativo não cria outro.
     await page.goto('/cadastro');
