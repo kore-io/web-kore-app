@@ -13,18 +13,21 @@ afterEach(() => {
 
 describe('Botão do e-\u2060mail (/entrar/confirmar, decisões 139 e 157(5))', () => {
   it('confirma o token uma vez e segue o next', async () => {
-    const fetchMock = mockApi(() =>
-      Response.json({
-        user: { id: 'u1', email: 'a@exemplo.com', isNew: true },
-        next: 'couple_signup',
-      }),
-    );
+    const verifyBodies: unknown[] = [];
+    mockApi(({ path, body }) => {
+      if (path === '/v1/auth/login-challenges/verify') {
+        verifyBodies.push(body);
+        return Response.json({
+          user: { id: 'u1', email: 'a@exemplo.com', isNew: true },
+          next: 'couple_signup',
+        });
+      }
+      // O /cadastro de destino lê a sessão.
+      return apiError({ status: 401, body: { error: 'SESSION_EXPIRED' } });
+    });
     const { router } = renderRoute({ url: '/entrar/confirmar?token=abcdefghijklmnopqrstuvwxyz' });
     await waitFor(() => expect(router.state.location.pathname).toBe('/cadastro'));
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))).toEqual({
-      token: 'abcdefghijklmnopqrstuvwxyz',
-    });
+    expect(verifyBodies).toEqual([{ token: 'abcdefghijklmnopqrstuvwxyz' }]);
   });
 
   it('token vencido volta ao Entrar com o aviso', async () => {
