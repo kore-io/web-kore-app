@@ -1,0 +1,70 @@
+/*
+ * Passo do e-mail da tela Entrar (Acessos, Penpot): 24 px entre os blocos; título em
+ * display.md com 8 px até o apoio em body.lg gray.700; "ou" em caption entre linhas, com
+ * 12 px; rótulo e campo com 6 px; botão G na largura toda; links do rodapé centralizados,
+ * 8 px entre as linhas e 4 px entre a pergunta e o link.
+ */
+.kore-sign-in,
+.kore-sign-in__form {
+  @apply flex flex-col gap-6;
+}
+
+.kore-sign-in__heading {
+  @apply flex flex-col gap-2;
+}
+
+.kore-sign-in__title {
+  @apply type-display-md text-ink;
+}
+
+.kore-sign-in__description {
+  @apply type-body-lg text-gray-700;
+}
+
+.kore-sign-in__google,
+.kore-sign-in__submit {
+  @apply w-full;
+}
+
+.kore-sign-in__or {
+  @apply flex items-center gap-3;
+}
+
+.kore-sign-in__or-text {
+  @apply type-caption shrink-0 text-gray-700;
+}
+
+.kore-sign-in__field {
+  @apply flex flex-col gap-1.5;
+}
+
+.kore-sign-in__error {
+  @apply type-caption text-danger-text;
+}
+
+.kore-sign-in__links {
+  @apply flex flex-col items-center gap-2;
+}
+
+.kore-sign-in__link-row {
+  @apply type-body-md text-gray-700;
+}
+
+.kore-sign-in__link {
+  @apply type-link text-primary-dark;
+}
+
+.kore-sign-in__or > .kore-divider {
+  @apply flex-1;
+}
+
+/* Controle único de reenviar (decisão 150): contagem em body.md gray.700, link no zero. */
+.kore-sign-in__resend {
+  @apply type-body-md text-gray-700;
+  @apply enabled:type-link enabled:cursor-pointer enabled:text-primary-dark;
+}
+
+.kore-sign-in__link {
+  @apply cursor-pointer;
+  @apply focus-visible:rounded-sm focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}
