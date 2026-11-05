@@ -164,5 +164,11 @@
     "title": "Quem é você?",
     "description": "Escolha o seu nome para entrar no casamento.",
     "submit": "Continuar"
+  },
+  "partnerInvite": {
+    "title": "{{inviter}} convidou você para o casamento",
+    "description": "Entre para montar o site e a lista junto com {{inviter}}. Vocês terão as mesmas permissões.",
+    "accept": "Aceitar convite",
+    "decline": "Recusar convite"
   }
 }

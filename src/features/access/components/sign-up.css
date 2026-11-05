@@ -68,3 +68,16 @@
 .kore-wedding-details__address {
   @apply whitespace-nowrap;
 }
+
+/* Cartão do casamento nos convites (Penpot): gray.100, raio lg, 20 px, 4 px entre linhas. */
+.kore-wedding-summary {
+  @apply flex flex-col gap-1 rounded-lg bg-gray-100 p-5;
+}
+
+.kore-wedding-summary__couple {
+  @apply type-display-sm text-ink;
+}
+
+.kore-wedding-summary__details {
+  @apply type-body-md text-gray-700;
+}
