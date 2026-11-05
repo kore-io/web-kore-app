@@ -14,7 +14,7 @@
     "lint": "eslint . && stylelint \"src/**/*.css\" --allow-empty-input",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "api:sync": "node scripts/sync-openapi.mjs && pnpm api:generate",
+    "api:sync": "node scripts/sync-openapi.mjs",
     "api:generate": "orval --config orval.config.ts",
     "api:check": "pnpm api:generate && git diff --exit-code -- src/shared/api/generated",
     "prepare": "husky"
