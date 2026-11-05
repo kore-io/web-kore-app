@@ -19,3 +19,7 @@ Node.js 24 (`.nvmrc`) e pnpm 10 (`packageManager`).
 | `pnpm format` / `pnpm format:check` | Prettier                                          |
 
 Commits em Conventional Commits (commitlint no `commit-msg`); lint-staged no `pre-commit`.
+
+## CI
+
+`.github/workflows/ci.yml`, completo no próprio repositório (decisão 145): roda em todo push, em qualquer branch, com o commitlint e, em seguida, `install --frozen-lockfile`, `format:check`, `lint`, `typecheck`, `test` e `build`. Um push novo cancela o anterior na mesma branch, menos em `homolog` e `production`. Actions fixadas pelo SHA do commit. O deploy (Cloudflare Pages) entra com a infra, no fim (decisão 81).
