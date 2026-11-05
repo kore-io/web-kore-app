@@ -2,14 +2,15 @@
  * Quadro das telas de acesso (Acessos, Penpot). Celular: 24/16 de respiro, 40 px entre
  * logo, conteúdo e a linha legal no pé. Tablet: cartão branco de 480 px, raio lg,
  * shadow.sm e 40 px de respiro, com a linha legal 24 px abaixo. Computador: painel da
- * marca de 600 px em primary.dark (64 px de respiro) e a coluna de 400 px centralizada.
+ * marca de 600 px em primary.dark (64 px de respiro, logo à esquerda, x = 64, decisão
+ * 161) e a coluna de 400 px centralizada.
  */
 .kore-access {
   @apply flex min-h-dvh bg-background;
 }
 
 .kore-access__brand {
-  @apply hidden w-150 shrink-0 flex-col justify-between bg-primary-dark p-16 lg:flex;
+  @apply hidden w-150 shrink-0 flex-col items-start justify-between bg-primary-dark p-16 lg:flex;
 }
 
 .kore-access__pitch {
