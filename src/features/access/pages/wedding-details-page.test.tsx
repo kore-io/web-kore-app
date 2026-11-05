@@ -317,4 +317,41 @@ describe('Dados do casamento ligados à API (decisões 155, 166 e 169)', () => {
     expect(await screen.findByText('Não foi possível continuar')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Convide Marcos' })).toBeInTheDocument();
   });
+
+  it('a origem da chegada (UTM e origem=site) sai da URL e vai no POST (decisão 169(2))', async () => {
+    const user = userEvent.setup();
+    let created: Record<string, unknown> = {};
+    api((request) => {
+      if (request.method === 'POST' && request.path === '/v1/weddings') {
+        created = request.body as Record<string, unknown>;
+        return Response.json(
+          {
+            weddingId: 'w1',
+            slug: 'ana-e-marcos',
+            status: 'draft',
+            timezone: 'America/Sao_Paulo',
+            referrer: null,
+          },
+          { status: 201 },
+        );
+      }
+      return available(request);
+    });
+    const { router } = renderRoute({
+      url: '/cadastro?utm_source=instagram&utm_medium=social&utm_campaign=lancamento&origem=site',
+    });
+    await waitFor(() => expect(router.state.location.search).toBe(''));
+    await fillForm(user);
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Criar nosso site' })).toBeEnabled(),
+    );
+    await user.click(screen.getByRole('button', { name: 'Criar nosso site' }));
+    await screen.findByRole('heading', { name: 'Convide Marcos' });
+    expect(created).toMatchObject({
+      signupSource: 'made_with_kore',
+      utmSource: 'instagram',
+      utmMedium: 'social',
+      utmCampaign: 'lancamento',
+    });
+  });
 });
