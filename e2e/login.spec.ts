@@ -118,4 +118,22 @@ test.describe('Login sem senha (Login sem senha e sessão)', () => {
     await expect(page.getByText('Sua sessão terminou')).toBeVisible();
     await expect(page.getByRole('heading', { level: 1, name: 'Entre no Kore' })).toBeVisible();
   });
+
+  test('Criar meu site: o cadastro entra pelo código e chega aos Dados do casamento (decisão 165)', async ({
+    page,
+  }) => {
+    const email = newEmail({ label: 'cadastro' });
+    await page.goto('/cadastro');
+    await expect(page.getByRole('heading', { name: 'Crie o site do casamento' })).toBeVisible();
+    await page.getByRole('textbox', { name: 'E-\u2060mail' }).fill(email);
+    await page.getByRole('button', { name: 'Continuar', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Confira seu e-\u2060mail' })).toBeVisible();
+    const code = codeFrom({ email: await latestEmail({ request: page.request, to: email }) });
+    await page.keyboard.type(code);
+    await page.getByRole('button', { name: 'Entrar' }).click();
+    // Conta nova pelo Criar meu site: o next é couple_signup, de volta ao /cadastro com sessão.
+    await expect(page.getByRole('heading', { name: 'Conte sobre o casamento' })).toBeVisible();
+    await expect(page).toHaveURL(/\/cadastro$/);
+    await expectSignedIn({ page, email });
+  });
 });
