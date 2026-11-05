@@ -31,7 +31,7 @@ describe('rotas do app (decisões 139, 146 e 147)', () => {
     ['/perfis', 'profiles'],
     ['/cadastro', 'sign-up'],
     ['/sessao-expirada', 'session-expired'],
-    ['/app', 'couple-area'],
+    ['/app', 'dashboard'],
   ])('%s abre a rota %s', (url, id) => {
     expect(routeIdAt({ url })).toBe(id);
   });

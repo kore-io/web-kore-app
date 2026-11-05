@@ -8,5 +8,7 @@
   "notificationsUnread_other": "Notificações, {{count}} não lidas",
   "nav": {
     "dashboard": "Dashboard"
-  }
+  },
+  "activeProfileCouple": "Perfil ativo: Casal",
+  "signOut": "Sair"
 }
