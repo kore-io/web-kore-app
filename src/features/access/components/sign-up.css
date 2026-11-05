@@ -54,3 +54,12 @@
 .kore-wedding-details__state {
   @apply w-24;
 }
+
+/* Convidar o parceiro (Penpot): "Fazer isso depois" e a nota, centralizados. */
+.kore-invite-partner__later {
+  @apply self-center;
+}
+
+.kore-invite-partner__note {
+  @apply type-caption text-center text-gray-700;
+}

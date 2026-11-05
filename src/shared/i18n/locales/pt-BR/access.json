@@ -146,5 +146,18 @@
       "slugFormat": "Use só letras minúsculas, números e hífen.",
       "email": "Informe um e-mail válido."
     }
+  },
+  "alreadyOwner": {
+    "title": "Você já tem um casamento no Kore.",
+    "description": "Cada pessoa é dona de um casamento por vez. O rascunho do simulador continua só neste navegador.",
+    "open": "Abrir meu casamento"
+  },
+  "invitePartner": {
+    "title": "Convide {{name}}",
+    "description": "{{name}} vai ter o próprio login, com as mesmas permissões que você. O convite vale por 30 dias.",
+    "emailLabel": "E-mail de {{name}}",
+    "submit": "Enviar convite",
+    "later": "Fazer isso depois",
+    "laterNote": "Dá para convidar depois pelo Dashboard."
   }
 }
