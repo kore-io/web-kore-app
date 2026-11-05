@@ -1,0 +1,4 @@
+/* A tela que não carregou (decisão 164): o aviso no meio da tela, sem o AppShell. */
+.kore-load-error {
+  @apply flex min-h-dvh items-center justify-center bg-background p-4;
+}
