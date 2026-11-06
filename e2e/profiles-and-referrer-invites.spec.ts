@@ -155,6 +155,98 @@ test.describe('Convites dos indicadores e Seleção com dois perfis (dados do pr
     await expect(page).toHaveURL('https://kore.com.br/cerimonialistas');
   });
 
+  test('o /i/ aberto antes não muda a atribuição no aceite do link do casal (RN14)', async ({
+    page,
+  }) => {
+    const run = unique();
+    const plannerId = await createUser({
+      db,
+      email: newEmail({ label: `juliana-${run}` }),
+      name: 'Juliana Prado',
+    });
+    const creditName = `Prado Assessoria ${run}`;
+    const referrerId = await createPlanner({ db, userId: plannerId, creditName });
+    const otherPlannerId = await createUser({
+      db,
+      email: newEmail({ label: `outro-cerimonial-${run}` }),
+      name: 'Carla Nunes',
+    });
+    const otherReferrerId = await createPlanner({
+      db,
+      userId: otherPlannerId,
+      creditName: `Nunes Eventos ${run}`,
+    });
+    const {
+      rows: [otherReferrer],
+    } = await db.query<{ referral_code: string }>(
+      'select referral_code from referrers where id = $1',
+      [otherReferrerId],
+    );
+    const weddingId = await createWedding({
+      db,
+      partners: ['Ana Souza', 'Marcos Lima'],
+      eventDate: '2027-05-15',
+      city: 'Campinas',
+      status: 'awaiting_couple',
+      createdByUserId: plannerId,
+      collaboratorIds: [plannerId],
+      referrerId,
+    });
+    const token = await createInvitation({
+      db,
+      weddingId,
+      kind: 'couple',
+      email: null,
+      invitedByUserId: plannerId,
+    });
+
+    // Ana abriu o link de indicação de outro cerimonialista há 5 dias: o código ficou guardado.
+    await page.goto(`/entrar?indicacao=${otherReferrer?.referral_code}`);
+    await expect(page).toHaveURL(/\/entrar$/);
+    await page.evaluate(() => {
+      const stored = JSON.parse(window.localStorage.getItem('kore.referral') ?? '{}') as object;
+      const fiveDaysAgo = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString();
+      window.localStorage.setItem(
+        'kore.referral',
+        JSON.stringify({ ...stored, savedAt: fiveDaysAgo }),
+      );
+    });
+    expect(
+      JSON.parse((await page.evaluate(() => window.localStorage.getItem('kore.referral'))) ?? '{}'),
+    ).toMatchObject({ code: otherReferrer?.referral_code });
+
+    // Depois, aceita o link do casal (sem e-mail) que a Juliana gerou.
+    await page.goto(`/convite/${token}`);
+    await expect(
+      page.getByRole('heading', {
+        level: 1,
+        name: `${creditName} preparou o site do casamento de vocês`,
+      }),
+    ).toBeVisible();
+    await page.getByRole('button', { name: 'Aceitar e virar dono' }).click();
+    await expect(page).toHaveURL(/\/entrar$/);
+    await signInAt({ page, email: newEmail({ label: `ana-${run}` }) });
+    await expect(page.getByRole('heading', { level: 1, name: 'Quem é você?' })).toBeVisible();
+    await page.locator('label').filter({ hasText: /^Ana$/ }).click();
+    await page
+      .locator('label')
+      .filter({ hasText: /^Noiva$/ })
+      .click();
+    const accept = page.waitForResponse((response) => response.url().endsWith('/accept'));
+    await page.getByRole('button', { name: 'Continuar' }).click();
+    expect((await accept).status()).toBe(200);
+    await expectCoupleArea({ page, couple: 'Ana & Marcos' });
+
+    // O casamento continua atribuído à Juliana.
+    const {
+      rows: [wedding],
+    } = await db.query<{ referrer_id: string; referral_source: string }>(
+      'select referrer_id, referral_source from weddings where id = $1',
+      [weddingId],
+    );
+    expect(wedding).toEqual({ referrer_id: referrerId, referral_source: 'created_by_planner' });
+  });
+
   test('conta com dois perfis: os dois cartões e o último usado (RN14, RN16; 174(7), 177(1))', async ({
     page,
   }) => {
