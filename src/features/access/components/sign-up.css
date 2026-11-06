@@ -106,3 +106,27 @@
 .kore-site-preview__rsvp {
   @apply font-site-body text-label rounded-full bg-site-primary px-5 py-2.5 font-bold text-site-primary-foreground;
 }
+
+/*
+ * Permissões do Convite do cerimonialista (Penpot): ícone de 24 px, 12 px até o texto e
+ * entre as linhas; o que pode, ✓ em success.text; o que é só do casal, ✕ em gray.700.
+ */
+.kore-planner-invite__permissions {
+  @apply flex flex-col gap-3;
+}
+
+.kore-planner-invite__permission {
+  @apply flex items-start gap-3 type-body-md text-ink;
+}
+
+.kore-planner-invite__icon {
+  @apply size-6 shrink-0 text-success-text;
+}
+
+.kore-planner-invite__icon--denied {
+  @apply text-gray-700;
+}
+
+.kore-planner-invite__decline {
+  @apply self-center;
+}

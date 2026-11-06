@@ -15,19 +15,26 @@ export function AccessLayout({
   children: ReactNode;
   /** A Seleção de perfil não tem a linha legal (Penpot e Voz). */
   showLegal?: boolean;
-  /** Texto do painel da marca: o do Acessos ou o do casal, no Cadastro (decisão 154). */
-  pitch?: 'default' | 'couple';
+  /**
+   * Texto do painel da marca: o do Acessos, o do casal (Cadastro e convites do casal,
+   * decisão 154) ou o do cerimonialista (Convite do cerimonialista, Penpot).
+   */
+  pitch?: 'default' | 'couple' | 'planner';
 }) {
   const { t } = useTranslation('access');
-  const panel = pitch === 'couple' ? 'brandPanelCouple' : 'brandPanel';
+  const panel = {
+    default: 'brandPanel',
+    couple: 'brandPanelCouple',
+    planner: 'brandPanelPlanner',
+  } as const satisfies Record<typeof pitch, string>;
   const { t: tCommon } = useTranslation('common');
   return (
     <div className="kore-access">
       <aside className="kore-access__brand">
         <Logo variant="white" label={tCommon('appName')} />
         <div className="kore-access__pitch">
-          <p className="kore-access__headline">{t(`${panel}.headline`)}</p>
-          <p className="kore-access__description">{t(`${panel}.description`)}</p>
+          <p className="kore-access__headline">{t(`${panel[pitch]}.headline`)}</p>
+          <p className="kore-access__description">{t(`${panel[pitch]}.description`)}</p>
         </div>
         <p className="kore-access__site">{t('brandPanel.site')}</p>
       </aside>

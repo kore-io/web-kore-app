@@ -7,8 +7,7 @@ import { CoupleInviteStep, type CoupleInviteStepProps } from './couple-invite-st
 
 function props(overrides: Partial<CoupleInviteStepProps> = {}): CoupleInviteStepProps {
   return {
-    organization: 'Prado Assessoria',
-    plannerName: 'Juliana',
+    inviterName: 'Prado Assessoria',
     preview: {
       couple: 'Ana & Marcos',
       details: `${formatLongDate({ isoDate: '2026-11-14' })} · Campinas`,
@@ -27,12 +26,12 @@ describe('Convite do casal (decisões 102, 106 e 156)', () => {
     expect(
       screen.getByRole('heading', {
         level: 1,
-        name: 'Prado Assessoria preparou este site para vocês.',
+        name: 'Prado Assessoria preparou o site do casamento de vocês',
       }),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        'Confiram tudo antes de aceitar. Ao aceitar, vocês viram os donos do casamento, e Juliana continua ajudando na organização.',
+        'Confiram tudo antes de aceitar. Ao aceitar, vocês viram os donos do casamento, e Prado Assessoria continua ajudando na organização.',
       ),
     ).toBeInTheDocument();
     expect(screen.getByText('14 de novembro de 2026 · Campinas')).toBeInTheDocument();
@@ -54,6 +53,28 @@ describe('Convite do casal (decisões 102, 106 e 156)', () => {
     render(<CoupleInviteStep {...props()} />);
     expect(screen.queryByText(/Vocês entram com o Google/)).toBeNull();
     expect(screen.queryByText(/de desconto/)).toBeNull();
+  });
+
+  it('do vendedor: "{nome}, do Kore," e sem o "continua ajudando" (decisão 174(1))', () => {
+    render(<CoupleInviteStep {...props({ inviterName: 'Lucas', fromSeller: true })} />);
+    expect(
+      screen.getByRole('heading', {
+        level: 1,
+        name: 'Lucas, do Kore, preparou o site do casamento de vocês',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Confiram tudo antes de aceitar. Ao aceitar, vocês viram os donos do casamento.',
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('sem o site ainda, sem o "Ver o site completo" (decisão 174(2))', () => {
+    const { onViewSite, ...withoutSite } = props();
+    expect(onViewSite).toBeDefined();
+    render(<CoupleInviteStep {...withoutSite} />);
+    expect(screen.queryByRole('button', { name: 'Ver o site completo' })).toBeNull();
   });
 
   it('a prévia usa o tema do site do casal e a pílula é só ilustração', () => {

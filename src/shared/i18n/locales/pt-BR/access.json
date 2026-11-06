@@ -113,11 +113,16 @@
       "alertTitle": "Peça um convite novo",
       "alertDescription": "Quem convidou você pode reenviar o convite pelo Kore em poucos segundos.",
       "signIn": "Entrar no Kore"
-    }
+    },
+    "declined": "Convite recusado."
   },
   "brandPanelCouple": {
     "headline": "A lista de convidados organizada sozinha.",
     "description": "Um link por grupo, a família responde por cada pessoa, e vocês veem o número real de convidados sem perguntar para ninguém."
+  },
+  "brandPanelPlanner": {
+    "headline": "Todos os seus casamentos num só painel.",
+    "description": "Monte o site dos seus clientes, acompanhe as respostas de cada casamento e ganhe comissão por cada casal que publicar. De graça."
   },
   "signUp": {
     "title": "Crie o site do casamento",
@@ -182,12 +187,25 @@
     "decline": "Recusar convite"
   },
   "coupleInvite": {
-    "title": "{{organization}} preparou este site para vocês.",
-    "description": "Confiram tudo antes de aceitar. Ao aceitar, vocês viram os donos do casamento, e {{planner}} continua ajudando na organização.",
+    "title": "{{name}} preparou o site do casamento de vocês",
+    "description": "Confiram tudo antes de aceitar. Ao aceitar, vocês viram os donos do casamento, e {{name}} continua ajudando na organização.",
+    "titleSeller": "{{name}}, do Kore, preparou o site do casamento de vocês",
+    "descriptionSeller": "Confiram tudo antes de aceitar. Ao aceitar, vocês viram os donos do casamento.",
     "previewLabel": "Prévia do site",
     "rsvp": "Confirmar presença",
     "accept": "Aceitar e virar dono",
     "viewSite": "Ver o site completo",
     "emailNote": "Vocês entram com o Google ou com um código no e-mail {{email}}."
+  },
+  "plannerInvite": {
+    "title": "{{couple}} convidaram você como cerimonialista",
+    "description": "O casamento vai aparecer em Meus casamentos, e você ajuda a montar o site e a lista.",
+    "canEdit": "Editar o site, os convidados e os envios",
+    "canFollow": "Acompanhar as respostas no painel",
+    "coupleOnly": "Publicar, pagar ou mexer na chave Pix: só o casal",
+    "nameLabel": "Seu nome",
+    "nameError": "Informe seu nome.",
+    "accept": "Aceitar convite",
+    "decline": "Recusar convite"
   }
 }
