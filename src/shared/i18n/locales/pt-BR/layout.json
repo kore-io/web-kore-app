@@ -10,5 +10,6 @@
     "dashboard": "Dashboard"
   },
   "activeProfileCouple": "Perfil ativo: Casal",
+  "activeProfileCoupleWedding": "Perfil ativo: Casal · {{couple}}",
   "signOut": "Sair"
 }

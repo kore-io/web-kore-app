@@ -17,23 +17,38 @@ const me = (overrides: Record<string, unknown> = {}) => ({
   },
   activeProfile: 'couple',
   authenticatedAt: '2026-11-05T12:00:00Z',
+  memberships: [
+    {
+      weddingId: 'w1',
+      role: 'owner',
+      weddingName: 'Ana & Marcos',
+      eventDate: '2026-11-14',
+      city: 'Campinas',
+      state: 'SP',
+    },
+  ],
+  profiles: ['couple'],
+  lastProfileOnDevice: 'couple',
+  planner: null,
+  referrer: null,
   ...overrides,
 });
 
 describe('área do casal com o /v1/me (decisão 163)', () => {
-  it('mostra a pessoa, o perfil ativo e só o Sair no Menu do usuário', async () => {
+  it('a Topbar e o menu com os nomes do casal, a pessoa e só o Sair (163(2))', async () => {
     const user = userEvent.setup();
     mockApi(() => Response.json(me()));
     renderRoute({ url: '/app' });
     const trigger = await screen.findByRole('button', { name: 'Menu do usuário' });
     expect(screen.getByRole('link', { name: 'Dashboard' })).toHaveAttribute('aria-current', 'page');
+    expect(within(screen.getByRole('banner')).getByText('Ana & Marcos')).toBeInTheDocument();
     await user.click(trigger);
     const menu = await screen.findByRole('menu');
     expect(
       screen.getByText('Ana Beatriz Moreira', { selector: '*:not(button *)' }),
     ).toBeInTheDocument();
     expect(screen.getByText('ana.moreira@gmail.com')).toBeInTheDocument();
-    expect(screen.getByText('Perfil ativo: Casal')).toBeInTheDocument();
+    expect(screen.getByText('Perfil ativo: Casal · Ana & Marcos')).toBeInTheDocument();
     expect(
       within(menu)
         .getAllByRole('menuitem')
@@ -60,9 +75,21 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
   });
 
   it('com outro perfil ativo (ou nenhum): vai à Seleção de perfil (RN14)', async () => {
-    mockApi(() => Response.json(me({ activeProfile: 'planner' })));
+    // Dois perfis com o de cerimonialista ativo: a Seleção mostra a escolha.
+    mockApi(() =>
+      Response.json(
+        me({
+          activeProfile: 'planner',
+          profiles: ['couple', 'planner'],
+          planner: { organization: 'Prado Assessoria', weddingsCount: 3 },
+        }),
+      ),
+    );
     const { router } = renderRoute({ url: '/app' });
     await waitFor(() => expect(router.state.location.pathname).toBe('/perfis'));
+    expect(
+      await screen.findByRole('heading', { name: 'Com qual perfil você quer entrar?' }),
+    ).toBeInTheDocument();
   });
 
   it('Sair encerra a sessão e vai ao Entrar (RN09)', async () => {
