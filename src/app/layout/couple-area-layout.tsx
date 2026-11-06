@@ -10,10 +10,10 @@ import { paths } from '../paths';
 import { AppShell } from './app-shell';
 
 /**
- * Área do casal (/app) com a sessão do GET /v1/me (decisão 163): o Menu do usuário com a
- * pessoa, o perfil ativo e só o Sair na F0; a Topbar sem título até a rota do casamento
- * trazer os nomes. Enquanto o /me carrega (ou redireciona), nada aparece; se ele falhar por
- * rede ou 5xx, o aviso com o Tentar de novo (decisão 164).
+ * Área do casal (/app) com a sessão do GET /v1/me (decisão 163): a Topbar com os nomes do
+ * casal ("Ana & Marcos", o casamento de dono) e o Menu do usuário com a pessoa, "Perfil
+ * ativo: Casal · Ana & Marcos" e só o Sair na F0. Enquanto o /me carrega (ou redireciona),
+ * nada aparece; se ele falhar por rede ou 5xx, o aviso com o Tentar de novo (decisão 164).
  */
 export function CoupleAreaLayout() {
   const { t } = useTranslation('layout');
@@ -24,11 +24,15 @@ export function CoupleAreaLayout() {
   if (failed) return <LoadError onRetry={retry} />;
   if (!me) return null;
 
+  const couple = me.memberships.find((membership) => membership.role === 'owner')?.weddingName;
+
   return (
     <AppShell
-      title={null}
+      title={couple ?? null}
       user={menuUser({ user: me.user })}
-      activeProfile={t('activeProfileCouple')}
+      activeProfile={
+        couple ? t('activeProfileCoupleWedding', { couple }) : t('activeProfileCouple')
+      }
       userMenuGroups={[[{ id: 'sign-out', label: t('signOut'), onSelect: signOut }]]}
       navigation={
         <NavItem asChild icon={<LayoutDashboard />} current>

@@ -4,20 +4,32 @@
  * Kore API
  * OpenAPI spec version: 1
  */
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
+  MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query';
 
-import type { MeResponse, RateLimitedErrorBody, SessionExpiredErrorBody } from '../model';
+import type {
+  MeResponse,
+  OriginNotAllowedErrorBody,
+  ProfileNotOwnedErrorBody,
+  RateLimitedErrorBody,
+  SessionExpiredErrorBody,
+  SetActiveProfileBody,
+  SetActiveProfileResponse,
+  ValidationErrorBody,
+} from '../model';
 
 import { httpClient } from '../../http-client';
 import type { ErrorType } from '../../http-client';
@@ -44,7 +56,7 @@ export const getMeControllerMeV1Url = () => {
 };
 
 /**
- * @summary Quem está conectado; a leitura também renova a sessão (RN08).
+ * @summary Quem está conectado, os perfis e os vínculos; a leitura também renova a sessão (RN08, RN14).
  */
 export const meControllerMeV1 = async (
   options?: Parameters<typeof httpClient>[1],
@@ -130,7 +142,7 @@ export function useMeControllerMeV1<
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
- * @summary Quem está conectado; a leitura também renova a sessão (RN08).
+ * @summary Quem está conectado, os perfis e os vínculos; a leitura também renova a sessão (RN08, RN14).
  */
 
 export function useMeControllerMeV1<
@@ -151,3 +163,131 @@ export function useMeControllerMeV1<
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+export const getMeControllerChooseProfileV1Url = () => {
+  return `/v1/me/active-profile`;
+};
+
+/**
+ * @summary Escolhe o perfil ativo da sessão, sem novo login (RN14, RN16 de Login).
+ */
+export const meControllerChooseProfileV1 = async (
+  setActiveProfileBody: SetActiveProfileBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<SetActiveProfileResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<SetActiveProfileResponse>(getMeControllerChooseProfileV1Url(), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(setActiveProfileBody),
+  });
+};
+
+export const getMeControllerChooseProfileV1MutationKey = () =>
+  ['meControllerChooseProfileV1'] as const;
+
+export const getMeControllerChooseProfileV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ProfileNotOwnedErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof meControllerChooseProfileV1>>,
+    TError,
+    MeControllerChooseProfileV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof meControllerChooseProfileV1>>,
+  TError,
+  MeControllerChooseProfileV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getMeControllerChooseProfileV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof meControllerChooseProfileV1>>,
+    MeControllerChooseProfileV1MutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return meControllerChooseProfileV1(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type MeControllerChooseProfileV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof meControllerChooseProfileV1>>
+>;
+export type MeControllerChooseProfileV1MutationBody = SetActiveProfileBody;
+export type MeControllerChooseProfileV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | ProfileNotOwnedErrorBody
+  | RateLimitedErrorBody
+>;
+export type MeControllerChooseProfileV1MutationVariables = { data: SetActiveProfileBody };
+
+/**
+ * @summary Escolhe o perfil ativo da sessão, sem novo login (RN14, RN16 de Login).
+ */
+export const useMeControllerChooseProfileV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ProfileNotOwnedErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof meControllerChooseProfileV1>>,
+      TError,
+      MeControllerChooseProfileV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof meControllerChooseProfileV1>>,
+  TError,
+  MeControllerChooseProfileV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getMeControllerChooseProfileV1MutationOptions(options), queryClient);
+};

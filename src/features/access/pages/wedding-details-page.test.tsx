@@ -206,13 +206,33 @@ describe('Dados do casamento ligados à API (decisões 155, 166 e 169)', () => {
     expect(screen.getByRole('button', { name: 'Criar nosso site' })).toBeDisabled();
   });
 
-  it('409 ALREADY_OWNER: Você já tem um casamento, e abrir vai à Seleção de perfil (RN06, 171(B))', async () => {
-    const { user, router } = await submitWith(
-      apiError({ status: 409, body: { error: 'ALREADY_OWNER', weddingId: 'w0' } }),
+  it('409 ALREADY_OWNER: Você já tem um casamento, e abrir passa ao perfil de casal (RN06, 171(B))', async () => {
+    const user = userEvent.setup();
+    let activeProfile: string | null = null;
+    const calls = api((request) => {
+      if (request.method === 'POST' && request.path === '/v1/weddings') {
+        return apiError({ status: 409, body: { error: 'ALREADY_OWNER', weddingId: 'w0' } });
+      }
+      if (request.path === '/v1/me/active-profile') {
+        activeProfile = 'couple';
+        return Response.json({ activeProfile, home: '/app' });
+      }
+      if (request.path === '/v1/me' && activeProfile)
+        return Response.json({ ...meBody, activeProfile });
+      return available(request);
+    });
+    const { router } = renderRoute({ url: '/cadastro' });
+    await fillForm(user);
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Criar nosso site' })).toBeEnabled(),
     );
+    await user.click(screen.getByRole('button', { name: 'Criar nosso site' }));
     expect(await screen.findByText('Você já tem um casamento no Kore.')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Abrir meu casamento' }));
-    await waitFor(() => expect(router.state.location.pathname).toBe('/perfis'));
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app'));
+    expect(calls.find((call) => call.path === '/v1/me/active-profile')?.body).toEqual({
+      profile: 'couple',
+    });
   });
 
   it('409 TERMS_VERSION_OUTDATED: recarrega para os termos novos (RN11, decisão 169(1))', async () => {

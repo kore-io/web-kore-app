@@ -101,8 +101,12 @@ test.describe('Convite do parceiro (Convites de acesso)', () => {
     });
     await answerTitle({ page });
     expect((await accept).status()).toBe(200);
-    // Com a decisão 178 na API, o dono aceito chega ao /app; antes dela, à Seleção de perfil.
-    await expect(page).toHaveURL(/\/(app|perfis)$/);
+    // Decisão 178: o dono aceito já está no perfil de casal e chega ao Dashboard.
+    await expect(page).toHaveURL(/\/app$/);
+    await page.getByRole('button', { name: 'Menu do usuário' }).click();
+    await expect(
+      page.getByText(`Perfil ativo: Casal · ${ownerName} & Marcos`, { exact: true }),
+    ).toBeVisible();
 
     // O convite vale uma vez só (RN03): o mesmo link agora é Convite inválido.
     await page.goto(link);
