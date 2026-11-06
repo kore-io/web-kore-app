@@ -4,12 +4,25 @@
  * Kore API
  * OpenAPI spec version: 1
  */
+import type { MeMembershipResponse } from './meMembershipResponse';
+import type { MePlannerResponse } from './mePlannerResponse';
+import type { MeReferrerResponse } from './meReferrerResponse';
 import type { MeResponseActiveProfile } from './meResponseActiveProfile';
+import type { MeResponseLastProfileOnDevice } from './meResponseLastProfileOnDevice';
+import type { MeResponseProfilesItem } from './meResponseProfilesItem';
 import type { MeUserResponse } from './meUserResponse';
 
 export interface MeResponse {
-  user: MeUserResponse;
+  memberships: MeMembershipResponse[];
+  /** @nullable */
+  planner: MePlannerResponse | null;
+  profiles: MeResponseProfilesItem[];
   /** @nullable */
   activeProfile: MeResponseActiveProfile;
+  /** @nullable */
+  lastProfileOnDevice: MeResponseLastProfileOnDevice;
+  /** @nullable */
+  referrer: MeReferrerResponse | null;
+  user: MeUserResponse;
   authenticatedAt: string;
 }

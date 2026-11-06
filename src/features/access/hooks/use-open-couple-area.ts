@@ -16,7 +16,7 @@ export function useOpenCoupleArea() {
   return {
     open: () =>
       setActiveProfile.mutate(
-        { profile: 'couple' },
+        { data: { profile: 'couple' } },
         {
           onSettled: () => {
             void queryClient.resetQueries({ queryKey: getMeControllerMeV1QueryKey() });

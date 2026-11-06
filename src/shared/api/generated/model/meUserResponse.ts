@@ -7,9 +7,9 @@
 import type { MeUserResponsePlatformRole } from './meUserResponsePlatformRole';
 
 export interface MeUserResponse {
-  id: string;
   /** @nullable */
   name: string | null;
-  email: string;
   platformRole: MeUserResponsePlatformRole;
+  id: string;
+  email: string;
 }

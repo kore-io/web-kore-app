@@ -11,7 +11,6 @@ import {
 import { ApiError } from '../../../shared/api/http-client';
 import { redirectTo } from '../../../shared/browser/redirect';
 import { useSetActiveProfile, type ProfileKind } from '../api/me-active-profile';
-import type { MeWithProfiles } from '../api/me-profiles';
 
 /**
  * Seleção de perfil (/perfis; RN14 a RN16 do Login; decisões 152, 173(e), 174(7) e 176): lê os
@@ -27,7 +26,7 @@ export function useProfiles() {
   const enteredDirectly = useRef(false);
 
   const signedOut = me.error instanceof ApiError && me.error.status === 401;
-  const data = me.data as MeWithProfiles | undefined;
+  const data = me.data;
   const profiles = data?.profiles ?? [];
 
   useEffect(() => {
@@ -36,7 +35,7 @@ export function useProfiles() {
 
   function choose({ profile }: { profile: ProfileKind }) {
     setActiveProfile.mutate(
-      { profile },
+      { data: { profile } },
       {
         onSuccess: ({ home }) => {
           void queryClient.resetQueries({ queryKey: getMeControllerMeV1QueryKey() });
