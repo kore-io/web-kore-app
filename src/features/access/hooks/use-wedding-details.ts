@@ -16,6 +16,7 @@ import type {
   WeddingDetailsField,
   WeddingDetailsValues,
 } from '../components/wedding-details-form';
+import { storedSignupOrigin } from '../signup-origin-storage';
 import { TERMS_VERSION } from '../terms';
 import { isValidSlug, suggestSlug } from '../wedding-slug';
 
@@ -109,7 +110,9 @@ export function useWeddingDetails({ referralCode }: { referralCode?: string | un
           slug: submitted.slug,
           ...(referralCode !== undefined && { referralCode }),
           termsVersion: TERMS_VERSION,
+          // A origem da chegada (decisão 169(2)); sem ela, direct.
           signupSource: 'direct',
+          ...storedSignupOrigin(),
         },
       },
       {
