@@ -37,7 +37,8 @@ const coupleInvite = {
   kind: 'couple',
   email: 'ana.moreira@gmail.com',
   invitedBy: { name: 'Prado Assessoria', role: 'planner' },
-  wedding: { ...wedding, partnerNames: ['Ana', 'Marcos'] },
+  // Os nomes completos, como a API manda; a tela mostra o primeiro nome (decisão 182).
+  wedding: { ...wedding, partnerNames: ['Ana Beatriz Moreira', 'Marcos Vinícius Rocha'] },
   sitePreview: null,
   referrer: { name: 'Juliana Prado', discountPercent: 10 },
   sessionEmailMismatch: false,
