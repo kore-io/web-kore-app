@@ -86,10 +86,10 @@ test.describe('Convites dos indicadores e Seleção com dois perfis (dados do pr
 
     // De volta ao convite (decisão 142): o Quem é você? antes de gravar o aceite.
     await expect(page.getByRole('heading', { level: 1, name: 'Quem é você?' })).toBeVisible();
-    // Os nomes como a API os devolve (partnerNames, decisão 173).
+    // O primeiro nome de cada noivo (decisão 182).
     await page
       .locator('label')
-      .filter({ hasText: /^Fernanda Alves$/ })
+      .filter({ hasText: /^Fernanda$/ })
       .click();
     await page
       .locator('label')

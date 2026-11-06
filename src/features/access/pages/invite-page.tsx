@@ -17,6 +17,7 @@ import { useInvite } from '../hooks/use-invite';
 import { markAccepting } from '../invite-storage';
 import { useSignIn } from '../hooks/use-sign-in';
 import { useSignOut } from '../hooks/use-sign-out';
+import { whoAreYouNames } from '../partner-names';
 import { formatLongDate, weddingProfileDescription } from '../profile-texts';
 
 /** Convite de acesso (/convite/:token): parceiro, casal ou cerimonialista. */
@@ -181,11 +182,11 @@ export function InvitePage() {
   );
 }
 
-/** Os dois nomes do Quem é você? (173(a)), na ordem do partnerIndex. */
+/** Os dois nomes do Quem é você? (173(a), 182), na ordem do partnerIndex. */
 function partnerNamesOf({ invitation }: { invitation: AccessInvitation }) {
   const [first, second] = invitation.wedding.partnerNames ?? [];
   return first !== undefined && second !== undefined
-    ? { partnerNames: [first, second] as [string, string] }
+    ? { partnerNames: whoAreYouNames({ names: [first, second] }) }
     : {};
 }
 
