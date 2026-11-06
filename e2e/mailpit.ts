@@ -3,7 +3,7 @@ import { expect, type APIRequestContext } from '@playwright/test';
 const MAILPIT_URL = process.env.MAILPIT_URL ?? 'http://localhost:8025';
 
 interface MailpitSearch {
-  messages: { ID: string }[];
+  messages: { ID: string; Created: string }[];
 }
 
 interface MailpitMessage {
@@ -11,24 +11,37 @@ interface MailpitMessage {
   HTML: string;
 }
 
-/** Último e-mail recebido por `to` no Mailpit, esperando ele chegar (o worker envia). */
-export async function latestEmail({ request, to }: { request: APIRequestContext; to: string }) {
-  let id: string | undefined;
+/**
+ * Último e-mail recebido por `to` no Mailpit, esperando ele chegar (o worker envia). Com
+ * `since`, espera um que tenha chegado depois (ex.: o do código, depois do convite).
+ */
+export async function latestEmail({
+  request,
+  to,
+  since,
+}: {
+  request: APIRequestContext;
+  to: string;
+  since?: Date;
+}) {
+  let message: MailpitMessage | undefined;
   await expect
     .poll(
       async () => {
         const response = await request.get(`${MAILPIT_URL}/api/v1/search`, {
           params: { query: `to:"${to}"`, limit: 1 },
         });
-        const search = (await response.json()) as MailpitSearch;
-        id = search.messages[0]?.ID;
-        return id;
+        const latest = ((await response.json()) as MailpitSearch).messages[0];
+        if (!latest || (since && new Date(latest.Created) < since)) return undefined;
+        message = (await (
+          await request.get(`${MAILPIT_URL}/api/v1/message/${latest.ID}`)
+        ).json()) as MailpitMessage;
+        return message;
       },
       { message: `e-mail para ${to}`, timeout: 15_000 },
     )
     .toBeTruthy();
-  const response = await request.get(`${MAILPIT_URL}/api/v1/message/${String(id)}`);
-  return (await response.json()) as MailpitMessage;
+  return message as MailpitMessage;
 }
 
 /** O código de 6 números do e-mail de login (o e-mail mostra em dois grupos: "980 127"). */
@@ -42,6 +55,13 @@ export function codeFrom({ email }: { email: MailpitMessage }) {
 export function confirmLinkFrom({ email }: { email: MailpitMessage }) {
   const link = /https?:\/\/[^\s"<>]+\/entrar\/confirmar\?token=[^\s"<>]+/.exec(email.HTML)?.[0];
   if (!link) throw new Error('link de confirmação não encontrado no e-mail');
+  return link.replaceAll('&amp;', '&');
+}
+
+/** O link do convite de acesso do e-mail (/convite/{token}). */
+export function inviteLinkFrom({ email }: { email: MailpitMessage }) {
+  const link = /https?:\/\/[^\s"<>]+\/convite\/[^\s"<>]+/.exec(email.HTML)?.[0];
+  if (!link) throw new Error('link do convite não encontrado no e-mail');
   return link.replaceAll('&amp;', '&');
 }
 
