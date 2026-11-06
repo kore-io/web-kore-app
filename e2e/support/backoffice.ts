@@ -158,7 +158,7 @@ export async function createInvitation({
 }: {
   db: Db;
   weddingId: string;
-  kind: 'couple' | 'planner';
+  kind: 'partner' | 'couple' | 'planner';
   email: string | null;
   invitedByUserId: string;
 }) {
