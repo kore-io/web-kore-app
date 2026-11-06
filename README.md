@@ -32,9 +32,18 @@ env "npm_config_//npm.pkg.github.com/:_authToken=$(gh auth token)" pnpm install
 celular. Antes, deixe de pé:
 
 - o `api-kore-api` (API e worker) em `http://localhost:3000`, com `GOOGLE_PROVIDER=dev`,
-  `ALLOWED_ORIGINS=http://localhost:5173` e `RATE_LIMIT_AUTH_PER_MINUTE` alto o bastante
-  para a suíte (ex.: 200; o padrão de 10 por minuto barra a suíte com 429);
+  `ALLOWED_ORIGINS=http://localhost:5173` e os limites por IP altos o bastante para a
+  suíte (ex.: `RATE_LIMIT_AUTH_PER_MINUTE=200` e `RATE_LIMIT_GENERAL_PER_MINUTE=1000`; os
+  padrões, 10 e 100 por minuto, barram a suíte com 429);
 - o Mailpit do compose da API em `http://localhost:8025`, de onde os testes leem o código.
+
+Os convites do casal e do cerimonialista e a Seleção com dois perfis montam os próprios
+dados (casamento, indicador e convite, únicos por rodada) pela conexão do backoffice da
+API, como os e2e do `api-kore-api`. Passe a URL dela no ambiente, sem gravar em arquivo:
+
+```sh
+E2E_DATABASE_BACKOFFICE_URL="$(grep '^DATABASE_BACKOFFICE_URL=' ../api-kore-api/.env | cut -d= -f2-)" pnpm test:e2e
+```
 
 O app sobe sozinho na 5173 (ou o teste reaproveita o que já estiver rodando). Na primeira
 vez, instale o navegador com `pnpm exec playwright install chromium`.

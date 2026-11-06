@@ -58,13 +58,6 @@ export function confirmLinkFrom({ email }: { email: MailpitMessage }) {
   return link.replaceAll('&amp;', '&');
 }
 
-/** O link do convite de acesso do e-mail (/convite/{token}). */
-export function inviteLinkFrom({ email }: { email: MailpitMessage }) {
-  const link = /https?:\/\/[^\s"<>]+\/convite\/[^\s"<>]+/.exec(email.HTML)?.[0];
-  if (!link) throw new Error('link do convite não encontrado no e-mail');
-  return link.replaceAll('&amp;', '&');
-}
-
 /** Um e-mail novo a cada teste, para não esbarrar nos limites da RN04. */
 export function newEmail({ label }: { label: string }) {
   return `e2e-${label}-${Date.now()}@kore.local`;

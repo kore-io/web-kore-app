@@ -1,5 +1,21 @@
-import { expect, test, type Browser, type Page } from '@playwright/test';
-import { codeFrom, inviteLinkFrom, latestEmail, newEmail } from './mailpit';
+import { expect, test, type Page } from '@playwright/test';
+import { codeFrom, latestEmail, newEmail } from './mailpit';
+import {
+  connectBackoffice,
+  createInvitation,
+  createUser,
+  createWedding,
+  unique,
+  type Db,
+} from './support/backoffice';
+
+let db: Db;
+test.beforeAll(async () => {
+  db = await connectBackoffice();
+});
+test.afterAll(async () => {
+  await db.end();
+});
 
 /** Pede o código (o clique que manda o e-mail) e entra com o código que chegou depois. */
 async function signInWithCode({
@@ -21,43 +37,36 @@ async function signInWithCode({
 }
 
 /**
- * A dona cria o casamento pelo cadastro e convida o parceiro; devolve o link do convite que
- * chegou ao Mailpit e o primeiro nome dela (quem convidou).
+ * A dona e o casamento, com o convite do parceiro já enviado, montados pela conexão do
+ * backoffice (o envio pela tela é coberto no cadastro do login.spec): devolve o link do
+ * convite, o primeiro nome de quem convidou e o e-mail do parceiro.
  */
-async function weddingWithPartnerInvite({ browser }: { browser: Browser }) {
-  const context = await browser.newContext();
-  const page = await context.newPage();
-  const unique = String(Date.now()).slice(-6);
-  const ownerName = `Ana${unique}`;
-  const ownerEmail = newEmail({ label: 'dona' });
-  await page.goto('/cadastro');
-  await page.getByRole('textbox', { name: 'E-⁠mail' }).fill(ownerEmail);
-  await signInWithCode({
-    page,
-    email: ownerEmail,
-    requestCode: () => page.getByRole('button', { name: 'Continuar', exact: true }).click(),
+async function weddingWithPartnerInvite() {
+  const run = unique();
+  const ownerName = `Ana${run}`;
+  const ownerId = await createUser({
+    db,
+    email: newEmail({ label: `dona-${run}` }),
+    name: `${ownerName} Moreira`,
   });
-  await page.getByRole('textbox', { name: 'Seu nome' }).fill(`${ownerName} Moreira`);
-  await page
-    .locator('label')
-    .filter({ hasText: /^Noiva$/ })
-    .click();
-  await page.getByRole('textbox', { name: 'Com quem você vai casar?' }).fill('Marcos Rocha');
-  await page.getByRole('textbox', { name: 'Cidade' }).fill('Campinas');
-  await page.getByRole('combobox', { name: 'UF' }).selectOption('SP');
-  await expect(page.getByRole('button', { name: 'Criar nosso site' })).toBeEnabled();
-  await page.getByRole('button', { name: 'Criar nosso site' }).click();
-  const partnerEmail = newEmail({ label: 'parceiro' });
-  await page.getByRole('textbox', { name: 'E-⁠mail de Marcos' }).fill(partnerEmail);
-  await page.getByRole('button', { name: 'Enviar convite' }).click();
-  await expect(
-    page.getByText(`Convite enviado para ${partnerEmail}.`, { exact: true }),
-  ).toBeVisible();
-  const link = inviteLinkFrom({
-    email: await latestEmail({ request: page.request, to: partnerEmail }),
+  const weddingId = await createWedding({
+    db,
+    partners: [`${ownerName} Moreira`, 'Marcos Rocha'],
+    eventDate: '2026-11-14',
+    city: 'Campinas',
+    status: 'draft',
+    createdByUserId: ownerId,
+    owners: [ownerId, null],
   });
-  await context.close();
-  return { link, ownerName, partnerEmail };
+  const partnerEmail = newEmail({ label: `parceiro-${run}` });
+  const token = await createInvitation({
+    db,
+    weddingId,
+    kind: 'partner',
+    email: partnerEmail,
+    invitedByUserId: ownerId,
+  });
+  return { link: `/convite/${token}`, ownerName, partnerEmail };
 }
 
 /**
@@ -83,10 +92,9 @@ const acceptResponse = (page: Page) =>
 
 test.describe('Convite do parceiro (Convites de acesso)', () => {
   test('sem conta: vê o casamento, entra pelo código na própria tela e aceita (RN06, RN08)', async ({
-    browser,
     page,
   }) => {
-    const { link, ownerName, partnerEmail } = await weddingWithPartnerInvite({ browser });
+    const { link, ownerName, partnerEmail } = await weddingWithPartnerInvite();
     await page.goto(link);
     await expect(
       page.getByRole('heading', { level: 1, name: `${ownerName} convidou você para o casamento` }),
@@ -114,10 +122,9 @@ test.describe('Convite do parceiro (Convites de acesso)', () => {
   });
 
   test('recusar sem entrar: avisa, vai ao Entrar, e o link deixa de valer (RN11; 172(6))', async ({
-    browser,
     page,
   }) => {
-    const { link } = await weddingWithPartnerInvite({ browser });
+    const { link } = await weddingWithPartnerInvite();
     await page.goto(link);
     await page.getByRole('button', { name: 'Recusar convite' }).click();
     await expect(page.getByText('Convite recusado.', { exact: true })).toBeVisible();
@@ -127,10 +134,9 @@ test.describe('Convite do parceiro (Convites de acesso)', () => {
   });
 
   test('entrar com outro e-⁠mail: Outra conta, e o convite fica nesta conta (RN07)', async ({
-    browser,
     page,
   }) => {
-    const { link, partnerEmail } = await weddingWithPartnerInvite({ browser });
+    const { link, partnerEmail } = await weddingWithPartnerInvite();
     const otherEmail = newEmail({ label: 'outra' });
     await page.goto(link);
     await page.getByRole('textbox', { name: 'E-⁠mail' }).fill(otherEmail);
