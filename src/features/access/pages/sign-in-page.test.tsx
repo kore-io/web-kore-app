@@ -52,7 +52,11 @@ describe('Entrar ligado à API (Login sem senha e sessão; decisões 150, 151 e 
     await user.keyboard('481905');
     await user.click(screen.getByRole('button', { name: 'Entrar' }));
     await waitFor(() => expect(router.state.location.pathname).toBe('/perfis'));
-    expect(requests).toEqual([
+    // Depois do login, a Seleção de perfil lê o /me: aqui contam só as chamadas do login.
+    const loginRequests = requests.filter((request) =>
+      (request as { path: string }).path.startsWith('/v1/auth/'),
+    );
+    expect(loginRequests).toEqual([
       { path: '/v1/auth/login-challenges', body: { email: 'ana@exemplo.com', origin: 'none' } },
       {
         path: '/v1/auth/login-challenges/verify',
