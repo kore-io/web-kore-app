@@ -5,14 +5,15 @@ import { useTranslation } from 'react-i18next';
 import { paths } from '../../../app/paths';
 import { useAuthControllerLogoutV1 } from '../../../shared/api/generated/auth/auth';
 import { ApiError } from '../../../shared/api/http-client';
+import type { SignInLocationState } from '../sign-in-location-state';
 
 /**
  * Sair (RN09, decisão 163(5)): encerra a sessão do aparelho, limpa o cache e vai ao Entrar.
  * Um 401 quer dizer que a sessão já tinha acabado (venceu, ou "sair de todos" em outro
- * aparelho): vale como saído. Só a falha de rede ou da API (5xx) mostra o aviso genérico
+ * aparelho): vale como saído. O `signInState` vai ao Entrar (ex.: a origem do convite). Só a falha de rede ou da API (5xx) mostra o aviso genérico
  * (decisão 157(3)) no Toast e deixa a pessoa na tela.
  */
-export function useSignOut() {
+export function useSignOut({ signInState }: { signInState?: SignInLocationState } = {}) {
   const { t } = useTranslation('access');
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -21,7 +22,8 @@ export function useSignOut() {
 
   const signedOut = () => {
     queryClient.clear();
-    void navigate(paths.signIn, { replace: true });
+    // O Entrar com outra conta do convite volta ao convite depois (origem invite, RN06).
+    void navigate(paths.signIn, { replace: true, state: signInState });
   };
 
   return () =>

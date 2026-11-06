@@ -4,7 +4,9 @@ import { describe, expect, it, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../../../tests/a11y';
 import { PartnerInviteStep, type PartnerInviteStepProps } from './partner-invite-step';
 
-function props(overrides: Partial<PartnerInviteStepProps> = {}): PartnerInviteStepProps {
+type SignedOutProps = Extract<PartnerInviteStepProps, { invitedEmail: string }>;
+
+function props(overrides: Partial<SignedOutProps> = {}): SignedOutProps {
   return {
     inviterName: 'Ana',
     couple: 'Ana & Marcos',
@@ -38,6 +40,25 @@ describe('Convite do parceiro (decisão 156)', () => {
     expect(stepProps.onSubmit).toHaveBeenCalledWith({ email: 'marcos.rocha@gmail.com' });
     await user.click(screen.getByRole('button', { name: 'Recusar convite' }));
     expect(stepProps.onDecline).toHaveBeenCalledTimes(1);
+  });
+
+  it('com sessão: só o Aceitar convite, sem o Google e o e-\u2060mail', async () => {
+    const user = userEvent.setup();
+    const onAccept = vi.fn();
+    render(
+      <PartnerInviteStep
+        signedIn
+        onAccept={onAccept}
+        inviterName="Ana"
+        couple="Ana & Marcos"
+        weddingDetails="x"
+        onDecline={vi.fn()}
+      />,
+    );
+    expect(screen.queryByRole('textbox')).toBeNull();
+    expect(screen.queryByRole('button', { name: /Google/ })).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Aceitar convite' }));
+    expect(onAccept).toHaveBeenCalledTimes(1);
   });
 
   it('é acessível', async () => {

@@ -32,10 +32,26 @@ describe('Quem é você? (decisão 106)', () => {
     expect(onSubmit).toHaveBeenCalledWith({ partnerIndex: 2, myTitle: 'bride' });
   });
 
+  it('sem os nomes: só "Você é o noivo ou a noiva?" (decisões 172(2) e 174(5))', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    render(<WhoAreYouStep onSubmit={onSubmit} />);
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Você é o noivo ou a noiva?' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Escolha o seu nome para entrar no casamento.')).toBeNull();
+    const submit = screen.getByRole('button', { name: 'Continuar' });
+    expect(submit).toBeDisabled();
+    await user.click(screen.getByRole('radio', { name: 'Noiva' }));
+    await user.click(submit);
+    expect(onSubmit).toHaveBeenCalledWith({ myTitle: 'bride' });
+  });
+
   it('é acessível', async () => {
     const { container } = render(
       <main>
         <WhoAreYouStep partnerNames={['Ana', 'Marcos']} onSubmit={vi.fn()} />
+        <WhoAreYouStep onSubmit={vi.fn()} />
       </main>,
     );
     await expectNoA11yViolations({ container });
