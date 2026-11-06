@@ -100,13 +100,15 @@ export function useInvite({ token }: { token: string }) {
     void navigate(role === 'owner' ? paths.coupleArea : paths.profiles, { replace: true });
   }
 
-  /** Já faz parte do casamento (ALREADY_MEMBER): abre direto, sem gravar nada (172(3)). */
+  /**
+   * Já faz parte do casamento (ALREADY_MEMBER, 172(3)): nada é gravado, e o 409 não diz o
+   * papel. A Seleção de perfil decide pelos perfis do /me: com um só, entra direto (176(2));
+   * com mais de um, a pessoa escolhe. O tipo do convite não escolhe o perfil (obs. do Crivo).
+   */
   function openExistingWedding() {
     clearInviteToken();
-    if (invitation?.kind === 'planner') {
-      void queryClient.resetQueries({ queryKey: getMeControllerMeV1QueryKey() });
-      void navigate(paths.profiles, { replace: true });
-    } else coupleArea.open();
+    void queryClient.resetQueries({ queryKey: getMeControllerMeV1QueryKey() });
+    void navigate(paths.profiles, { replace: true });
   }
 
   function showGenericError() {

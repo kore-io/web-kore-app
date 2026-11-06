@@ -63,7 +63,7 @@ function api({
   invitation,
   answer = () => undefined,
 }: {
-  session: ReturnType<typeof me> | null;
+  session: (ReturnType<typeof me> & Record<string, unknown>) | null;
   invitation: Record<string, unknown> | Response;
   answer?: (request: Request) => Response | undefined;
 }) {
@@ -272,25 +272,65 @@ describe('Convite do casal (RN09; decisões 172(1), 173 e 174)', () => {
     ).toBeInTheDocument();
   });
 
-  it('já faz parte deste casamento: passa ao perfil de casal e abre (ALREADY_MEMBER)', async () => {
+  async function acceptAsAlreadyMember({
+    session,
+  }: {
+    session: Parameters<typeof api>[0]['session'];
+  }) {
     const user = userEvent.setup();
     const calls = api({
-      session: me('ana.moreira@gmail.com'),
+      session,
       invitation: coupleInvite,
       answer: ({ path }) =>
         path.endsWith('/accept')
           ? apiError({ status: 409, body: { error: 'ALREADY_MEMBER' } })
           : undefined,
     });
-    const { router } = renderRoute({ url: '/convite/tk1' });
+    const view = renderRoute({ url: '/convite/tk1' });
     await user.click(await screen.findByRole('button', { name: 'Aceitar e virar dono' }));
     await user.click(await screen.findByRole('radio', { name: 'Marcos' }));
     await user.click(screen.getByRole('radio', { name: 'Noivo' }));
     await user.click(screen.getByRole('button', { name: 'Continuar' }));
-    await waitFor(() => expect(router.state.location.pathname).toBe('/app'));
-    expect(calls.find((call) => call.path === '/v1/me/active-profile')?.body).toEqual({
-      profile: 'couple',
+    return { calls, ...view };
+  }
+
+  const anaAndMarcos = {
+    weddingId: 'w1',
+    role: 'owner',
+    weddingName: 'Ana & Marcos',
+    eventDate: '2026-11-14',
+    city: 'Campinas',
+    state: 'SP',
+  };
+
+  it('já faz parte do casamento, com um perfil só: a Seleção entra direto (ALREADY_MEMBER, 176(2))', async () => {
+    const { calls, router } = await acceptAsAlreadyMember({
+      session: {
+        ...me('ana.moreira@gmail.com'),
+        profiles: ['couple'],
+        memberships: [anaAndMarcos],
+      },
     });
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app'));
+    expect(
+      calls.filter((call) => call.path === '/v1/me/active-profile').map((call) => call.body),
+    ).toEqual([{ profile: 'couple' }]);
+  });
+
+  it('cerimonialista com dois perfis no link do casal: a Seleção, sem trocar o perfil (obs. do Crivo)', async () => {
+    const { calls, router } = await acceptAsAlreadyMember({
+      session: {
+        ...me('juliana@prado.com.br', 'Juliana Prado'),
+        profiles: ['couple', 'planner'],
+        memberships: [{ ...anaAndMarcos, role: 'collaborator' }],
+        planner: { organization: 'Prado Assessoria', weddingsCount: 3 },
+      },
+    });
+    await waitFor(() => expect(router.state.location.pathname).toBe('/perfis'));
+    expect(
+      await screen.findByRole('heading', { name: 'Com qual perfil você quer entrar?' }),
+    ).toBeInTheDocument();
+    expect(calls.some((call) => call.path === '/v1/me/active-profile')).toBe(false);
   });
 });
 
