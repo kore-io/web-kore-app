@@ -11,6 +11,9 @@ import pg from 'pg';
 
 const BACKOFFICE_DB_ROLE = 'kore_backoffice';
 
+/** Só o banco local: a conexão grava com BYPASSRLS (até o E2E ir à homologação, 159). */
+const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '::1', '[::1]']);
+
 export type Db = pg.Client;
 
 export async function connectBackoffice(): Promise<Db> {
@@ -18,6 +21,12 @@ export async function connectBackoffice(): Promise<Db> {
   if (!connectionString) {
     throw new Error(
       'Faltou E2E_DATABASE_BACKOFFICE_URL (a DATABASE_BACKOFFICE_URL do .env da API local).',
+    );
+  }
+  const { hostname } = new URL(connectionString);
+  if (!LOCAL_HOSTS.has(hostname)) {
+    throw new Error(
+      `E2E_DATABASE_BACKOFFICE_URL aponta para "${hostname}": o E2E só grava no banco local.`,
     );
   }
   // Como a BackofficePrismaService: o BYPASSRLS não é herdado pela participação no papel.
