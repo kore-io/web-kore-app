@@ -17,7 +17,6 @@ import {
   type AccessInvitation,
   type AcceptInvitationResponse,
 } from '../api/access-invitations';
-import { useSetActiveProfile } from '../api/me-active-profile';
 import type { WhoAreYouValues } from '../components/who-are-you-step';
 import {
   clearAccepting,
@@ -27,6 +26,7 @@ import {
   saveInviteToken,
 } from '../invite-storage';
 import type { SignInLocationState } from '../sign-in-location-state';
+import { useOpenCoupleArea } from './use-open-couple-area';
 
 /** Em que ponto do convite a pessoa está. */
 export type InviteStage =
@@ -72,7 +72,7 @@ export function useInvite({ token }: { token: string }) {
   });
   const accept = useAcceptInvitation();
   const decline = useDeclineInvitation();
-  const setActiveProfile = useSetActiveProfile();
+  const coupleArea = useOpenCoupleArea();
 
   /** A pessoa tocou em Aceitar (agora, ou antes do login, decisão 142). */
   const [accepting, setAccepting] = useState(() => isAccepting({ token }));
@@ -90,19 +90,6 @@ export function useInvite({ token }: { token: string }) {
     invitationQuery.error instanceof ApiError && invitationQuery.error.status === 410;
   const signedIn = viewer !== undefined;
 
-  /** Passa a sessão ao perfil de casal e abre o Dashboard (RN14 e RN16 do Login). */
-  function openCoupleArea() {
-    setActiveProfile.mutate(
-      { profile: 'couple' },
-      {
-        onSettled: () => {
-          void queryClient.resetQueries({ queryKey: getMeControllerMeV1QueryKey() });
-          void navigate(paths.coupleArea, { replace: true });
-        },
-      },
-    );
-  }
-
   /**
    * Depois de aceitar: o dono já está no perfil de casal (decisão 178) e vai ao Dashboard;
    * o cerimonialista (colaborador) vai à Seleção de perfil (174(4)).
@@ -119,7 +106,7 @@ export function useInvite({ token }: { token: string }) {
     if (invitation?.kind === 'planner') {
       void queryClient.resetQueries({ queryKey: getMeControllerMeV1QueryKey() });
       void navigate(paths.profiles, { replace: true });
-    } else openCoupleArea();
+    } else coupleArea.open();
   }
 
   function showGenericError() {
@@ -221,7 +208,7 @@ export function useInvite({ token }: { token: string }) {
   return {
     stage: stage(),
     signedIn,
-    submitting: accept.isPending || decline.isPending || setActiveProfile.isPending,
+    submitting: accept.isPending || decline.isPending || coupleArea.opening,
     nameError,
     /** Aceitar convite / Aceitar e virar dono. */
     startAccept,
@@ -251,7 +238,7 @@ export function useInvite({ token }: { token: string }) {
     /** Você já tem um casamento → Abrir meu casamento. */
     openMyWedding: () => {
       clearInviteToken();
-      openCoupleArea();
+      coupleArea.open();
     },
     decline: () =>
       decline.mutate(

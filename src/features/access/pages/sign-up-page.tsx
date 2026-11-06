@@ -9,6 +9,7 @@ import { SignInCodeStep } from '../components/sign-in-code-step';
 import { SignUpStartStep } from '../components/sign-up-start-step';
 import { WeddingDetailsForm } from '../components/wedding-details-form';
 import { useInvitePartner } from '../hooks/use-invite-partner';
+import { useOpenCoupleArea } from '../hooks/use-open-couple-area';
 import { useSignUp } from '../hooks/use-sign-up';
 import { useWeddingDetails } from '../hooks/use-wedding-details';
 
@@ -56,6 +57,8 @@ export function SignUpPage() {
 /** Dados do casamento e o que vem depois do POST /v1/weddings (RN06 e RN10, decisão 169). */
 function WeddingDetailsStage({ referralCode }: { referralCode: string | undefined }) {
   const navigate = useNavigate();
+  // RN06: Abrir meu casamento passa ao perfil de casal e vai ao Dashboard (171(B)).
+  const coupleArea = useOpenCoupleArea();
   const details = useWeddingDetails({ referralCode });
   const openWedding = () =>
     void details.openWedding().then(() => navigate(paths.coupleArea, { replace: true }));
@@ -64,7 +67,7 @@ function WeddingDetailsStage({ referralCode }: { referralCode: string | undefine
     return (
       <AccessLayout pitch="couple" showLegal={false}>
         {/* Até existir o POST /v1/me/active-profile, a Seleção de perfil (decisão 171(B)). */}
-        <AlreadyOwner onOpenWedding={() => void navigate(paths.profiles, { replace: true })} />
+        <AlreadyOwner onOpenWedding={coupleArea.open} />
       </AccessLayout>
     );
   }
