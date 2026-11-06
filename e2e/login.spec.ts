@@ -39,6 +39,10 @@ test.describe('Login sem senha (Login sem senha e sessão)', () => {
     await page.keyboard.type(code);
     await page.getByRole('button', { name: 'Entrar' }).click();
     await expect(page).toHaveURL(/\/perfis$/);
+    // RN14: sem perfil, a Seleção oferece os dois começos.
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Como você quer usar o Kore?' }),
+    ).toBeVisible();
     await expectSignedIn({ page, email });
   });
 
@@ -177,8 +181,15 @@ test.describe('Login sem senha (Login sem senha e sessão)', () => {
     const invite = await latestEmail({ request: page.request, to: partnerEmail });
     expect(invite.HTML).toContain('/convite/');
     await expect(page).toHaveURL(/\/app$/);
+    await expect(page.getByRole('banner').getByText(`Ana${unique} & Marcos`)).toBeVisible();
     await page.getByRole('button', { name: 'Menu do usuário' }).click();
-    await expect(page.getByText('Perfil ativo: Casal')).toBeVisible();
+    await expect(
+      page.getByText(`Perfil ativo: Casal · Ana${unique} & Marcos`, { exact: true }),
+    ).toBeVisible();
+
+    // RN14: com um perfil só, a Seleção de perfil entra direto nele (decisão 176(2)).
+    await page.goto('/perfis');
+    await expect(page).toHaveURL(/\/app$/);
 
     // RN06: dono de um casamento ativo não cria outro.
     await page.goto('/cadastro');
