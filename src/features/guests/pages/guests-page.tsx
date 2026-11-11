@@ -6,6 +6,7 @@ import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { useState } from 'react';
 import { PartyFilters } from '../components/party-filters';
 import { PartyList } from '../components/party-list';
+import { PartyRowMenu } from '../components/party-row-menu';
 import { SelectionBar } from '../components/selection-bar';
 import { TrashDialog } from '../components/trash-dialog';
 import { useActiveWedding, type Audience } from '../hooks/use-active-wedding';
@@ -14,6 +15,7 @@ import { useTrash } from '../hooks/use-trash';
 import { usePartyFilters } from '../hooks/use-party-filters';
 import { usePartyList } from '../hooks/use-party-list';
 import { usePartySelection } from '../hooks/use-party-selection';
+import { useRowActions } from '../hooks/use-row-actions';
 
 /** Aba Grupos e convidados (RN13 de Grupos e convidados), dentro do GuestsLayout. */
 export function GuestsPage() {
@@ -38,6 +40,7 @@ function PartiesView({ weddingId, audience }: { weddingId: string; audience: Aud
   const selection = usePartySelection({ ids });
   const applyTag = useApplyTag({ weddingId });
   const trash = useTrash({ weddingId, audience });
+  const rowActions = useRowActions({ weddingId });
   const [confirmTrash, setConfirmTrash] = useState(false);
   const marked = list.parties.filter((party) => selection.isSelected(party.id));
   const onlyOne = marked.length === 1 ? marked[0] : undefined;
@@ -68,6 +71,7 @@ function PartiesView({ weddingId, audience }: { weddingId: string; audience: Aud
           isLoadingMore={list.isLoadingMore}
           loadMoreFailed={list.loadMoreFailed}
           onLoadMore={list.loadMore}
+          actionsFor={(party) => <PartyRowMenu party={party} onAction={rowActions.onAction} />}
         />
         <p className="kore-guests__showing">
           {t('showing', { shown: list.parties.length, count: list.total ?? 0 })}
@@ -102,6 +106,19 @@ function PartiesView({ weddingId, audience }: { weddingId: string; audience: Aud
           onTrash={() => setConfirmTrash(true)}
         />
       )}
+      <TrashDialog
+        open={rowActions.trashing !== null}
+        title={t('trash.party.title', { name: rowActions.trashing?.name ?? '' })}
+        description={t('trash.party.description', { count: rowActions.trashing?.named ?? 0 })}
+        isPending={trash.isTrashing}
+        returnFocusRef={rowActions.trigger}
+        onClose={rowActions.closeTrash}
+        onConfirm={() => {
+          const party = rowActions.trashing;
+          if (!party) return;
+          trash.trashParty({ partyId: party.id, name: party.name, onDone: rowActions.closeTrash });
+        }}
+      />
       <TrashDialog
         open={confirmTrash}
         // Com 1 grupo marcado, vale o Dialog do grupo, com o nome (Lixeira RN02).

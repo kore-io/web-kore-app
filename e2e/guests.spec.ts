@@ -19,6 +19,8 @@ function toast({ page, text }: { page: Page; text: string }) {
   return page.getByRole('region', { name: /^Avisos/ }).getByText(text);
 }
 const APP_ORIGIN = 'http://localhost:5173';
+/** O site do convidado (o link do grupo), que a API monta pelo SITE_URL. */
+const SITE_URL = process.env.E2E_SITE_URL ?? 'http://localhost:5174';
 
 /** Entra pelo provedor dev do Google (decisão 147) e espera a área do casal. */
 async function signIn({ page, email }: { page: Page; email: string }) {
@@ -167,7 +169,8 @@ test.describe('Convidados › Grupos e convidados (RN13)', () => {
 
     const link = page.locator('.kore-party-panel__link');
     const oldUrl = (await link.textContent()) ?? '';
-    expect(oldUrl).toMatch(/^http:\/\/localhost:5173\/e2e-[^/]+\/grupo\/\S+$/);
+    expect(oldUrl.startsWith(`${SITE_URL}/e2e-`)).toBe(true);
+    expect(oldUrl).toMatch(/\/e2e-[^/]+\/grupo\/\S+$/);
     await page.getByRole('button', { name: 'Copiar link' }).click();
     await expect(toast({ page, text: 'Link copiado.' })).toBeVisible();
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(oldUrl);
@@ -618,6 +621,134 @@ test.describe('Convidados › Grupos e convidados (RN13)', () => {
     await expect(toast({ page, text: 'Alterações salvas.' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Beatriz e Leonardo' })).toBeVisible();
     await expect(page.getByText('Pedro Castro')).toBeVisible();
+  });
+
+  test('fluxo completo da F1: tag, Novo grupo, Editar, filtro, Mover de grupo, ⋮ da linha, lixeira, importar, colar e exportar', async ({
+    page,
+    context,
+  }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await weddingWithParties({ db, page });
+    const tabs = page.getByRole('navigation', { name: 'Convidados' });
+
+    // 1. Tag nova.
+    await page.goto('/app/convidados/tags');
+    await page.getByRole('textbox', { name: 'Nome da tag nova' }).fill('Padrinhos');
+    await page.getByRole('button', { name: 'Criar tag' }).click();
+    await expect(page.getByRole('heading', { name: '1 de 10 tags' })).toBeVisible();
+
+    // 2. Novo grupo com a tag.
+    await tabs.getByRole('link', { name: /^Grupos/ }).click();
+    await page.getByRole('button', { name: 'Novo grupo' }).click();
+    await page.getByRole('textbox', { name: 'Nome do grupo' }).fill('Beatriz e Leonardo');
+    const guests = page.getByRole('group', { name: 'Convidados' });
+    await guests.getByRole('textbox', { name: 'Nome' }).first().fill('Beatriz Lima');
+    await guests.getByRole('textbox', { name: 'Telefone' }).first().fill('(19) 99876-1402');
+    await page.getByRole('button', { name: '+ Adicionar convidado' }).click();
+    await guests.getByRole('textbox', { name: 'Nome' }).nth(1).fill('Leonardo Castro');
+    await page.getByRole('checkbox', { name: 'Padrinhos' }).locator('..').click();
+    await page.getByRole('button', { name: 'Salvar grupo' }).click();
+    await expect(toast({ page, text: 'Grupo criado.' })).toBeVisible();
+
+    // 3. Editar grupo: mais uma pessoa.
+    await page.getByRole('searchbox', { name: 'Buscar por nome' }).fill('Beatriz e Leonardo');
+    await page.getByRole('link', { name: 'Beatriz e Leonardo' }).click();
+    await page.getByRole('button', { name: 'Editar grupo' }).click();
+    await page.getByRole('button', { name: '+ Adicionar convidado' }).click();
+    await guests.getByRole('textbox', { name: 'Nome' }).nth(2).fill('Pedro Lima');
+    await page.getByRole('button', { name: 'Salvar alterações' }).click();
+    await expect(toast({ page, text: 'Alterações salvas.' })).toBeVisible();
+    await expect(page.getByText('3 convidados · Contato: Beatriz Lima')).toBeVisible();
+
+    // 4. Mover de grupo: Pedro vai para a Vó Helena.
+    await page.getByRole('button', { name: 'Ações de Pedro Lima' }).click();
+    await page.getByRole('menuitem', { name: 'Mover de grupo' }).click();
+    const move = page.getByRole('dialog', { name: 'Mover Pedro Lima para outro grupo' });
+    await move.getByRole('searchbox', { name: 'Buscar por nome' }).fill('helena');
+    const target = move.getByRole('combobox', { name: 'Grupo' });
+    await expect(target.getByRole('option', { name: 'Vó Helena' })).toBeAttached();
+    await target.selectOption({ label: 'Vó Helena' });
+    await move.getByRole('button', { name: 'Mover' }).click();
+    await expect(toast({ page, text: 'Pedro Lima foi para Vó Helena.' })).toBeVisible();
+
+    // 5. Filtro de tag: só o grupo novo.
+    await page.getByRole('link', { name: '‹ Voltar para Convidados' }).click();
+    await page.getByRole('button', { name: 'Filtros' }).click();
+    const sheet = page.getByRole('dialog', { name: 'Filtros' });
+    await sheet.getByRole('combobox', { name: 'Tag' }).selectOption({ label: 'Tag: Padrinhos' });
+    await sheet.getByRole('button', { name: 'Mostrar resultados' }).click();
+    await expect(page.getByText('Mostrando 1 de 1 grupo')).toBeVisible();
+
+    // 6. ⋮ da linha: Copiar link (o site do convidado) e Mover para a lixeira.
+    await page.getByRole('button', { name: 'Ações de Beatriz e Leonardo' }).click();
+    await page.getByRole('menuitem', { name: 'Copiar link' }).click();
+    await expect(toast({ page, text: 'Link copiado.' })).toBeVisible();
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(
+      new RegExp(`^${SITE_URL.replace(/[.:/]/g, '\\$&')}/e2e-[^/]+/grupo/\\S+$`),
+    );
+    await page.getByRole('button', { name: 'Ações de Beatriz e Leonardo' }).click();
+    await page.getByRole('menuitem', { name: 'Mover para a lixeira' }).click();
+    const trash = page.getByRole('alertdialog', {
+      name: 'Mover o grupo Beatriz e Leonardo para a lixeira?',
+    });
+    await expect(trash).toContainText('O grupo e os 2 convidados ficam 30 dias na lixeira');
+    await trash.getByRole('button', { name: 'Mover para a lixeira' }).click();
+    await expect(page.getByText('Nenhum grupo encontrado.')).toBeVisible();
+
+    // 7. Lixeira: restaurar.
+    await tabs.getByRole('link', { name: 'Lixeira' }).click();
+    await page
+      .getByRole('listitem')
+      .filter({ hasText: 'Grupo · Beatriz e Leonardo' })
+      .getByRole('button', { name: 'Restaurar' })
+      .click();
+    await expect(toast({ page, text: 'Beatriz e Leonardo voltou para a lista.' })).toBeVisible();
+
+    // 8. Importar planilha: o modelo do app com um grupo.
+    await tabs.getByRole('link', { name: 'Importar' }).click();
+    const model = await page.request.get('/modelo-convidados-kore.xlsx');
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load((await model.body()) as unknown as ArrayBuffer);
+    workbook.worksheets[0]?.addRow(['Família Rocha', 'Antônio Rocha', '', '', 'Adulto', '', '']);
+    await page.getByLabel(/Arrastem a planilha/).setInputFiles({
+      name: 'rocha.xlsx',
+      mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      buffer: Buffer.from(await workbook.xlsx.writeBuffer()),
+    });
+    await page.getByRole('button', { name: 'Importar 1 convidado' }).click();
+    await expect(toast({ page, text: '1 grupo importado' })).toBeVisible();
+
+    // 9. Colar a lista.
+    await tabs.getByRole('link', { name: 'Importar' }).click();
+    await page.getByRole('button', { name: 'Colar a lista' }).click();
+    await page.getByRole('textbox', { name: 'Colar a lista' }).fill('Márcia Rocha');
+    await page.getByRole('button', { name: 'Continuar' }).click();
+    await page.getByRole('button', { name: 'Importar 1 convidado' }).click();
+    await expect(toast({ page, text: '1 grupo importado' })).toBeVisible();
+
+    // 10. Exportar Todos em Excel: uma linha por convidado com nome.
+    await tabs.getByRole('link', { name: 'Exportar' }).click();
+    const all = page.getByRole('radio', { name: /^Todos \([1-9]\d*\)$/ });
+    await expect(all).toBeChecked();
+    const named = Number(/\((\d+)\)/.exec((await all.locator('..').textContent()) ?? '')?.[1]);
+    const download = page.waitForEvent('download');
+    await page.getByRole('button', { name: `Exportar ${named} convidados` }).click();
+    const sheetFile = new ExcelJS.Workbook();
+    await sheetFile.xlsx.load(
+      (await readFile((await (await download).path()) ?? '')) as unknown as ArrayBuffer,
+    );
+    const rows = sheetFile.worksheets[0];
+    expect(rows?.rowCount).toBe(named + 1);
+    const names = (rows?.getColumn(1).values ?? []).slice(2);
+    expect(names).toEqual(
+      expect.arrayContaining([
+        'Beatriz Lima',
+        'Leonardo Castro',
+        'Pedro Lima',
+        'Antônio Rocha',
+        'Márcia Rocha',
+      ]),
+    );
   });
 
   test.describe('computador', () => {
