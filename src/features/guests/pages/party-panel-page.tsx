@@ -1,6 +1,14 @@
-import { Badge, Button, Dialog, PageHeader, Tag, type BadgeTone } from '@kore-io/design';
+import {
+  ActionMenu,
+  Badge,
+  Button,
+  Dialog,
+  PageHeader,
+  Tag,
+  type BadgeTone,
+} from '@kore-io/design';
 import { Check, Clock, X } from 'lucide-react';
-import { useState, type ReactNode } from 'react';
+import { useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate, useParams } from 'react-router';
 import { paths } from '../../../app/paths';
@@ -10,7 +18,9 @@ import type {
   PartyResponse,
 } from '../../../shared/api/generated/model';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
+import { MoveGuestDialog } from '../components/move-guest-dialog';
 import { useActiveWedding, type Audience } from '../hooks/use-active-wedding';
+import { useMoveGuest } from '../hooks/use-move-guest';
 import { usePartyPanel } from '../hooks/use-party-panel';
 import { maskPhone } from '../phone-mask';
 
@@ -40,7 +50,11 @@ function PartyPanel({
 }) {
   const { t } = useTranslation('guests');
   const panel = usePartyPanel({ weddingId, partyId });
+  const mover = useMoveGuest({ weddingId, audience });
   const [confirming, setConfirming] = useState(false);
+  const [moving, setMoving] = useState<{ id: string; name: string } | null>(null);
+  // O ⋮ do convidado que abriu o Mover de grupo: o foco volta a ele (o item do menu some).
+  const menuButton = useRef<HTMLElement | null>(null);
 
   if (panel.notFound) return <Navigate to={paths.guests} replace />;
   if (panel.isError) return <LoadErrorNotice onRetry={panel.retry} />;
@@ -63,9 +77,36 @@ function PartyPanel({
       />
       <div className="kore-party-panel__cards">
         <GroupCard party={party} />
-        <GuestsCard guests={party.guests} />
+        <GuestsCard
+          guests={party.guests}
+          onMove={({ guest, trigger }) => {
+            menuButton.current = trigger;
+            // O último convidado com nome não sai do grupo (RN08): o aviso, sem o Dialog.
+            const named = party.guests.filter((item) => item.name !== null).length;
+            if (named <= 1) mover.lastGuest();
+            else setMoving(guest);
+          }}
+        />
         <LinkCard party={party} onCopy={(url) => void panel.copyLink({ url })} />
       </div>
+      <MoveGuestDialog
+        weddingId={weddingId}
+        guest={moving}
+        fromPartyId={party.id}
+        isMoving={mover.isMoving}
+        returnFocusRef={menuButton}
+        onClose={() => setMoving(null)}
+        onMove={(toParty) =>
+          moving &&
+          mover.move({
+            guestId: moving.id,
+            guestName: moving.name,
+            fromPartyId: party.id,
+            toParty,
+            onDone: () => setMoving(null),
+          })
+        }
+      />
       <Dialog
         open={confirming}
         onOpenChange={setConfirming}
@@ -162,35 +203,79 @@ function GroupCard({ party }: { party: PartyResponse }) {
   );
 }
 
-function GuestsCard({ guests }: { guests: PartyGuestResponse[] }) {
+function GuestsCard({
+  guests,
+  onMove,
+}: {
+  guests: PartyGuestResponse[];
+  onMove: (args: { guest: { id: string; name: string }; trigger: HTMLElement | null }) => void;
+}) {
   const { t } = useTranslation('guests');
   return (
     <Card title={t('panel.guests.title')}>
       <ul className="kore-party-panel__guests">
-        {guests.map((guest) => {
-          const badge = rsvpBadges[guest.rsvpStatus];
-          const details = [
-            guest.ageGroup && t(`panel.guests.ageGroup.${guest.ageGroup}`),
-            guest.dietaryRestriction,
-          ].filter(Boolean);
-          return (
-            <li key={guest.id} className="kore-party-panel__guest">
-              <span className="kore-party-panel__guest-text">
-                <span className="kore-party-panel__guest-name">
-                  {guest.name ?? t('panel.guests.plusOne')}
-                </span>
-                {details.length > 0 && (
-                  <span className="kore-party-panel__guest-details">{details.join(' · ')}</span>
-                )}
-              </span>
-              <Badge tone={badge.tone} icon={badge.icon}>
-                {t(`panel.guests.rsvp.${guest.rsvpStatus}`)}
-              </Badge>
-            </li>
-          );
-        })}
+        {guests.map((guest) => (
+          <GuestItem key={guest.id} guest={guest} onMove={onMove} />
+        ))}
       </ul>
     </Card>
+  );
+}
+
+/**
+ * Um convidado: nome (ou "Acompanhante", a vaga vazia), faixa etária e restrição, o selo
+ * da resposta e, para quem tem nome, o ⋮ com Mover de grupo (decisão 201; a vaga vazia
+ * não se move, RN10).
+ */
+function GuestItem({
+  guest,
+  onMove,
+}: {
+  guest: PartyGuestResponse;
+  onMove: (args: { guest: { id: string; name: string }; trigger: HTMLElement | null }) => void;
+}) {
+  const { t } = useTranslation('guests');
+  const actions = useRef<HTMLSpanElement>(null);
+  const badge = rsvpBadges[guest.rsvpStatus];
+  const { name } = guest;
+  const details = [
+    guest.ageGroup && t(`panel.guests.ageGroup.${guest.ageGroup}`),
+    guest.dietaryRestriction,
+  ].filter(Boolean);
+  return (
+    <li className="kore-party-panel__guest">
+      <span className="kore-party-panel__guest-text">
+        <span className="kore-party-panel__guest-name">{name ?? t('panel.guests.plusOne')}</span>
+        {details.length > 0 && (
+          <span className="kore-party-panel__guest-details">{details.join(' · ')}</span>
+        )}
+      </span>
+      <span className="kore-party-panel__guest-status">
+        <Badge tone={badge.tone} icon={badge.icon}>
+          {t(`panel.guests.rsvp.${guest.rsvpStatus}`)}
+        </Badge>
+        {name !== null && (
+          <span ref={actions} className="kore-party-panel__guest-actions">
+            <ActionMenu
+              label={t('panel.guests.actions', { name })}
+              groups={[
+                [
+                  {
+                    id: 'move',
+                    label: t('panel.move.action'),
+                    onSelect: () =>
+                      onMove({
+                        guest: { id: guest.id, name },
+                        trigger: actions.current?.querySelector('button') ?? null,
+                      }),
+                  },
+                ],
+              ]}
+            />
+          </span>
+        )}
+      </span>
+    </li>
   );
 }
 

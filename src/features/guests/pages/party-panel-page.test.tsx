@@ -268,3 +268,160 @@ describe('Painel do grupo (RN14)', () => {
     await expectNoA11yViolations({ container });
   });
 });
+
+/** O mock do Painel com a lista de grupos (para a escolha) e o POST do move. */
+function mockMove({
+  party = moreira(),
+  move,
+}: { party?: PartyResponse; move?: (body: unknown) => Response } = {}) {
+  const calls: { path: string; body: unknown }[] = [];
+  let current = party;
+  mockApi(({ method, path, body }) => {
+    if (path === '/v1/me') return Response.json(me);
+    if (method === 'GET' && path === '/v1/weddings/w1/parties/p1') return Response.json(current);
+    if (method === 'GET' && path.startsWith('/v1/weddings/w1/parties?')) {
+      calls.push({ path, body: undefined });
+      const all = [
+        { id: 'p1', name: 'Família Moreira' },
+        { id: 'p2', name: 'Padrinhos' },
+        { id: 'p3', name: 'Vó Helena' },
+      ].filter(({ name }) => !path.includes('q=') || name.toLowerCase().includes('padr'));
+      return Response.json({
+        summary: { guests: 0, namedGuests: 0, parties: 3, confirmed: 0, declined: 0, pending: 0 },
+        total: all.length,
+        data: all.map(({ id, name }) => ({
+          id,
+          name,
+          contact: null,
+          firstGuestName: null,
+          people: 1,
+          counts: { confirmed: 0, declined: 0, pending: 1, pendingPlusOnes: 0 },
+          deliveryStatus: 'not_sent',
+          respondedAt: null,
+          respondedBy: null,
+          tags: [],
+        })),
+        nextCursor: null,
+      });
+    }
+    if (method === 'POST' && path.endsWith('/move')) {
+      calls.push({ path, body });
+      const response =
+        move?.(body) ?? Response.json({ guestId: 'g3', fromPartyId: 'p1', toPartyId: 'p2' });
+      if (response.ok)
+        current = { ...current, guests: current.guests.filter((guest) => guest.id !== 'g3') };
+      return response;
+    }
+    return apiError({ status: 404, body: { error: 'NOT_FOUND' } });
+  });
+  return calls;
+}
+
+async function openMove(user: ReturnType<typeof userEvent.setup>, name: string) {
+  await user.click(await screen.findByRole('button', { name: `Ações de ${name}` }));
+  await user.click(screen.getByRole('menuitem', { name: 'Mover de grupo' }));
+}
+
+describe('Mover de grupo (RN10; decisão 201)', () => {
+  it('só os convidados com nome têm o ⋮ (a vaga vazia não se move)', async () => {
+    mockMove();
+    renderRoute({ url: '/app/convidados/grupos/p1' });
+    await screen.findByRole('button', { name: 'Ações de Luiz Moreira' });
+    expect(screen.getAllByRole('button', { name: /^Ações de / })).toHaveLength(3);
+  });
+
+  it('escolhe o grupo (sem o atual), move e mostra o Toast', async () => {
+    const user = userEvent.setup();
+    const calls = mockMove();
+    renderRoute({ url: '/app/convidados/grupos/p1' });
+    await openMove(user, 'Pedro Moreira');
+    const dialog = screen.getByRole('dialog', { name: 'Mover Pedro Moreira para outro grupo' });
+    const select = within(dialog).getByRole('combobox', { name: 'Grupo' });
+    await waitFor(() =>
+      expect(
+        within(select)
+          .getAllByRole('option')
+          .map((option) => option.textContent),
+      ).toEqual(['Padrinhos', 'Vó Helena']),
+    );
+    // O placeholder "Grupo" é a opção escondida do Select da lib; o grupo atual não aparece.
+    expect(select).toHaveDisplayValue('Grupo');
+    const mover = within(dialog).getByRole('button', { name: 'Mover' });
+    expect(mover).toBeDisabled();
+    await user.selectOptions(select, 'p2');
+    await user.click(mover);
+    expect(await screen.findByText('Pedro Moreira foi para Padrinhos.')).toBeInTheDocument();
+    expect(calls.find((call) => call.path.endsWith('/move'))).toEqual({
+      path: '/v1/weddings/w1/guests/g3/move',
+      body: { partyId: 'p2' },
+    });
+    await waitFor(() => expect(screen.queryByText('Pedro Moreira')).toBeNull());
+  });
+
+  it('a busca do diálogo procura o grupo pelo nome', async () => {
+    const user = userEvent.setup();
+    const calls = mockMove();
+    renderRoute({ url: '/app/convidados/grupos/p1' });
+    await openMove(user, 'Pedro Moreira');
+    await user.type(screen.getByRole('searchbox', { name: 'Buscar por nome' }), 'padr');
+    await waitFor(() =>
+      expect(calls.at(-1)?.path).toBe('/v1/weddings/w1/parties?q=padr&limit=100'),
+    );
+  });
+
+  it('Cancelar não move e devolve o foco ao ⋮', async () => {
+    const user = userEvent.setup();
+    const calls = mockMove();
+    renderRoute({ url: '/app/convidados/grupos/p1' });
+    await openMove(user, 'Pedro Moreira');
+    await user.click(screen.getByRole('button', { name: 'Cancelar' }));
+    expect(calls.some((call) => call.path.endsWith('/move'))).toBe(false);
+    expect(screen.getByRole('button', { name: 'Ações de Pedro Moreira' })).toHaveFocus();
+  });
+
+  it('o último convidado com nome não sai: o aviso do casal, sem diálogo nem API (RN08)', async () => {
+    const user = userEvent.setup();
+    const party = moreira();
+    const calls = mockMove({
+      party: {
+        ...party,
+        guests: party.guests.filter((guest) => guest.id === 'g1' || guest.isPlusOne),
+      },
+    });
+    renderRoute({ url: '/app/convidados/grupos/p1' });
+    await openMove(user, 'Luiz Moreira');
+    expect(
+      await screen.findByText(
+        'O grupo precisa de pelo menos um convidado. Para tirar todos, movam o grupo para a lixeira.',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(calls.some((call) => call.path.endsWith('/move'))).toBe(false);
+  });
+
+  it('se a API recusa com LAST_GUEST, o mesmo aviso (RN08)', async () => {
+    const user = userEvent.setup();
+    mockMove({ move: () => apiError({ status: 409, body: { error: 'LAST_GUEST' } }) });
+    renderRoute({ url: '/app/convidados/grupos/p1' });
+    await openMove(user, 'Pedro Moreira');
+    const dialog = screen.getByRole('dialog');
+    const select = within(dialog).getByRole('combobox', { name: 'Grupo' });
+    await waitFor(() => expect(within(select).getAllByRole('option')).toHaveLength(2));
+    await user.selectOptions(select, 'p2');
+    await user.click(within(dialog).getByRole('button', { name: 'Mover' }));
+    expect(
+      await screen.findByText(
+        'O grupo precisa de pelo menos um convidado. Para tirar todos, movam o grupo para a lixeira.',
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('é acessível com o diálogo aberto', async () => {
+    const user = userEvent.setup();
+    mockMove();
+    renderRoute({ url: '/app/convidados/grupos/p1' });
+    await openMove(user, 'Pedro Moreira');
+    await screen.findByRole('dialog');
+    await expectNoA11yViolations({ container: document.body, disabledRules: ['region'] });
+  });
+});
