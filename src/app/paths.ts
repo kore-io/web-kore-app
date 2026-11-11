@@ -20,6 +20,8 @@ export const paths = {
   coupleArea: '/app',
   /** Convidados › Grupos e convidados (decisão 198); busca e filtros na query. */
   guests: '/app/convidados',
+  /** Convidados › Tags (decisão 198). */
+  guestTags: '/app/convidados/tags',
   /** Painel do grupo (decisão 198): link próprio, para compartilhar e para o voltar. */
   guestParty: '/app/convidados/grupos/:partyId',
 } as const;

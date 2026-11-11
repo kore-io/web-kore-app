@@ -1,0 +1,92 @@
+/*
+ * Aba Tags (Penpot, Área do Casal, página 05): cartão branco de até 720 px, borda
+ * gray.300, raio lg, 20 px de respiro e 12 px entre os itens; contador em type.overline
+ * gray.700; o campo "Nome da tag nova" com o Criar tag ao lado; cada tag numa linha, com a
+ * contagem em type.caption gray.700 e o Editar à direita; legenda em type.caption.
+ */
+.kore-tags {
+  @apply flex max-w-180 flex-col gap-3 rounded-lg border border-gray-300 bg-white p-5;
+}
+
+.kore-tags__counter {
+  @apply type-overline text-gray-700;
+}
+
+.kore-tags__create {
+  @apply flex gap-2;
+}
+
+.kore-tags__name {
+  @apply min-w-0 flex-1;
+}
+
+.kore-tags__hint {
+  @apply type-caption text-gray-700;
+}
+
+.kore-tags__hint--danger {
+  @apply text-danger-text;
+}
+
+.kore-tags__list {
+  @apply flex flex-col gap-1;
+}
+
+.kore-tags__item {
+  @apply flex min-h-11 items-center gap-3;
+}
+
+.kore-tags__tag {
+  @apply flex min-w-0 flex-1;
+}
+
+.kore-tags__guests {
+  @apply type-caption shrink-0 text-gray-700;
+}
+
+.kore-tags__caption {
+  @apply type-caption text-gray-700;
+}
+
+/*
+ * Editar tag: o nome, as cores numa linha (quebram no celular) e o Excluir à esquerda.
+ * Divergência do Penpot (8 px entre as linhas das cores no celular): 24 px, para as áreas
+ * de toque de 44 px das cores se encostarem sem se sobrepor (uma tocava a da outra linha).
+ */
+.kore-edit-tag {
+  @apply flex flex-col gap-4;
+}
+
+.kore-edit-tag__colors {
+  @apply flex flex-col gap-2;
+}
+
+.kore-edit-tag__colors-label {
+  @apply type-label text-ink;
+}
+
+.kore-edit-tag__options {
+  @apply flex flex-wrap gap-x-2 gap-y-6;
+}
+
+.kore-edit-tag__delete {
+  @apply md:mr-auto;
+}
+
+/* Cor da tag: o radio nativo escondido e a Tag; a escolhida com o contorno em ring. */
+.kore-tag-color {
+  @apply relative inline-flex cursor-pointer rounded-full;
+  @apply before:absolute before:-inset-y-3 before:inset-x-0;
+}
+
+.kore-tag-color__input {
+  @apply sr-only;
+}
+
+.kore-tag-color__input:checked + .kore-tag {
+  @apply outline-2 outline-offset-1 outline-ring;
+}
+
+.kore-tag-color__input:focus-visible + .kore-tag {
+  @apply shadow-focus-ring;
+}
