@@ -3,11 +3,14 @@ import { SearchX, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useTagsControllerListV1 } from '../../../shared/api/generated/tags/tags';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
+import { useState } from 'react';
 import { PartyFilters } from '../components/party-filters';
 import { PartyList } from '../components/party-list';
 import { SelectionBar } from '../components/selection-bar';
+import { TrashDialog } from '../components/trash-dialog';
 import { useActiveWedding, type Audience } from '../hooks/use-active-wedding';
 import { useApplyTag } from '../hooks/use-apply-tag';
+import { useTrash } from '../hooks/use-trash';
 import { usePartyFilters } from '../hooks/use-party-filters';
 import { usePartyList } from '../hooks/use-party-list';
 import { usePartySelection } from '../hooks/use-party-selection';
@@ -34,6 +37,10 @@ function PartiesView({ weddingId, audience }: { weddingId: string; audience: Aud
   const ids = list.parties.map((party) => party.id);
   const selection = usePartySelection({ ids });
   const applyTag = useApplyTag({ weddingId });
+  const trash = useTrash({ weddingId, audience });
+  const [confirmTrash, setConfirmTrash] = useState(false);
+  const marked = list.parties.filter((party) => selection.isSelected(party.id));
+  const onlyOne = marked.length === 1 ? marked[0] : undefined;
 
   function content() {
     if (list.isLoading) {
@@ -92,8 +99,36 @@ function PartiesView({ weddingId, audience }: { weddingId: string; audience: Aud
               onDone: selection.clear,
             })
           }
+          onTrash={() => setConfirmTrash(true)}
         />
       )}
+      <TrashDialog
+        open={confirmTrash}
+        // Com 1 grupo marcado, vale o Dialog do grupo, com o nome (Lixeira RN02).
+        title={
+          onlyOne
+            ? t('trash.party.title', { name: onlyOne.name })
+            : t('trash.many.title', { count: marked.length })
+        }
+        description={
+          onlyOne
+            ? t('trash.party.description', {
+                count: onlyOne.people - onlyOne.counts.pendingPlusOnes,
+              })
+            : t('trash.many.description')
+        }
+        isPending={trash.isTrashing}
+        onClose={() => setConfirmTrash(false)}
+        onConfirm={() =>
+          trash.trashMany({
+            partyIds: marked.map((party) => party.id),
+            onDone: (ok) => {
+              setConfirmTrash(false);
+              if (ok) selection.clear();
+            },
+          })
+        }
+      />
       {content()}
     </>
   );
