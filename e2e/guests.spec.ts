@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import { expect, test, type Page } from '@playwright/test';
 import ExcelJS from 'exceljs';
 import {
@@ -495,6 +496,74 @@ test.describe('Convidados › Grupos e convidados (RN13)', () => {
     await expect(
       page.getByText('38 convidados em 31 grupos · 0 confirmados, 0 recusados e 38 pendentes'),
     ).toBeVisible();
+  });
+
+  test('Exportar: o Excel de Todos com as colunas padrão e o PDF por tag (Exportação RN01 a RN04, RN09)', async ({
+    page,
+  }) => {
+    const { weddingId } = await weddingWithParties({ db, page });
+    await page.goto('/app/convidados/exportar');
+    // Espera o resumo chegar: antes dele, a opção mostra "Todos (0)".
+    const all = page.getByRole('radio', { name: /^Todos \([1-9]\d*\)$/ });
+    await expect(all).toBeChecked();
+    const named = Number(/\((\d+)\)/.exec((await all.locator('..').textContent()) ?? '')?.[1]);
+    await expect(page.getByRole('radio', { name: 'Confirmados (0)' })).toBeDisabled();
+
+    const excel = page.waitForEvent('download');
+    await page.getByRole('button', { name: `Exportar ${named} convidados` }).click();
+    const file = await excel;
+    const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(
+      new Date(),
+    );
+    expect(file.suggestedFilename()).toMatch(new RegExp(`^convidados-[a-z0-9-]+-${today}\\.xlsx$`));
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load((await readFile((await file.path()) ?? '')) as unknown as ArrayBuffer);
+    const sheet = workbook.worksheets[0];
+    expect((sheet?.getRow(1).values as unknown[]).slice(1)).toEqual([
+      'Nome',
+      'Grupo',
+      'Faixa etária',
+      'Restrição alimentar',
+      'Resposta',
+    ]);
+    expect(sheet?.rowCount).toBe(named + 1);
+
+    // Por tag, em PDF, com o telefone: uma tag com um grupo e outra vazia.
+    const created = await page.request.post(`${API_URL}/v1/weddings/${weddingId}/tags`, {
+      headers: { origin: APP_ORIGIN },
+      data: { name: 'Padrinhos', color: 'champagne' },
+    });
+    expect(created.status(), await created.text()).toBe(201);
+    const { id: tagId } = (await created.json()) as { id: string };
+    const empty = await page.request.post(`${API_URL}/v1/weddings/${weddingId}/tags`, {
+      headers: { origin: APP_ORIGIN },
+      data: { name: 'Igreja', color: null },
+    });
+    expect(empty.status(), await empty.text()).toBe(201);
+    await createParty({
+      page,
+      weddingId,
+      body: {
+        name: 'Padrinhos do noivo',
+        guests: [{ name: 'Bruno Lima' }, { name: 'Lia Lima' }],
+        tagIds: [tagId],
+      },
+    });
+    await page.reload();
+    await page.getByRole('radio', { name: 'PDF para impressão' }).locator('..').click();
+    await page.getByRole('radio', { name: 'Por tag' }).locator('..').click();
+    const tag = page.getByRole('combobox', { name: 'Tag' });
+    await expect(tag).toHaveValue(tagId);
+    await expect(tag.getByRole('option', { name: 'Igreja (0)' })).toBeDisabled();
+    await page.getByRole('checkbox', { name: 'Telefone de contato' }).locator('..').click();
+    const pdf = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'Exportar 2 convidados' }).click();
+    const pdfFile = await pdf;
+    expect(pdfFile.suggestedFilename()).toMatch(
+      new RegExp(`^convidados-[a-z0-9-]+-${today}\\.pdf$`),
+    );
+    const bytes = await readFile((await pdfFile.path()) ?? '');
+    expect(bytes.subarray(0, 5).toString()).toBe('%PDF-');
   });
 
   test.describe('computador', () => {

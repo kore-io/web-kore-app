@@ -147,8 +147,8 @@ test.describe('Convites dos indicadores e Seleção com dois perfis (dados do pr
     // Conta nova, sem nome: o aceite pede o Seu nome (168(4)).
     const name = page.getByRole('textbox', { name: 'Seu nome' });
     await expect(name).toBeVisible();
-    // O código de indicação vem do nome, com até 50 tentativas na API: um nome por rodada,
-    // para o banco local, que acumula as rodadas, não esgotar os "clara-dias-N".
+    // O código de indicação vem do nome: um nome por rodada, para o teste não depender dos
+    // "clara-dias-N" que as rodadas anteriores deixaram no banco local.
     await name.fill(`Clara Dias ${run}`);
     const accept = page.waitForResponse((response) => response.url().endsWith('/accept'));
     await page.getByRole('button', { name: 'Aceitar convite' }).click();
