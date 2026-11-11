@@ -442,5 +442,60 @@
     "export_zero": "Exportar {{count}} convidados",
     "export_one": "Exportar {{count}} convidado",
     "export_other": "Exportar {{count}} convidados"
+  },
+  "partyForm": {
+    "newButton": "Novo grupo",
+    "editButton": "Editar grupo",
+    "newTitle": "Novo grupo",
+    "editTitle": "Editar grupo",
+    "intro": "O convite vai para o convidado de contato, e o grupo responde por todos no mesmo link.",
+    "groupName": "Nome do grupo",
+    "guests": "Convidados",
+    "guestName": "Nome",
+    "ageGroup": "Faixa etária",
+    "ages": {
+      "adult": "Adulto",
+      "child": "Criança",
+      "baby": "Bebê",
+      "none": "Sem faixa etária"
+    },
+    "phone": "Telefone",
+    "phonePlaceholder": "(00) 00000-0000",
+    "email": "E-mail",
+    "emailPlaceholder": "nome@email.com",
+    "contact": "Convidado de contato (recebe o convite)",
+    "addGuest": "+ Adicionar convidado",
+    "plusOnes": "Vagas de acompanhante",
+    "plusOnesNone": "Nenhuma",
+    "plusOnesCount_one": "{{count}} vaga",
+    "plusOnesCount_other": "{{count}} vagas",
+    "plusOnesHint": "A vaga aparece no convite como \"Acompanhante\", sem nome.",
+    "tags": "Tags",
+    "note": "Observação interna (só vocês veem)",
+    "notePlaceholder": "Ex.: chegam de São Paulo no sábado",
+    "cancel": "Cancelar",
+    "save": "Salvar grupo",
+    "saveChanges": "Salvar alterações",
+    "created": "Grupo criado.",
+    "saved": "Alterações salvas.",
+    "answered": "Esta pessoa já respondeu. Salvar as alterações mesmo assim?",
+    "errors": {
+      "groupNameMissing": {
+        "couple": "Informem o nome do grupo.",
+        "planner": "Informe o nome do grupo."
+      },
+      "guestNameMissing": {
+        "couple": "Informem o nome do convidado.",
+        "planner": "Informe o nome do convidado."
+      },
+      "tooLong": "O nome passa de 80 caracteres.",
+      "noteTooLong": "A observação passa de 500 caracteres.",
+      "emailInvalid": {
+        "couple": "Informem um e-mail válido.",
+        "planner": "Informe um e-mail válido."
+      },
+      "plusOnesInUse_one": "Já há {{count}} acompanhante com resposta neste grupo.",
+      "plusOnesInUse_other": "Já há {{count}} acompanhantes com resposta neste grupo."
+    }
   }
 }

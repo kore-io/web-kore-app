@@ -10,7 +10,7 @@ import { summaryText } from '../party-texts';
 /**
  * Convidados (IA da Área do Casal): o título, o resumo do casamento (RN13) e as abas
  * Grupos e convidados · Importar · Exportar · Tags · n de 10 (Tags RN04) · Lixeira, em volta
- * da aba aberta, e o Importar planilha no topo (Importação RN01).
+ * da aba aberta, e o Importar planilha (Importação RN01) e o Novo grupo (RN03) no topo.
  */
 export function GuestsLayout() {
   const { weddingId } = useActiveWedding();
@@ -36,9 +36,14 @@ function GuestsFrame({ weddingId }: { weddingId: string }) {
         title={t('title')}
         description={summary && summaryText({ t, summary })}
         actions={
-          <Button variant="secondary" onClick={() => void navigate(paths.guestImport)}>
-            {t('importSheet.headerButton')}
-          </Button>
+          <>
+            <Button variant="secondary" onClick={() => void navigate(paths.guestImport)}>
+              {t('importSheet.headerButton')}
+            </Button>
+            <Button onClick={() => void navigate(paths.guestNew)}>
+              {t('partyForm.newButton')}
+            </Button>
+          </>
         }
       />
       <div className="kore-guests__tabs">

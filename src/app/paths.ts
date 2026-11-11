@@ -30,11 +30,18 @@ export const paths = {
   guestTrash: '/app/convidados/lixeira',
   /** Painel do grupo (decisão 198): link próprio, para compartilhar e para o voltar. */
   guestParty: '/app/convidados/grupos/:partyId',
+  /** Novo grupo e Editar grupo (decisão 213(9)). */
+  guestNew: '/app/convidados/novo',
+  guestPartyEdit: '/app/convidados/grupos/:partyId/editar',
 } as const;
 
 /** Caminho do Painel de um grupo. */
 export function guestPartyPath({ partyId }: { partyId: string }) {
   return paths.guestParty.replace(':partyId', encodeURIComponent(partyId));
+}
+
+export function guestPartyEditPath({ partyId }: { partyId: string }) {
+  return paths.guestPartyEdit.replace(':partyId', encodeURIComponent(partyId));
 }
 
 /** Endereços fora do app. */
