@@ -18,3 +18,4 @@
 @import '../features/guests/pages/guests-page.css' layer(components);
 @import '../features/guests/pages/party-panel-page.css' layer(components);
 @import '../features/guests/pages/tags-page.css' layer(components);
+@import '../features/guests/pages/trash-page.css' layer(components);

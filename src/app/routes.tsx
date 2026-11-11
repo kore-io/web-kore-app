@@ -11,6 +11,7 @@ import { GuestsLayout } from '../features/guests/pages/guests-layout';
 import { GuestsPage } from '../features/guests/pages/guests-page';
 import { PartyPanelPage } from '../features/guests/pages/party-panel-page';
 import { TagsPage } from '../features/guests/pages/tags-page';
+import { TrashPage } from '../features/guests/pages/trash-page';
 import { AppRoot } from './app-root';
 import { CoupleAreaLayout } from './layout/couple-area-layout';
 import { paths } from './paths';
@@ -39,6 +40,7 @@ export const routes: RouteObject[] = [
             children: [
               { id: 'guests', index: true, element: <GuestsPage /> },
               { id: 'guest-tags', path: 'tags', element: <TagsPage /> },
+              { id: 'guest-trash', path: 'lixeira', element: <TrashPage /> },
             ],
           },
           { id: 'guest-party', path: 'convidados/grupos/:partyId', element: <PartyPanelPage /> },

@@ -23,7 +23,8 @@
     "parties": "Grupos e convidados",
     "partiesShort": "Grupos",
     "tags": "Tags · {{count}} de {{limit}}",
-    "tagsShort": "Tags"
+    "tagsShort": "Tags",
+    "trash": "Lixeira"
   },
   "filters": {
     "search": "Buscar por nome",
@@ -249,5 +250,37 @@
       "party": "Só o casal pode excluir um grupo que já respondeu.",
       "guest": "Só o casal pode excluir quem já respondeu."
     }
+  },
+  "trashPage": {
+    "loading": "Carregando a lixeira",
+    "warning": "Itens na lixeira são apagados de vez depois de 30 dias.",
+    "restoreInfo": "Restaurar devolve o item com as respostas e as tags que ele tinha.",
+    "restore": "Restaurar",
+    "party": {
+      "title": "Grupo · {{name}}",
+      "details": "{{guests}} · removido em {{removed}} · apagado depois de {{purge}}"
+    },
+    "guest": {
+      "title": "Convidado · {{name}}",
+      "details": "do grupo {{party}} · removido em {{removed}} · apagado depois de {{purge}}"
+    },
+    "tag": {
+      "title": "Tag · {{name}}",
+      "details": "{{guests}} · removida em {{removed}} · apagada depois de {{purge}}"
+    },
+    "guests_zero": "{{count}} convidados",
+    "guests_one": "{{count}} convidado",
+    "guests_other": "{{count}} convidados",
+    "restored": "{{name}} voltou para a lista.",
+    "tagRestored": "A tag {{name}} voltou.",
+    "tagLimit": {
+      "couple": "Vocês já têm 10 tags. Excluam uma para restaurar esta.",
+      "planner": "Este casamento já tem 10 tags. Exclua uma para restaurar esta."
+    },
+    "tagNameTaken": {
+      "couple": "Já existe uma tag {{name}}. Mudem o nome dela para restaurar esta.",
+      "planner": "Já existe uma tag {{name}}. Mude o nome dela para restaurar esta."
+    },
+    "empty": "A lixeira está vazia."
   }
 }

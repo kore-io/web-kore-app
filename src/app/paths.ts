@@ -22,6 +22,8 @@ export const paths = {
   guests: '/app/convidados',
   /** Convidados › Tags (decisão 198). */
   guestTags: '/app/convidados/tags',
+  /** Convidados › Lixeira (decisão 198). */
+  guestTrash: '/app/convidados/lixeira',
   /** Painel do grupo (decisão 198): link próprio, para compartilhar e para o voltar. */
   guestParty: '/app/convidados/grupos/:partyId',
 } as const;
