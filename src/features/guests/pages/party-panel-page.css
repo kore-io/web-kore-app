@@ -91,6 +91,7 @@
   @apply flex flex-col gap-3;
 }
 
+.kore-move-guest__more,
 .kore-move-guest__empty {
   @apply type-caption text-gray-700;
 }

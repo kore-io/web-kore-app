@@ -153,6 +153,10 @@
       "lastGuest": {
         "couple": "O grupo precisa de pelo menos um convidado. Para tirar todos, movam o grupo para a lixeira.",
         "planner": "O grupo precisa de pelo menos um convidado. Para tirar todos, mova o grupo para a lixeira."
+      },
+      "more": {
+        "couple": "Mostrando {{shown}} de {{total}} grupos. Busquem pelo nome para achar os outros.",
+        "planner": "Mostrando {{shown}} de {{total}} grupos. Busque pelo nome para achar os outros."
       }
     }
   }

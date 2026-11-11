@@ -90,6 +90,7 @@ function PartyPanel({
       </div>
       <MoveGuestDialog
         weddingId={weddingId}
+        audience={audience}
         guest={moving}
         fromPartyId={party.id}
         isMoving={mover.isMoving}

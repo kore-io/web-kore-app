@@ -283,7 +283,8 @@ describe('Painel do grupo (RN14)', () => {
 function mockMove({
   party = moreira(),
   move,
-}: { party?: PartyResponse; move?: (body: unknown) => Response } = {}) {
+  total,
+}: { party?: PartyResponse; move?: (body: unknown) => Response; total?: number } = {}) {
   const calls: { path: string; body: unknown }[] = [];
   let current = party;
   mockApi(({ method, path, body }) => {
@@ -298,7 +299,7 @@ function mockMove({
       ].filter(({ name }) => !path.includes('q=') || name.toLowerCase().includes('padr'));
       return Response.json({
         summary: { guests: 0, namedGuests: 0, parties: 3, confirmed: 0, declined: 0, pending: 0 },
-        total: all.length,
+        total: total ?? all.length,
         data: all.map(({ id, name }) => ({
           id,
           name,
@@ -424,6 +425,27 @@ describe('Mover de grupo (RN10; decisão 201)', () => {
         'O grupo precisa de pelo menos um convidado. Para tirar todos, movam o grupo para a lixeira.',
       ),
     ).toBeInTheDocument();
+  });
+
+  it('com mais grupos do que o Select mostra, a linha de apoio pede a busca (decisão 203)', async () => {
+    const user = userEvent.setup();
+    mockMove({ total: 158 });
+    renderRoute({ url: '/app/convidados/grupos/p1' });
+    await openMove(user, 'Pedro Moreira');
+    expect(
+      await screen.findByText('Mostrando 3 de 158 grupos. Busquem pelo nome para achar os outros.'),
+    ).toBeInTheDocument();
+  });
+
+  it('com todos os grupos no Select, sem a linha de apoio', async () => {
+    const user = userEvent.setup();
+    mockMove();
+    renderRoute({ url: '/app/convidados/grupos/p1' });
+    await openMove(user, 'Pedro Moreira');
+    await waitFor(() =>
+      expect(within(screen.getByRole('dialog')).getAllByRole('option')).toHaveLength(2),
+    );
+    expect(screen.queryByText(/^Mostrando .* grupos\. Busquem/)).toBeNull();
   });
 
   it('é acessível com o diálogo aberto', async () => {
