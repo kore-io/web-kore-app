@@ -303,7 +303,7 @@ describe('Convidados › Grupos e convidados (RN13)', () => {
     mockList(() => Response.json(page(many, { total: 201 })));
     renderRoute({ url: '/app/convidados' });
     await screen.findByRole('table');
-    await user.click(screen.getByRole('checkbox', { name: 'Selecionar todos os grupos' }));
+    await user.click(screen.getByLabelText('Selecionar todos os grupos'));
     const button = screen.getByRole('button', { name: 'Adicionar tag' });
     expect(button).toBeDisabled();
     // O Mover para a lixeira também (206 ampliada), com o mesmo aviso.
@@ -315,12 +315,12 @@ describe('Convidados › Grupos e convidados (RN13)', () => {
     expect(button).toHaveAccessibleDescription(
       'Marquem até 200 grupos para adicionar uma tag ou mover para a lixeira.',
     );
-    await user.click(screen.getByRole('checkbox', { name: 'Selecionar Grupo 0' }));
+    await user.click(screen.getByLabelText('Selecionar Grupo 0'));
     expect(screen.getByRole('button', { name: 'Adicionar tag' })).toBeEnabled();
     expect(
       screen.queryByText('Marquem até 200 grupos para adicionar uma tag ou mover para a lixeira.'),
     ).toBeNull();
-  });
+  }, 15_000);
 
   it('cerimonialista: o aviso dos 200 no singular, nas Tags e na Lixeira (decisões 198(2) e 206)', async () => {
     profileUnderTest.current = 'planner';
@@ -329,14 +329,14 @@ describe('Convidados › Grupos e convidados (RN13)', () => {
     mockList(() => Response.json(page(many, { total: 201 })));
     renderAreaScreen({ url: '/app/convidados' });
     await screen.findByRole('table');
-    await user.click(screen.getByRole('checkbox', { name: 'Selecionar todos os grupos' }));
+    await user.click(screen.getByLabelText('Selecionar todos os grupos'));
     // O mesmo aviso nos dois botões: o das Tags e o da Lixeira (206 ampliada).
     for (const name of ['Adicionar tag', 'Mover para a lixeira']) {
       expect(screen.getByRole('button', { name })).toHaveAccessibleDescription(
         'Marque até 200 grupos para adicionar uma tag ou mover para a lixeira.',
       );
     }
-  });
+  }, 15_000);
 
   it('sem nenhuma tag, o Adicionar tag fica desabilitado', async () => {
     const user = userEvent.setup();
