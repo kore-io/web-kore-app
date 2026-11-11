@@ -2,7 +2,8 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../../../tests/a11y';
-import { apiError, mockApi, renderRoute } from '../../../../tests/render-route';
+import { meFor, profileUnderTest } from '../../../../tests/profile';
+import { apiError, mockApi, renderAreaScreen, renderRoute } from '../../../../tests/render-route';
 import { trashDates } from './trash-page';
 
 afterEach(() => {
@@ -71,7 +72,7 @@ function mockTrash({
   let current = [...start];
   mockApi((call) => {
     const { method, path, body } = call;
-    if (path === '/v1/me') return Response.json(me);
+    if (path === '/v1/me') return Response.json(meFor(me));
     if (path === '/v1/weddings/w1/tags') return Response.json({ limit: 10, data: [] });
     if (path === '/v1/weddings/w1/parties?limit=1') {
       return Response.json({
@@ -128,6 +129,9 @@ describe('Convidados › Lixeira (Lixeira de convidados, RN08 e RN09)', () => {
     const restores = screen.getAllByRole('button', { name: 'Restaurar' });
     expect(restores).toHaveLength(3);
     expect(restores[1]).toHaveAccessibleDescription('Convidado · Bruno Lima');
+    // Sem "Esvaziar lixeira": o expurgo é só o automático (decisão 208).
+    expect(screen.queryByRole('button', { name: /Esvaziar/ })).toBeNull();
+    expect(screen.queryByText(/Esvaziar/)).toBeNull();
   });
 
   it('restaurar o grupo: o Toast "{nome} voltou para a lista." e o item sai (RN09)', async () => {
@@ -217,5 +221,22 @@ describe('Convidados › Lixeira (Lixeira de convidados, RN08 e RN09)', () => {
     const { container } = renderRoute({ url: '/app/convidados/lixeira' });
     await screen.findByText('Grupo · Amigos do vôlei');
     await expectNoA11yViolations({ container });
+  });
+  it('cerimonialista: os avisos de tag no singular (TAG_LIMIT_REACHED e TAG_NAME_TAKEN; 198(2))', async () => {
+    profileUnderTest.current = 'planner';
+    const user = userEvent.setup();
+    let answer = apiError({ status: 409, body: { error: 'TAG_LIMIT_REACHED' } });
+    mockTrash({ restore: () => answer });
+    renderAreaScreen({ url: '/app/convidados/lixeira' });
+    const item = (await screen.findByText('Tag · Vizinhos')).closest('li') as HTMLElement;
+    await user.click(within(item).getByRole('button', { name: 'Restaurar' }));
+    expect(
+      await screen.findByText('Este casamento já tem 10 tags. Exclua uma para restaurar esta.'),
+    ).toBeInTheDocument();
+    answer = apiError({ status: 409, body: { error: 'TAG_NAME_TAKEN', conflictName: 'VIZINHOS' } });
+    await user.click(within(item).getByRole('button', { name: 'Restaurar' }));
+    expect(
+      await screen.findByText('Já existe uma tag VIZINHOS. Mude o nome dela para restaurar esta.'),
+    ).toBeInTheDocument();
   });
 });

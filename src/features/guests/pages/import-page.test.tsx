@@ -2,7 +2,8 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../../../tests/a11y';
-import { apiError, mockApi, renderRoute } from '../../../../tests/render-route';
+import { meFor, profileUnderTest } from '../../../../tests/profile';
+import { apiError, mockApi, renderAreaScreen, renderRoute } from '../../../../tests/render-route';
 import type { SpreadsheetPreviewResponse } from '../../../shared/api/generated/model';
 
 afterEach(() => {
@@ -70,10 +71,13 @@ function mockImport({
   previewResponse = () => Response.json(preview),
   importResponse = () =>
     Response.json({ parties: 58, guests: 142, skipped: 3, tagsCreated: [] }, { status: 201 }),
-}: { previewResponse?: () => Response; importResponse?: () => Response } = {}) {
+}: {
+  previewResponse?: () => Response | Promise<Response>;
+  importResponse?: () => Response | Promise<Response>;
+} = {}) {
   const calls: Call[] = [];
   mockApi(({ method, path }) => {
-    if (path === '/v1/me') return Response.json(me);
+    if (path === '/v1/me') return Response.json(meFor(me));
     if (path === '/v1/weddings/w1/tags') return Response.json({ limit: 10, data: [] });
     if (method === 'GET' && path.startsWith('/v1/weddings/w1/parties')) {
       return Response.json({
@@ -185,17 +189,90 @@ describe('Convidados › Importar planilha (Importação RN01 a RN09)', () => {
 
   it('Importar reenvia o arquivo, fica desabilitado e volta à lista com "58 grupos importados"', async () => {
     const user = userEvent.setup();
-    const calls = mockImport();
+    // A resposta do importar fica presa até o teste conferir o botão desabilitado (186(1)).
+    let answer: (response: Response) => void = () => undefined;
+    const calls = mockImport({
+      importResponse: () =>
+        new Promise<Response>((resolve) => {
+          answer = resolve;
+        }),
+    });
     const { router } = renderRoute({ url: '/app/convidados/importar' });
     await sendSheet(user);
     const button = await screen.findByRole('button', { name: 'Importar 142 convidados' });
     await user.click(button);
+    await waitFor(() => expect(button).toBeDisabled());
+    answer(
+      Response.json({ parties: 58, guests: 142, skipped: 3, tagsCreated: [] }, { status: 201 }),
+    );
     expect(await screen.findByText('58 grupos importados')).toBeInTheDocument();
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/convidados'));
     expect(calls.map((call) => call.path)).toEqual([
       '/v1/weddings/w1/guest-imports/spreadsheet/preview',
       '/v1/weddings/w1/guest-imports/spreadsheet',
     ]);
+  });
+
+  it('enquanto a API lê o arquivo, o Spinner "Lendo a planilha" e a área desabilitada (209(c))', async () => {
+    const user = userEvent.setup();
+    let answer: (response: Response) => void = () => undefined;
+    mockImport({
+      previewResponse: () =>
+        new Promise<Response>((resolve) => {
+          answer = resolve;
+        }),
+    });
+    renderRoute({ url: '/app/convidados/importar' });
+    await sendSheet(user);
+    expect((await screen.findByText('Lendo a planilha')).closest('[role="status"]')).not.toBeNull();
+    expect(screen.getByLabelText(/Arrastem a planilha/)).toBeDisabled();
+    answer(Response.json(preview));
+    expect(await screen.findByText('convidados-ana-e-marcos.xlsx')).toBeInTheDocument();
+    expect(screen.queryByText('Lendo a planilha')).toBeNull();
+  });
+
+  describe('versão da cerimonialista (decisão 198(2))', () => {
+    it('o envio, o erro da linha, o aviso da tag e o rodapé no singular', async () => {
+      profileUnderTest.current = 'planner';
+      const user = userEvent.setup();
+      mockImport();
+      renderAreaScreen({ url: '/app/convidados/importar' });
+      await user.upload(
+        await screen.findByLabelText(/Arraste a planilha ou clique para escolher/),
+        sheet(),
+      );
+      expect(
+        await screen.findByText('Falta o nome do convidado. Preencha a coluna Nome.'),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText('A tag Vizinhos não foi criada: este casamento já tem 10 tags.'),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText('As 3 linhas que ficaram de fora você cadastra depois, uma a uma.'),
+      ).toBeInTheDocument();
+    });
+
+    it.each([
+      [
+        422,
+        'TEMPLATE_MISMATCH',
+        'Esta planilha não está no modelo do Kore. Baixe o modelo ou use Colar a lista.',
+      ],
+      [422, 'TOO_MANY_ROWS', 'A planilha tem mais de 1.000 linhas. Divida em duas.'],
+      [
+        422,
+        'NOT_XLSX',
+        'Este arquivo não é uma planilha do Excel (.xlsx). Baixe o modelo ou use Colar a lista.',
+      ],
+      [413, 'FILE_TOO_LARGE', 'A planilha passa de 5 MB. Divida em duas.'],
+    ])('arquivo recusado com %s %s', async (status, error, text) => {
+      profileUnderTest.current = 'planner';
+      const user = userEvent.setup();
+      mockImport({ previewResponse: () => apiError({ status, body: { error } }) });
+      renderAreaScreen({ url: '/app/convidados/importar' });
+      await user.upload(await screen.findByLabelText(/Arraste a planilha/), sheet());
+      expect(await screen.findByRole('alert')).toHaveTextContent(text);
+    });
   });
 
   it('Enviar outra planilha volta ao envio, sem importar', async () => {

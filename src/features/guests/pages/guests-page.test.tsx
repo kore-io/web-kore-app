@@ -2,7 +2,8 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../../../tests/a11y';
-import { apiError, mockApi, renderRoute } from '../../../../tests/render-route';
+import { meFor, profileUnderTest } from '../../../../tests/profile';
+import { apiError, mockApi, renderAreaScreen, renderRoute } from '../../../../tests/render-route';
 import { intersect } from '../../../../tests/setup';
 import type { PartyListItemResponse, PartyListResponse } from '../../../shared/api/generated/model';
 
@@ -81,13 +82,13 @@ function mockList(
   const listPaths: string[] = [];
   applied = [];
   mockApi(({ path, body }) => {
-    if (path === '/v1/me') return Response.json(me);
+    if (path === '/v1/me') return Response.json(meFor(me));
     if (path === '/v1/weddings/w1/tags') {
       return Response.json({ limit: 10, data: tags });
     }
     if (path === '/v1/weddings/w1/tags/t1/apply') {
       applied.push(body);
-      return Response.json({ parties: 2 });
+      return Response.json({ parties: (body as { partyIds: string[] }).partyIds.length });
     }
     // O resumo do cabeçalho (GuestsLayout) pede uma página de um grupo.
     if (path === '/v1/weddings/w1/parties?limit=1') return respond(path);
@@ -269,6 +270,18 @@ describe('Convidados › Grupos e convidados (RN13)', () => {
     expect(screen.queryByText(/selecionad/)).toBeNull();
   });
 
+  it('Adicionar tag a 1 grupo: o Toast no singular "Tag aplicada a 1 grupo." (Tags RN08)', async () => {
+    const user = userEvent.setup();
+    mockList(() => Response.json(page([party('p1', 'Família Moreira'), party('p2', 'Tio Jorge')])));
+    renderRoute({ url: '/app/convidados' });
+    await screen.findByRole('table');
+    await user.click(screen.getByRole('checkbox', { name: 'Selecionar Tio Jorge' }));
+    await user.click(screen.getByRole('button', { name: 'Adicionar tag' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Família da Ana' }));
+    expect(await screen.findByText('Tag aplicada a 1 grupo.')).toBeInTheDocument();
+    expect(applied).toEqual([{ partyIds: ['p2'] }]);
+  });
+
   it('Adicionar tag aplica a tag escolhida aos grupos marcados e desfaz a seleção (Tags RN08)', async () => {
     const user = userEvent.setup();
     mockList(() => Response.json(page([party('p1', 'Família Moreira'), party('p2', 'Tio Jorge')])));
@@ -290,7 +303,7 @@ describe('Convidados › Grupos e convidados (RN13)', () => {
     mockList(() => Response.json(page(many, { total: 201 })));
     renderRoute({ url: '/app/convidados' });
     await screen.findByRole('table');
-    await user.click(screen.getByRole('checkbox', { name: 'Selecionar todos os grupos' }));
+    await user.click(screen.getByLabelText('Selecionar todos os grupos'));
     const button = screen.getByRole('button', { name: 'Adicionar tag' });
     expect(button).toBeDisabled();
     // O Mover para a lixeira também (206 ampliada), com o mesmo aviso.
@@ -302,12 +315,28 @@ describe('Convidados › Grupos e convidados (RN13)', () => {
     expect(button).toHaveAccessibleDescription(
       'Marquem até 200 grupos para adicionar uma tag ou mover para a lixeira.',
     );
-    await user.click(screen.getByRole('checkbox', { name: 'Selecionar Grupo 0' }));
+    await user.click(screen.getByLabelText('Selecionar Grupo 0'));
     expect(screen.getByRole('button', { name: 'Adicionar tag' })).toBeEnabled();
     expect(
       screen.queryByText('Marquem até 200 grupos para adicionar uma tag ou mover para a lixeira.'),
     ).toBeNull();
-  });
+  }, 15_000);
+
+  it('cerimonialista: o aviso dos 200 no singular, nas Tags e na Lixeira (decisões 198(2) e 206)', async () => {
+    profileUnderTest.current = 'planner';
+    const user = userEvent.setup();
+    const many = Array.from({ length: 201 }, (_, index) => party(`p${index}`, `Grupo ${index}`));
+    mockList(() => Response.json(page(many, { total: 201 })));
+    renderAreaScreen({ url: '/app/convidados' });
+    await screen.findByRole('table');
+    await user.click(screen.getByLabelText('Selecionar todos os grupos'));
+    // O mesmo aviso nos dois botões: o das Tags e o da Lixeira (206 ampliada).
+    for (const name of ['Adicionar tag', 'Mover para a lixeira']) {
+      expect(screen.getByRole('button', { name })).toHaveAccessibleDescription(
+        'Marque até 200 grupos para adicionar uma tag ou mover para a lixeira.',
+      );
+    }
+  }, 15_000);
 
   it('sem nenhuma tag, o Adicionar tag fica desabilitado', async () => {
     const user = userEvent.setup();
@@ -360,7 +389,7 @@ describe('Convidados › Grupos e convidados (RN13)', () => {
   it('enquanto a lista carrega, o Spinner diz "Carregando os grupos" (200(b))', async () => {
     mockApi(({ path }) =>
       path === '/v1/me'
-        ? Response.json(me)
+        ? Response.json(meFor(me))
         : new Promise<Response>(() => {
             // A lista não responde: fica carregando.
           }),

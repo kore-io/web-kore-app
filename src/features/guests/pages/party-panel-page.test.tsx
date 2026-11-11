@@ -2,7 +2,8 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../../../tests/a11y';
-import { apiError, mockApi, renderRoute } from '../../../../tests/render-route';
+import { meFor, profileUnderTest } from '../../../../tests/profile';
+import { apiError, mockApi, renderAreaScreen, renderRoute } from '../../../../tests/render-route';
 import type { PartyResponse } from '../../../shared/api/generated/model';
 
 afterEach(() => {
@@ -113,7 +114,7 @@ function mockPanel({
   const calls: string[] = [];
   let current = party;
   mockApi(({ method, path }) => {
-    if (path === '/v1/me') return Response.json(me);
+    if (path === '/v1/me') return Response.json(meFor(me));
     if (method === 'GET' && path === '/v1/weddings/w1/parties/p1') {
       return current
         ? Response.json(current)
@@ -241,6 +242,34 @@ describe('Painel do grupo (RN14)', () => {
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
   });
 
+  it('cerimonialista: o texto do Regenerar link no singular (RN12; 198(2))', async () => {
+    profileUnderTest.current = 'planner';
+    const user = userEvent.setup();
+    mockPanel();
+    renderAreaScreen({ url: '/app/convidados/grupos/p1' });
+    await user.click(await screen.findByRole('button', { name: 'Regenerar link' }));
+    expect(
+      screen.getByRole('alertdialog', { name: 'Regenerar o link do grupo Família Moreira?' }),
+    ).toHaveAccessibleDescription(
+      'O link antigo para de funcionar na hora. Você vai precisar enviar o link novo ao grupo.',
+    );
+  });
+
+  it('as ações da F1, sem "Alterar resposta" nem "Ver como este grupo" (RN14; 201)', async () => {
+    const user = userEvent.setup();
+    mockPanel();
+    renderRoute({ url: '/app/convidados/grupos/p1' });
+    await screen.findByRole('heading', { name: 'Família Moreira', level: 1 });
+    expect(screen.queryByText(/Alterar resposta/)).toBeNull();
+    expect(screen.queryByText(/Ver como/)).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Ações de Célia Moreira' }));
+    expect(
+      within(screen.getByRole('menu'))
+        .getAllByRole('menuitem')
+        .map((item) => item.textContent),
+    ).toEqual(['Mover de grupo', 'Mover para a lixeira']);
+  });
+
   it('Cancelar não regenera (RN12)', async () => {
     const user = userEvent.setup();
     const calls = mockPanel();
@@ -288,7 +317,7 @@ function mockMove({
   const calls: { path: string; body: unknown }[] = [];
   let current = party;
   mockApi(({ method, path, body }) => {
-    if (path === '/v1/me') return Response.json(me);
+    if (path === '/v1/me') return Response.json(meFor(me));
     if (method === 'GET' && path === '/v1/weddings/w1/parties/p1') return Response.json(current);
     if (method === 'GET' && path.startsWith('/v1/weddings/w1/parties?')) {
       calls.push({ path, body: undefined });
@@ -408,6 +437,25 @@ describe('Mover de grupo (RN10; decisão 201)', () => {
     ).toBeInTheDocument();
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(calls.some((call) => call.path.endsWith('/move'))).toBe(false);
+  });
+
+  it('cerimonialista: o último convidado no singular (RN08; 198(2))', async () => {
+    profileUnderTest.current = 'planner';
+    const user = userEvent.setup();
+    const party = moreira();
+    mockMove({
+      party: {
+        ...party,
+        guests: party.guests.filter((guest) => guest.id === 'g1' || guest.isPlusOne),
+      },
+    });
+    renderAreaScreen({ url: '/app/convidados/grupos/p1' });
+    await openMove(user, 'Luiz Moreira');
+    expect(
+      await screen.findByText(
+        'O grupo precisa de pelo menos um convidado. Para tirar todos, mova o grupo para a lixeira.',
+      ),
+    ).toBeInTheDocument();
   });
 
   it('se a API recusa com LAST_GUEST, o mesmo aviso (RN08)', async () => {

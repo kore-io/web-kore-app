@@ -2,15 +2,16 @@ import '@testing-library/jest-dom/vitest';
 import '../src/shared/i18n/i18n';
 import { cleanup, configure } from '@testing-library/react';
 import { afterEach } from 'vitest';
+import { profileUnderTest } from './profile';
 
-// O findBy e o waitFor esperam 1 s por padrão. Na 1ª rodada de uma cópia limpa (o Vite
-// ainda transforma os arquivos) e com a máquina ocupada, a lista de 201 grupos passou
-// desse prazo uma vez (391/392, nota do Crivo no novo-grupo). 3 s cobre a folga; um
-// teste que falha de verdade continua falhando, só espera mais.
+// O findBy e o waitFor esperam 1 s por padrão; 3 s dá folga com a máquina ocupada (o
+// teste que falha de verdade continua falhando, só espera mais). O teste lento de verdade
+// (a lista de 201 grupos) tem o prazo próprio no it.
 configure({ asyncUtilTimeout: 3000 });
 
 afterEach(() => {
   cleanup();
+  profileUnderTest.current = 'couple';
 });
 
 // O jsdom não tem o <dialog> modal: abrir e fechar mudam o atributo `open`, como no navegador.

@@ -279,6 +279,31 @@ describe('Convidados › Novo grupo (Grupos e convidados RN03 a RN07; decisão 2
     ).not.toHaveAccessibleDescription();
   });
 
+  it('o 400 de e-mail inválido mostra o texto do casal (RN04)', async () => {
+    const user = userEvent.setup();
+    mockParties({
+      create: () =>
+        apiError({
+          status: 400,
+          body: {
+            error: 'Bad Request',
+            message: ['x'],
+            errors: [{ path: 'guests.0.email', code: 'IS_EMAIL', params: {} }],
+          },
+        }),
+    });
+    renderRoute({ url: '/app/convidados/novo' });
+    await user.type(await screen.findByRole('textbox', { name: 'Nome do grupo' }), 'Família Rocha');
+    await user.type(guestCards()[0] as HTMLElement, 'Antônio Rocha');
+    await user.type(screen.getByRole('textbox', { name: EMAIL }), 'antonio@gmail');
+    await user.click(screen.getByRole('button', { name: 'Salvar grupo' }));
+    await waitFor(() =>
+      expect(screen.getByRole('textbox', { name: EMAIL })).toHaveAccessibleDescription(
+        'Informem um e-\u2060mail válido.',
+      ),
+    );
+  });
+
   it('a cerimonialista lê os erros no singular (RN04; 189(5))', () => {
     const t = i18next.getFixedT('pt-BR', 'guests');
     const text = (code: FieldError['code'], field: Parameters<typeof fieldErrorText>[0]['field']) =>
@@ -340,6 +365,9 @@ describe('Convidados › Editar grupo (RN09; decisão 213(8))', () => {
     expect(screen.getByRole('textbox', { name: 'Observação interna (só vocês veem)' })).toHaveValue(
       'chegam no sábado',
     );
+    // O formulário não tem a restrição alimentar, que vem da planilha (RN05).
+    expect(screen.queryByText(/Restrição alimentar/i)).toBeNull();
+    expect(screen.queryByText(/sem glúten/)).toBeNull();
 
     await user.type(guestCards()[0] as HTMLElement, ' Filho');
     await user.click(screen.getByRole('button', { name: 'Salvar alterações' }));

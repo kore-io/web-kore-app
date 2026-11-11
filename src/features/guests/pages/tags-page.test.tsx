@@ -2,7 +2,8 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../../../tests/a11y';
-import { apiError, mockApi, renderRoute } from '../../../../tests/render-route';
+import { meFor, profileUnderTest } from '../../../../tests/profile';
+import { apiError, mockApi, renderAreaScreen, renderRoute } from '../../../../tests/render-route';
 import type { TagResponse } from '../../../shared/api/generated/model';
 
 afterEach(() => {
@@ -55,7 +56,7 @@ function mockTags({
   let current = [...tags];
   mockApi((call) => {
     const { method, path, body } = call;
-    if (path === '/v1/me') return Response.json(me);
+    if (path === '/v1/me') return Response.json(meFor(me));
     if (path === '/v1/weddings/w1/parties?limit=1') {
       return Response.json({
         summary: {
@@ -288,7 +289,7 @@ describe('Convidados › Tags (Tags dos convidados)', () => {
   it('enquanto carrega, o Spinner diz "Carregando as tags"', async () => {
     mockApi(({ path }) =>
       path === '/v1/me'
-        ? Response.json(me)
+        ? Response.json(meFor(me))
         : new Promise<Response>(() => {
             // Nada responde: fica carregando.
           }),
@@ -308,6 +309,58 @@ describe('Convidados › Tags (Tags dos convidados)', () => {
     );
     expect(calls).toHaveLength(0);
     expect(screen.getByText('Igreja')).toBeInTheDocument();
+  });
+
+  it('Editar tag com um nome que já existe: o 409 TAG_NAME_TAKEN marca o campo (RN02)', async () => {
+    const user = userEvent.setup();
+    mockTags({
+      write: ({ method }) =>
+        method === 'PATCH'
+          ? apiError({ status: 409, body: { error: 'TAG_NAME_TAKEN' } })
+          : undefined,
+    });
+    renderRoute({ url: '/app/convidados/tags' });
+    const dialog = await openEdit(user, 'Igreja');
+    const name = within(dialog).getByRole('textbox', { name: 'Nome da tag' });
+    await user.clear(name);
+    await user.type(name, 'Padrinhos');
+    await user.click(within(dialog).getByRole('button', { name: 'Salvar alterações' }));
+    await waitFor(() =>
+      expect(name).toHaveAccessibleDescription('Já existe uma tag com este nome.'),
+    );
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
+
+  describe('versão da cerimonialista (decisão 198(2))', () => {
+    it('a legenda e o aviso das 10 tags no singular (RN01, RN04)', async () => {
+      profileUnderTest.current = 'planner';
+      const dez = Array.from({ length: 10 }, (_, index) => ({
+        id: `t${index}`,
+        name: `Tag ${index}`,
+        color: null,
+        guests: 0,
+      }));
+      mockTags({ tags: dez });
+      renderAreaScreen({ url: '/app/convidados/tags' });
+      expect(
+        await screen.findByText('Este casamento já tem 10 tags. Exclua uma para criar outra.'),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText('Um convidado pode ter várias tags. Este casamento pode ter até 10.'),
+      ).toBeInTheDocument();
+    });
+
+    it('Editar tag sem nome: "Dê um nome à tag." (RN02)', async () => {
+      profileUnderTest.current = 'planner';
+      const user = userEvent.setup();
+      const calls = mockTags();
+      renderAreaScreen({ url: '/app/convidados/tags' });
+      const dialog = await openEdit(user, 'Igreja');
+      await user.clear(within(dialog).getByRole('textbox', { name: 'Nome da tag' }));
+      await user.click(within(dialog).getByRole('button', { name: 'Salvar alterações' }));
+      expect(within(dialog).getByText('Dê um nome à tag.')).toBeInTheDocument();
+      expect(calls).toHaveLength(0);
+    });
   });
 
   it('é acessível, com o Editar tag aberto', async () => {

@@ -1,7 +1,8 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { apiError, mockApi, renderRoute } from '../../../../tests/render-route';
+import { meFor, profileUnderTest } from '../../../../tests/profile';
+import { apiError, mockApi, renderAreaScreen, renderRoute } from '../../../../tests/render-route';
 import type { PartyListItemResponse, PartyResponse } from '../../../shared/api/generated/model';
 
 afterEach(() => {
@@ -87,7 +88,7 @@ function mockAll({
   let current = party;
   mockApi((call) => {
     const { method, path } = call;
-    if (path === '/v1/me') return Response.json(me);
+    if (path === '/v1/me') return Response.json(meFor(me));
     if (path === '/v1/weddings/w1/tags') return Response.json({ limit: 10, data: [] });
     if (method === 'GET' && path === '/v1/weddings/w1/parties/p1') return Response.json(current);
     if (method === 'GET' && path.startsWith('/v1/weddings/w1/parties')) {
@@ -204,6 +205,24 @@ describe('Mover para a lixeira (Lixeira RN02 a RN07)', () => {
     ).toBeInTheDocument();
   });
 
+  it('o grupo que já respondeu: o 403 ALREADY_RESPONDED vira o texto do grupo (RN07)', async () => {
+    const user = userEvent.setup();
+    mockAll({
+      write: ({ method, path }) =>
+        method === 'DELETE' && path === '/v1/weddings/w1/parties/p1'
+          ? apiError({ status: 403, body: { error: 'ALREADY_RESPONDED' } })
+          : undefined,
+    });
+    renderRoute({ url: '/app/convidados/grupos/p1' });
+    await user.click(await screen.findByRole('button', { name: 'Mover para a lixeira' }));
+    await user.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Mover para a lixeira' }),
+    );
+    expect(
+      await screen.findByText('Só o casal pode excluir um grupo que já respondeu.'),
+    ).toBeInTheDocument();
+  });
+
   it('a seleção com vários grupos: "Mover 2 grupos para a lixeira?" e o Toast (RN06)', async () => {
     const user = userEvent.setup();
     const calls = mockAll();
@@ -285,6 +304,64 @@ describe('Mover para a lixeira (Lixeira RN02 a RN07)', () => {
     expect(
       await screen.findByText(
         '1 grupo foi para a lixeira. 1 grupo que já respondeu ficou: só o casal pode excluí-lo.',
+      ),
+    ).toBeInTheDocument();
+  });
+  it('dois que já responderam ficam: o plural do aviso (RN07)', async () => {
+    const user = userEvent.setup();
+    mockAll({
+      write: ({ path }) =>
+        path.endsWith('/parties/trash')
+          ? Response.json({
+              trashed: 0,
+              skipped: [
+                { id: 'p2', name: 'Tio Jorge', reason: 'ALREADY_RESPONDED' },
+                { id: 'p3', name: 'Vó Helena', reason: 'ALREADY_RESPONDED' },
+              ],
+            })
+          : undefined,
+    });
+    renderRoute({ url: '/app/convidados' });
+    await screen.findByRole('table');
+    await user.click(screen.getByRole('checkbox', { name: 'Selecionar Tio Jorge' }));
+    await user.click(screen.getByRole('checkbox', { name: 'Selecionar Vó Helena' }));
+    await user.click(screen.getByRole('button', { name: 'Mover para a lixeira' }));
+    await user.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Mover para a lixeira' }),
+    );
+    expect(
+      await screen.findByText('2 grupos que já responderam ficaram: só o casal pode excluí-los.'),
+    ).toBeInTheDocument();
+  });
+
+  it('só 1 dos marcados foi, sem nenhum que ficou: "1 grupo foi para a lixeira." sozinho (RN06)', async () => {
+    const user = userEvent.setup();
+    mockAll({
+      write: ({ path }) =>
+        path.endsWith('/parties/trash') ? Response.json({ trashed: 1, skipped: [] }) : undefined,
+    });
+    renderRoute({ url: '/app/convidados' });
+    await screen.findByRole('table');
+    await user.click(screen.getByRole('checkbox', { name: 'Selecionar Tio Jorge' }));
+    await user.click(screen.getByRole('checkbox', { name: 'Selecionar Vó Helena' }));
+    await user.click(screen.getByRole('button', { name: 'Mover para a lixeira' }));
+    await user.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Mover para a lixeira' }),
+    );
+    const message = await screen.findByText('1 grupo foi para a lixeira.');
+    expect(message.textContent).toBe('1 grupo foi para a lixeira.');
+  });
+
+  it('cerimonialista: o último convidado no singular (RN08; decisão 198(2))', async () => {
+    profileUnderTest.current = 'planner';
+    const user = userEvent.setup();
+    mockAll({ party: { ...moreira, guests: [guest('g1', 'Luiz Moreira')] } });
+    renderAreaScreen({ url: '/app/convidados/grupos/p1' });
+    await user.click(await screen.findByRole('button', { name: 'Ações de Luiz Moreira' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Mover para a lixeira' }));
+    expect(
+      await screen.findByText(
+        'O grupo precisa de pelo menos um convidado. Para tirar todos, mova o grupo para a lixeira.',
       ),
     ).toBeInTheDocument();
   });
