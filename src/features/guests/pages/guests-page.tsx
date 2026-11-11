@@ -82,6 +82,7 @@ function PartiesView({ weddingId, audience }: { weddingId: string; audience: Aud
       {selection.count > 0 && (
         <SelectionBar
           count={selection.count}
+          audience={audience}
           tags={tags.data?.data ?? []}
           isApplying={applyTag.isApplying}
           onApplyTag={(tagId) =>

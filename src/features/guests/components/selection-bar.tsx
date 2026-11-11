@@ -1,9 +1,15 @@
 import { ActionMenu, Button, Tag } from '@kore-io/design';
+import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TagResponse } from '../../../shared/api/generated/model';
+import type { Audience } from '../hooks/use-active-wedding';
+
+/** O máximo de grupos do POST /tags/:id/apply (decisão 206). */
+export const APPLY_TAG_MAX_PARTIES = 200;
 
 interface SelectionBarProps {
   count: number;
+  audience: Audience;
   tags: TagResponse[];
   isApplying: boolean;
   onApplyTag: (tagId: string) => void;
@@ -11,11 +17,14 @@ interface SelectionBarProps {
 
 /**
  * Barra da seleção múltipla (RN13; decisão 197): "{n} grupos selecionados" e o Adicionar
- * tag, que abre o Menu de ações com as tags (decisão 204). Sem nenhuma tag, o botão fica
- * desabilitado. "Mover para a lixeira" entra com a lixeira.
+ * tag, que abre o Menu de ações com as tags (decisão 204). Sem nenhuma tag, ou com mais
+ * de 200 marcados (com o aviso da decisão 206), o botão fica desabilitado. "Mover para a lixeira" entra com a lixeira.
  */
-export function SelectionBar({ count, tags, isApplying, onApplyTag }: SelectionBarProps) {
+export function SelectionBar({ count, audience, tags, isApplying, onApplyTag }: SelectionBarProps) {
   const { t } = useTranslation('guests');
+  // Acima de 200 marcados, o apply recusaria: o botão fica desabilitado com o aviso (206).
+  const tooMany = count > APPLY_TAG_MAX_PARTIES;
+  const hintId = useId();
   return (
     <div className="kore-selection-bar">
       <p className="kore-selection-bar__count" role="status">
@@ -25,7 +34,12 @@ export function SelectionBar({ count, tags, isApplying, onApplyTag }: SelectionB
         <ActionMenu
           label={t('selection.addTag')}
           trigger={
-            <Button variant="secondary" size="sm" disabled={tags.length === 0 || isApplying}>
+            <Button
+              variant="secondary"
+              size="sm"
+              disabled={tags.length === 0 || tooMany || isApplying}
+              aria-describedby={tooMany ? hintId : undefined}
+            >
               {t('selection.addTag')}
             </Button>
           }
@@ -39,6 +53,11 @@ export function SelectionBar({ count, tags, isApplying, onApplyTag }: SelectionB
           ]}
         />
       </div>
+      {tooMany && (
+        <p id={hintId} className="kore-selection-bar__hint">
+          {t(`selection.tooMany.${audience}`)}
+        </p>
+      )}
     </div>
   );
 }

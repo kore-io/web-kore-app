@@ -283,6 +283,21 @@ describe('Convidados › Grupos e convidados (RN13)', () => {
     await waitFor(() => expect(screen.queryByText(/selecionad/)).toBeNull());
   });
 
+  it('com mais de 200 grupos marcados, o Adicionar tag fica desabilitado com o aviso (decisão 206)', async () => {
+    const user = userEvent.setup();
+    const many = Array.from({ length: 201 }, (_, index) => party(`p${index}`, `Grupo ${index}`));
+    mockList(() => Response.json(page(many, { total: 201 })));
+    renderRoute({ url: '/app/convidados' });
+    await screen.findByRole('table');
+    await user.click(screen.getByRole('checkbox', { name: 'Selecionar todos os grupos' }));
+    const button = screen.getByRole('button', { name: 'Adicionar tag' });
+    expect(button).toBeDisabled();
+    expect(button).toHaveAccessibleDescription('Marquem até 200 grupos para adicionar uma tag.');
+    await user.click(screen.getByRole('checkbox', { name: 'Selecionar Grupo 0' }));
+    expect(screen.getByRole('button', { name: 'Adicionar tag' })).toBeEnabled();
+    expect(screen.queryByText('Marquem até 200 grupos para adicionar uma tag.')).toBeNull();
+  });
+
   it('sem nenhuma tag, o Adicionar tag fica desabilitado', async () => {
     const user = userEvent.setup();
     mockList(() => Response.json(page([party('p1', 'Família Moreira')])), []);

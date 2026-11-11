@@ -35,6 +35,10 @@
   @apply flex flex-wrap gap-2;
 }
 
+.kore-selection-bar__hint {
+  @apply type-caption basis-full text-primary-dark;
+}
+
 .kore-guests__loading {
   @apply flex justify-center py-6;
 }
