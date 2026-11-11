@@ -5,8 +5,8 @@ import { afterEach } from 'vitest';
 import { profileUnderTest } from './profile';
 
 // O findBy e o waitFor esperam 1 s por padrão; 3 s dá folga com a máquina ocupada (o
-// teste que falha de verdade continua falhando, só espera mais). O teste lento de verdade
-// (a lista de 201 grupos) tem o prazo próprio no it.
+// teste que falha de verdade continua falhando, só espera mais). O prazo do teste inteiro
+// fica no vitest.config.ts (testTimeout).
 configure({ asyncUtilTimeout: 3000 });
 
 afterEach(() => {

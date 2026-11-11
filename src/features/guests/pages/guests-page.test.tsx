@@ -320,7 +320,7 @@ describe('Convidados › Grupos e convidados (RN13)', () => {
     expect(
       screen.queryByText('Marquem até 200 grupos para adicionar uma tag ou mover para a lixeira.'),
     ).toBeNull();
-  }, 15_000);
+  });
 
   it('cerimonialista: o aviso dos 200 no singular, nas Tags e na Lixeira (decisões 198(2) e 206)', async () => {
     profileUnderTest.current = 'planner';
@@ -336,7 +336,7 @@ describe('Convidados › Grupos e convidados (RN13)', () => {
         'Marque até 200 grupos para adicionar uma tag ou mover para a lixeira.',
       );
     }
-  }, 15_000);
+  });
 
   it('sem nenhuma tag, o Adicionar tag fica desabilitado', async () => {
     const user = userEvent.setup();
