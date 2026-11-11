@@ -98,16 +98,27 @@ export function useTags({ weddingId }: { weddingId: string }) {
           onError: (error) => onDone(nameError({ error })),
         },
       ),
-    trash: ({ tagId, name, onDone }: { tagId: string; name: string; onDone: () => void }) =>
+    trash: ({
+      tagId,
+      name,
+      onDone,
+    }: {
+      tagId: string;
+      name: string;
+      onDone: (result: { deleted: boolean }) => void;
+    }) =>
       trash.mutate(
         { weddingId, tagId },
         {
           onSuccess: () => {
             refresh();
             showToast({ tone: 'success', message: t('tags.deleted', { name }) });
+            onDone({ deleted: true });
           },
-          onError: genericError,
-          onSettled: onDone,
+          onError: () => {
+            genericError();
+            onDone({ deleted: false });
+          },
         },
       ),
   };

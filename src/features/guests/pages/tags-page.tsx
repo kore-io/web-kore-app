@@ -23,11 +23,15 @@ function TagsView({ weddingId, audience }: { weddingId: string; audience: Audien
   const [editing, setEditing] = useState<TagResponse | null>(null);
   const [deleting, setDeleting] = useState<TagResponse | null>(null);
   const editButton = useRef<HTMLElement | null>(null);
+  const nameField = useRef<HTMLInputElement>(null);
+  // Para onde o foco volta ao fechar o Excluir: o Editar da linha, ou o campo do nome
+  // quando a tag saiu da lista (a linha some junto com o Editar).
+  const afterDelete = useRef<HTMLElement | null>(null);
 
   if (tags.isLoading) {
     return (
       <div className="kore-guests__loading">
-        <Spinner label={t('loading')} />
+        <Spinner label={t('tags.loading')} />
       </div>
     );
   }
@@ -66,6 +70,7 @@ function TagsView({ weddingId, audience }: { weddingId: string; audience: Audien
         }}
       >
         <Input
+          ref={nameField}
           className="kore-tags__name"
           aria-label={t('tags.newName')}
           placeholder={t('tags.newName')}
@@ -126,6 +131,7 @@ function TagsView({ weddingId, audience }: { weddingId: string; audience: Audien
           editing && tags.update({ tagId: editing.id, name, color, onDone })
         }
         onDelete={() => {
+          afterDelete.current = editButton.current;
           setDeleting(editing);
           setEditing(null);
         }}
@@ -133,7 +139,7 @@ function TagsView({ weddingId, audience }: { weddingId: string; audience: Audien
       <Dialog
         open={deleting !== null}
         onOpenChange={(open) => !open && setDeleting(null)}
-        returnFocusRef={editButton}
+        returnFocusRef={afterDelete}
         title={t('tags.deleteDialog.title', { name: deleting?.name ?? '' })}
         description={t('tags.deleteDialog.description')}
         actions={
@@ -149,7 +155,10 @@ function TagsView({ weddingId, audience }: { weddingId: string; audience: Audien
                 tags.trash({
                   tagId: deleting.id,
                   name: deleting.name,
-                  onDone: () => setDeleting(null),
+                  onDone: ({ deleted }) => {
+                    if (deleted) afterDelete.current = nameField.current;
+                    setDeleting(null);
+                  },
                 })
               }
             >
