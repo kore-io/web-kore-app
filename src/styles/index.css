@@ -22,3 +22,4 @@
 @import '../features/guests/pages/import-page.css' layer(components);
 @import '../features/guests/pages/paste-list.css' layer(components);
 @import '../features/guests/pages/export-page.css' layer(components);
+@import '../features/guests/components/party-form.css' layer(components);

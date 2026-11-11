@@ -11,7 +11,7 @@ import { Check, Clock, X } from 'lucide-react';
 import { useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate, useNavigate, useParams } from 'react-router';
-import { paths } from '../../../app/paths';
+import { guestPartyEditPath, paths } from '../../../app/paths';
 import type {
   PartyGuestResponse,
   PartyGuestResponseRsvpStatus,
@@ -75,9 +75,14 @@ function PartyPanel({
         title={party.name}
         description={panelSummary({ t, party })}
         actions={
-          <Button variant="secondary" onClick={() => setConfirming(true)}>
-            {t('panel.regenerate')}
-          </Button>
+          <>
+            <Button variant="secondary" onClick={() => setConfirming(true)}>
+              {t('panel.regenerate')}
+            </Button>
+            <Button onClick={() => void navigate(guestPartyEditPath({ partyId: party.id }))}>
+              {t('partyForm.editButton')}
+            </Button>
+          </>
         }
       />
       <div className="kore-party-panel__cards">

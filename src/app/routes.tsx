@@ -11,6 +11,7 @@ import { GuestsLayout } from '../features/guests/pages/guests-layout';
 import { GuestsPage } from '../features/guests/pages/guests-page';
 import { ExportPage } from '../features/guests/pages/export-page';
 import { ImportPage } from '../features/guests/pages/import-page';
+import { EditPartyPage, NewPartyPage } from '../features/guests/pages/party-form-page';
 import { PartyPanelPage } from '../features/guests/pages/party-panel-page';
 import { TagsPage } from '../features/guests/pages/tags-page';
 import { TrashPage } from '../features/guests/pages/trash-page';
@@ -48,6 +49,12 @@ export const routes: RouteObject[] = [
             ],
           },
           { id: 'guest-party', path: 'convidados/grupos/:partyId', element: <PartyPanelPage /> },
+          { id: 'guest-new', path: 'convidados/novo', element: <NewPartyPage /> },
+          {
+            id: 'guest-party-edit',
+            path: 'convidados/grupos/:partyId/editar',
+            element: <EditPartyPage />,
+          },
         ],
       },
       // Sem página de "não encontrado" no DS: o caminho desconhecido volta para a área.
