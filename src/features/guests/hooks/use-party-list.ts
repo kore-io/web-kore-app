@@ -7,13 +7,23 @@ const SEARCH_DEBOUNCE_MS = 300;
 
 /**
  * Lista de grupos (GET /parties, RN13) com rolagem infinita pelo cursor (decisão 197):
- * as páginas somadas, o total com os filtros e o resumo do casamento inteiro.
+ * as páginas somadas e o total com os filtros. `enabled` segura o pedido até a tela saber
+ * se a tag da URL ainda existe.
  */
-export function usePartyList({ weddingId, filters }: { weddingId: string; filters: PartyFilters }) {
+export function usePartyList({
+  weddingId,
+  filters,
+  enabled = true,
+}: {
+  weddingId: string;
+  filters: PartyFilters;
+  enabled?: boolean;
+}) {
   const q = useDebouncedValue({ value: filters.q, delayMs: SEARCH_DEBOUNCE_MS });
   const params = toListParams({ filters: { ...filters, q } });
   const query = usePartiesControllerListV1Infinite(weddingId, params, {
     query: {
+      enabled,
       initialPageParam: undefined,
       getNextPageParam: (page) => page.nextCursor ?? undefined,
     },

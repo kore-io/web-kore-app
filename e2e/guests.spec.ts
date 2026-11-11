@@ -99,6 +99,7 @@ async function weddingWithParties({ db, page }: { db: Db; page: Page }) {
       body: { name: `Grupo E2E ${number}`, guests: [{ name: `Pessoa ${number}` }] },
     });
   }
+  return { weddingId };
 }
 
 test.describe('Convidados › Grupos e convidados (RN13)', () => {
@@ -270,6 +271,33 @@ test.describe('Convidados › Grupos e convidados (RN13)', () => {
     await confirm.getByRole('button', { name: 'Excluir tag' }).click();
     await expect(toast({ page, text: 'A tag Igreja Matriz foi para a lixeira.' })).toBeVisible();
     await expect(page.getByRole('heading', { name: '0 de 10 tags' })).toBeVisible();
+  });
+
+  test('filtro de Tag: mostra só o grupo com a tag, pela folha do celular (Tags RN09)', async ({
+    page,
+  }) => {
+    const { weddingId } = await weddingWithParties({ db, page });
+    const created = await page.request.post(`${API_URL}/v1/weddings/${weddingId}/tags`, {
+      headers: { origin: APP_ORIGIN },
+      data: { name: 'Padrinhos', color: 'champagne' },
+    });
+    expect(created.status(), await created.text()).toBe(201);
+    const { id: tagId } = (await created.json()) as { id: string };
+    await createParty({
+      page,
+      weddingId,
+      body: { name: 'Padrinhos do noivo', guests: [{ name: 'Bruno Lima' }], tagIds: [tagId] },
+    });
+
+    await page.goto('/app/convidados');
+    await page.getByRole('button', { name: 'Filtros' }).click();
+    const sheet = page.getByRole('dialog', { name: 'Filtros' });
+    await sheet.getByRole('combobox', { name: 'Tag' }).selectOption({ label: 'Tag: Padrinhos' });
+    await sheet.getByRole('button', { name: 'Mostrar resultados' }).click();
+    await expect(page.getByText('Mostrando 1 de 1 grupo')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Padrinhos do noivo' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Filtros (1)' })).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`\\?tag=${tagId}$`));
   });
 
   test.describe('computador', () => {

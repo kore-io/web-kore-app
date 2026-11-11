@@ -249,6 +249,33 @@ describe('Convidados › Tags (Tags dos convidados)', () => {
     expect(await screen.findByRole('heading', { name: '5 de 10 tags' })).toBeInTheDocument();
   });
 
+  it('depois de excluir, o foco vai para o campo "Nome da tag nova" (a linha sumiu)', async () => {
+    const user = userEvent.setup();
+    mockTags();
+    renderRoute({ url: '/app/convidados/tags' });
+    const dialog = await openEdit(user, 'Igreja');
+    await user.click(within(dialog).getByRole('button', { name: 'Excluir tag' }));
+    await user.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Excluir tag' }),
+    );
+    await screen.findByText('A tag Igreja foi para a lixeira.');
+    await waitFor(() =>
+      expect(screen.getByRole('textbox', { name: 'Nome da tag nova' })).toHaveFocus(),
+    );
+  });
+
+  it('enquanto carrega, o Spinner diz "Carregando as tags"', async () => {
+    mockApi(({ path }) =>
+      path === '/v1/me'
+        ? Response.json(me)
+        : new Promise<Response>(() => {
+            // Nada responde: fica carregando.
+          }),
+    );
+    renderRoute({ url: '/app/convidados/tags' });
+    expect(await screen.findByRole('status')).toHaveTextContent('Carregando as tags');
+  });
+
   it('Cancelar no Excluir não apaga', async () => {
     const user = userEvent.setup();
     const calls = mockTags();

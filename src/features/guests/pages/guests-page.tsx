@@ -1,6 +1,7 @@
 import { EmptyState, Spinner } from '@kore-io/design';
 import { SearchX, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useTagsControllerListV1 } from '../../../shared/api/generated/tags/tags';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { PartyFilters } from '../components/party-filters';
 import { PartyList } from '../components/party-list';
@@ -18,8 +19,16 @@ export function GuestsPage() {
 
 function PartiesView({ weddingId, audience }: { weddingId: string; audience: Audience }) {
   const { t } = useTranslation('guests');
-  const { filters, setFilters } = usePartyFilters();
-  const list = usePartyList({ weddingId, filters });
+  const { filters: urlFilters, setFilters } = usePartyFilters();
+  const tags = useTagsControllerListV1(weddingId);
+  // A tag da URL só vale se for uma tag ativa (excluída ou de um link antigo, cai).
+  const tagKnown = tags.data?.data.some((tag) => tag.id === urlFilters.tag) ?? false;
+  const filters = { ...urlFilters, tag: tagKnown ? urlFilters.tag : '' };
+  const list = usePartyList({
+    weddingId,
+    filters,
+    enabled: !urlFilters.tag || !tags.isPending,
+  });
   const selection = usePartySelection({ ids: list.parties.map((party) => party.id) });
 
   function content() {
@@ -60,6 +69,7 @@ function PartiesView({ weddingId, audience }: { weddingId: string; audience: Aud
     <>
       <PartyFilters
         filters={filters}
+        tags={tags.data?.data ?? []}
         onChange={(next) => {
           selection.clear();
           setFilters(next);
