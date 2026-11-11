@@ -8,6 +8,14 @@ import {
 } from './support/backoffice';
 
 const API_URL = process.env.E2E_API_URL ?? 'http://localhost:3000';
+
+/**
+ * O Toast visível, dentro da região de avisos: o Radix também cria, por 1 s, uma cópia
+ * escondida do texto para o leitor de tela, fora da região.
+ */
+function toast({ page, text }: { page: Page; text: string }) {
+  return page.getByRole('region', { name: /^Avisos/ }).getByText(text);
+}
 const APP_ORIGIN = 'http://localhost:5173';
 
 /** Entra pelo provedor dev do Google (decisão 147) e espera a área do casal. */
@@ -151,7 +159,7 @@ test.describe('Convidados › Grupos e convidados (RN13)', () => {
     const oldUrl = (await link.textContent()) ?? '';
     expect(oldUrl).toMatch(/^http:\/\/localhost:5173\/e2e-[^/]+\/grupo\/\S+$/);
     await page.getByRole('button', { name: 'Copiar link' }).click();
-    await expect(page.getByText('Link copiado.')).toBeVisible();
+    await expect(toast({ page, text: 'Link copiado.' })).toBeVisible();
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(oldUrl);
 
     await page.getByRole('button', { name: 'Regenerar link' }).click();
@@ -164,6 +172,50 @@ test.describe('Convidados › Grupos e convidados (RN13)', () => {
 
     await page.getByRole('link', { name: '‹ Voltar para Convidados' }).click();
     await expect(page).toHaveURL(/\/app\/convidados$/);
+  });
+
+  test('Mover de grupo: leva o convidado ao outro grupo e recusa o último (RN08, RN10; decisão 201)', async ({
+    page,
+  }) => {
+    await weddingWithParties({ db, page });
+    await page.goto('/app/convidados?q=moreira');
+    await page.getByRole('link', { name: 'Família Moreira' }).click();
+
+    await page.getByRole('button', { name: 'Ações de Pedro Moreira' }).click();
+    await page.getByRole('menuitem', { name: 'Mover de grupo' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Mover Pedro Moreira para outro grupo' });
+    await dialog.getByRole('searchbox', { name: 'Buscar por nome' }).fill('helena');
+    const select = dialog.getByRole('combobox', { name: 'Grupo' });
+    await expect(select.getByRole('option', { name: 'Vó Helena' })).toBeAttached();
+    await select.selectOption({ label: 'Vó Helena' });
+    await dialog.getByRole('button', { name: 'Mover' }).click();
+    await expect(toast({ page, text: 'Pedro Moreira foi para Vó Helena.' })).toBeVisible();
+    await expect(page.getByText('2 convidados · Contato: Célia Moreira')).toBeVisible();
+
+    // No destino, Pedro entra no fim do grupo (RN17).
+    await page.getByRole('link', { name: '‹ Voltar para Convidados' }).click();
+    await page.getByRole('searchbox', { name: 'Buscar por nome' }).fill('helena');
+    await page.getByRole('link', { name: 'Vó Helena' }).click();
+    const guests = page
+      .getByRole('heading', { name: 'Convidados', level: 2 })
+      .locator('..')
+      .getByRole('listitem');
+    await expect(guests).toHaveCount(2);
+    await expect(guests.nth(1)).toContainText('Pedro Moreira');
+
+    // Um grupo de uma pessoa: o último convidado com nome não sai (RN08).
+    await page.getByRole('link', { name: '‹ Voltar para Convidados' }).click();
+    await page.getByRole('searchbox', { name: 'Buscar por nome' }).fill('E2E 01');
+    await page.getByRole('link', { name: 'Grupo E2E 01' }).click();
+    await page.getByRole('button', { name: 'Ações de Pessoa 01' }).click();
+    await page.getByRole('menuitem', { name: 'Mover de grupo' }).click();
+    await expect(
+      toast({
+        page,
+        text: 'O grupo precisa de pelo menos um convidado. Para tirar todos, movam o grupo para a lixeira.',
+      }),
+    ).toBeVisible();
+    await expect(page.getByRole('dialog')).toHaveCount(0);
   });
 
   test.describe('computador', () => {
