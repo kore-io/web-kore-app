@@ -7,6 +7,7 @@ export * from './me/me';
 export * from './memberships/memberships';
 export * from './parties/parties';
 export * from './referrals/referrals';
+export * from './site-images/site-images';
 export * from './tags/tags';
 export * from './trash/trash';
 export * from './weddings/weddings';

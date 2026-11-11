@@ -15,6 +15,12 @@ export interface PastedGroupResponse {
   name: string | null;
   guests: PastedGuestResponse[];
   warnings: PastedGroupResponseWarningsItem[];
+  /**
+   * Quantos nomes repetidos saíram do grupo ("Jorge, jorge, JORGE" dá 2); o app
+   * os soma ao removedInPreview (RN14; decisão 210(4)).
+   * @minimum 0
+   */
+  duplicatesRemoved: number;
   line: number;
   /** A linha original, para o cartão "Qual é o nome de cada pessoa deste grupo?". */
   source: string;

@@ -3756,6 +3756,246 @@
           "guests"
         ]
       }
+    },
+    "/v1/weddings/{weddingId}/site-images": {
+      "post": {
+        "operationId": "SiteImagesController_confirm_v1",
+        "parameters": [
+          {
+            "name": "weddingId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmSiteImageBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Já estava pronta (idempotente).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteImageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionExpiredErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/OriginNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/WeddingNotFoundErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SiteImageNotFoundErrorBody"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SiteImageProcessingErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SiteImageUploadMissingErrorBody"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteImageInvalidErrorBody"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateLimitedErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Confirma o envio e processa na hora (Imagens do site RN05): 201 com a\nimagem pronta; 200 quando ela já estava pronta (confirmação repetida). O\nprocessamento fica fora da transação do banco (@OwnTransactions).",
+        "tags": [
+          "site-images"
+        ]
+      }
+    },
+    "/v1/weddings/{weddingId}/site-images/upload-authorizations": {
+      "post": {
+        "operationId": "SiteImagesController_authorize_v1",
+        "parameters": [
+          {
+            "name": "weddingId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SiteImageUploadAuthorizationBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteImageUploadAuthorizationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionExpiredErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/OriginNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeddingNotFoundErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteImageLimitErrorBody"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateLimitedErrorBody"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Autorização de envio direto ao armazenamento (Imagens do site RN04 e RN07).",
+        "tags": [
+          "site-images"
+        ]
+      }
     }
   },
   "info": {
@@ -7219,6 +7459,11 @@
               ]
             }
           },
+          "duplicatesRemoved": {
+            "type": "integer",
+            "description": "Quantos nomes repetidos saíram do grupo (\"Jorge, jorge, JORGE\" dá 2); o app\nos soma ao removedInPreview (RN14; decisão 210(4)).",
+            "minimum": 0
+          },
           "line": {
             "type": "number"
           },
@@ -7231,6 +7476,7 @@
           "name",
           "guests",
           "warnings",
+          "duplicatesRemoved",
           "line",
           "source"
         ]
@@ -7384,6 +7630,268 @@
           "error",
           "message"
         ]
+      },
+      "SiteImageNotFoundErrorBody": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "number",
+            "enum": [
+              404
+            ]
+          },
+          "error": {
+            "type": "string",
+            "enum": [
+              "IMAGE_NOT_FOUND"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "statusCode",
+          "error",
+          "message"
+        ]
+      },
+      "SiteImageProcessingErrorBody": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "number",
+            "enum": [
+              409
+            ]
+          },
+          "error": {
+            "type": "string",
+            "enum": [
+              "IMAGE_PROCESSING"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "statusCode",
+          "error",
+          "message"
+        ]
+      },
+      "SiteImageUploadMissingErrorBody": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "number",
+            "enum": [
+              409
+            ]
+          },
+          "error": {
+            "type": "string",
+            "enum": [
+              "UPLOAD_MISSING"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "statusCode",
+          "error",
+          "message"
+        ]
+      },
+      "SiteImageInvalidErrorBody": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "number",
+            "enum": [
+              422
+            ]
+          },
+          "error": {
+            "type": "string",
+            "enum": [
+              "IMAGE_INVALID"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "statusCode",
+          "error",
+          "message"
+        ]
+      },
+      "ConfirmSiteImageBody": {
+        "type": "object",
+        "properties": {
+          "imageId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "imageId"
+        ]
+      },
+      "SiteImageResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "description": "display.jpg, até 2560 px, pelo CDN."
+          },
+          "thumbUrl": {
+            "type": "string",
+            "description": "thumb.jpg, 640 px, pelo CDN."
+          },
+          "width": {
+            "type": "number"
+          },
+          "height": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "url",
+          "thumbUrl",
+          "width",
+          "height"
+        ]
+      },
+      "SiteImageLimitErrorBody": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "number",
+            "enum": [
+              409
+            ]
+          },
+          "error": {
+            "type": "string",
+            "enum": [
+              "SITE_IMAGE_LIMIT"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "statusCode",
+          "error",
+          "message"
+        ]
+      },
+      "SiteImageUploadAuthorizationBody": {
+        "type": "object",
+        "properties": {
+          "contentType": {
+            "type": "string",
+            "description": "O app sempre envia JPEG (RN03).",
+            "enum": [
+              "image/jpeg"
+            ],
+            "example": "image/jpeg"
+          },
+          "sizeBytes": {
+            "type": "number",
+            "description": "De 1 byte a 4 MB (RN03).",
+            "minimum": 1,
+            "maximum": 4194304,
+            "example": 1048576
+          }
+        },
+        "required": [
+          "contentType",
+          "sizeBytes"
+        ]
+      },
+      "SiteImageUploadHeaders": {
+        "type": "object",
+        "properties": {
+          "Content-Type": {
+            "type": "string",
+            "example": "image/jpeg"
+          },
+          "Content-Length": {
+            "type": "string",
+            "description": "Informativo: o navegador tira o tamanho do Blob e não deixa definir este cabeçalho.",
+            "example": "1048576"
+          }
+        },
+        "required": [
+          "Content-Type",
+          "Content-Length"
+        ]
+      },
+      "SiteImageUploadAuthorizationResponse": {
+        "type": "object",
+        "properties": {
+          "imageId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "uploadUrl": {
+            "type": "string",
+            "description": "PUT pré-assinado do original, no bucket privado, válido por 5 minutos (RN04)."
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "PUT"
+            ]
+          },
+          "headers": {
+            "$ref": "#/components/schemas/SiteImageUploadHeaders"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "imageId",
+          "uploadUrl",
+          "method",
+          "headers",
+          "expiresAt"
+        ]
+      },
+      "SpreadsheetTemplateHeaders": {
+        "type": "string",
+        "enum": [
+          "Grupo",
+          "Nome",
+          "Telefone",
+          "E-mail",
+          "Faixa etária",
+          "Restrição alimentar",
+          "Tags"
+        ],
+        "description": "Os 7 títulos da primeira linha do modelo de planilha, na ordem das colunas (Importação RN02 e RN03)."
       }
     }
   }
