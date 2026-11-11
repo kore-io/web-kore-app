@@ -1,6 +1,7 @@
 import { Button, Input, Select } from '@kore-io/design';
 import { useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { TagResponse } from '../../../shared/api/generated/model';
 import {
   rsvpFilters,
   SEARCH_MAX_LENGTH,
@@ -10,13 +11,16 @@ import {
   type SentFilter,
 } from '../hooks/use-party-filters';
 
+type SheetFilters = Pick<Filters, 'rsvp' | 'sent' | 'tag'>;
+
 interface SelectsProps {
-  value: Pick<Filters, 'rsvp' | 'sent'>;
+  value: SheetFilters;
+  tags: TagResponse[];
   onChange: (next: Partial<Filters>) => void;
 }
 
-/** Os Selects Resposta e Envio (RN13); o de Tag chega com as tags. */
-function FilterSelects({ value, onChange }: SelectsProps) {
+/** Os Selects Resposta, Envio e Tag (RN13; Tags RN09; decisão 194(1)). */
+function FilterSelects({ value, tags, onChange }: SelectsProps) {
   const { t } = useTranslation('guests');
   return (
     <>
@@ -44,6 +48,18 @@ function FilterSelects({ value, onChange }: SelectsProps) {
           </option>
         ))}
       </Select>
+      <Select
+        aria-label={t('filters.tag.label')}
+        value={value.tag}
+        onChange={(event) => onChange({ tag: event.target.value })}
+      >
+        <option value="">{t('filters.tag.all')}</option>
+        {tags.map((tag) => (
+          <option key={tag.id} value={tag.id}>
+            {t('filters.tag.option', { name: tag.name })}
+          </option>
+        ))}
+      </Select>
     </>
   );
 }
@@ -55,23 +71,25 @@ function FilterSelects({ value, onChange }: SelectsProps) {
  */
 export function PartyFilters({
   filters,
+  tags,
   onChange,
 }: {
   filters: Filters;
+  tags: TagResponse[];
   onChange: (next: Partial<Filters>) => void;
 }) {
   const { t } = useTranslation('guests');
   const dialog = useRef<HTMLDialogElement>(null);
   const titleId = useId();
-  const [draft, setDraft] = useState<Pick<Filters, 'rsvp' | 'sent'>>(filters);
-  const activeCount = [filters.rsvp, filters.sent].filter(Boolean).length;
+  const [draft, setDraft] = useState<SheetFilters>(filters);
+  const activeCount = [filters.rsvp, filters.sent, filters.tag].filter(Boolean).length;
 
   function openSheet() {
-    setDraft({ rsvp: filters.rsvp, sent: filters.sent });
+    setDraft({ rsvp: filters.rsvp, sent: filters.sent, tag: filters.tag });
     dialog.current?.showModal();
   }
 
-  function closeSheet(next: Pick<Filters, 'rsvp' | 'sent'>) {
+  function closeSheet(next: SheetFilters) {
     onChange(next);
     dialog.current?.close();
   }
@@ -88,7 +106,7 @@ export function PartyFilters({
         onChange={(event) => onChange({ q: event.target.value })}
       />
       <div className="kore-party-filters__selects">
-        <FilterSelects value={filters} onChange={onChange} />
+        <FilterSelects value={filters} tags={tags} onChange={onChange} />
       </div>
       <Button variant="secondary" className="kore-party-filters__open" onClick={openSheet}>
         {/* "Filtros (n)" com filtro ativo; a busca fica fora da folha e não conta (200(c)). */}
@@ -99,11 +117,15 @@ export function PartyFilters({
           {t('filters.title')}
         </h2>
         <div className="kore-party-filters__fields">
-          <FilterSelects value={draft} onChange={(next) => setDraft({ ...draft, ...next })} />
+          <FilterSelects
+            value={draft}
+            tags={tags}
+            onChange={(next) => setDraft({ ...draft, ...next })}
+          />
         </div>
         <div className="kore-party-filters__actions">
           <Button onClick={() => closeSheet(draft)}>{t('filters.apply')}</Button>
-          <Button variant="secondary" onClick={() => closeSheet({ rsvp: '', sent: '' })}>
+          <Button variant="secondary" onClick={() => closeSheet({ rsvp: '', sent: '', tag: '' })}>
             {t('filters.clear')}
           </Button>
         </div>

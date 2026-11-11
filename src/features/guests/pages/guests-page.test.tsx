@@ -182,6 +182,42 @@ describe('Convidados › Grupos e convidados (RN13)', () => {
     expect(screen.getAllByRole('combobox', { name: 'Resposta' })[0]).toHaveValue('');
   });
 
+  it('o filtro de Tag vai para a URL pelo id e para a API (Tags RN09)', async () => {
+    const user = userEvent.setup();
+    const listPaths = mockList(() =>
+      Response.json(page([party('p1', 'Família Moreira')], { total: 1 })),
+    );
+    const { router } = renderRoute({ url: '/app/convidados' });
+    await screen.findByRole('table');
+    const select = screen.getAllByRole('combobox', { name: 'Tag' })[0] as HTMLElement;
+    expect(
+      within(select)
+        .getAllByRole('option')
+        .map((option) => option.textContent),
+    ).toEqual(['Tag: todas', 'Tag: Família da Ana']);
+    await user.selectOptions(select, 't1');
+    await waitFor(() => expect(listPaths.at(-1)).toBe('/v1/weddings/w1/parties?tag=t1'));
+    expect(router.state.location.search).toBe('?tag=t1');
+  });
+
+  it('tag da URL que não existe mais é ignorada, sem 400 da API', async () => {
+    const listPaths = mockList(() =>
+      Response.json(page([party('p1', 'Família Moreira')], { total: 1 })),
+    );
+    renderRoute({ url: '/app/convidados?tag=apagada&resposta=pendentes' });
+    await screen.findByRole('table');
+    expect(listPaths).toEqual(['/v1/weddings/w1/parties?rsvp=pending']);
+  });
+
+  it('a folha do celular tem o Select de Tag e o "Filtros (n)" conta a tag', async () => {
+    const user = userEvent.setup();
+    mockList(() => Response.json(page([party('p1', 'Família Moreira')], { total: 1 })));
+    renderRoute({ url: '/app/convidados?tag=t1&envio=enviado' });
+    await user.click(await screen.findByRole('button', { name: 'Filtros (2)' }));
+    const sheet = screen.getByRole('dialog', { name: 'Filtros' });
+    expect(within(sheet).getByRole('combobox', { name: 'Tag' })).toHaveValue('t1');
+  });
+
   it('a folha de Filtros do celular só aplica no Mostrar resultados, e o Limpar tira tudo', async () => {
     const user = userEvent.setup();
     const listPaths = mockList(() =>

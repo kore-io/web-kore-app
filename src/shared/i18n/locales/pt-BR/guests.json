@@ -46,7 +46,12 @@
       "viewed": "Envio: visualizado",
       "responded": "Envio: respondido"
     },
-    "openCount": "Filtros ({{count}})"
+    "openCount": "Filtros ({{count}})",
+    "tag": {
+      "label": "Tag",
+      "all": "Tag: todas",
+      "option": "Tag: {{name}}"
+    }
   },
   "table": {
     "label": "Grupos e convidados",
@@ -207,6 +212,7 @@
       "cancel": "Cancelar",
       "confirm": "Excluir tag"
     },
-    "deleted": "A tag {{name}} foi para a lixeira."
+    "deleted": "A tag {{name}} foi para a lixeira.",
+    "loading": "Carregando as tags"
   }
 }

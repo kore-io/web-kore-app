@@ -6,8 +6,8 @@ import type {
 } from '../../../shared/api/generated/model';
 
 /**
- * Valores dos filtros na URL (decisão 198): `?q=&resposta=&envio=`, em português como os
- * caminhos; a tela troca pelos valores da API.
+ * Valores dos filtros na URL (decisão 198): `?q=&resposta=&envio=&tag=`, em português como
+ * os caminhos (a tag vai pelo id); a tela troca pelos valores da API.
  */
 export const rsvpFilters = {
   confirmados: 'confirmed',
@@ -29,6 +29,8 @@ export interface PartyFilters {
   q: string;
   rsvp: RsvpFilter | '';
   sent: SentFilter | '';
+  /** Id de uma tag ativa (Tags RN09); vazio, todas. */
+  tag: string;
 }
 
 /** Limite da busca no contrato (`q` até 80 caracteres). */
@@ -45,6 +47,7 @@ export function usePartyFilters() {
     q: (searchParams.get('q') ?? '').slice(0, SEARCH_MAX_LENGTH),
     rsvp: pick<RsvpFilter>({ value: searchParams.get('resposta'), options: rsvpFilters }),
     sent: pick<SentFilter>({ value: searchParams.get('envio'), options: sentFilters }),
+    tag: searchParams.get('tag') ?? '',
   };
 
   function setFilters(next: Partial<PartyFilters>) {
@@ -53,6 +56,7 @@ export function usePartyFilters() {
     if (merged.q.trim()) params.set('q', merged.q);
     if (merged.rsvp) params.set('resposta', merged.rsvp);
     if (merged.sent) params.set('envio', merged.sent);
+    if (merged.tag) params.set('tag', merged.tag);
     setSearchParams(params, { replace: true });
   }
 
@@ -70,5 +74,6 @@ export function toListParams({
     ...(q && { q }),
     ...(filters.rsvp && { rsvp: rsvpFilters[filters.rsvp] }),
     ...(filters.sent && { sent: sentFilters[filters.sent] }),
+    ...(filters.tag && { tag: filters.tag }),
   };
 }
