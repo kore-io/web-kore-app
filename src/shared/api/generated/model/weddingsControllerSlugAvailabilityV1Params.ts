@@ -8,6 +8,8 @@
 export type WeddingsControllerSlugAvailabilityV1Params = {
   /** Para a sugestão com o ano (RN05). */
   eventDate?: string;
+  /** Editor do site: o endereço atual deste casamento volta como livre (Dados básicos RN06). */
+  weddingId?: string;
   /** @maxLength 200 */
   slug: string;
 };
