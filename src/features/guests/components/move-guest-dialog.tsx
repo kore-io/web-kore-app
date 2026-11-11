@@ -3,6 +3,7 @@ import { useState, type RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePartiesControllerListV1 } from '../../../shared/api/generated/parties/parties';
 import { useDebouncedValue } from '../../../shared/hooks/use-debounced-value';
+import type { Audience } from '../hooks/use-active-wedding';
 import { SEARCH_MAX_LENGTH } from '../hooks/use-party-filters';
 
 /** Quantos grupos a escolha mostra de uma vez (o máximo do GET /parties). */
@@ -11,6 +12,7 @@ const SEARCH_DEBOUNCE_MS = 300;
 
 interface MoveGuestDialogProps {
   weddingId: string;
+  audience: Audience;
   guest: { id: string; name: string } | null;
   fromPartyId: string;
   isMoving: boolean;
@@ -21,10 +23,12 @@ interface MoveGuestDialogProps {
 
 /**
  * Dialog do Mover de grupo (decisão 201): "Mover {nome} para outro grupo", a busca pelo
- * nome e o Select dos grupos (sem o atual, em ordem alfabética, até 100), Cancelar · Mover.
+ * nome e o Select dos grupos (sem o atual, em ordem alfabética, até 100; com mais, a linha
+ * de apoio da decisão 203), Cancelar · Mover.
  */
 export function MoveGuestDialog({
   weddingId,
+  audience,
   guest,
   fromPartyId,
   isMoving,
@@ -43,6 +47,9 @@ export function MoveGuestDialog({
   );
   const options = (groups.data?.data ?? []).filter((party) => party.id !== fromPartyId);
   const toParty = options.find((party) => party.id === toPartyId);
+  // Mais grupos do que cabem no Select: a linha de apoio pede a busca (decisão 203).
+  const shown = groups.data?.data.length ?? 0;
+  const total = groups.data?.total ?? 0;
 
   function close() {
     setSearch('');
@@ -92,6 +99,11 @@ export function MoveGuestDialog({
             </option>
           ))}
         </Select>
+        {total > shown && (
+          <p className="kore-move-guest__more">
+            {t(`panel.move.more.${audience}`, { shown, total })}
+          </p>
+        )}
         {groups.isSuccess && options.length === 0 && (
           <p className="kore-move-guest__empty">{t('noResults')}</p>
         )}
