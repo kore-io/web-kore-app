@@ -18,14 +18,17 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
       '@kore-io/design':
-        specifier: 0.2.0-homolog.20
-        version: 0.2.0-homolog.20(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(eslint@10.14.0(jiti@2.7.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(stylelint@18.0.0)(tailwindcss@4.3.4)
+        specifier: 0.2.0-homolog.22
+        version: 0.2.0-homolog.22(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(eslint@10.14.0(jiti@2.7.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(stylelint@18.0.0)(tailwindcss@4.3.4)
       '@tanstack/react-query':
         specifier: ^5.106.1
         version: 5.106.1(@types/react@19.3.0)(react@19.3.1)
       i18next:
         specifier: ^26.7.2
         version: 26.7.2(typescript@6.0.3)
+      libphonenumber-js:
+        specifier: ^1.13.16
+        version: 1.13.16
       lucide-react:
         specifier: ^1.69.0
         version: 1.69.0(@types/react@19.3.0)(react@19.3.1)
@@ -1068,8 +1071,8 @@ packages:
   '@keyv/serialize@1.1.1':
     resolution: {integrity: sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==}
 
-  '@kore-io/design@0.2.0-homolog.20':
-    resolution: {integrity: sha512-7kKtJLbAMq+8Y6Q0nZfYwuSmuinnUjZLYR9qQSB6kuarZ1mTcNDC6s/o1AlJSBBQLcCKQZvmKJpCFef+kAPa3g==, tarball: https://npm.pkg.github.com/download/@kore-io/design/0.2.0-homolog.20/8d3da1393af7f06eea0efc894cc4761a9be2186f}
+  '@kore-io/design@0.2.0-homolog.22':
+    resolution: {integrity: sha512-BuWw2CxjTK5sPlfaoVE3DpUDCPMrb7rMB8biVJcg5eQirTXrxHdBr3McTL2DIMTlX8tPsCGhEE700aOPOeO41g==, tarball: https://npm.pkg.github.com/download/@kore-io/design/0.2.0-homolog.22/9afb9d3368775329c406d7485973ca72006a27a9}
     engines: {node: '>=24'}
     peerDependencies:
       eslint: ^10.0.0
@@ -3025,6 +3028,9 @@ packages:
   levn@0.4.1:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
+
+  libphonenumber-js@1.13.16:
+    resolution: {integrity: sha512-tIOCM9yx2Go6d5/ZANe0K+G4AZek1Ymx81HxQpf19Sri4zMP95eQbKdnUGHAvFQ4nx0PeLhFqvAfisTADXj3tQ==}
 
   lightningcss-android-arm64@1.33.0:
     resolution: {integrity: sha512-gEpRTalKdosp4Bb8qWtc2iOgE5SeIHlpS1up9bFq2wAyYhl1UdTObYiHe98zEM9SQvSoqQZ1IQD0JNpg3Ml5pg==}
@@ -5157,7 +5163,7 @@ snapshots:
 
   '@keyv/serialize@1.1.1': {}
 
-  '@kore-io/design@0.2.0-homolog.20(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(eslint@10.14.0(jiti@2.7.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(stylelint@18.0.0)(tailwindcss@4.3.4)':
+  '@kore-io/design@0.2.0-homolog.22(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(eslint@10.14.0(jiti@2.7.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(stylelint@18.0.0)(tailwindcss@4.3.4)':
     dependencies:
       '@radix-ui/react-dialog': 1.3.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@radix-ui/react-dropdown-menu': 2.2.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -7076,6 +7082,8 @@ snapshots:
     dependencies:
       prelude-ls: 1.2.1
       type-check: 0.4.0
+
+  libphonenumber-js@1.13.16: {}
 
   lightningcss-android-arm64@1.33.0:
     optional: true
