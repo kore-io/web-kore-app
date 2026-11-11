@@ -76,6 +76,14 @@ function mockList(respond: (path: string) => Response) {
   const listPaths: string[] = [];
   mockApi(({ path }) => {
     if (path === '/v1/me') return Response.json(me);
+    if (path === '/v1/weddings/w1/tags') {
+      return Response.json({
+        limit: 10,
+        data: [{ id: 't1', name: 'Família da Ana', color: 'wine', guests: 31 }],
+      });
+    }
+    // O resumo do cabeçalho (GuestsLayout) pede uma página de um grupo.
+    if (path === '/v1/weddings/w1/parties?limit=1') return respond(path);
     if (path.startsWith('/v1/weddings/w1/parties')) {
       listPaths.push(path);
       return respond(path);
@@ -113,7 +121,11 @@ describe('Convidados › Grupos e convidados (RN13)', () => {
     );
     expect(screen.getByRole('link', { name: 'Dashboard' })).not.toHaveAttribute('aria-current');
     const tabs = screen.getByRole('navigation', { name: 'Convidados' });
-    expect(within(tabs).getByRole('link')).toHaveAttribute('aria-current', 'page');
+    const [partiesTab, tagsTab] = within(tabs).getAllByRole('link');
+    expect(partiesTab).toHaveAttribute('aria-current', 'page');
+    // A aba Tags conta as tags do casamento (Tags RN04).
+    expect(tagsTab).toHaveTextContent('Tags · 1 de 10');
+    expect(tagsTab).not.toHaveAttribute('aria-current');
 
     const rows = within(table).getAllByRole('row').slice(1);
     expect(rows).toHaveLength(2);

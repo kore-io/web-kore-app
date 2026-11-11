@@ -21,7 +21,9 @@
   "tabs": {
     "label": "Convidados",
     "parties": "Grupos e convidados",
-    "partiesShort": "Grupos"
+    "partiesShort": "Grupos",
+    "tags": "Tags · {{count}} de {{limit}}",
+    "tagsShort": "Tags"
   },
   "filters": {
     "search": "Buscar por nome",
@@ -159,5 +161,52 @@
         "planner": "Mostrando {{shown}} de {{total}} grupos. Busque pelo nome para achar os outros."
       }
     }
+  },
+  "tags": {
+    "counter": "{{count}} de {{limit}} tags",
+    "newName": "Nome da tag nova",
+    "create": "Criar tag",
+    "guests_zero": "{{count}} convidados",
+    "guests_one": "{{count}} convidado",
+    "guests_other": "{{count}} convidados",
+    "edit": "Editar",
+    "caption": {
+      "couple": "Um convidado pode ter várias tags. Vocês podem criar até 10.",
+      "planner": "Um convidado pode ter várias tags. Este casamento pode ter até 10."
+    },
+    "limit": {
+      "couple": "Vocês já têm 10 tags. Excluam uma para criar outra.",
+      "planner": "Este casamento já tem 10 tags. Exclua uma para criar outra."
+    },
+    "nameTaken": "Já existe uma tag com este nome.",
+    "nameEmpty": {
+      "couple": "Deem um nome à tag.",
+      "planner": "Dê um nome à tag."
+    },
+    "editDialog": {
+      "title": "Editar tag",
+      "name": "Nome da tag",
+      "color": "Cor",
+      "cancel": "Cancelar",
+      "save": "Salvar alterações",
+      "delete": "Excluir tag"
+    },
+    "colors": {
+      "none": "Sem cor",
+      "wine": "Vinho",
+      "champagne": "Champanhe",
+      "green": "Verde",
+      "amber": "Âmbar",
+      "red": "Vermelho",
+      "blue": "Azul"
+    },
+    "saved": "Alterações salvas.",
+    "deleteDialog": {
+      "title": "Excluir a tag {{name}}?",
+      "description": "A tag sai dos grupos e dos convidados e fica 30 dias na lixeira. Depois, é apagada de vez.",
+      "cancel": "Cancelar",
+      "confirm": "Excluir tag"
+    },
+    "deleted": "A tag {{name}} foi para a lixeira."
   }
 }

@@ -24,7 +24,6 @@ export function usePartyList({ weddingId, filters }: { weddingId: string; filter
   return {
     parties: pages.flatMap((page) => page.data),
     total: first?.total,
-    summary: first?.summary,
     isLoading: query.isPending,
     isError: query.isError && pages.length === 0,
     retry: () => void query.refetch(),

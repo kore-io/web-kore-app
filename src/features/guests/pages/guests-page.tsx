@@ -1,8 +1,6 @@
-import { Divider, EmptyState, PageHeader, Spinner, Tab, Tabs } from '@kore-io/design';
+import { EmptyState, Spinner } from '@kore-io/design';
 import { SearchX, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
-import { paths } from '../../../app/paths';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { PartyFilters } from '../components/party-filters';
 import { PartyList } from '../components/party-list';
@@ -10,9 +8,8 @@ import { useActiveWedding, type Audience } from '../hooks/use-active-wedding';
 import { usePartyFilters } from '../hooks/use-party-filters';
 import { usePartyList } from '../hooks/use-party-list';
 import { usePartySelection } from '../hooks/use-party-selection';
-import { summaryText } from '../party-texts';
 
-/** Convidados › Grupos e convidados (RN13 de Grupos e convidados; IA da Área do Casal). */
+/** Aba Grupos e convidados (RN13 de Grupos e convidados), dentro do GuestsLayout. */
 export function GuestsPage() {
   const { weddingId, audience } = useActiveWedding();
   if (!weddingId) return null;
@@ -60,22 +57,7 @@ function PartiesView({ weddingId, audience }: { weddingId: string; audience: Aud
   }
 
   return (
-    <div className="kore-guests">
-      <PageHeader
-        title={t('title')}
-        description={list.summary && summaryText({ t, summary: list.summary })}
-      />
-      <div className="kore-guests__tabs">
-        <Tabs aria-label={t('tabs.label')}>
-          <Tab asChild current>
-            <Link to={paths.guests}>
-              <span className="kore-guests__tab-long">{t('tabs.parties')}</span>
-              <span className="kore-guests__tab-short">{t('tabs.partiesShort')}</span>
-            </Link>
-          </Tab>
-        </Tabs>
-        <Divider />
-      </div>
+    <>
       <PartyFilters
         filters={filters}
         onChange={(next) => {
@@ -89,6 +71,6 @@ function PartiesView({ weddingId, audience }: { weddingId: string; audience: Aud
         </p>
       )}
       {content()}
-    </div>
+    </>
   );
 }
