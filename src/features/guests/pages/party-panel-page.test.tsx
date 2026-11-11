@@ -433,7 +433,19 @@ describe('Mover de grupo (RN10; decisão 201)', () => {
     renderRoute({ url: '/app/convidados/grupos/p1' });
     await openMove(user, 'Pedro Moreira');
     expect(
-      await screen.findByText('Mostrando 3 de 158 grupos. Busquem pelo nome para achar os outros.'),
+      // O Select tira o grupo atual: 2 opções de 157 (158 menos o atual).
+      await screen.findByText('Mostrando 2 de 157 grupos. Busquem pelo nome para achar os outros.'),
+    ).toBeInTheDocument();
+  });
+
+  it('com busca, o total só desconta o grupo atual quando ele está nos resultados', async () => {
+    const user = userEvent.setup();
+    mockMove({ total: 158 });
+    renderRoute({ url: '/app/convidados/grupos/p1' });
+    await openMove(user, 'Pedro Moreira');
+    await user.type(screen.getByRole('searchbox', { name: 'Buscar por nome' }), 'padr');
+    expect(
+      await screen.findByText('Mostrando 1 de 158 grupos. Busquem pelo nome para achar os outros.'),
     ).toBeInTheDocument();
   });
 

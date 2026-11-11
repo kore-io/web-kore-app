@@ -48,8 +48,10 @@ export function MoveGuestDialog({
   const options = (groups.data?.data ?? []).filter((party) => party.id !== fromPartyId);
   const toParty = options.find((party) => party.id === toPartyId);
   // Mais grupos do que cabem no Select: a linha de apoio pede a busca (decisão 203).
-  const shown = groups.data?.data.length ?? 0;
-  const total = groups.data?.total ?? 0;
+  // O Select tira o grupo atual: a conta mostra só as opções (e o total sem o atual).
+  const shown = options.length;
+  const listedCurrent = (groups.data?.data.length ?? 0) > options.length;
+  const total = Math.max((groups.data?.total ?? 0) - (q ? (listedCurrent ? 1 : 0) : 1), 0);
 
   function close() {
     setSearch('');
