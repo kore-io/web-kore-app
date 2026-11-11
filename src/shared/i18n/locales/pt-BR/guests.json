@@ -93,6 +93,10 @@
       "sent": "Enviado",
       "viewed": "Visualizado",
       "responded": "Respondido"
+    },
+    "menu": {
+      "label": "Ações de {{name}}",
+      "open": "Abrir"
     }
   },
   "selected_one": "{{count}} grupo selecionado",

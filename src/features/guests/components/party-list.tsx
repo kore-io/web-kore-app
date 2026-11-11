@@ -40,6 +40,8 @@ interface PartyListProps {
   isLoadingMore: boolean;
   loadMoreFailed: boolean;
   onLoadMore: () => void;
+  /** O ⋮ de cada grupo (decisão 199(2)). */
+  actionsFor: (party: PartyListItemResponse) => ReactNode;
 }
 
 /**
@@ -53,6 +55,7 @@ export function PartyList({
   isLoadingMore,
   loadMoreFailed,
   onLoadMore,
+  actionsFor,
 }: PartyListProps) {
   const { t } = useTranslation('guests');
   const { t: tCommon } = useTranslation('common');
@@ -116,7 +119,7 @@ export function PartyList({
                   {tag.name}
                 </Tag>
               ))}
-              actions={null}
+              actions={actionsFor(party)}
             />
           );
         })}
