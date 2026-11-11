@@ -22,6 +22,7 @@ describe('rotas do app (decisões 139, 146, 147 e 198)', () => {
       coupleArea: '/app',
       guests: '/app/convidados',
       guestTags: '/app/convidados/tags',
+      guestTrash: '/app/convidados/lixeira',
       guestParty: '/app/convidados/grupos/:partyId',
     });
   });
@@ -36,6 +37,7 @@ describe('rotas do app (decisões 139, 146, 147 e 198)', () => {
     ['/sessao-expirada', 'session-expired'],
     ['/app/convidados?resposta=pendentes', 'guests'],
     ['/app/convidados/tags', 'guest-tags'],
+    ['/app/convidados/lixeira', 'guest-trash'],
     ['/app/convidados/grupos/0190f3a2-0000-7000-8000-000000000001', 'guest-party'],
     ['/app', 'dashboard'],
   ])('%s abre a rota %s', (url, id) => {
