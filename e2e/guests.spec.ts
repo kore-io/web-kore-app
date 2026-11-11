@@ -566,6 +566,60 @@ test.describe('Convidados › Grupos e convidados (RN13)', () => {
     expect(bytes.subarray(0, 5).toString()).toBe('%PDF-');
   });
 
+  test('Novo grupo e Editar grupo: o erro do telefone no convidado certo, o contato e o PATCH (RN03 a RN09)', async ({
+    page,
+  }) => {
+    await weddingWithParties({ db, page });
+    await page.goto('/app/convidados');
+    await page.getByRole('button', { name: 'Novo grupo' }).click();
+    await expect(page).toHaveURL(/\/app\/convidados\/novo$/);
+    await page.getByRole('textbox', { name: 'Nome do grupo' }).fill('Beatriz e Leonardo');
+    const guests = page.getByRole('group', { name: 'Convidados' });
+    await guests.getByRole('textbox', { name: 'Nome' }).first().fill('Beatriz Lima');
+    await guests.getByRole('textbox', { name: 'Telefone' }).first().fill('(19) 99876-1402');
+    await guests
+      .getByRole('checkbox', { name: 'Convidado de contato (recebe o convite)' })
+      .first()
+      .locator('..')
+      .click();
+    await page.getByRole('button', { name: '+ Adicionar convidado' }).click();
+    await guests.getByRole('textbox', { name: 'Nome' }).nth(1).fill('Leonardo Castro');
+    const leoPhone = guests.getByRole('textbox', { name: 'Telefone' }).nth(1);
+    await leoPhone.fill('9876-1402');
+    await page.getByRole('button', { name: 'Salvar grupo' }).click();
+    // O servidor confere o telefone e aponta o 2º convidado (guests.1.phone).
+    await expect(
+      page.getByText('O telefone tem 8 números. Usem DDD + número, ex.: (19) 99999-9999.'),
+    ).toBeVisible();
+    await expect(leoPhone).toHaveAttribute('aria-invalid', 'true');
+    await leoPhone.fill('');
+    await page
+      .getByRole('combobox', { name: 'Vagas de acompanhante' })
+      .selectOption({ label: '1 vaga' });
+    await page.getByRole('button', { name: 'Salvar grupo' }).click();
+    await expect(toast({ page, text: 'Grupo criado.' })).toBeVisible();
+    await expect(page).toHaveURL(/\/app\/convidados$/);
+    await page.getByRole('searchbox', { name: 'Buscar por nome' }).fill('Beatriz e Leonardo');
+    await expect(page.getByText('Beatriz Lima · (19) 9****-1402')).toBeVisible();
+
+    await page.getByRole('link', { name: 'Beatriz e Leonardo' }).click();
+    await page.getByRole('button', { name: 'Editar grupo' }).click();
+    await expect(page).toHaveURL(/\/editar$/);
+    await expect(guests.getByRole('textbox', { name: 'Telefone' }).first()).toHaveValue(
+      '(19) 99876-1402',
+    );
+    await guests
+      .getByRole('textbox', { name: 'E-\u2060mail' })
+      .nth(1)
+      .fill('leo.castro@exemplo.kore.local');
+    await page.getByRole('button', { name: '+ Adicionar convidado' }).click();
+    await guests.getByRole('textbox', { name: 'Nome' }).nth(2).fill('Pedro Castro');
+    await page.getByRole('button', { name: 'Salvar alterações' }).click();
+    await expect(toast({ page, text: 'Alterações salvas.' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Beatriz e Leonardo' })).toBeVisible();
+    await expect(page.getByText('Pedro Castro')).toBeVisible();
+  });
+
   test.describe('computador', () => {
     test.use({ viewport: { width: 1440, height: 900 }, isMobile: false, hasTouch: false });
 
