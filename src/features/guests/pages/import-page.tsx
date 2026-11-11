@@ -1,15 +1,18 @@
 import { Alert, Button, FileUpload, Spinner, StatCard } from '@kore-io/design';
 import { FileSpreadsheet, X } from 'lucide-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { SpreadsheetPreviewResponse } from '../../../shared/api/generated/model';
 import { useActiveWedding, type Audience } from '../hooks/use-active-wedding';
+import { usePasteImport } from '../hooks/use-paste-import';
 import { useSpreadsheetImport } from '../hooks/use-spreadsheet-import';
 import { rowErrorText } from '../import-texts';
+import { PastePreview, PasteText } from './paste-list';
 
 /** O modelo estático da planilha (decisão 209), em public/. */
 const TEMPLATE_URL = '/modelo-convidados-kore.xlsx';
 
-/** Aba Importar (Importação de convidados, RN01 a RN09), dentro do GuestsLayout. */
+/** Aba Importar (Importação de convidados, RN01 a RN12), dentro do GuestsLayout. */
 export function ImportPage() {
   const { weddingId, audience } = useActiveWedding();
   if (!weddingId) return null;
@@ -18,6 +21,16 @@ export function ImportPage() {
 
 function ImportView({ weddingId, audience }: { weddingId: string; audience: Audience }) {
   const sheet = useSpreadsheetImport({ weddingId, audience });
+  const paste = usePasteImport({ weddingId, audience });
+  // O Colar a lista abre no lugar do envio; o Voltar dele volta, guardando o texto (210(7)).
+  const [pasting, setPasting] = useState(false);
+  if (pasting) {
+    return paste.draft ? (
+      <PastePreview paste={paste} audience={audience} />
+    ) : (
+      <PasteText paste={paste} audience={audience} onBack={() => setPasting(false)} />
+    );
+  }
   if (sheet.preview && sheet.file) {
     return (
       <Preview
@@ -30,16 +43,18 @@ function ImportView({ weddingId, audience }: { weddingId: string; audience: Audi
       />
     );
   }
-  return <Upload audience={audience} sheet={sheet} />;
+  return <Upload audience={audience} sheet={sheet} onPaste={() => setPasting(true)} />;
 }
 
 /** Envio (RN02 e RN03): 1. Baixar o modelo; 2. Enviar a planilha preenchida. */
 function Upload({
   audience,
   sheet,
+  onPaste,
 }: {
   audience: Audience;
   sheet: ReturnType<typeof useSpreadsheetImport>;
+  onPaste: () => void;
 }) {
   const { t } = useTranslation('guests');
   return (
@@ -68,6 +83,9 @@ function Upload({
         </Alert>
       )}
       <p className="kore-import__note">{t('importSheet.previewNote')}</p>
+      <Button variant="secondary" onClick={onPaste}>
+        {t('pasteList.open')}
+      </Button>
     </section>
   );
 }

@@ -381,5 +381,39 @@
         "planner": "A planilha passa de 5 MB. Divida em duas."
       }
     }
+  },
+  "pasteList": {
+    "open": "Colar a lista",
+    "title": "Colar a lista",
+    "intro": {
+      "couple": "Uma linha por grupo. Podem colar do jeito que está na planilha.",
+      "planner": "Uma linha por grupo. Pode colar do jeito que está na planilha."
+    },
+    "placeholder": "Família Moreira: Luiz, Célia, Pedro\nCarla Nunes + 2 filhos\nRafael e Bianca\nMárcia Rocha",
+    "continue": "Continuar",
+    "back": "Voltar",
+    "tooMany": {
+      "couple": "A lista passa de 1.000 convidados. Dividam em duas.",
+      "planner": "A lista passa de 1.000 convidados. Divida em duas."
+    },
+    "groups": "Grupos",
+    "groupsDetail": "da lista colada",
+    "guests": "Convidados",
+    "guestsDetail": "depois dos nomes",
+    "missing": "Faltam nomes",
+    "missingDetail_one": "num grupo",
+    "missingDetail_other": "em {{count}} grupos",
+    "askNames": "Qual é o nome de cada pessoa deste grupo?",
+    "personName": "Nome da {{n}}ª pessoa",
+    "groupName": "Nome do grupo",
+    "removePerson": "Remover pessoa",
+    "tooLong": "O nome passa de 80 caracteres.",
+    "duplicateName": "Este nome já está neste grupo.",
+    "partyExists": "Já existe um grupo com este nome.",
+    "duplicateRemoved": "Um nome repetido neste grupo ficou de fora.",
+    "plusOutOfRange": {
+      "couple": "Usem de + 1 a + 20 por linha.",
+      "planner": "Use de + 1 a + 20 por linha."
+    }
   }
 }
