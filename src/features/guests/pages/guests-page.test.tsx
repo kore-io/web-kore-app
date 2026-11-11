@@ -292,10 +292,20 @@ describe('Convidados › Grupos e convidados (RN13)', () => {
     await user.click(screen.getByRole('checkbox', { name: 'Selecionar todos os grupos' }));
     const button = screen.getByRole('button', { name: 'Adicionar tag' });
     expect(button).toBeDisabled();
-    expect(button).toHaveAccessibleDescription('Marquem até 200 grupos para adicionar uma tag.');
+    // O Mover para a lixeira também (206 ampliada), com o mesmo aviso.
+    const trash = screen.getByRole('button', { name: 'Mover para a lixeira' });
+    expect(trash).toBeDisabled();
+    expect(trash).toHaveAccessibleDescription(
+      'Marquem até 200 grupos para adicionar uma tag ou mover para a lixeira.',
+    );
+    expect(button).toHaveAccessibleDescription(
+      'Marquem até 200 grupos para adicionar uma tag ou mover para a lixeira.',
+    );
     await user.click(screen.getByRole('checkbox', { name: 'Selecionar Grupo 0' }));
     expect(screen.getByRole('button', { name: 'Adicionar tag' })).toBeEnabled();
-    expect(screen.queryByText('Marquem até 200 grupos para adicionar uma tag.')).toBeNull();
+    expect(
+      screen.queryByText('Marquem até 200 grupos para adicionar uma tag ou mover para a lixeira.'),
+    ).toBeNull();
   });
 
   it('sem nenhuma tag, o Adicionar tag fica desabilitado', async () => {

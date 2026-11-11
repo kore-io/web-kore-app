@@ -10,7 +10,7 @@ import {
 import { Check, Clock, X } from 'lucide-react';
 import { useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, Navigate, useParams } from 'react-router';
+import { Link, Navigate, useNavigate, useParams } from 'react-router';
 import { paths } from '../../../app/paths';
 import type {
   PartyGuestResponse,
@@ -19,8 +19,10 @@ import type {
 } from '../../../shared/api/generated/model';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { MoveGuestDialog } from '../components/move-guest-dialog';
+import { TrashDialog } from '../components/trash-dialog';
 import { useActiveWedding, type Audience } from '../hooks/use-active-wedding';
 import { useMoveGuest } from '../hooks/use-move-guest';
+import { useTrash } from '../hooks/use-trash';
 import { usePartyPanel } from '../hooks/use-party-panel';
 
 /** Selo da resposta do convidado, como os Badges do DS. */
@@ -50,6 +52,10 @@ function PartyPanel({
   const { t } = useTranslation('guests');
   const panel = usePartyPanel({ weddingId, partyId });
   const mover = useMoveGuest({ weddingId, audience });
+  const trash = useTrash({ weddingId, audience });
+  const navigate = useNavigate();
+  const [trashingParty, setTrashingParty] = useState(false);
+  const [trashingGuest, setTrashingGuest] = useState<{ id: string; name: string } | null>(null);
   const [confirming, setConfirming] = useState(false);
   const [moving, setMoving] = useState<{ id: string; name: string } | null>(null);
   // O ⋮ do convidado que abriu o Mover de grupo: o foco volta a ele (o item do menu some).
@@ -78,6 +84,13 @@ function PartyPanel({
         <GroupCard party={party} />
         <GuestsCard
           guests={party.guests}
+          onTrash={({ guest, trigger }) => {
+            menuButton.current = trigger;
+            // O último convidado com nome não sai (Grupos RN08; Lixeira RN04).
+            const named = party.guests.filter((item) => item.name !== null).length;
+            if (named <= 1) mover.lastGuest();
+            else setTrashingGuest(guest);
+          }}
           onMove={({ guest, trigger }) => {
             menuButton.current = trigger;
             // O último convidado com nome não sai do grupo (RN08): o aviso, sem o Dialog.
@@ -86,7 +99,11 @@ function PartyPanel({
             else setMoving(guest);
           }}
         />
-        <LinkCard party={party} onCopy={(url) => void panel.copyLink({ url })} />
+        <LinkCard
+          party={party}
+          onCopy={(url) => void panel.copyLink({ url })}
+          onTrash={() => setTrashingParty(true)}
+        />
       </div>
       <MoveGuestDialog
         weddingId={weddingId}
@@ -104,6 +121,42 @@ function PartyPanel({
             fromPartyId: party.id,
             toParty,
             onDone: () => setMoving(null),
+          })
+        }
+      />
+      <TrashDialog
+        open={trashingParty}
+        title={t('trash.party.title', { name: party.name })}
+        description={t('trash.party.description', {
+          count: party.guests.filter((guest) => guest.name !== null).length,
+        })}
+        isPending={trash.isTrashing}
+        onClose={() => setTrashingParty(false)}
+        onConfirm={() =>
+          trash.trashParty({
+            partyId: party.id,
+            name: party.name,
+            onDone: (ok) => {
+              setTrashingParty(false);
+              // O grupo saiu da lista: o Painel volta para ela.
+              if (ok) void navigate(paths.guests);
+            },
+          })
+        }
+      />
+      <TrashDialog
+        open={trashingGuest !== null}
+        title={t('trash.guest.title', { name: trashingGuest?.name ?? '' })}
+        description={t('trash.guest.description')}
+        isPending={trash.isTrashing}
+        returnFocusRef={menuButton}
+        onClose={() => setTrashingGuest(null)}
+        onConfirm={() =>
+          trashingGuest &&
+          trash.trashGuest({
+            guestId: trashingGuest.id,
+            name: trashingGuest.name,
+            onDone: () => setTrashingGuest(null),
           })
         }
       />
@@ -205,19 +258,26 @@ function GroupCard({ party }: { party: PartyResponse }) {
   );
 }
 
+type GuestAction = (args: {
+  guest: { id: string; name: string };
+  trigger: HTMLElement | null;
+}) => void;
+
 function GuestsCard({
   guests,
   onMove,
+  onTrash,
 }: {
   guests: PartyGuestResponse[];
-  onMove: (args: { guest: { id: string; name: string }; trigger: HTMLElement | null }) => void;
+  onMove: GuestAction;
+  onTrash: GuestAction;
 }) {
   const { t } = useTranslation('guests');
   return (
     <Card title={t('panel.guests.title')}>
       <ul className="kore-party-panel__guests">
         {guests.map((guest) => (
-          <GuestItem key={guest.id} guest={guest} onMove={onMove} />
+          <GuestItem key={guest.id} guest={guest} onMove={onMove} onTrash={onTrash} />
         ))}
       </ul>
     </Card>
@@ -226,15 +286,17 @@ function GuestsCard({
 
 /**
  * Um convidado: nome (ou "Acompanhante", a vaga vazia), faixa etária e restrição, o selo
- * da resposta e, para quem tem nome, o ⋮ com Mover de grupo (decisão 201; a vaga vazia
- * não se move, RN10).
+ * da resposta e, para quem tem nome, o ⋮ com Mover de grupo (decisão 201) e Mover para a
+ * lixeira (Lixeira RN02 e RN04); a vaga vazia não tem o ⋮ (RN10).
  */
 function GuestItem({
   guest,
   onMove,
+  onTrash,
 }: {
   guest: PartyGuestResponse;
-  onMove: (args: { guest: { id: string; name: string }; trigger: HTMLElement | null }) => void;
+  onMove: GuestAction;
+  onTrash: GuestAction;
 }) {
   const { t } = useTranslation('guests');
   const actions = useRef<HTMLSpanElement>(null);
@@ -272,6 +334,18 @@ function GuestItem({
                       }),
                   },
                 ],
+                [
+                  {
+                    id: 'trash',
+                    label: t('trash.action'),
+                    destructive: true,
+                    onSelect: () =>
+                      onTrash({
+                        guest: { id: guest.id, name },
+                        trigger: actions.current?.querySelector('button') ?? null,
+                      }),
+                  },
+                ],
               ]}
             />
           </span>
@@ -281,7 +355,15 @@ function GuestItem({
   );
 }
 
-function LinkCard({ party, onCopy }: { party: PartyResponse; onCopy: (url: string) => void }) {
+function LinkCard({
+  party,
+  onCopy,
+  onTrash,
+}: {
+  party: PartyResponse;
+  onCopy: (url: string) => void;
+  onTrash: () => void;
+}) {
   const { t } = useTranslation('guests');
   const { url } = party.link;
   return (
@@ -296,6 +378,9 @@ function LinkCard({ party, onCopy }: { party: PartyResponse; onCopy: (url: strin
           onClick={() => url && onCopy(url)}
         >
           {t('panel.link.copy')}
+        </Button>
+        <Button variant="destructive" size="sm" onClick={onTrash}>
+          {t('trash.action')}
         </Button>
       </div>
     </Card>

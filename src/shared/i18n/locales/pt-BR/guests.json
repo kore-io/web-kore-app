@@ -220,8 +220,34 @@
     "applied_one": "Tag aplicada a {{count}} grupo.",
     "applied_other": "Tag aplicada a {{count}} grupos.",
     "tooMany": {
-      "couple": "Marquem até 200 grupos para adicionar uma tag.",
-      "planner": "Marque até 200 grupos para adicionar uma tag."
+      "couple": "Marquem até 200 grupos para adicionar uma tag ou mover para a lixeira.",
+      "planner": "Marque até 200 grupos para adicionar uma tag ou mover para a lixeira."
+    }
+  },
+  "trash": {
+    "action": "Mover para a lixeira",
+    "cancel": "Cancelar",
+    "party": {
+      "title": "Mover o grupo {{name}} para a lixeira?",
+      "description_one": "O grupo e o convidado dele ficam 30 dias na lixeira e saem das contagens. Depois, são apagados de vez.",
+      "description_other": "O grupo e os {{count}} convidados ficam 30 dias na lixeira e saem das contagens. Depois, são apagados de vez."
+    },
+    "guest": {
+      "title": "Mover {{name}} para a lixeira?",
+      "description": "O convidado fica 30 dias na lixeira e sai das contagens. Depois, é apagado de vez."
+    },
+    "many": {
+      "title": "Mover {{count}} grupos para a lixeira?",
+      "description": "Os grupos e os convidados deles ficam 30 dias na lixeira e saem das contagens. Depois, são apagados de vez."
+    },
+    "moved": "{{name}} foi para a lixeira.",
+    "movedMany_one": "{{count}} grupo foi para a lixeira.",
+    "movedMany_other": "{{count}} grupos foram para a lixeira.",
+    "skipped_one": "{{count}} grupo que já respondeu ficou: só o casal pode excluí-lo.",
+    "skipped_other": "{{count}} grupos que já responderam ficaram: só o casal pode excluí-los.",
+    "alreadyResponded": {
+      "party": "Só o casal pode excluir um grupo que já respondeu.",
+      "guest": "Só o casal pode excluir quem já respondeu."
     }
   }
 }

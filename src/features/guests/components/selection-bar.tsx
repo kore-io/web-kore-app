@@ -13,14 +13,23 @@ interface SelectionBarProps {
   tags: TagResponse[];
   isApplying: boolean;
   onApplyTag: (tagId: string) => void;
+  onTrash: () => void;
 }
 
 /**
- * Barra da seleção múltipla (RN13; decisão 197): "{n} grupos selecionados" e o Adicionar
- * tag, que abre o Menu de ações com as tags (decisão 204). Sem nenhuma tag, ou com mais
- * de 200 marcados (com o aviso da decisão 206), o botão fica desabilitado. "Mover para a lixeira" entra com a lixeira.
+ * Barra da seleção múltipla (RN13; decisão 197): "{n} grupos selecionados", o Adicionar
+ * tag, que abre o Menu de ações com as tags (decisão 204), e o Mover para a lixeira
+ * (Lixeira RN06). Sem nenhuma tag, o Adicionar tag fica desabilitado; com mais de 200
+ * marcados (o máximo do apply e do POST /parties/trash), os dois, com o aviso da 206.
  */
-export function SelectionBar({ count, audience, tags, isApplying, onApplyTag }: SelectionBarProps) {
+export function SelectionBar({
+  count,
+  audience,
+  tags,
+  isApplying,
+  onApplyTag,
+  onTrash,
+}: SelectionBarProps) {
   const { t } = useTranslation('guests');
   // Acima de 200 marcados, o apply recusaria: o botão fica desabilitado com o aviso (206).
   const tooMany = count > APPLY_TAG_MAX_PARTIES;
@@ -52,6 +61,15 @@ export function SelectionBar({ count, audience, tags, isApplying, onApplyTag }: 
             })),
           ]}
         />
+        <Button
+          variant="destructive"
+          size="sm"
+          disabled={tooMany}
+          aria-describedby={tooMany ? hintId : undefined}
+          onClick={onTrash}
+        >
+          {t('trash.action')}
+        </Button>
       </div>
       {tooMany && (
         <p id={hintId} className="kore-selection-bar__hint">
