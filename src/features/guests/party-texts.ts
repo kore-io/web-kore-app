@@ -1,0 +1,75 @@
+import type { TFunction } from 'i18next';
+import type {
+  PartyCountsResponse,
+  PartyListItemResponse,
+  PartySummaryResponse,
+} from '../../shared/api/generated/model';
+
+type GuestsT = TFunction<'guests'>;
+
+/**
+ * Resumo do topo (RN13): "142 convidados em 58 grupos · 96 confirmados, 18 recusados e
+ * 28 pendentes"; com 0, o plural ("0 recusados", decisão 199(2)).
+ */
+export function summaryText({ t, summary }: { t: GuestsT; summary: PartySummaryResponse }) {
+  return t('summary.line', {
+    guests: t('summary.guests', { count: summary.guests }),
+    parties: t('summary.parties', { count: summary.parties }),
+    confirmed: t('summary.confirmed', { count: summary.confirmed }),
+    declined: t('summary.declined', { count: summary.declined }),
+    pending: t('summary.pending', { count: summary.pending }),
+  });
+}
+
+/**
+ * Linha do contato (RN06 e RN13): "Célia Moreira · (19) 9****-3310"; sem contato, o 1º
+ * convidado "· sem telefone ou e-mail"; contato só com e-mail, só o nome (decisão 198(e)).
+ */
+export function contactText({ t, party }: { t: GuestsT; party: PartyListItemResponse }) {
+  const { contact, firstGuestName } = party;
+  if (contact === null) return t('row.noContact', { name: firstGuestName ?? '' });
+  const name = contact.name ?? '';
+  return contact.phoneMasked === null
+    ? name
+    : t('row.contact', { name, phone: contact.phoneMasked });
+}
+
+/**
+ * Coluna Respostas (decisão 198(f)): 1ª linha "nenhum confirmado" / "1 confirmado" /
+ * "{n} confirmados"; 2ª linha "nenhum recusado ou pendente" com tudo zero, senão
+ * "nenhum recusado" ou "{n} recusado(s)", mais os pendentes com nome e as vagas pendentes
+ * que não são zero, separados por " · ".
+ */
+export function responsesText({ t, counts }: { t: GuestsT; counts: PartyCountsResponse }) {
+  const namedPending = counts.pending - counts.pendingPlusOnes;
+  const primary = t('row.confirmed', { count: counts.confirmed });
+  if (counts.declined === 0 && counts.pending === 0) {
+    return { primary, secondary: t('row.noneDeclinedOrPending') };
+  }
+  const parts = [
+    counts.declined === 0 ? t('row.noneDeclined') : t('row.declined', { count: counts.declined }),
+  ];
+  if (namedPending > 0) parts.push(t('row.pending', { count: namedPending }));
+  if (counts.pendingPlusOnes > 0) {
+    parts.push(t('row.pendingPlusOnes', { count: counts.pendingPlusOnes }));
+  }
+  return { primary, secondary: parts.join(' · ') };
+}
+
+/**
+ * Respondido em (Fase 4): "12/09 às 20h14" e "por Célia"; hora cheia sem minutos
+ * ("21/06 às 9h", regra das datas curtas em listas da Voz).
+ */
+export function respondedAtText({ t, party }: { t: GuestsT; party: PartyListItemResponse }) {
+  if (party.respondedAt === null) return null;
+  const at = new Date(party.respondedAt);
+  const two = (value: number) => String(value).padStart(2, '0');
+  const date = `${two(at.getDate())}/${two(at.getMonth() + 1)}`;
+  const time =
+    at.getMinutes() === 0 ? `${at.getHours()}h` : `${at.getHours()}h${two(at.getMinutes())}`;
+  return {
+    primary: t('row.respondedAt', { date, time }),
+    secondary:
+      party.respondedBy === null ? undefined : t('row.respondedBy', { name: party.respondedBy }),
+  };
+}

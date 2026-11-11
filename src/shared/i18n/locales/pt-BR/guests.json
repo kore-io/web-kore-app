@@ -1,0 +1,97 @@
+{
+  "title": "Convidados",
+  "summary": {
+    "guests_zero": "{{count}} convidados",
+    "guests_one": "{{count}} convidado",
+    "guests_other": "{{count}} convidados",
+    "parties_zero": "em {{count}} grupos",
+    "parties_one": "em {{count}} grupo",
+    "parties_other": "em {{count}} grupos",
+    "confirmed_zero": "{{count}} confirmados",
+    "confirmed_one": "{{count}} confirmado",
+    "confirmed_other": "{{count}} confirmados",
+    "declined_zero": "{{count}} recusados",
+    "declined_one": "{{count}} recusado",
+    "declined_other": "{{count}} recusados",
+    "pending_zero": "{{count}} pendentes",
+    "pending_one": "{{count}} pendente",
+    "pending_other": "{{count}} pendentes",
+    "line": "{{guests}} {{parties}} · {{confirmed}}, {{declined}} e {{pending}}"
+  },
+  "tabs": {
+    "label": "Convidados",
+    "parties": "Grupos e convidados",
+    "partiesShort": "Grupos"
+  },
+  "filters": {
+    "search": "Buscar por nome",
+    "open": "Filtros",
+    "title": "Filtros",
+    "apply": "Mostrar resultados",
+    "clear": "Limpar",
+    "rsvp": {
+      "label": "Resposta",
+      "all": "Resposta: todas",
+      "confirmed": "Resposta: confirmados",
+      "declined": "Resposta: recusados",
+      "pending": "Resposta: pendentes"
+    },
+    "sent": {
+      "label": "Envio",
+      "all": "Envio: todos",
+      "not_sent": "Envio: não enviado",
+      "sent": "Envio: enviado",
+      "viewed": "Envio: visualizado",
+      "responded": "Envio: respondido"
+    }
+  },
+  "table": {
+    "label": "Grupos e convidados",
+    "selectAll": "Selecionar todos os grupos",
+    "select": "Selecionar {{name}}",
+    "columns": {
+      "group": "Grupo",
+      "people": "Pessoas",
+      "responses": "Respostas",
+      "delivery": "Envio",
+      "respondedAt": "Respondido em",
+      "tags": "Tags",
+      "actions": "Ações"
+    }
+  },
+  "row": {
+    "contact": "{{name}} · {{phone}}",
+    "noContact": "{{name}} · sem telefone ou e-mail",
+    "people_one": "{{count}} pessoa",
+    "people_other": "{{count}} pessoas",
+    "confirmed_zero": "nenhum confirmado",
+    "confirmed_one": "{{count}} confirmado",
+    "confirmed_other": "{{count}} confirmados",
+    "noneDeclinedOrPending": "nenhum recusado ou pendente",
+    "noneDeclined": "nenhum recusado",
+    "declined_one": "{{count}} recusado",
+    "declined_other": "{{count}} recusados",
+    "pending_one": "{{count}} pendente",
+    "pending_other": "{{count}} pendentes",
+    "pendingPlusOnes_one": "{{count}} vaga pendente",
+    "pendingPlusOnes_other": "{{count}} vagas pendentes",
+    "respondedAt": "{{date}} às {{time}}",
+    "respondedBy": "por {{name}}",
+    "delivery": {
+      "not_sent": "Não enviado",
+      "sent": "Enviado",
+      "viewed": "Visualizado",
+      "responded": "Respondido"
+    }
+  },
+  "selected_one": "{{count}} grupo selecionado",
+  "selected_other": "{{count}} grupos selecionados",
+  "showing_one": "Mostrando {{shown}} de {{count}} grupo",
+  "showing_other": "Mostrando {{shown}} de {{count}} grupos",
+  "loadingMore": "Carregando mais grupos",
+  "empty": {
+    "couple": "Vocês ainda não cadastraram convidados.",
+    "planner": "Este casamento ainda não tem convidados."
+  },
+  "noResults": "Nenhum grupo encontrado."
+}

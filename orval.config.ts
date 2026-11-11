@@ -18,6 +18,12 @@ export default defineConfig({
         // O mutator devolve só o corpo e lança ApiError fora do 2xx (com o corpo tipado).
         fetch: { includeHttpResponseReturnType: false },
         mutator: { path: './src/shared/api/http-client.ts', name: 'httpClient' },
+        operations: {
+          // Lista de grupos com rolagem infinita pelo cursor (RN13; decisão 197).
+          PartiesController_list_v1: {
+            query: { useInfinite: true, useInfiniteQueryParam: 'cursor' },
+          },
+        },
       },
     },
     hooks: { afterAllFilesWrite: 'prettier --write' },
