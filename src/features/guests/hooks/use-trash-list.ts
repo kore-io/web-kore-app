@@ -66,7 +66,11 @@ export function useTrashList({ weddingId, audience }: { weddingId: string; audie
                   : t('trashPage.restored', { name }),
             });
           },
-          onError: (error) => refused({ error }),
+          onError: (error) => {
+            refused({ error });
+            // Outra pessoa já restaurou (404 TRASH_ITEM_NOT_FOUND): a lista recarrega.
+            refresh();
+          },
         },
       ),
   };
