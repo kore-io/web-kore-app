@@ -9,7 +9,7 @@ function routeIdAt({ url }: { url: string }) {
   return matches?.at(-1)?.route.id;
 }
 
-describe('rotas do app (decisões 139, 146 e 147)', () => {
+describe('rotas do app (decisões 139, 146, 147 e 198)', () => {
   it('os caminhos aprovados', () => {
     expect(paths).toEqual({
       signIn: '/entrar',
@@ -20,6 +20,7 @@ describe('rotas do app (decisões 139, 146 e 147)', () => {
       signUp: '/cadastro',
       sessionExpired: '/sessao-expirada',
       coupleArea: '/app',
+      guests: '/app/convidados',
     });
   });
 
@@ -31,6 +32,7 @@ describe('rotas do app (decisões 139, 146 e 147)', () => {
     ['/perfis', 'profiles'],
     ['/cadastro', 'sign-up'],
     ['/sessao-expirada', 'session-expired'],
+    ['/app/convidados?resposta=pendentes', 'guests'],
     ['/app', 'dashboard'],
   ])('%s abre a rota %s', (url, id) => {
     expect(routeIdAt({ url })).toBe(id);

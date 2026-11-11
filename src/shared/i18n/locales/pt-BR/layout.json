@@ -7,7 +7,8 @@
   "notificationsUnread_one": "Notificações, {{count}} não lida",
   "notificationsUnread_other": "Notificações, {{count}} não lidas",
   "nav": {
-    "dashboard": "Dashboard"
+    "dashboard": "Dashboard",
+    "guests": "Convidados"
   },
   "activeProfileCouple": "Perfil ativo: Casal",
   "activeProfileCoupleWedding": "Perfil ativo: Casal · {{couple}}",

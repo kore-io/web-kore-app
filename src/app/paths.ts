@@ -18,6 +18,8 @@ export const paths = {
   sessionExpired: '/sessao-expirada',
   /** Área do casal; o Dashboard é a raiz. */
   coupleArea: '/app',
+  /** Convidados › Grupos e convidados (decisão 198); busca e filtros na query. */
+  guests: '/app/convidados',
 } as const;
 
 /** Endereços fora do app. */

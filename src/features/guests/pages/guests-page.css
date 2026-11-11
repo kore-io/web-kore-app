@@ -1,0 +1,80 @@
+/*
+ * Convidados › Grupos e convidados (Penpot, Área do Casal, página 05): 24 px entre as
+ * partes; as abas com a linha logo abaixo; "Grupos e convidados" vira "Grupos" no
+ * celular; a barra de seleção em primary.tint, raio md, 12/16 px, texto em type.label
+ * em primary.dark; "Mostrando…" em type.caption, gray.700, centrado.
+ */
+.kore-guests {
+  @apply flex flex-col gap-6;
+}
+
+.kore-guests__tabs {
+  @apply flex flex-col;
+}
+
+.kore-guests__tab-long {
+  @apply hidden md:inline;
+}
+
+.kore-guests__tab-short {
+  @apply md:hidden;
+}
+
+.kore-guests__selection {
+  @apply type-label rounded-md bg-primary-tint px-4 py-3 text-primary-dark;
+}
+
+.kore-guests__loading {
+  @apply flex justify-center py-6;
+}
+
+.kore-guests__showing {
+  @apply type-caption text-center text-gray-700;
+}
+
+/* Busca e filtros: celular com a busca e o botão Filtros; tablet e computador em linha. */
+.kore-party-filters {
+  @apply flex gap-3;
+}
+
+.kore-party-filters__search {
+  @apply min-w-0 flex-1;
+}
+
+.kore-party-filters__selects {
+  @apply hidden md:flex md:gap-3;
+}
+
+.kore-party-filters__selects > * {
+  @apply md:w-42.5 lg:w-50;
+}
+
+.kore-party-filters__open {
+  @apply shrink-0 md:hidden;
+}
+
+/* Folha de Filtros do celular: a tela inteira, 24 px de respiro, ações no pé. */
+.kore-party-filters__sheet {
+  @apply m-0 h-dvh max-h-none w-full max-w-none flex-col gap-4 bg-white p-6 text-ink;
+  @apply open:flex backdrop:bg-overlay;
+}
+
+.kore-party-filters__title {
+  @apply type-heading;
+}
+
+.kore-party-filters__fields {
+  @apply flex flex-col gap-4;
+}
+
+.kore-party-filters__actions {
+  @apply mt-auto flex flex-col gap-2;
+}
+
+.kore-party-list__sentinel {
+  @apply h-px;
+}
+
+.kore-party-list__loading {
+  @apply flex justify-center py-4;
+}

@@ -1,0 +1,281 @@
+import { screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { expectNoA11yViolations } from '../../../../tests/a11y';
+import { apiError, mockApi, renderRoute } from '../../../../tests/render-route';
+import { intersect } from '../../../../tests/setup';
+import type { PartyListItemResponse, PartyListResponse } from '../../../shared/api/generated/model';
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
+const me = {
+  user: {
+    id: 'u1',
+    name: 'Ana Beatriz Moreira',
+    email: 'ana.moreira@gmail.com',
+    platformRole: 'none',
+  },
+  activeProfile: 'couple',
+  authenticatedAt: '2026-11-05T12:00:00Z',
+  memberships: [
+    {
+      weddingId: 'w1',
+      role: 'owner',
+      weddingName: 'Ana & Marcos',
+      eventDate: '2026-11-14',
+      city: 'Campinas',
+      state: 'SP',
+    },
+  ],
+  profiles: ['couple'],
+  lastProfileOnDevice: 'couple',
+  planner: null,
+  referrer: null,
+};
+
+function party(
+  id: string,
+  name: string,
+  overrides: Partial<PartyListItemResponse> = {},
+): PartyListItemResponse {
+  return {
+    id,
+    name,
+    contact: { guestId: `${id}-g`, name: 'Célia Moreira', phoneMasked: '(19) 9****-3310' },
+    firstGuestName: 'Célia Moreira',
+    people: 3,
+    counts: { confirmed: 3, declined: 0, pending: 0, pendingPlusOnes: 0 },
+    deliveryStatus: 'not_sent',
+    respondedAt: null,
+    respondedBy: null,
+    tags: [],
+    ...overrides,
+  };
+}
+
+const summary = {
+  guests: 142,
+  namedGuests: 140,
+  parties: 58,
+  confirmed: 96,
+  declined: 18,
+  pending: 28,
+};
+
+function page(
+  data: PartyListItemResponse[],
+  extra: Partial<PartyListResponse> = {},
+): PartyListResponse {
+  return { summary, total: 58, data, nextCursor: null, ...extra };
+}
+
+/** Responde o /me e a lista; devolve os caminhos pedidos da lista. */
+function mockList(respond: (path: string) => Response) {
+  const listPaths: string[] = [];
+  mockApi(({ path }) => {
+    if (path === '/v1/me') return Response.json(me);
+    if (path.startsWith('/v1/weddings/w1/parties')) {
+      listPaths.push(path);
+      return respond(path);
+    }
+    return apiError({ status: 404, body: { error: 'NOT_FOUND' } });
+  });
+  return listPaths;
+}
+
+describe('Convidados › Grupos e convidados (RN13)', () => {
+  it('mostra o resumo, a aba, as linhas e o "Mostrando", com o item Convidados ativo', async () => {
+    mockList(() =>
+      Response.json(
+        page([
+          party('p1', 'Família Moreira', {
+            deliveryStatus: 'responded',
+            tags: [{ id: 't1', name: 'Família da Ana', color: 'wine' }],
+          }),
+          party('p2', 'Carla e Rafael', {
+            contact: { guestId: 'g2', name: 'Carla Nunes', phoneMasked: '(11) 9****-8024' },
+            counts: { confirmed: 1, declined: 1, pending: 1, pendingPlusOnes: 1 },
+          }),
+        ]),
+      ),
+    );
+    renderRoute({ url: '/app/convidados' });
+    const table = await screen.findByRole('table', { name: 'Grupos e convidados' });
+    expect(screen.getByRole('heading', { name: 'Convidados' })).toBeInTheDocument();
+    expect(
+      screen.getByText('142 convidados em 58 grupos · 96 confirmados, 18 recusados e 28 pendentes'),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Convidados' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+    expect(screen.getByRole('link', { name: 'Dashboard' })).not.toHaveAttribute('aria-current');
+    const tabs = screen.getByRole('navigation', { name: 'Convidados' });
+    expect(within(tabs).getByRole('link')).toHaveAttribute('aria-current', 'page');
+
+    const rows = within(table).getAllByRole('row').slice(1);
+    expect(rows).toHaveLength(2);
+    expect(within(rows[0] as HTMLElement).getByText('Família Moreira')).toBeInTheDocument();
+    expect(within(rows[0] as HTMLElement).getByText('Respondido')).toBeInTheDocument();
+    expect(within(rows[0] as HTMLElement).getByText('Família da Ana')).toHaveClass(
+      'kore-tag--wine',
+    );
+    expect(
+      within(rows[1] as HTMLElement).getByText('Carla Nunes · (11) 9****-8024'),
+    ).toBeInTheDocument();
+    expect(
+      within(rows[1] as HTMLElement).getByText('1 recusado · 1 vaga pendente'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Mostrando 2 de 58 grupos')).toBeInTheDocument();
+  });
+
+  it('a busca e os filtros vão para a URL e para a API, com a busca esperando a digitação', async () => {
+    const user = userEvent.setup();
+    const listPaths = mockList(() =>
+      Response.json(page([party('p1', 'Família Moreira')], { total: 1 })),
+    );
+    const { router } = renderRoute({ url: '/app/convidados' });
+    await screen.findByRole('table');
+
+    await user.selectOptions(
+      screen.getAllByRole('combobox', { name: 'Resposta' })[0] as HTMLElement,
+      'pendentes',
+    );
+    await waitFor(() => expect(listPaths.at(-1)).toBe('/v1/weddings/w1/parties?rsvp=pending'));
+    expect(router.state.location.search).toBe('?resposta=pendentes');
+
+    await user.type(screen.getByRole('searchbox', { name: 'Buscar por nome' }), 'celia');
+    await waitFor(() =>
+      expect(listPaths.at(-1)).toBe('/v1/weddings/w1/parties?q=celia&rsvp=pending'),
+    );
+    // Uma só busca para "celia", não uma por letra.
+    expect(listPaths.filter((path) => path.includes('q='))).toHaveLength(1);
+    expect(router.state.location.search).toBe('?q=celia&resposta=pendentes');
+  });
+
+  it('abre com os filtros da URL', async () => {
+    const listPaths = mockList(() =>
+      Response.json(page([party('p1', 'Família Moreira')], { total: 1 })),
+    );
+    renderRoute({ url: '/app/convidados?envio=nao-enviado&resposta=x' });
+    await screen.findByRole('table');
+    expect(listPaths[0]).toBe('/v1/weddings/w1/parties?sent=not_sent');
+    expect(screen.getAllByRole('combobox', { name: 'Envio' })[0]).toHaveValue('nao-enviado');
+    expect(screen.getAllByRole('combobox', { name: 'Resposta' })[0]).toHaveValue('');
+  });
+
+  it('a folha de Filtros do celular só aplica no Mostrar resultados, e o Limpar tira tudo', async () => {
+    const user = userEvent.setup();
+    const listPaths = mockList(() =>
+      Response.json(page([party('p1', 'Família Moreira')], { total: 1 })),
+    );
+    const { router } = renderRoute({ url: '/app/convidados' });
+    await screen.findByRole('table');
+
+    await user.click(screen.getByRole('button', { name: 'Filtros' }));
+    const sheet = screen.getByRole('dialog', { name: 'Filtros' });
+    await user.selectOptions(within(sheet).getByRole('combobox', { name: 'Envio' }), 'respondido');
+    expect(router.state.location.search).toBe('');
+    await user.click(within(sheet).getByRole('button', { name: 'Mostrar resultados' }));
+    expect(sheet).not.toHaveAttribute('open');
+    await waitFor(() => expect(listPaths.at(-1)).toBe('/v1/weddings/w1/parties?sent=responded'));
+
+    await user.click(screen.getByRole('button', { name: 'Filtros' }));
+    await user.click(within(sheet).getByRole('button', { name: 'Limpar' }));
+    await waitFor(() => expect(router.state.location.search).toBe(''));
+  });
+
+  it('a seleção conta os grupos e o "marcar todos" fica parcial, depois marca todos', async () => {
+    const user = userEvent.setup();
+    mockList(() => Response.json(page([party('p1', 'Família Moreira'), party('p2', 'Tio Jorge')])));
+    renderRoute({ url: '/app/convidados' });
+    await screen.findByRole('table');
+    const selectAll = screen.getByRole<HTMLInputElement>('checkbox', {
+      name: 'Selecionar todos os grupos',
+    });
+
+    await user.click(screen.getByRole('checkbox', { name: 'Selecionar Tio Jorge' }));
+    expect(screen.getByRole('status')).toHaveTextContent('1 grupo selecionado');
+    expect(selectAll).toBePartiallyChecked();
+
+    await user.click(selectAll);
+    expect(screen.getByRole('status')).toHaveTextContent('2 grupos selecionados');
+    expect(selectAll).toBeChecked();
+    await user.click(selectAll);
+    expect(screen.queryByText(/selecionad/)).toBeNull();
+  });
+
+  it('rolagem infinita: no fim da lista, pede a página seguinte pelo cursor (decisão 197)', async () => {
+    const listPaths = mockList((path) =>
+      path.includes('cursor=c1')
+        ? Response.json(page([party('p2', 'Tio Jorge')], { total: 2 }))
+        : Response.json(page([party('p1', 'Família Moreira')], { total: 2, nextCursor: 'c1' })),
+    );
+    renderRoute({ url: '/app/convidados' });
+    await screen.findByText('Mostrando 1 de 2 grupos');
+    intersect();
+    await screen.findByText('Mostrando 2 de 2 grupos');
+    expect(listPaths).toEqual(['/v1/weddings/w1/parties', '/v1/weddings/w1/parties?cursor=c1']);
+    expect(screen.getByText('Tio Jorge')).toBeInTheDocument();
+  });
+
+  it('sem grupo nenhum, o vazio do casal; com filtro sem resultado, o "Nenhum grupo encontrado." (198)', async () => {
+    mockList((path) =>
+      Response.json(
+        page([], {
+          total: 0,
+          summary: path.includes('q=')
+            ? summary
+            : {
+                ...summary,
+                guests: 0,
+                namedGuests: 0,
+                parties: 0,
+                confirmed: 0,
+                declined: 0,
+                pending: 0,
+              },
+        }),
+      ),
+    );
+    renderRoute({ url: '/app/convidados' });
+    expect(await screen.findByText('Vocês ainda não cadastraram convidados.')).toBeInTheDocument();
+    expect(screen.queryByRole('table')).toBeNull();
+
+    renderRoute({ url: '/app/convidados?q=zz' });
+    expect(await screen.findByText('Nenhum grupo encontrado.')).toBeInTheDocument();
+  });
+
+  it('se a lista não carrega, o aviso com o Tentar de novo (decisão 164)', async () => {
+    const user = userEvent.setup();
+    let fail = true;
+    mockList(() =>
+      fail
+        ? apiError({ status: 500, body: {} })
+        : Response.json(page([party('p1', 'Família Moreira')])),
+    );
+    renderRoute({ url: '/app/convidados' });
+    const retry = await screen.findByRole('button', { name: 'Tentar de novo' });
+    fail = false;
+    await user.click(retry);
+    expect(await screen.findByRole('table')).toBeInTheDocument();
+  });
+
+  it('é acessível', async () => {
+    mockList(() =>
+      Response.json(
+        page([
+          party('p1', 'Família Moreira', {
+            deliveryStatus: 'viewed',
+            tags: [{ id: 't', name: 'Igreja', color: null }],
+          }),
+        ]),
+      ),
+    );
+    const { container } = renderRoute({ url: '/app/convidados' });
+    await screen.findByRole('table');
+    await expectNoA11yViolations({ container });
+  });
+});
