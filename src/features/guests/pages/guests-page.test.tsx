@@ -182,8 +182,10 @@ describe('Convidados › Grupos e convidados (RN13)', () => {
     expect(sheet).not.toHaveAttribute('open');
     await waitFor(() => expect(listPaths.at(-1)).toBe('/v1/weddings/w1/parties?sent=responded'));
 
-    await user.click(screen.getByRole('button', { name: 'Filtros' }));
+    // Com o filtro ativo, o botão conta (200(c)).
+    await user.click(screen.getByRole('button', { name: 'Filtros (1)' }));
     await user.click(within(sheet).getByRole('button', { name: 'Limpar' }));
+    expect(await screen.findByRole('button', { name: 'Filtros' })).toBeInTheDocument();
     await waitFor(() => expect(router.state.location.search).toBe(''));
   });
 
@@ -219,6 +221,56 @@ describe('Convidados › Grupos e convidados (RN13)', () => {
     await screen.findByText('Mostrando 2 de 2 grupos');
     expect(listPaths).toEqual(['/v1/weddings/w1/parties', '/v1/weddings/w1/parties?cursor=c1']);
     expect(screen.getByText('Tio Jorge')).toBeInTheDocument();
+  });
+
+  it('se a próxima página falha, o Tentar de novo embaixo pede de novo (decisão 200(d))', async () => {
+    const user = userEvent.setup();
+    let failNext = true;
+    mockList((path) => {
+      if (!path.includes('cursor=c1')) {
+        return Response.json(
+          page([party('p1', 'Família Moreira')], { total: 2, nextCursor: 'c1' }),
+        );
+      }
+      return failNext
+        ? apiError({ status: 500, body: {} })
+        : Response.json(page([party('p2', 'Tio Jorge')], { total: 2 }));
+    });
+    renderRoute({ url: '/app/convidados' });
+    await screen.findByText('Mostrando 1 de 2 grupos');
+    intersect();
+    const retry = await screen.findByRole('button', { name: 'Tentar de novo' });
+    // A lista que já veio continua na tela.
+    expect(screen.getByText('Família Moreira')).toBeInTheDocument();
+    failNext = false;
+    await user.click(retry);
+    await screen.findByText('Mostrando 2 de 2 grupos');
+    expect(screen.queryByRole('button', { name: 'Tentar de novo' })).toBeNull();
+  });
+
+  it('enquanto a lista carrega, o Spinner diz "Carregando os grupos" (200(b))', async () => {
+    mockApi(({ path }) =>
+      path === '/v1/me'
+        ? Response.json(me)
+        : new Promise<Response>(() => {
+            // A lista não responde: fica carregando.
+          }),
+    );
+    renderRoute({ url: '/app/convidados' });
+    expect(await screen.findByRole('status')).toHaveTextContent('Carregando os grupos');
+  });
+
+  it('no celular, o botão diz quantos filtros estão ativos, sem contar a busca (200(c))', async () => {
+    mockList(() => Response.json(page([party('p1', 'Família Moreira')], { total: 1 })));
+    renderRoute({ url: '/app/convidados?q=celia&resposta=pendentes&envio=enviado' });
+    expect(await screen.findByRole('button', { name: 'Filtros (2)' })).toBeInTheDocument();
+  });
+
+  it('sem filtro ativo, o botão é só "Filtros"', async () => {
+    mockList(() => Response.json(page([party('p1', 'Família Moreira')], { total: 1 })));
+    renderRoute({ url: '/app/convidados?q=celia' });
+    await screen.findByRole('table');
+    expect(screen.getByRole('button', { name: 'Filtros' })).toBeInTheDocument();
   });
 
   it('sem grupo nenhum, o vazio do casal; com filtro sem resultado, o "Nenhum grupo encontrado." (198)', async () => {

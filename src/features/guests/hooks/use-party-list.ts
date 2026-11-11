@@ -30,7 +30,10 @@ export function usePartyList({ weddingId, filters }: { weddingId: string; filter
     retry: () => void query.refetch(),
     hasMore: query.hasNextPage,
     isLoadingMore: query.isFetchingNextPage,
+    /** A próxima página falhou: a lista mostra o Tentar de novo embaixo (decisão 200(d)). */
+    loadMoreFailed: query.isFetchNextPageError,
     loadMore: () => {
+      // Depois de uma falha, só o Tentar de novo pede de novo (o marcador não dispara sozinho).
       if (query.hasNextPage && !query.isFetchingNextPage) void query.fetchNextPage();
     },
     isFiltered: Object.keys(params).length > 0,

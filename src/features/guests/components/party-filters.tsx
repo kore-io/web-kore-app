@@ -64,6 +64,7 @@ export function PartyFilters({
   const dialog = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   const [draft, setDraft] = useState<Pick<Filters, 'rsvp' | 'sent'>>(filters);
+  const activeCount = [filters.rsvp, filters.sent].filter(Boolean).length;
 
   function openSheet() {
     setDraft({ rsvp: filters.rsvp, sent: filters.sent });
@@ -90,7 +91,8 @@ export function PartyFilters({
         <FilterSelects value={filters} onChange={onChange} />
       </div>
       <Button variant="secondary" className="kore-party-filters__open" onClick={openSheet}>
-        {t('filters.open')}
+        {/* "Filtros (n)" com filtro ativo; a busca fica fora da folha e não conta (200(c)). */}
+        {activeCount > 0 ? t('filters.openCount', { count: activeCount }) : t('filters.open')}
       </Button>
       <dialog ref={dialog} className="kore-party-filters__sheet" aria-labelledby={titleId}>
         <h2 id={titleId} className="kore-party-filters__title">

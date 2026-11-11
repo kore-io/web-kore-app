@@ -43,7 +43,8 @@
       "sent": "Envio: enviado",
       "viewed": "Envio: visualizado",
       "responded": "Envio: respondido"
-    }
+    },
+    "openCount": "Filtros ({{count}})"
   },
   "table": {
     "label": "Grupos e convidados",
@@ -93,5 +94,6 @@
     "couple": "Vocês ainda não cadastraram convidados.",
     "planner": "Este casamento ainda não tem convidados."
   },
-  "noResults": "Nenhum grupo encontrado."
+  "noResults": "Nenhum grupo encontrado.",
+  "loading": "Carregando os grupos"
 }
