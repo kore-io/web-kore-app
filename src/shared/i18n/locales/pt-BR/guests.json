@@ -218,6 +218,10 @@
   "selection": {
     "addTag": "Adicionar tag",
     "applied_one": "Tag aplicada a {{count}} grupo.",
-    "applied_other": "Tag aplicada a {{count}} grupos."
+    "applied_other": "Tag aplicada a {{count}} grupos.",
+    "tooMany": {
+      "couple": "Marquem até 200 grupos para adicionar uma tag.",
+      "planner": "Marque até 200 grupos para adicionar uma tag."
+    }
   }
 }
