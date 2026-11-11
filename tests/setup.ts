@@ -8,7 +8,10 @@ afterEach(() => {
 });
 
 // O jsdom não tem o <dialog> modal: abrir e fechar mudam o atributo `open`, como no navegador.
-if (!HTMLDialogElement.prototype.showModal) {
+// Só no jsdom: testes em ambiente node (ex.: o modelo da planilha) não têm DOM.
+const hasDom = typeof window !== 'undefined';
+
+if (hasDom && !HTMLDialogElement.prototype.showModal) {
   HTMLDialogElement.prototype.showModal = function showModal(this: HTMLDialogElement) {
     this.setAttribute('open', '');
   };
@@ -31,7 +34,7 @@ class FakeIntersectionObserver {
     return [];
   }
 }
-if (!('IntersectionObserver' in window)) {
+if (hasDom && !('IntersectionObserver' in window)) {
   Object.assign(window, { IntersectionObserver: FakeIntersectionObserver });
 }
 
