@@ -32,9 +32,11 @@ import type {
   PartyListResponse,
   PartyNotFoundErrorBody,
   PartyResponse,
+  PlusOnesInUseErrorBody,
   RateLimitedErrorBody,
   RegeneratePartyLinkResponse,
   SessionExpiredErrorBody,
+  UpdatePartyBody,
   ValidationErrorBody,
   WeddingNotFoundErrorBody,
 } from '../model';
@@ -735,6 +737,147 @@ export function usePartiesControllerGetV1<
   return withQueryKey(query, queryOptions.queryKey);
 }
 
+export const getPartiesControllerUpdateV1Url = (weddingId: string, partyId: string) => {
+  return `/v1/weddings/${weddingId}/parties/${partyId}`;
+};
+
+/**
+ * @summary Editar grupo (Grupos RN09): não tira convidado; vale a última gravação.
+ */
+export const partiesControllerUpdateV1 = async (
+  weddingId: string,
+  partyId: string,
+  updatePartyBody: UpdatePartyBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<PartyResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<PartyResponse>(getPartiesControllerUpdateV1Url(weddingId, partyId), {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updatePartyBody),
+  });
+};
+
+export const getPartiesControllerUpdateV1MutationKey = () => ['partiesControllerUpdateV1'] as const;
+
+export const getPartiesControllerUpdateV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | PartyNotFoundErrorBody
+    | PlusOnesInUseErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof partiesControllerUpdateV1>>,
+    TError,
+    PartiesControllerUpdateV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof partiesControllerUpdateV1>>,
+  TError,
+  PartiesControllerUpdateV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getPartiesControllerUpdateV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof partiesControllerUpdateV1>>,
+    PartiesControllerUpdateV1MutationVariables
+  > = (props) => {
+    const { weddingId, partyId, data } = props ?? {};
+
+    return partiesControllerUpdateV1(weddingId, partyId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PartiesControllerUpdateV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof partiesControllerUpdateV1>>
+>;
+export type PartiesControllerUpdateV1MutationBody = UpdatePartyBody;
+export type PartiesControllerUpdateV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | ActionNotAllowedErrorBody
+  | WeddingNotFoundErrorBody
+  | PartyNotFoundErrorBody
+  | PlusOnesInUseErrorBody
+  | RateLimitedErrorBody
+>;
+export type PartiesControllerUpdateV1MutationVariables = {
+  weddingId: string;
+  partyId: string;
+  data: UpdatePartyBody;
+};
+
+/**
+ * @summary Editar grupo (Grupos RN09): não tira convidado; vale a última gravação.
+ */
+export const usePartiesControllerUpdateV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | PartyNotFoundErrorBody
+    | PlusOnesInUseErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof partiesControllerUpdateV1>>,
+      TError,
+      PartiesControllerUpdateV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof partiesControllerUpdateV1>>,
+  TError,
+  PartiesControllerUpdateV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getPartiesControllerUpdateV1MutationOptions(options), queryClient);
+};
 export const getPartiesControllerRegenerateV1Url = (weddingId: string, partyId: string) => {
   return `/v1/weddings/${weddingId}/parties/${partyId}/regenerate-link`;
 };
