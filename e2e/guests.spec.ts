@@ -225,6 +225,53 @@ test.describe('Convidados › Grupos e convidados (RN13)', () => {
     await expect(page.getByRole('dialog')).toHaveCount(0);
   });
 
+  test('Tags: cria, edita nome e cor, recusa nome repetido e manda para a lixeira (Tags RN01 a RN06)', async ({
+    page,
+  }) => {
+    await weddingWithParties({ db, page });
+    await page.goto('/app/convidados');
+    await page
+      .getByRole('navigation', { name: 'Convidados' })
+      .getByRole('link', { name: /^Tags/ })
+      .click();
+    await expect(page).toHaveURL(/\/app\/convidados\/tags$/);
+    await expect(page.getByRole('heading', { name: '0 de 10 tags' })).toBeVisible();
+
+    const field = page.getByRole('textbox', { name: 'Nome da tag nova' });
+    await field.fill('Igreja');
+    await page.getByRole('button', { name: 'Criar tag' }).click();
+    await expect(page.getByRole('heading', { name: '1 de 10 tags' })).toBeVisible();
+    await field.fill('IGREJA');
+    await page.getByRole('button', { name: 'Criar tag' }).click();
+    await expect(page.getByText('Já existe uma tag com este nome.')).toBeVisible();
+
+    await page
+      .getByRole('listitem')
+      .filter({ hasText: 'Igreja' })
+      .getByRole('button', { name: 'Editar' })
+      .click();
+    const dialog = page.getByRole('dialog', { name: 'Editar tag' });
+    await dialog.getByRole('textbox', { name: 'Nome da tag' }).fill('Igreja Matriz');
+    // Quem usa toca na cor (o rótulo, com a área de toque de 44 px).
+    const champagne = dialog.getByRole('radio', { name: 'Champanhe' });
+    await champagne.locator('..').click();
+    await expect(champagne).toBeChecked();
+    await dialog.getByRole('button', { name: 'Salvar alterações' }).click();
+    await expect(toast({ page, text: 'Alterações salvas.' })).toBeVisible();
+    await expect(page.getByText('Igreja Matriz')).toHaveClass(/kore-tag--champagne/);
+
+    await page
+      .getByRole('listitem')
+      .filter({ hasText: 'Igreja Matriz' })
+      .getByRole('button', { name: 'Editar' })
+      .click();
+    await dialog.getByRole('button', { name: 'Excluir tag' }).click();
+    const confirm = page.getByRole('alertdialog', { name: 'Excluir a tag Igreja Matriz?' });
+    await confirm.getByRole('button', { name: 'Excluir tag' }).click();
+    await expect(toast({ page, text: 'A tag Igreja Matriz foi para a lixeira.' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '0 de 10 tags' })).toBeVisible();
+  });
+
   test.describe('computador', () => {
     test.use({ viewport: { width: 1440, height: 900 }, isMobile: false, hasTouch: false });
 
