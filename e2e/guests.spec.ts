@@ -411,7 +411,8 @@ test.describe('Convidados › Grupos e convidados (RN13)', () => {
     const download = await page.request.get('/modelo-convidados-kore.xlsx');
     expect(download.status()).toBe(200);
     const workbook = new ExcelJS.Workbook();
-    await workbook.xlsx.load(Buffer.from(await download.body()));
+    // O tipo do exceljs pede Buffer antigo; o body do Playwright é um Buffer<ArrayBuffer>.
+    await workbook.xlsx.load((await download.body()) as unknown as ArrayBuffer);
     const sheet = workbook.worksheets[0];
     sheet?.addRow(['Família Silva', 'Ana Silva', '(19) 99876-1111', '', 'Adulta', '', '']);
     sheet?.addRow(['Família Silva', 'Beto Silva', '9876-1402', '', '', '', '']);
