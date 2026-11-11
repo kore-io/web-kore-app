@@ -9,6 +9,7 @@ import { SignUpPage } from '../features/access/pages/sign-up-page';
 import { DashboardPage } from '../features/dashboard/pages/dashboard-page';
 import { GuestsLayout } from '../features/guests/pages/guests-layout';
 import { GuestsPage } from '../features/guests/pages/guests-page';
+import { ImportPage } from '../features/guests/pages/import-page';
 import { PartyPanelPage } from '../features/guests/pages/party-panel-page';
 import { TagsPage } from '../features/guests/pages/tags-page';
 import { TrashPage } from '../features/guests/pages/trash-page';
@@ -39,6 +40,7 @@ export const routes: RouteObject[] = [
             element: <GuestsLayout />,
             children: [
               { id: 'guests', index: true, element: <GuestsPage /> },
+              { id: 'guest-import', path: 'importar', element: <ImportPage /> },
               { id: 'guest-tags', path: 'tags', element: <TagsPage /> },
               { id: 'guest-trash', path: 'lixeira', element: <TrashPage /> },
             ],

@@ -128,7 +128,8 @@ describe('Convidados › Grupos e convidados (RN13)', () => {
     );
     expect(screen.getByRole('link', { name: 'Dashboard' })).not.toHaveAttribute('aria-current');
     const tabs = screen.getByRole('navigation', { name: 'Convidados' });
-    const [partiesTab, tagsTab] = within(tabs).getAllByRole('link');
+    const partiesTab = within(tabs).getByRole('link', { name: /^Grupos/ });
+    const tagsTab = within(tabs).getByRole('link', { name: /^Tags/ });
     expect(partiesTab).toHaveAttribute('aria-current', 'page');
     // A aba Tags conta as tags do casamento (Tags RN04).
     expect(tagsTab).toHaveTextContent('Tags · 1 de 10');

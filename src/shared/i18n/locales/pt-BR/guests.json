@@ -24,7 +24,8 @@
     "partiesShort": "Grupos",
     "tags": "Tags · {{count}} de {{limit}}",
     "tagsShort": "Tags",
-    "trash": "Lixeira"
+    "trash": "Lixeira",
+    "import": "Importar"
   },
   "filters": {
     "search": "Buscar por nome",
@@ -282,5 +283,103 @@
       "planner": "Já existe uma tag {{name}}. Mude o nome dela para restaurar esta."
     },
     "empty": "A lixeira está vazia."
+  },
+  "importSheet": {
+    "headerButton": "Importar planilha",
+    "step1": "1. Baixar o modelo",
+    "step1Text": "Uma linha por convidado. Convidados do mesmo grupo repetem o nome do grupo.",
+    "download": "Baixar modelo (.xlsx)",
+    "step2": "2. Enviar a planilha preenchida",
+    "drop": {
+      "couple": "Arrastem a planilha ou cliquem para escolher",
+      "planner": "Arraste a planilha ou clique para escolher"
+    },
+    "dropHint": "Excel (.xlsx) com até 1.000 linhas",
+    "previewNote": "Antes de criar os grupos, mostramos uma prévia com as linhas que têm erro.",
+    "reading": "Lendo a planilha",
+    "fileCounts": "{{parties}} · {{guests}}",
+    "parties_zero": "{{count}} grupos",
+    "parties_one": "{{count}} grupo",
+    "parties_other": "{{count}} grupos",
+    "guests_zero": "{{count}} convidados",
+    "guests_one": "{{count}} convidado",
+    "guests_other": "{{count}} convidados",
+    "removeFile": "Enviar outra planilha",
+    "valid": "Válidas",
+    "validDetail_one": "viram {{count}} grupo",
+    "validDetail_other": "viram {{count}} grupos",
+    "errors": "Com erro",
+    "duplicates": "Duplicadas",
+    "leftOut": "ficam de fora",
+    "skippedTitle": "Linhas que ficam de fora",
+    "row": "Linha {{row}} · {{name}}",
+    "noName": "sem nome",
+    "summary": "{{parties}} e {{guests}} serão criados.",
+    "summaryLeftOut": {
+      "couple_one": "A linha que ficou de fora vocês cadastram depois.",
+      "couple_other": "As {{count}} linhas que ficaram de fora vocês cadastram depois, uma a uma.",
+      "planner_one": "A linha que ficou de fora você cadastra depois.",
+      "planner_other": "As {{count}} linhas que ficaram de fora você cadastra depois, uma a uma."
+    },
+    "sendAnother": "Enviar outra planilha",
+    "import_zero": "Importar {{count}} convidados",
+    "import_one": "Importar {{count}} convidado",
+    "import_other": "Importar {{count}} convidados",
+    "imported_one": "{{count}} grupo importado",
+    "imported_other": "{{count}} grupos importados",
+    "partyExists": "{{party}}: já existe um grupo com este nome.",
+    "tagLimit": {
+      "couple": "A tag {{tag}} não foi criada: vocês já têm 10 tags.",
+      "planner": "A tag {{tag}} não foi criada: este casamento já tem 10 tags."
+    },
+    "rowErrors": {
+      "NAME_MISSING": {
+        "couple": "Falta o nome do convidado. Preencham a coluna Nome.",
+        "planner": "Falta o nome do convidado. Preencha a coluna Nome."
+      },
+      "PARTY_MISSING": {
+        "couple": "Falta o grupo. Preencham a coluna Grupo.",
+        "planner": "Falta o grupo. Preencha a coluna Grupo."
+      },
+      "PHONE_TOO_SHORT": {
+        "couple": "O telefone tem {{n}} números. Usem DDD + número, ex.: (19) 99999-9999.",
+        "planner": "O telefone tem {{n}} números. Use DDD + número, ex.: (19) 99999-9999."
+      },
+      "PHONE_TOO_LONG": {
+        "couple": "O telefone tem {{n}} números. Se for de fora do Brasil, comecem com + e o código do país.",
+        "planner": "O telefone tem {{n}} números. Se for de fora do Brasil, comece com + e o código do país."
+      },
+      "PHONE_INVALID": "O telefone tem {{n}} números. Um número de fora do Brasil tem de 8 a 15, com o código do país.",
+      "EMAIL_INVALID": {
+        "couple": "O e-mail não parece certo. Confiram a coluna E-mail.",
+        "planner": "O e-mail não parece certo. Confira a coluna E-mail."
+      },
+      "AGE_GROUP_INVALID": {
+        "couple": "Usem Adulto, Criança ou Bebê na Faixa etária.",
+        "planner": "Use Adulto, Criança ou Bebê na Faixa etária."
+      },
+      "TOO_LONG_name": "O nome passa de 80 caracteres.",
+      "TOO_LONG_dietaryRestriction": "A restrição alimentar passa de 200 caracteres.",
+      "TOO_LONG_tags": "A tag {{tag}} passa de 40 caracteres.",
+      "DUPLICATE": "Repetido: já está na linha {{row}}, no grupo {{party}}."
+    },
+    "refused": {
+      "TEMPLATE_MISMATCH": {
+        "couple": "Esta planilha não está no modelo do Kore. Baixem o modelo ou usem Colar a lista.",
+        "planner": "Esta planilha não está no modelo do Kore. Baixe o modelo ou use Colar a lista."
+      },
+      "TOO_MANY_ROWS": {
+        "couple": "A planilha tem mais de 1.000 linhas. Dividam em duas.",
+        "planner": "A planilha tem mais de 1.000 linhas. Divida em duas."
+      },
+      "NOT_XLSX": {
+        "couple": "Este arquivo não é uma planilha do Excel (.xlsx). Baixem o modelo ou usem Colar a lista.",
+        "planner": "Este arquivo não é uma planilha do Excel (.xlsx). Baixe o modelo ou use Colar a lista."
+      },
+      "FILE_TOO_LARGE": {
+        "couple": "A planilha passa de 5 MB. Dividam em duas.",
+        "planner": "A planilha passa de 5 MB. Divida em duas."
+      }
+    }
   }
 }

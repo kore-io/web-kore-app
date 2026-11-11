@@ -1,0 +1,111 @@
+/*
+ * Aba Importar (Penpot, Área do Casal, página 05). Envio: cartão branco de até 720 px,
+ * borda gray.300, raio lg, 20 px de respiro e 16 px entre os itens; os passos em
+ * type.heading ink; o texto em type.body.md gray.700; o "Baixar modelo (.xlsx)" é um
+ * link de download com a cara do Button secundário do DS; a nota em type.caption.
+ * Prévia: o cartão do arquivo, os 3 Stat Cards (em coluna no celular), as linhas de
+ * fora com o erro em danger.text, os avisos, o resumo e as ações à direita.
+ */
+.kore-import {
+  @apply flex max-w-180 flex-col items-start gap-4 rounded-lg border border-gray-300 bg-white p-5;
+}
+
+.kore-import > .kore-file-upload,
+.kore-import > .kore-alert {
+  @apply self-stretch;
+}
+
+.kore-import__step {
+  @apply type-heading text-ink;
+}
+
+.kore-import__text {
+  @apply type-body-md text-gray-700;
+}
+
+.kore-import__download {
+  @apply type-label inline-flex h-10 items-center rounded-md border border-gray-300 bg-white px-4 text-primary-dark transition;
+  @apply focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}
+
+.kore-import__reading {
+  @apply flex self-stretch justify-center;
+}
+
+.kore-import__note {
+  @apply type-caption text-gray-700;
+}
+
+.kore-import-preview {
+  @apply flex flex-col gap-6;
+}
+
+.kore-import-preview__file {
+  @apply flex items-center gap-3 rounded-lg border border-gray-300 bg-white p-4;
+}
+
+.kore-import-preview__file-icon {
+  @apply flex size-10 shrink-0 items-center justify-center rounded-md bg-primary-tint text-primary-dark;
+}
+
+.kore-import-preview__file-icon > svg {
+  @apply size-5;
+}
+
+.kore-import-preview__file-text {
+  @apply flex min-w-0 flex-1 flex-col gap-0.5;
+}
+
+.kore-import-preview__file-name {
+  @apply type-label truncate text-ink;
+}
+
+.kore-import-preview__file-counts {
+  @apply type-caption text-gray-700;
+}
+
+.kore-import-preview__remove {
+  @apply relative inline-flex size-8 shrink-0 items-center justify-center rounded-md text-ink;
+  @apply after:absolute after:-inset-1.5;
+  @apply focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}
+
+.kore-import-preview__remove > svg {
+  @apply size-5;
+}
+
+.kore-import-preview__stats {
+  @apply grid gap-4 md:grid-cols-3;
+}
+
+.kore-import-preview__skipped {
+  @apply flex flex-col gap-3 rounded-lg border border-gray-300 bg-white p-5;
+}
+
+.kore-import-preview__skipped-title {
+  @apply type-overline text-gray-700;
+}
+
+.kore-import-preview__rows {
+  @apply flex flex-col gap-3;
+}
+
+.kore-import-preview__row {
+  @apply flex flex-col gap-0.5;
+}
+
+.kore-import-preview__row-title {
+  @apply type-body-md text-ink;
+}
+
+.kore-import-preview__row-error {
+  @apply type-body-md text-danger-text;
+}
+
+.kore-import-preview__warnings {
+  @apply flex flex-col gap-1;
+}
+
+.kore-import-preview__actions {
+  @apply flex flex-col-reverse gap-3 md:flex-row md:justify-end;
+}
