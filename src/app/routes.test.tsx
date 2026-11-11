@@ -21,6 +21,7 @@ describe('rotas do app (decisões 139, 146, 147 e 198)', () => {
       sessionExpired: '/sessao-expirada',
       coupleArea: '/app',
       guests: '/app/convidados',
+      guestParty: '/app/convidados/grupos/:partyId',
     });
   });
 
@@ -33,6 +34,7 @@ describe('rotas do app (decisões 139, 146, 147 e 198)', () => {
     ['/cadastro', 'sign-up'],
     ['/sessao-expirada', 'session-expired'],
     ['/app/convidados?resposta=pendentes', 'guests'],
+    ['/app/convidados/grupos/0190f3a2-0000-7000-8000-000000000001', 'guest-party'],
     ['/app', 'dashboard'],
   ])('%s abre a rota %s', (url, id) => {
     expect(routeIdAt({ url })).toBe(id);

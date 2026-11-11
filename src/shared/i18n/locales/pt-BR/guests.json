@@ -95,5 +95,51 @@
     "planner": "Este casamento ainda não tem convidados."
   },
   "noResults": "Nenhum grupo encontrado.",
-  "loading": "Carregando os grupos"
+  "loading": "Carregando os grupos",
+  "panel": {
+    "back": "‹ Voltar para Convidados",
+    "summary": {
+      "guests_one": "{{count}} convidado",
+      "guests_other": "{{count}} convidados",
+      "contact": "Contato: {{name}}"
+    },
+    "regenerate": "Regenerar link",
+    "group": {
+      "title": "Grupo",
+      "contact": "Convidado de contato",
+      "phone": "Telefone",
+      "email": "E-mail",
+      "plusOneSlots": "Vagas de acompanhante",
+      "plusOneSlotsNone": "nenhuma",
+      "tags": "Tags",
+      "internalNote": "Observação interna: {{note}}"
+    },
+    "guests": {
+      "title": "Convidados",
+      "plusOne": "Acompanhante",
+      "ageGroup": {
+        "adult": "Adulto",
+        "child": "Criança",
+        "baby": "Bebê"
+      },
+      "rsvp": {
+        "pending": "Pendente",
+        "confirmed": "Confirmado",
+        "declined": "Recusado"
+      }
+    },
+    "link": {
+      "title": "Link do grupo",
+      "caption": "Quem abre este link responde pelo grupo {{name}}.",
+      "copy": "Copiar link",
+      "copied": "Link copiado."
+    },
+    "regenerateDialog": {
+      "title": "Regenerar o link do grupo {{name}}?",
+      "couple": "O link antigo para de funcionar na hora. Vocês vão precisar enviar o link novo ao grupo.",
+      "planner": "O link antigo para de funcionar na hora. Você vai precisar enviar o link novo ao grupo.",
+      "cancel": "Cancelar",
+      "confirm": "Regenerar link"
+    }
+  }
 }
