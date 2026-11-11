@@ -2,7 +2,8 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../../../tests/a11y';
-import { apiError, mockApi, renderRoute } from '../../../../tests/render-route';
+import { meFor, profileUnderTest } from '../../../../tests/profile';
+import { apiError, mockApi, renderAreaScreen, renderRoute } from '../../../../tests/render-route';
 import type { PastePreviewResponse } from '../../../shared/api/generated/model';
 
 afterEach(() => {
@@ -86,7 +87,7 @@ function mockPaste({
 }: { previewResponse?: () => Response; importResponse?: () => Response } = {}) {
   const calls: Call[] = [];
   mockApi(({ method, path, body }) => {
-    if (path === '/v1/me') return Response.json(me);
+    if (path === '/v1/me') return Response.json(meFor(me));
     if (path === '/v1/weddings/w1/tags') return Response.json({ limit: 10, data: [] });
     if (method === 'GET' && path.startsWith('/v1/weddings/w1/parties')) {
       return Response.json({
@@ -302,5 +303,54 @@ describe('Convidados › Colar a lista (Importação RN10 a RN12)', () => {
     await user.click(screen.getByRole('button', { name: 'Continuar' }));
     await screen.findByText('da lista colada');
     await expectNoA11yViolations({ container });
+  });
+  describe('versão da cerimonialista (decisão 198(2))', () => {
+    it('a frase do texto e o aviso do "+ N" fora de 1 a 20 no singular (RN10)', async () => {
+      profileUnderTest.current = 'planner';
+      const user = userEvent.setup();
+      mockPaste({
+        previewResponse: () =>
+          Response.json({
+            ...example,
+            groups: [
+              {
+                line: 1,
+                source: 'Carla Nunes + 99',
+                name: 'Carla Nunes',
+                guests: [{ name: 'Carla Nunes' }],
+                warnings: ['PLUS_OUT_OF_RANGE'],
+                duplicatesRemoved: 0,
+              },
+            ],
+          }),
+      });
+      renderAreaScreen({ url: '/app/convidados/importar' });
+      await user.click(await screen.findByRole('button', { name: 'Colar a lista' }));
+      expect(
+        screen.getByText('Uma linha por grupo. Pode colar do jeito que está na planilha.'),
+      ).toBeInTheDocument();
+      await user.type(screen.getByRole('textbox', { name: 'Colar a lista' }), 'Carla Nunes + 99');
+      await user.click(screen.getByRole('button', { name: 'Continuar' }));
+      expect(
+        within(await screen.findByRole('region', { name: 'Carla Nunes + 99' })).getByText(
+          'Use de + 1 a + 20 por linha.',
+        ),
+      ).toBeInTheDocument();
+    });
+
+    it('lista acima de 1.000 convidados: "Divida em duas." (RN10)', async () => {
+      profileUnderTest.current = 'planner';
+      const user = userEvent.setup();
+      mockPaste({
+        previewResponse: () => apiError({ status: 422, body: { error: 'TOO_MANY_GUESTS' } }),
+      });
+      renderAreaScreen({ url: '/app/convidados/importar' });
+      await user.click(await screen.findByRole('button', { name: 'Colar a lista' }));
+      await user.type(screen.getByRole('textbox', { name: 'Colar a lista' }), 'Família + 20');
+      await user.click(screen.getByRole('button', { name: 'Continuar' }));
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'A lista passa de 1.000 convidados. Divida em duas.',
+      );
+    });
   });
 });
