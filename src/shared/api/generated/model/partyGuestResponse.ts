@@ -25,6 +25,16 @@ export interface PartyGuestResponse {
   phone: string | null;
   /** @nullable */
   email: string | null;
+  /**
+   * Para o painel (decisão 202(3)): "(19) 9****-3310", "+351 9** *** 678".
+   * @nullable
+   */
+  phoneMasked: string | null;
+  /**
+   * Para o painel (decisão 202(3)): "ce***@gmail.com".
+   * @nullable
+   */
+  emailMasked: string | null;
   rsvpStatus: PartyGuestResponseRsvpStatus;
   tags: TagSummaryResponse[];
   id: string;

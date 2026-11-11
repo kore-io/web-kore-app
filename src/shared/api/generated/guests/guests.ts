@@ -14,6 +14,7 @@ import type {
 
 import type {
   ActionNotAllowedErrorBody,
+  AlreadyRespondedErrorBody,
   EmptyPlusOneErrorBody,
   GuestNotFoundErrorBody,
   LastGuestErrorBody,
@@ -22,6 +23,7 @@ import type {
   OriginNotAllowedErrorBody,
   RateLimitedErrorBody,
   SessionExpiredErrorBody,
+  TrashedGuestResponse,
   ValidationErrorBody,
   WeddingNotFoundErrorBody,
 } from '../model';
@@ -31,6 +33,124 @@ import type { ErrorType } from '../../http-client';
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
+export const getGuestsControllerTrashV1Url = (weddingId: string, guestId: string) => {
+  return `/v1/weddings/${weddingId}/guests/${guestId}`;
+};
+
+/**
+ * @summary Mover o convidado para a lixeira (Lixeira RN04 e RN07).
+ */
+export const guestsControllerTrashV1 = async (
+  weddingId: string,
+  guestId: string,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<TrashedGuestResponse> => {
+  return httpClient<TrashedGuestResponse>(getGuestsControllerTrashV1Url(weddingId, guestId), {
+    ...options,
+    method: 'DELETE',
+  });
+};
+
+export const getGuestsControllerTrashV1MutationKey = () => ['guestsControllerTrashV1'] as const;
+
+export const getGuestsControllerTrashV1MutationOptions = <
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | AlreadyRespondedErrorBody
+    | WeddingNotFoundErrorBody
+    | GuestNotFoundErrorBody
+    | LastGuestErrorBody
+    | EmptyPlusOneErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof guestsControllerTrashV1>>,
+    TError,
+    GuestsControllerTrashV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof guestsControllerTrashV1>>,
+  TError,
+  GuestsControllerTrashV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getGuestsControllerTrashV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof guestsControllerTrashV1>>,
+    GuestsControllerTrashV1MutationVariables
+  > = (props) => {
+    const { weddingId, guestId } = props ?? {};
+
+    return guestsControllerTrashV1(weddingId, guestId, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type GuestsControllerTrashV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof guestsControllerTrashV1>>
+>;
+
+export type GuestsControllerTrashV1MutationError = ErrorType<
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | ActionNotAllowedErrorBody
+  | AlreadyRespondedErrorBody
+  | WeddingNotFoundErrorBody
+  | GuestNotFoundErrorBody
+  | LastGuestErrorBody
+  | EmptyPlusOneErrorBody
+  | RateLimitedErrorBody
+>;
+export type GuestsControllerTrashV1MutationVariables = { weddingId: string; guestId: string };
+
+/**
+ * @summary Mover o convidado para a lixeira (Lixeira RN04 e RN07).
+ */
+export const useGuestsControllerTrashV1 = <
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | AlreadyRespondedErrorBody
+    | WeddingNotFoundErrorBody
+    | GuestNotFoundErrorBody
+    | LastGuestErrorBody
+    | EmptyPlusOneErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof guestsControllerTrashV1>>,
+      TError,
+      GuestsControllerTrashV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof guestsControllerTrashV1>>,
+  TError,
+  GuestsControllerTrashV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getGuestsControllerTrashV1MutationOptions(options), queryClient);
+};
 export const getGuestsControllerMoveV1Url = (weddingId: string, guestId: string) => {
   return `/v1/weddings/${weddingId}/guests/${guestId}/move`;
 };
