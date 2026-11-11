@@ -106,7 +106,8 @@ export function useTrash({ weddingId, audience }: { weddingId: string; audience:
             ]
               .filter(Boolean)
               .join(' ');
-            showToast({ tone: 'success', message });
+            // Nenhum foi (todos já tinham respondido): o aviso, no tom de erro do DS.
+            showToast({ tone: trashed > 0 ? 'success' : 'danger', message });
             onDone(true);
           },
           onError: (error) => {

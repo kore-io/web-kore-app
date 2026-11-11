@@ -239,6 +239,30 @@ describe('Mover para a lixeira (Lixeira RN02 a RN07)', () => {
     );
   });
 
+  it('se todos já tinham respondido, só o aviso, no tom de erro do DS', async () => {
+    const user = userEvent.setup();
+    mockAll({
+      write: ({ path }) =>
+        path.endsWith('/parties/trash')
+          ? Response.json({
+              trashed: 0,
+              skipped: [{ id: 'p2', name: 'Tio Jorge', reason: 'ALREADY_RESPONDED' }],
+            })
+          : undefined,
+    });
+    renderRoute({ url: '/app/convidados' });
+    await screen.findByRole('table');
+    await user.click(screen.getByRole('checkbox', { name: 'Selecionar Tio Jorge' }));
+    await user.click(screen.getByRole('button', { name: 'Mover para a lixeira' }));
+    await user.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Mover para a lixeira' }),
+    );
+    const message = await screen.findByText(
+      '1 grupo que já respondeu ficou: só o casal pode excluí-lo.',
+    );
+    expect(message.closest('.kore-toast')).toHaveClass('kore-toast--danger');
+  });
+
   it('os que já responderam ficam, e o Toast avisa na mesma frase (RN07)', async () => {
     const user = userEvent.setup();
     mockAll({
