@@ -21,6 +21,8 @@ export const paths = {
   /** Convidados › Grupos e convidados (decisão 198); busca e filtros na query. */
   guests: '/app/convidados',
   /** Convidados › Tags (decisão 198). */
+  /** Convidados › Importar (decisão 198). */
+  guestImport: '/app/convidados/importar',
   guestTags: '/app/convidados/tags',
   /** Convidados › Lixeira (decisão 198). */
   guestTrash: '/app/convidados/lixeira',

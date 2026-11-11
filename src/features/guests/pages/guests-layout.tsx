@@ -1,6 +1,6 @@
-import { Divider, PageHeader, Tab, Tabs } from '@kore-io/design';
+import { Button, Divider, PageHeader, Tab, Tabs } from '@kore-io/design';
 import { useTranslation } from 'react-i18next';
-import { Link, Outlet, useMatch } from 'react-router';
+import { Link, Outlet, useMatch, useNavigate } from 'react-router';
 import { paths } from '../../../app/paths';
 import { usePartiesControllerListV1 } from '../../../shared/api/generated/parties/parties';
 import { useTagsControllerListV1 } from '../../../shared/api/generated/tags/tags';
@@ -9,8 +9,8 @@ import { summaryText } from '../party-texts';
 
 /**
  * Convidados (IA da Área do Casal): o título, o resumo do casamento (RN13) e as abas
- * Grupos e convidados · Tags · n de 10 (Tags RN04) · Lixeira, em volta da aba aberta. As
- * outras abas (Importar, Exportar) entram com as telas delas.
+ * Grupos e convidados · Importar · Tags · n de 10 (Tags RN04) · Lixeira, em volta da aba
+ * aberta, e o Importar planilha no topo (Importação RN01). Exportar entra com a tela dela.
  */
 export function GuestsLayout() {
   const { weddingId } = useActiveWedding();
@@ -22,6 +22,8 @@ function GuestsFrame({ weddingId }: { weddingId: string }) {
   const { t } = useTranslation('guests');
   const onTags = useMatch(paths.guestTags) !== null;
   const onTrash = useMatch(paths.guestTrash) !== null;
+  const onImport = useMatch(paths.guestImport) !== null;
+  const navigate = useNavigate();
   // O resumo é do casamento inteiro, sem filtros: basta um grupo na página (limit 1).
   const parties = usePartiesControllerListV1(weddingId, { limit: 1 });
   const tags = useTagsControllerListV1(weddingId);
@@ -29,14 +31,25 @@ function GuestsFrame({ weddingId }: { weddingId: string }) {
 
   return (
     <div className="kore-guests">
-      <PageHeader title={t('title')} description={summary && summaryText({ t, summary })} />
+      <PageHeader
+        title={t('title')}
+        description={summary && summaryText({ t, summary })}
+        actions={
+          <Button variant="secondary" onClick={() => void navigate(paths.guestImport)}>
+            {t('importSheet.headerButton')}
+          </Button>
+        }
+      />
       <div className="kore-guests__tabs">
         <Tabs aria-label={t('tabs.label')}>
-          <Tab asChild current={!onTags && !onTrash}>
+          <Tab asChild current={!onTags && !onTrash && !onImport}>
             <Link to={paths.guests}>
               <span className="kore-guests__tab-long">{t('tabs.parties')}</span>
               <span className="kore-guests__tab-short">{t('tabs.partiesShort')}</span>
             </Link>
+          </Tab>
+          <Tab asChild current={onImport}>
+            <Link to={paths.guestImport}>{t('tabs.import')}</Link>
           </Tab>
           <Tab asChild current={onTags}>
             <Link to={paths.guestTags}>

@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import ExcelJS from 'exceljs';
 import {
   connectBackoffice,
   createUser,
@@ -398,6 +399,59 @@ test.describe('Convidados › Grupos e convidados (RN13)', () => {
     await expect(page.getByRole('navigation', { name: 'Convidados' })).toContainText(
       'Tags · 1 de 10',
     );
+  });
+
+  test('Importar planilha: o modelo do app, a prévia com erro e repetida, e a importação (Importação RN02 a RN09)', async ({
+    page,
+  }) => {
+    await weddingWithParties({ db, page });
+    await page.goto('/app/convidados/importar');
+
+    // O modelo que o app serve, preenchido: a API tem de aceitar os títulos dele (209).
+    const download = await page.request.get('/modelo-convidados-kore.xlsx');
+    expect(download.status()).toBe(200);
+    const workbook = new ExcelJS.Workbook();
+    // O tipo do exceljs pede Buffer antigo; o body do Playwright é um Buffer<ArrayBuffer>.
+    await workbook.xlsx.load((await download.body()) as unknown as ArrayBuffer);
+    const sheet = workbook.worksheets[0];
+    sheet?.addRow(['Família Silva', 'Ana Silva', '(19) 99876-1111', '', 'Adulta', '', '']);
+    sheet?.addRow(['Família Silva', 'Beto Silva', '9876-1402', '', '', '', '']);
+    sheet?.addRow(['família silva', 'ana silva', '', '', '', '', '']);
+    sheet?.addRow([
+      'Vó Rosa',
+      'Rosa Lima',
+      '',
+      'rosa@exemplo.kore.local',
+      'adulto',
+      'sem glúten',
+      '',
+    ]);
+    const buffer = Buffer.from(await workbook.xlsx.writeBuffer());
+
+    await page.getByLabel(/Arrastem a planilha/).setInputFiles({
+      name: 'convidados-teste.xlsx',
+      mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      buffer,
+    });
+    await expect(page.getByText('convidados-teste.xlsx')).toBeVisible();
+    await expect(page.getByText('2 grupos · 2 convidados')).toBeVisible();
+    await expect(page.getByText('Linha 3 · Beto Silva')).toBeVisible();
+    await expect(
+      page.getByText('O telefone tem 8 números. Usem DDD + número, ex.: (19) 99999-9999.'),
+    ).toBeVisible();
+    await expect(
+      page.getByText('Repetido: já está na linha 2, no grupo Família Silva.'),
+    ).toBeVisible();
+    await expect(
+      page.getByText('As 2 linhas que ficaram de fora vocês cadastram depois, uma a uma.'),
+    ).toBeVisible();
+
+    await page.getByRole('button', { name: 'Importar 2 convidados' }).click();
+    await expect(toast({ page, text: '2 grupos importados' })).toBeVisible();
+    await expect(page).toHaveURL(/\/app\/convidados$/);
+    await expect(
+      page.getByText('33 convidados em 29 grupos · 0 confirmados, 0 recusados e 33 pendentes'),
+    ).toBeVisible();
   });
 
   test.describe('computador', () => {

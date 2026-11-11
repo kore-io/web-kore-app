@@ -186,6 +186,32 @@ describe('Convidados › Lixeira (Lixeira de convidados, RN08 e RN09)', () => {
     ).toBeInTheDocument();
   });
 
+  it('item que outra pessoa já restaurou (404): o aviso e a lista recarrega sem ele', async () => {
+    const user = userEvent.setup();
+    let gone = false;
+    mockTrash({
+      restore: () => {
+        gone = true;
+        return apiError({ status: 404, body: { error: 'TRASH_ITEM_NOT_FOUND' } });
+      },
+    });
+    const original = globalThis.fetch;
+    vi.stubGlobal('fetch', async (input: RequestInfo | URL, init?: RequestInit) => {
+      const response = await original(input, init);
+      if (gone && String(input).endsWith('/trash') && (init?.method ?? 'GET') === 'GET') {
+        return Response.json({ data: items.filter((item) => item.id !== 'p9') });
+      }
+      return response;
+    });
+    renderRoute({ url: '/app/convidados/lixeira' });
+    const item = (await screen.findByText('Grupo · Amigos do vôlei')).closest('li') as HTMLElement;
+    await user.click(within(item).getByRole('button', { name: 'Restaurar' }));
+    expect(
+      await screen.findByText('Não foi possível continuar. Confira sua conexão e tente de novo.'),
+    ).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText('Grupo · Amigos do vôlei')).toBeNull());
+  });
+
   it('é acessível', async () => {
     mockTrash();
     const { container } = renderRoute({ url: '/app/convidados/lixeira' });
