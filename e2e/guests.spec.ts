@@ -68,7 +68,11 @@ async function weddingWithParties({ db, page }: { db: Db; page: Page }) {
       name: 'Família Moreira',
       guests: [
         { name: 'Luiz Moreira' },
-        { name: 'Célia Moreira', phone: '(19) 99876-3310' },
+        {
+          name: 'Célia Moreira',
+          phone: '(19) 99876-3310',
+          email: 'celia.moreira@exemplo.kore.local',
+        },
         { name: 'Pedro Moreira' },
       ],
     },
@@ -154,6 +158,9 @@ test.describe('Convidados › Grupos e convidados (RN13)', () => {
     await expect(page.getByRole('heading', { name: 'Família Moreira', level: 1 })).toBeVisible();
     await expect(page.getByText('3 convidados · Contato: Célia Moreira')).toBeVisible();
     await expect(page.getByText('(19) 9****-3310')).toBeVisible();
+    // Telefone e e-mail mascarados pelo servidor (decisão 202); os inteiros não aparecem.
+    await expect(page.getByText('ce***@exemplo.kore.local')).toBeVisible();
+    await expect(page.getByText('celia.moreira@exemplo.kore.local')).toHaveCount(0);
 
     const link = page.locator('.kore-party-panel__link');
     const oldUrl = (await link.textContent()) ?? '';

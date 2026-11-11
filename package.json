@@ -46,7 +46,6 @@
     "@kore-io/design": "0.2.0-homolog.22",
     "@tanstack/react-query": "^5.106.1",
     "i18next": "^26.7.2",
-    "libphonenumber-js": "^1.13.16",
     "lucide-react": "^1.69.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
