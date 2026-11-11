@@ -300,6 +300,55 @@ test.describe('Convidados › Grupos e convidados (RN13)', () => {
     await expect(page).toHaveURL(new RegExp(`\\?tag=${tagId}$`));
   });
 
+  test('Mover para a lixeira: o convidado, o grupo e a seleção saem da lista e do resumo (Lixeira RN02 a RN06)', async ({
+    page,
+  }) => {
+    await weddingWithParties({ db, page });
+    await page.goto('/app/convidados?q=moreira');
+    await page.getByRole('link', { name: 'Família Moreira' }).click();
+
+    await page.getByRole('button', { name: 'Ações de Pedro Moreira' }).click();
+    await page.getByRole('menuitem', { name: 'Mover para a lixeira' }).click();
+    await page
+      .getByRole('alertdialog', { name: 'Mover Pedro Moreira para a lixeira?' })
+      .getByRole('button', { name: 'Mover para a lixeira' })
+      .click();
+    await expect(toast({ page, text: 'Pedro Moreira foi para a lixeira.' })).toBeVisible();
+    await expect(page.getByText('2 convidados · Contato: Célia Moreira')).toBeVisible();
+
+    await page
+      .locator('.kore-party-panel__link')
+      .locator('..')
+      .getByRole('button', { name: 'Mover para a lixeira' })
+      .click();
+    const dialog = page.getByRole('alertdialog', {
+      name: 'Mover o grupo Família Moreira para a lixeira?',
+    });
+    await expect(dialog).toContainText('O grupo e os 2 convidados ficam 30 dias na lixeira');
+    await dialog.getByRole('button', { name: 'Mover para a lixeira' }).click();
+    await expect(toast({ page, text: 'Família Moreira foi para a lixeira.' })).toBeVisible();
+    await expect(page).toHaveURL(/\/app\/convidados$/);
+    await expect(
+      page.getByText('28 convidados em 26 grupos · 0 confirmados, 0 recusados e 28 pendentes'),
+    ).toBeVisible();
+
+    await page.getByRole('searchbox', { name: 'Buscar por nome' }).fill('E2E 0');
+    await expect(page.getByText('Mostrando 9 de 9 grupos')).toBeVisible();
+    for (const name of ['Grupo E2E 01', 'Grupo E2E 02']) {
+      await page
+        .getByRole('checkbox', { name: `Selecionar ${name}` })
+        .locator('..')
+        .click();
+    }
+    await page.getByRole('button', { name: 'Mover para a lixeira' }).click();
+    await page
+      .getByRole('alertdialog', { name: 'Mover 2 grupos para a lixeira?' })
+      .getByRole('button', { name: 'Mover para a lixeira' })
+      .click();
+    await expect(toast({ page, text: '2 grupos foram para a lixeira.' })).toBeVisible();
+    await expect(page.getByText('Mostrando 7 de 7 grupos')).toBeVisible();
+  });
+
   test.describe('computador', () => {
     test.use({ viewport: { width: 1440, height: 900 }, isMobile: false, hasTouch: false });
 
