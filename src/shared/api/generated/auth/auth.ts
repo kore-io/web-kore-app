@@ -521,7 +521,7 @@ export const getGoogleLoginControllerStartV1QueryKey = (
 
 export const getGoogleLoginControllerStartV1QueryOptions = <
   TData = Awaited<ReturnType<typeof googleLoginControllerStartV1>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<void | ValidationErrorBody | RateLimitedErrorBody>,
 >(
   params?: GoogleLoginControllerStartV1Params,
   options?: {
@@ -549,11 +549,13 @@ export const getGoogleLoginControllerStartV1QueryOptions = <
 export type GoogleLoginControllerStartV1QueryResult = NonNullable<
   Awaited<ReturnType<typeof googleLoginControllerStartV1>>
 >;
-export type GoogleLoginControllerStartV1QueryError = ErrorType<void>;
+export type GoogleLoginControllerStartV1QueryError = ErrorType<
+  void | ValidationErrorBody | RateLimitedErrorBody
+>;
 
 export function useGoogleLoginControllerStartV1<
   TData = Awaited<ReturnType<typeof googleLoginControllerStartV1>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<void | ValidationErrorBody | RateLimitedErrorBody>,
 >(
   params: undefined | GoogleLoginControllerStartV1Params,
   options: {
@@ -574,7 +576,7 @@ export function useGoogleLoginControllerStartV1<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGoogleLoginControllerStartV1<
   TData = Awaited<ReturnType<typeof googleLoginControllerStartV1>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<void | ValidationErrorBody | RateLimitedErrorBody>,
 >(
   params?: GoogleLoginControllerStartV1Params,
   options?: {
@@ -595,7 +597,7 @@ export function useGoogleLoginControllerStartV1<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGoogleLoginControllerStartV1<
   TData = Awaited<ReturnType<typeof googleLoginControllerStartV1>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<void | ValidationErrorBody | RateLimitedErrorBody>,
 >(
   params?: GoogleLoginControllerStartV1Params,
   options?: {
@@ -612,7 +614,7 @@ export function useGoogleLoginControllerStartV1<
 
 export function useGoogleLoginControllerStartV1<
   TData = Awaited<ReturnType<typeof googleLoginControllerStartV1>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<void | ValidationErrorBody | RateLimitedErrorBody>,
 >(
   params?: GoogleLoginControllerStartV1Params,
   options?: {
@@ -654,7 +656,7 @@ export const getGoogleLoginControllerCallbackV1QueryKey = () => {
 
 export const getGoogleLoginControllerCallbackV1QueryOptions = <
   TData = Awaited<ReturnType<typeof googleLoginControllerCallbackV1>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<void | RateLimitedErrorBody>,
 >(options?: {
   query?: Partial<
     UseQueryOptions<Awaited<ReturnType<typeof googleLoginControllerCallbackV1>>, TError, TData>
@@ -679,11 +681,11 @@ export const getGoogleLoginControllerCallbackV1QueryOptions = <
 export type GoogleLoginControllerCallbackV1QueryResult = NonNullable<
   Awaited<ReturnType<typeof googleLoginControllerCallbackV1>>
 >;
-export type GoogleLoginControllerCallbackV1QueryError = ErrorType<void>;
+export type GoogleLoginControllerCallbackV1QueryError = ErrorType<void | RateLimitedErrorBody>;
 
 export function useGoogleLoginControllerCallbackV1<
   TData = Awaited<ReturnType<typeof googleLoginControllerCallbackV1>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<void | RateLimitedErrorBody>,
 >(
   options: {
     query: Partial<
@@ -703,7 +705,7 @@ export function useGoogleLoginControllerCallbackV1<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGoogleLoginControllerCallbackV1<
   TData = Awaited<ReturnType<typeof googleLoginControllerCallbackV1>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<void | RateLimitedErrorBody>,
 >(
   options?: {
     query?: Partial<
@@ -723,7 +725,7 @@ export function useGoogleLoginControllerCallbackV1<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGoogleLoginControllerCallbackV1<
   TData = Awaited<ReturnType<typeof googleLoginControllerCallbackV1>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<void | RateLimitedErrorBody>,
 >(
   options?: {
     query?: Partial<
@@ -739,7 +741,7 @@ export function useGoogleLoginControllerCallbackV1<
 
 export function useGoogleLoginControllerCallbackV1<
   TData = Awaited<ReturnType<typeof googleLoginControllerCallbackV1>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<void | RateLimitedErrorBody>,
 >(
   options?: {
     query?: Partial<

@@ -4,12 +4,15 @@
  * Kore API
  * OpenAPI spec version: 1
  */
+import type { FieldErrorBody } from './fieldErrorBody';
 import type { ValidationErrorBodyError } from './validationErrorBodyError';
 import type { ValidationErrorBodyStatusCode } from './validationErrorBodyStatusCode';
 
 export interface ValidationErrorBody {
   statusCode: ValidationErrorBodyStatusCode;
   error: ValidationErrorBodyError;
-  /** Um texto por campo inválido. */
+  /** Um texto por falha, só para quem desenvolve (decisão 189, item 1). */
   message: string[];
+  /** Uma entrada por falha, para o app montar o texto pelo perfil ativo. */
+  errors: FieldErrorBody[];
 }
