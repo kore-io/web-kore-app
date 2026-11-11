@@ -1,5 +1,6 @@
 import {
   Badge,
+  Button,
   Checkbox,
   GroupRow,
   GroupTable,
@@ -35,6 +36,7 @@ interface PartyListProps {
   selection: ReturnType<typeof usePartySelection>;
   hasMore: boolean;
   isLoadingMore: boolean;
+  loadMoreFailed: boolean;
   onLoadMore: () => void;
 }
 
@@ -47,10 +49,13 @@ export function PartyList({
   selection,
   hasMore,
   isLoadingMore,
+  loadMoreFailed,
   onLoadMore,
 }: PartyListProps) {
   const { t } = useTranslation('guests');
-  const sentinel = useLoadMoreOnScroll({ enabled: hasMore, onLoadMore });
+  const { t: tCommon } = useTranslation('common');
+  // Com a próxima página em erro, o marcador para; volta pelo Tentar de novo (200(d)).
+  const sentinel = useLoadMoreOnScroll({ enabled: hasMore && !loadMoreFailed, onLoadMore });
 
   return (
     <>
@@ -110,7 +115,16 @@ export function PartyList({
           );
         })}
       </GroupTable>
-      {hasMore && <div ref={sentinel} className="kore-party-list__sentinel" aria-hidden="true" />}
+      {hasMore && !loadMoreFailed && (
+        <div ref={sentinel} className="kore-party-list__sentinel" aria-hidden="true" />
+      )}
+      {loadMoreFailed && !isLoadingMore && (
+        <div className="kore-party-list__loading">
+          <Button variant="secondary" onClick={onLoadMore}>
+            {tCommon('retry')}
+          </Button>
+        </div>
+      )}
       {isLoadingMore && (
         <div className="kore-party-list__loading">
           <Spinner label={t('loadingMore')} />

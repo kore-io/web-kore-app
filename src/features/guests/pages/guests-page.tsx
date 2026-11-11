@@ -29,7 +29,7 @@ function PartiesView({ weddingId, audience }: { weddingId: string; audience: Aud
     if (list.isLoading) {
       return (
         <div className="kore-guests__loading">
-          <Spinner label={t('loadingMore')} />
+          <Spinner label={t('loading')} />
         </div>
       );
     }
@@ -49,6 +49,7 @@ function PartiesView({ weddingId, audience }: { weddingId: string; audience: Aud
           selection={selection}
           hasMore={list.hasMore}
           isLoadingMore={list.isLoadingMore}
+          loadMoreFailed={list.loadMoreFailed}
           onLoadMore={list.loadMore}
         />
         <p className="kore-guests__showing">
