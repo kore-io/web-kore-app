@@ -55,6 +55,8 @@ function moreira(overrides: Partial<PartyResponse> = {}): PartyResponse {
         dietaryRestriction: null,
         phone: null,
         email: null,
+        phoneMasked: null,
+        emailMasked: null,
         rsvpStatus: 'pending',
         tags: [],
         isPlusOne: false,
@@ -66,6 +68,8 @@ function moreira(overrides: Partial<PartyResponse> = {}): PartyResponse {
         dietaryRestriction: 'sem glúten',
         phone: '+5519998763310',
         email: 'celia.moreira@gmail.com',
+        phoneMasked: '(19) 9****-3310',
+        emailMasked: 'ce***@gmail.com',
         rsvpStatus: 'confirmed',
         tags: [],
         isPlusOne: false,
@@ -77,6 +81,8 @@ function moreira(overrides: Partial<PartyResponse> = {}): PartyResponse {
         dietaryRestriction: null,
         phone: null,
         email: null,
+        phoneMasked: null,
+        emailMasked: null,
         rsvpStatus: 'declined',
         tags: [],
         isPlusOne: false,
@@ -88,6 +94,8 @@ function moreira(overrides: Partial<PartyResponse> = {}): PartyResponse {
         dietaryRestriction: null,
         phone: null,
         email: null,
+        phoneMasked: null,
+        emailMasked: null,
         rsvpStatus: 'pending',
         tags: [],
         isPlusOne: true,
@@ -159,7 +167,9 @@ describe('Painel do grupo (RN14)', () => {
 
     const group = screen.getByRole('heading', { name: 'Grupo' }).closest('section') as HTMLElement;
     expect(within(group).getByText('(19) 9****-3310')).toBeInTheDocument();
-    expect(within(group).getByText('celia.moreira@gmail.com')).toBeInTheDocument();
+    // E-mail e telefone mascarados pelo servidor (decisão 202); os inteiros não aparecem.
+    expect(within(group).getByText('ce***@gmail.com')).toBeInTheDocument();
+    expect(screen.queryByText('celia.moreira@gmail.com')).toBeNull();
     expect(within(group).getByText('1')).toBeInTheDocument();
     expect(
       within(group).getByText('Observação interna: Pedro tem 7 anos e vai de pajem.'),

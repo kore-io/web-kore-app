@@ -22,7 +22,6 @@ import { MoveGuestDialog } from '../components/move-guest-dialog';
 import { useActiveWedding, type Audience } from '../hooks/use-active-wedding';
 import { useMoveGuest } from '../hooks/use-move-guest';
 import { usePartyPanel } from '../hooks/use-party-panel';
-import { maskPhone } from '../phone-mask';
 
 /** Selo da resposta do convidado, como os Badges do DS. */
 const rsvpBadges: Record<PartyGuestResponseRsvpStatus, { tone: BadgeTone; icon: ReactNode }> = {
@@ -163,8 +162,10 @@ function GroupCard({ party }: { party: PartyResponse }) {
   const contact = party.guests.find((guest) => guest.id === party.contactGuestId);
   const rows: [string, ReactNode][] = [
     [t('panel.group.contact'), contact?.name ?? '—'],
-    [t('panel.group.phone'), contact?.phone ? maskPhone({ e164: contact.phone }) : '—'],
-    [t('panel.group.email'), contact?.email ?? '—'],
+    // Mascarados no servidor (decisões 186(11) e 202): o número e o e-mail inteiros só
+    // servem ao formulário de edição.
+    [t('panel.group.phone'), contact?.phoneMasked ?? '—'],
+    [t('panel.group.email'), contact?.emailMasked ?? '—'],
     [
       t('panel.group.plusOneSlots'),
       party.plusOneSlots === 0 ? t('panel.group.plusOneSlotsNone') : party.plusOneSlots,

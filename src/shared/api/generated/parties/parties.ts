@@ -26,6 +26,7 @@ import type {
 
 import type {
   ActionNotAllowedErrorBody,
+  AlreadyRespondedErrorBody,
   CreatePartyBody,
   OriginNotAllowedErrorBody,
   PartiesControllerListV1Params,
@@ -36,6 +37,9 @@ import type {
   RateLimitedErrorBody,
   RegeneratePartyLinkResponse,
   SessionExpiredErrorBody,
+  TrashPartiesBody,
+  TrashPartiesResponse,
+  TrashedPartyResponse,
   UpdatePartyBody,
   ValidationErrorBody,
   WeddingNotFoundErrorBody,
@@ -61,6 +65,563 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   return result;
 };
 
+export const getPartiesControllerTrashManyV1Url = (weddingId: string) => {
+  return `/v1/weddings/${weddingId}/parties/trash`;
+};
+
+/**
+ * @summary Seleção múltipla, Mover para a lixeira (Lixeira RN06 e RN07).
+ */
+export const partiesControllerTrashManyV1 = async (
+  weddingId: string,
+  trashPartiesBody: TrashPartiesBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<TrashPartiesResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<TrashPartiesResponse>(getPartiesControllerTrashManyV1Url(weddingId), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(trashPartiesBody),
+  });
+};
+
+export const getPartiesControllerTrashManyV1MutationKey = () =>
+  ['partiesControllerTrashManyV1'] as const;
+
+export const getPartiesControllerTrashManyV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof partiesControllerTrashManyV1>>,
+    TError,
+    PartiesControllerTrashManyV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof partiesControllerTrashManyV1>>,
+  TError,
+  PartiesControllerTrashManyV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getPartiesControllerTrashManyV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof partiesControllerTrashManyV1>>,
+    PartiesControllerTrashManyV1MutationVariables
+  > = (props) => {
+    const { weddingId, data } = props ?? {};
+
+    return partiesControllerTrashManyV1(weddingId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PartiesControllerTrashManyV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof partiesControllerTrashManyV1>>
+>;
+export type PartiesControllerTrashManyV1MutationBody = TrashPartiesBody;
+export type PartiesControllerTrashManyV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | ActionNotAllowedErrorBody
+  | WeddingNotFoundErrorBody
+  | RateLimitedErrorBody
+>;
+export type PartiesControllerTrashManyV1MutationVariables = {
+  weddingId: string;
+  data: TrashPartiesBody;
+};
+
+/**
+ * @summary Seleção múltipla, Mover para a lixeira (Lixeira RN06 e RN07).
+ */
+export const usePartiesControllerTrashManyV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof partiesControllerTrashManyV1>>,
+      TError,
+      PartiesControllerTrashManyV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof partiesControllerTrashManyV1>>,
+  TError,
+  PartiesControllerTrashManyV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getPartiesControllerTrashManyV1MutationOptions(options), queryClient);
+};
+export const getPartiesControllerTrashV1Url = (weddingId: string, partyId: string) => {
+  return `/v1/weddings/${weddingId}/parties/${partyId}`;
+};
+
+/**
+ * @summary Mover o grupo para a lixeira, com os convidados dele (Lixeira RN03 e RN07).
+ */
+export const partiesControllerTrashV1 = async (
+  weddingId: string,
+  partyId: string,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<TrashedPartyResponse> => {
+  return httpClient<TrashedPartyResponse>(getPartiesControllerTrashV1Url(weddingId, partyId), {
+    ...options,
+    method: 'DELETE',
+  });
+};
+
+export const getPartiesControllerTrashV1MutationKey = () => ['partiesControllerTrashV1'] as const;
+
+export const getPartiesControllerTrashV1MutationOptions = <
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | AlreadyRespondedErrorBody
+    | WeddingNotFoundErrorBody
+    | PartyNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof partiesControllerTrashV1>>,
+    TError,
+    PartiesControllerTrashV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof partiesControllerTrashV1>>,
+  TError,
+  PartiesControllerTrashV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getPartiesControllerTrashV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof partiesControllerTrashV1>>,
+    PartiesControllerTrashV1MutationVariables
+  > = (props) => {
+    const { weddingId, partyId } = props ?? {};
+
+    return partiesControllerTrashV1(weddingId, partyId, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PartiesControllerTrashV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof partiesControllerTrashV1>>
+>;
+
+export type PartiesControllerTrashV1MutationError = ErrorType<
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | ActionNotAllowedErrorBody
+  | AlreadyRespondedErrorBody
+  | WeddingNotFoundErrorBody
+  | PartyNotFoundErrorBody
+  | RateLimitedErrorBody
+>;
+export type PartiesControllerTrashV1MutationVariables = { weddingId: string; partyId: string };
+
+/**
+ * @summary Mover o grupo para a lixeira, com os convidados dele (Lixeira RN03 e RN07).
+ */
+export const usePartiesControllerTrashV1 = <
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | AlreadyRespondedErrorBody
+    | WeddingNotFoundErrorBody
+    | PartyNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof partiesControllerTrashV1>>,
+      TError,
+      PartiesControllerTrashV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof partiesControllerTrashV1>>,
+  TError,
+  PartiesControllerTrashV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getPartiesControllerTrashV1MutationOptions(options), queryClient);
+};
+export const getPartiesControllerGetV1Url = (weddingId: string, partyId: string) => {
+  return `/v1/weddings/${weddingId}/parties/${partyId}`;
+};
+
+/**
+ * @summary Painel do grupo e Editar grupo (Grupos RN14).
+ */
+export const partiesControllerGetV1 = async (
+  weddingId: string,
+  partyId: string,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<PartyResponse> => {
+  return httpClient<PartyResponse>(getPartiesControllerGetV1Url(weddingId, partyId), {
+    ...options,
+    method: 'GET',
+  });
+};
+
+export const getPartiesControllerGetV1QueryKey = (weddingId: string, partyId: string) => {
+  return [`/v1/weddings/${weddingId}/parties/${partyId}`] as const;
+};
+
+export const getPartiesControllerGetV1QueryOptions = <
+  TData = Awaited<ReturnType<typeof partiesControllerGetV1>>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | WeddingNotFoundErrorBody
+    | PartyNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  weddingId: string,
+  partyId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof partiesControllerGetV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getPartiesControllerGetV1QueryKey(weddingId, partyId);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof partiesControllerGetV1>>> = ({ signal }) =>
+    partiesControllerGetV1(weddingId, partyId, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled:
+      weddingId !== null && weddingId !== undefined && partyId !== null && partyId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof partiesControllerGetV1>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+};
+
+export type PartiesControllerGetV1QueryResult = NonNullable<
+  Awaited<ReturnType<typeof partiesControllerGetV1>>
+>;
+export type PartiesControllerGetV1QueryError = ErrorType<
+  SessionExpiredErrorBody | WeddingNotFoundErrorBody | PartyNotFoundErrorBody | RateLimitedErrorBody
+>;
+
+export function usePartiesControllerGetV1<
+  TData = Awaited<ReturnType<typeof partiesControllerGetV1>>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | WeddingNotFoundErrorBody
+    | PartyNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  weddingId: string,
+  partyId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof partiesControllerGetV1>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof partiesControllerGetV1>>,
+          TError,
+          Awaited<ReturnType<typeof partiesControllerGetV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePartiesControllerGetV1<
+  TData = Awaited<ReturnType<typeof partiesControllerGetV1>>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | WeddingNotFoundErrorBody
+    | PartyNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  weddingId: string,
+  partyId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof partiesControllerGetV1>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof partiesControllerGetV1>>,
+          TError,
+          Awaited<ReturnType<typeof partiesControllerGetV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePartiesControllerGetV1<
+  TData = Awaited<ReturnType<typeof partiesControllerGetV1>>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | WeddingNotFoundErrorBody
+    | PartyNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  weddingId: string,
+  partyId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof partiesControllerGetV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Painel do grupo e Editar grupo (Grupos RN14).
+ */
+
+export function usePartiesControllerGetV1<
+  TData = Awaited<ReturnType<typeof partiesControllerGetV1>>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | WeddingNotFoundErrorBody
+    | PartyNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  weddingId: string,
+  partyId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof partiesControllerGetV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getPartiesControllerGetV1QueryOptions(weddingId, partyId, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export const getPartiesControllerUpdateV1Url = (weddingId: string, partyId: string) => {
+  return `/v1/weddings/${weddingId}/parties/${partyId}`;
+};
+
+/**
+ * @summary Editar grupo (Grupos RN09): não tira convidado; vale a última gravação.
+ */
+export const partiesControllerUpdateV1 = async (
+  weddingId: string,
+  partyId: string,
+  updatePartyBody: UpdatePartyBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<PartyResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<PartyResponse>(getPartiesControllerUpdateV1Url(weddingId, partyId), {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updatePartyBody),
+  });
+};
+
+export const getPartiesControllerUpdateV1MutationKey = () => ['partiesControllerUpdateV1'] as const;
+
+export const getPartiesControllerUpdateV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | PartyNotFoundErrorBody
+    | PlusOnesInUseErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof partiesControllerUpdateV1>>,
+    TError,
+    PartiesControllerUpdateV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof partiesControllerUpdateV1>>,
+  TError,
+  PartiesControllerUpdateV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getPartiesControllerUpdateV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof partiesControllerUpdateV1>>,
+    PartiesControllerUpdateV1MutationVariables
+  > = (props) => {
+    const { weddingId, partyId, data } = props ?? {};
+
+    return partiesControllerUpdateV1(weddingId, partyId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PartiesControllerUpdateV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof partiesControllerUpdateV1>>
+>;
+export type PartiesControllerUpdateV1MutationBody = UpdatePartyBody;
+export type PartiesControllerUpdateV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | ActionNotAllowedErrorBody
+  | WeddingNotFoundErrorBody
+  | PartyNotFoundErrorBody
+  | PlusOnesInUseErrorBody
+  | RateLimitedErrorBody
+>;
+export type PartiesControllerUpdateV1MutationVariables = {
+  weddingId: string;
+  partyId: string;
+  data: UpdatePartyBody;
+};
+
+/**
+ * @summary Editar grupo (Grupos RN09): não tira convidado; vale a última gravação.
+ */
+export const usePartiesControllerUpdateV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | PartyNotFoundErrorBody
+    | PlusOnesInUseErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof partiesControllerUpdateV1>>,
+      TError,
+      PartiesControllerUpdateV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof partiesControllerUpdateV1>>,
+  TError,
+  PartiesControllerUpdateV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getPartiesControllerUpdateV1MutationOptions(options), queryClient);
+};
 export const getPartiesControllerListV1Url = (
   weddingId: string,
   params?: PartiesControllerListV1Params,
@@ -566,317 +1127,6 @@ export const usePartiesControllerCreateV1 = <
   TContext
 > => {
   return useMutation(getPartiesControllerCreateV1MutationOptions(options), queryClient);
-};
-export const getPartiesControllerGetV1Url = (weddingId: string, partyId: string) => {
-  return `/v1/weddings/${weddingId}/parties/${partyId}`;
-};
-
-/**
- * @summary Painel do grupo e Editar grupo (Grupos RN14).
- */
-export const partiesControllerGetV1 = async (
-  weddingId: string,
-  partyId: string,
-  options?: Parameters<typeof httpClient>[1],
-): Promise<PartyResponse> => {
-  return httpClient<PartyResponse>(getPartiesControllerGetV1Url(weddingId, partyId), {
-    ...options,
-    method: 'GET',
-  });
-};
-
-export const getPartiesControllerGetV1QueryKey = (weddingId: string, partyId: string) => {
-  return [`/v1/weddings/${weddingId}/parties/${partyId}`] as const;
-};
-
-export const getPartiesControllerGetV1QueryOptions = <
-  TData = Awaited<ReturnType<typeof partiesControllerGetV1>>,
-  TError = ErrorType<
-    | SessionExpiredErrorBody
-    | WeddingNotFoundErrorBody
-    | PartyNotFoundErrorBody
-    | RateLimitedErrorBody
-  >,
->(
-  weddingId: string,
-  partyId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof partiesControllerGetV1>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof httpClient>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getPartiesControllerGetV1QueryKey(weddingId, partyId);
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof partiesControllerGetV1>>> = ({ signal }) =>
-    partiesControllerGetV1(weddingId, partyId, { signal, ...requestOptions });
-
-  return {
-    queryKey,
-    queryFn,
-    enabled:
-      weddingId !== null && weddingId !== undefined && partyId !== null && partyId !== undefined,
-    ...queryOptions,
-  } as UseQueryOptions<Awaited<ReturnType<typeof partiesControllerGetV1>>, TError, TData> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-  };
-};
-
-export type PartiesControllerGetV1QueryResult = NonNullable<
-  Awaited<ReturnType<typeof partiesControllerGetV1>>
->;
-export type PartiesControllerGetV1QueryError = ErrorType<
-  SessionExpiredErrorBody | WeddingNotFoundErrorBody | PartyNotFoundErrorBody | RateLimitedErrorBody
->;
-
-export function usePartiesControllerGetV1<
-  TData = Awaited<ReturnType<typeof partiesControllerGetV1>>,
-  TError = ErrorType<
-    | SessionExpiredErrorBody
-    | WeddingNotFoundErrorBody
-    | PartyNotFoundErrorBody
-    | RateLimitedErrorBody
-  >,
->(
-  weddingId: string,
-  partyId: string,
-  options: {
-    query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof partiesControllerGetV1>>, TError, TData>
-    > &
-      Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof partiesControllerGetV1>>,
-          TError,
-          Awaited<ReturnType<typeof partiesControllerGetV1>>
-        >,
-        'initialData'
-      >;
-    request?: SecondParameter<typeof httpClient>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function usePartiesControllerGetV1<
-  TData = Awaited<ReturnType<typeof partiesControllerGetV1>>,
-  TError = ErrorType<
-    | SessionExpiredErrorBody
-    | WeddingNotFoundErrorBody
-    | PartyNotFoundErrorBody
-    | RateLimitedErrorBody
-  >,
->(
-  weddingId: string,
-  partyId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof partiesControllerGetV1>>, TError, TData>
-    > &
-      Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof partiesControllerGetV1>>,
-          TError,
-          Awaited<ReturnType<typeof partiesControllerGetV1>>
-        >,
-        'initialData'
-      >;
-    request?: SecondParameter<typeof httpClient>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function usePartiesControllerGetV1<
-  TData = Awaited<ReturnType<typeof partiesControllerGetV1>>,
-  TError = ErrorType<
-    | SessionExpiredErrorBody
-    | WeddingNotFoundErrorBody
-    | PartyNotFoundErrorBody
-    | RateLimitedErrorBody
-  >,
->(
-  weddingId: string,
-  partyId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof partiesControllerGetV1>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof httpClient>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-/**
- * @summary Painel do grupo e Editar grupo (Grupos RN14).
- */
-
-export function usePartiesControllerGetV1<
-  TData = Awaited<ReturnType<typeof partiesControllerGetV1>>,
-  TError = ErrorType<
-    | SessionExpiredErrorBody
-    | WeddingNotFoundErrorBody
-    | PartyNotFoundErrorBody
-    | RateLimitedErrorBody
-  >,
->(
-  weddingId: string,
-  partyId: string,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof partiesControllerGetV1>>, TError, TData>
-    >;
-    request?: SecondParameter<typeof httpClient>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getPartiesControllerGetV1QueryOptions(weddingId, partyId, options);
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-  };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-export const getPartiesControllerUpdateV1Url = (weddingId: string, partyId: string) => {
-  return `/v1/weddings/${weddingId}/parties/${partyId}`;
-};
-
-/**
- * @summary Editar grupo (Grupos RN09): não tira convidado; vale a última gravação.
- */
-export const partiesControllerUpdateV1 = async (
-  weddingId: string,
-  partyId: string,
-  updatePartyBody: UpdatePartyBody,
-  options?: Parameters<typeof httpClient>[1],
-): Promise<PartyResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit['headers']>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  return httpClient<PartyResponse>(getPartiesControllerUpdateV1Url(weddingId, partyId), {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(updatePartyBody),
-  });
-};
-
-export const getPartiesControllerUpdateV1MutationKey = () => ['partiesControllerUpdateV1'] as const;
-
-export const getPartiesControllerUpdateV1MutationOptions = <
-  TError = ErrorType<
-    | ValidationErrorBody
-    | SessionExpiredErrorBody
-    | OriginNotAllowedErrorBody
-    | ActionNotAllowedErrorBody
-    | WeddingNotFoundErrorBody
-    | PartyNotFoundErrorBody
-    | PlusOnesInUseErrorBody
-    | RateLimitedErrorBody
-  >,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof partiesControllerUpdateV1>>,
-    TError,
-    PartiesControllerUpdateV1MutationVariables,
-    TContext
-  >;
-  request?: SecondParameter<typeof httpClient>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof partiesControllerUpdateV1>>,
-  TError,
-  PartiesControllerUpdateV1MutationVariables,
-  TContext
-> => {
-  const mutationKey = getPartiesControllerUpdateV1MutationKey();
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof partiesControllerUpdateV1>>,
-    PartiesControllerUpdateV1MutationVariables
-  > = (props) => {
-    const { weddingId, partyId, data } = props ?? {};
-
-    return partiesControllerUpdateV1(weddingId, partyId, data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type PartiesControllerUpdateV1MutationResult = NonNullable<
-  Awaited<ReturnType<typeof partiesControllerUpdateV1>>
->;
-export type PartiesControllerUpdateV1MutationBody = UpdatePartyBody;
-export type PartiesControllerUpdateV1MutationError = ErrorType<
-  | ValidationErrorBody
-  | SessionExpiredErrorBody
-  | OriginNotAllowedErrorBody
-  | ActionNotAllowedErrorBody
-  | WeddingNotFoundErrorBody
-  | PartyNotFoundErrorBody
-  | PlusOnesInUseErrorBody
-  | RateLimitedErrorBody
->;
-export type PartiesControllerUpdateV1MutationVariables = {
-  weddingId: string;
-  partyId: string;
-  data: UpdatePartyBody;
-};
-
-/**
- * @summary Editar grupo (Grupos RN09): não tira convidado; vale a última gravação.
- */
-export const usePartiesControllerUpdateV1 = <
-  TError = ErrorType<
-    | ValidationErrorBody
-    | SessionExpiredErrorBody
-    | OriginNotAllowedErrorBody
-    | ActionNotAllowedErrorBody
-    | WeddingNotFoundErrorBody
-    | PartyNotFoundErrorBody
-    | PlusOnesInUseErrorBody
-    | RateLimitedErrorBody
-  >,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof partiesControllerUpdateV1>>,
-      TError,
-      PartiesControllerUpdateV1MutationVariables,
-      TContext
-    >;
-    request?: SecondParameter<typeof httpClient>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof partiesControllerUpdateV1>>,
-  TError,
-  PartiesControllerUpdateV1MutationVariables,
-  TContext
-> => {
-  return useMutation(getPartiesControllerUpdateV1MutationOptions(options), queryClient);
 };
 export const getPartiesControllerRegenerateV1Url = (weddingId: string, partyId: string) => {
   return `/v1/weddings/${weddingId}/parties/${partyId}/regenerate-link`;
