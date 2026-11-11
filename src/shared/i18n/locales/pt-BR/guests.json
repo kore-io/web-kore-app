@@ -25,7 +25,8 @@
     "tags": "Tags · {{count}} de {{limit}}",
     "tagsShort": "Tags",
     "trash": "Lixeira",
-    "import": "Importar"
+    "import": "Importar",
+    "export": "Exportar"
   },
   "filters": {
     "search": "Buscar por nome",
@@ -415,5 +416,31 @@
       "couple": "Usem de + 1 a + 20 por linha.",
       "planner": "Use de + 1 a + 20 por linha."
     }
+  },
+  "exportList": {
+    "format": "Formato",
+    "xlsx": "Excel (.xlsx)",
+    "pdf": "PDF para impressão",
+    "who": "Quem entra",
+    "all": "Todos ({{count}})",
+    "confirmed": "Confirmados ({{count}})",
+    "tag": "Por tag",
+    "tagLabel": "Tag",
+    "tagOption": "{{name}} ({{count}})",
+    "columns": "Colunas",
+    "column": {
+      "name": "Nome",
+      "party": "Grupo",
+      "ageGroup": "Faixa etária",
+      "dietaryRestriction": "Restrição alimentar",
+      "rsvp": "Resposta",
+      "phone": "Telefone de contato",
+      "tags": "Tags"
+    },
+    "buffet_one": "Para o buffet: nome, faixa etária e restrição alimentar de {{count}} confirmado.",
+    "buffet_other": "Para o buffet: nome, faixa etária e restrição alimentar dos {{count}} confirmados.",
+    "export_zero": "Exportar {{count}} convidados",
+    "export_one": "Exportar {{count}} convidado",
+    "export_other": "Exportar {{count}} convidados"
   }
 }

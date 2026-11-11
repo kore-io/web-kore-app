@@ -9,8 +9,8 @@ import { summaryText } from '../party-texts';
 
 /**
  * Convidados (IA da Área do Casal): o título, o resumo do casamento (RN13) e as abas
- * Grupos e convidados · Importar · Tags · n de 10 (Tags RN04) · Lixeira, em volta da aba
- * aberta, e o Importar planilha no topo (Importação RN01). Exportar entra com a tela dela.
+ * Grupos e convidados · Importar · Exportar · Tags · n de 10 (Tags RN04) · Lixeira, em volta
+ * da aba aberta, e o Importar planilha no topo (Importação RN01).
  */
 export function GuestsLayout() {
   const { weddingId } = useActiveWedding();
@@ -23,6 +23,7 @@ function GuestsFrame({ weddingId }: { weddingId: string }) {
   const onTags = useMatch(paths.guestTags) !== null;
   const onTrash = useMatch(paths.guestTrash) !== null;
   const onImport = useMatch(paths.guestImport) !== null;
+  const onExport = useMatch(paths.guestExport) !== null;
   const navigate = useNavigate();
   // O resumo é do casamento inteiro, sem filtros: basta um grupo na página (limit 1).
   const parties = usePartiesControllerListV1(weddingId, { limit: 1 });
@@ -42,7 +43,7 @@ function GuestsFrame({ weddingId }: { weddingId: string }) {
       />
       <div className="kore-guests__tabs">
         <Tabs aria-label={t('tabs.label')}>
-          <Tab asChild current={!onTags && !onTrash && !onImport}>
+          <Tab asChild current={!onTags && !onTrash && !onImport && !onExport}>
             <Link to={paths.guests}>
               <span className="kore-guests__tab-long">{t('tabs.parties')}</span>
               <span className="kore-guests__tab-short">{t('tabs.partiesShort')}</span>
@@ -50,6 +51,9 @@ function GuestsFrame({ weddingId }: { weddingId: string }) {
           </Tab>
           <Tab asChild current={onImport}>
             <Link to={paths.guestImport}>{t('tabs.import')}</Link>
+          </Tab>
+          <Tab asChild current={onExport}>
+            <Link to={paths.guestExport}>{t('tabs.export')}</Link>
           </Tab>
           <Tab asChild current={onTags}>
             <Link to={paths.guestTags}>

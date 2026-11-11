@@ -23,6 +23,8 @@ export const paths = {
   /** Convidados › Tags (decisão 198). */
   /** Convidados › Importar (decisão 198). */
   guestImport: '/app/convidados/importar',
+  /** Convidados › Exportar (decisão 198). */
+  guestExport: '/app/convidados/exportar',
   guestTags: '/app/convidados/tags',
   /** Convidados › Lixeira (decisão 198). */
   guestTrash: '/app/convidados/lixeira',
