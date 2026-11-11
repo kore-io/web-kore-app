@@ -5,7 +5,9 @@ import { useTagsControllerListV1 } from '../../../shared/api/generated/tags/tags
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { PartyFilters } from '../components/party-filters';
 import { PartyList } from '../components/party-list';
+import { SelectionBar } from '../components/selection-bar';
 import { useActiveWedding, type Audience } from '../hooks/use-active-wedding';
+import { useApplyTag } from '../hooks/use-apply-tag';
 import { usePartyFilters } from '../hooks/use-party-filters';
 import { usePartyList } from '../hooks/use-party-list';
 import { usePartySelection } from '../hooks/use-party-selection';
@@ -29,7 +31,9 @@ function PartiesView({ weddingId, audience }: { weddingId: string; audience: Aud
     filters,
     enabled: !urlFilters.tag || !tags.isPending,
   });
-  const selection = usePartySelection({ ids: list.parties.map((party) => party.id) });
+  const ids = list.parties.map((party) => party.id);
+  const selection = usePartySelection({ ids });
+  const applyTag = useApplyTag({ weddingId });
 
   function content() {
     if (list.isLoading) {
@@ -76,9 +80,18 @@ function PartiesView({ weddingId, audience }: { weddingId: string; audience: Aud
         }}
       />
       {selection.count > 0 && (
-        <p className="kore-guests__selection" role="status">
-          {t('selected', { count: selection.count })}
-        </p>
+        <SelectionBar
+          count={selection.count}
+          tags={tags.data?.data ?? []}
+          isApplying={applyTag.isApplying}
+          onApplyTag={(tagId) =>
+            applyTag.apply({
+              tagId,
+              partyIds: ids.filter((id) => selection.isSelected(id)),
+              onDone: selection.clear,
+            })
+          }
+        />
       )}
       {content()}
     </>

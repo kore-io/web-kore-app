@@ -214,5 +214,10 @@
     },
     "deleted": "A tag {{name}} foi para a lixeira.",
     "loading": "Carregando as tags"
+  },
+  "selection": {
+    "addTag": "Adicionar tag",
+    "applied_one": "Tag aplicada a {{count}} grupo.",
+    "applied_other": "Tag aplicada a {{count}} grupos."
   }
 }

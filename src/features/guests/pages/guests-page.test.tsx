@@ -72,15 +72,22 @@ function page(
 }
 
 /** Responde o /me e a lista; devolve os caminhos pedidos da lista. */
-function mockList(respond: (path: string) => Response) {
+let applied: unknown[] = [];
+
+function mockList(
+  respond: (path: string) => Response,
+  tags: unknown[] = [{ id: 't1', name: 'Família da Ana', color: 'wine', guests: 31 }],
+) {
   const listPaths: string[] = [];
-  mockApi(({ path }) => {
+  applied = [];
+  mockApi(({ path, body }) => {
     if (path === '/v1/me') return Response.json(me);
     if (path === '/v1/weddings/w1/tags') {
-      return Response.json({
-        limit: 10,
-        data: [{ id: 't1', name: 'Família da Ana', color: 'wine', guests: 31 }],
-      });
+      return Response.json({ limit: 10, data: tags });
+    }
+    if (path === '/v1/weddings/w1/tags/t1/apply') {
+      applied.push(body);
+      return Response.json({ parties: 2 });
     }
     // O resumo do cabeçalho (GuestsLayout) pede uma página de um grupo.
     if (path === '/v1/weddings/w1/parties?limit=1') return respond(path);
@@ -259,6 +266,30 @@ describe('Convidados › Grupos e convidados (RN13)', () => {
     expect(selectAll).toBeChecked();
     await user.click(selectAll);
     expect(screen.queryByText(/selecionad/)).toBeNull();
+  });
+
+  it('Adicionar tag aplica a tag escolhida aos grupos marcados e desfaz a seleção (Tags RN08)', async () => {
+    const user = userEvent.setup();
+    mockList(() => Response.json(page([party('p1', 'Família Moreira'), party('p2', 'Tio Jorge')])));
+    renderRoute({ url: '/app/convidados' });
+    await screen.findByRole('table');
+    await user.click(screen.getByRole('checkbox', { name: 'Selecionar todos os grupos' }));
+    await user.click(screen.getByRole('button', { name: 'Adicionar tag' }));
+    const item = screen.getByRole('menuitem', { name: 'Família da Ana' });
+    expect(item.querySelector('.kore-tag--wine')).not.toBeNull();
+    await user.click(item);
+    expect(await screen.findByText('Tag aplicada a 2 grupos.')).toBeInTheDocument();
+    expect(applied).toEqual([{ partyIds: ['p1', 'p2'] }]);
+    await waitFor(() => expect(screen.queryByText(/selecionad/)).toBeNull());
+  });
+
+  it('sem nenhuma tag, o Adicionar tag fica desabilitado', async () => {
+    const user = userEvent.setup();
+    mockList(() => Response.json(page([party('p1', 'Família Moreira')])), []);
+    renderRoute({ url: '/app/convidados' });
+    await screen.findByRole('table');
+    await user.click(screen.getByRole('checkbox', { name: 'Selecionar Família Moreira' }));
+    expect(screen.getByRole('button', { name: 'Adicionar tag' })).toBeDisabled();
   });
 
   it('rolagem infinita: no fim da lista, pede a página seguinte pelo cursor (decisão 197)', async () => {
