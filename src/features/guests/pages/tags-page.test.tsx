@@ -264,6 +264,27 @@ describe('Convidados › Tags (Tags dos convidados)', () => {
     );
   });
 
+  it('com 10 tags, depois de excluir, o foco vai ao campo quando ele volta a habilitar', async () => {
+    const user = userEvent.setup();
+    const nove = Array.from({ length: 9 }, (_, index) => ({
+      id: `t${index}`,
+      name: `Tag ${index}`,
+      color: null,
+      guests: 0,
+    }));
+    mockTags({ tags: [...nove, igreja] });
+    renderRoute({ url: '/app/convidados/tags' });
+    expect(await screen.findByRole('textbox', { name: 'Nome da tag nova' })).toBeDisabled();
+    const dialog = await openEdit(user, 'Igreja');
+    await user.click(within(dialog).getByRole('button', { name: 'Excluir tag' }));
+    await user.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Excluir tag' }),
+    );
+    const field = screen.getByRole('textbox', { name: 'Nome da tag nova' });
+    await waitFor(() => expect(field).toBeEnabled());
+    await waitFor(() => expect(field).toHaveFocus());
+  });
+
   it('enquanto carrega, o Spinner diz "Carregando as tags"', async () => {
     mockApi(({ path }) =>
       path === '/v1/me'

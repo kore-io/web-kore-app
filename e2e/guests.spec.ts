@@ -303,6 +303,39 @@ test.describe('Convidados › Grupos e convidados (RN13)', () => {
   test.describe('computador', () => {
     test.use({ viewport: { width: 1440, height: 900 }, isMobile: false, hasTouch: false });
 
+    test('Adicionar tag aplica a tag aos grupos marcados (Tags RN08; decisão 204)', async ({
+      page,
+    }) => {
+      const { weddingId } = await weddingWithParties({ db, page });
+      const created = await page.request.post(`${API_URL}/v1/weddings/${weddingId}/tags`, {
+        headers: { origin: APP_ORIGIN },
+        data: { name: 'Padrinhos', color: 'champagne' },
+      });
+      expect(created.status()).toBe(201);
+      await page.goto('/app/convidados?q=e2e 0');
+      const table = page.getByRole('table', { name: 'Grupos e convidados' });
+      for (const name of ['Grupo E2E 01', 'Grupo E2E 02']) {
+        await table
+          .getByRole('checkbox', { name: `Selecionar ${name}` })
+          .locator('..')
+          .click();
+      }
+      await page.getByRole('button', { name: 'Adicionar tag' }).click();
+      await page.getByRole('menuitem', { name: 'Padrinhos' }).click();
+      await expect(toast({ page, text: 'Tag aplicada a 2 grupos.' })).toBeVisible();
+      await expect(page.getByRole('status').filter({ hasText: 'selecionad' })).toHaveCount(0);
+
+      await page.goto('/app/convidados');
+      await page
+        .getByRole('combobox', { name: 'Tag' })
+        .first()
+        .selectOption({ label: 'Tag: Padrinhos' });
+      await expect(page.getByText('Mostrando 2 de 2 grupos')).toBeVisible();
+      await expect(page.getByRole('navigation', { name: 'Convidados' })).toContainText(
+        'Tags · 1 de 10',
+      );
+    });
+
     test('a tabela com o cabeçalho, a vaga pendente e a seleção', async ({ page }) => {
       await weddingWithParties({ db, page });
       await page.goto('/app/convidados?resposta=pendentes');
