@@ -66,6 +66,14 @@
   @apply type-label text-ink;
 }
 
+.kore-party-panel__guest-status {
+  @apply flex shrink-0 items-center gap-2;
+}
+
+.kore-party-panel__guest-actions {
+  @apply flex;
+}
+
 .kore-party-panel__guest-details {
   @apply type-caption text-gray-700;
 }
@@ -76,4 +84,13 @@
 
 .kore-party-panel__actions {
   @apply flex flex-wrap gap-2;
+}
+
+/* Mover de grupo: a busca e o Select dos grupos, 12 px entre eles. */
+.kore-move-guest {
+  @apply flex flex-col gap-3;
+}
+
+.kore-move-guest__empty {
+  @apply type-caption text-gray-700;
 }

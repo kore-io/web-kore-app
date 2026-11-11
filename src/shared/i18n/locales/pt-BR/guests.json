@@ -126,7 +126,8 @@
         "pending": "Pendente",
         "confirmed": "Confirmado",
         "declined": "Recusado"
-      }
+      },
+      "actions": "Ações de {{name}}"
     },
     "link": {
       "title": "Link do grupo",
@@ -140,6 +141,19 @@
       "planner": "O link antigo para de funcionar na hora. Você vai precisar enviar o link novo ao grupo.",
       "cancel": "Cancelar",
       "confirm": "Regenerar link"
+    },
+    "move": {
+      "action": "Mover de grupo",
+      "title": "Mover {{name}} para outro grupo",
+      "search": "Buscar por nome",
+      "group": "Grupo",
+      "cancel": "Cancelar",
+      "confirm": "Mover",
+      "moved": "{{name}} foi para {{group}}.",
+      "lastGuest": {
+        "couple": "O grupo precisa de pelo menos um convidado. Para tirar todos, movam o grupo para a lixeira.",
+        "planner": "O grupo precisa de pelo menos um convidado. Para tirar todos, mova o grupo para a lixeira."
+      }
     }
   }
 }
