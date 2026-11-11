@@ -349,6 +349,57 @@ test.describe('Convidados › Grupos e convidados (RN13)', () => {
     await expect(page.getByText('Mostrando 7 de 7 grupos')).toBeVisible();
   });
 
+  test('Lixeira: mostra o grupo e a tag removidos e restaura os dois (Lixeira RN08, RN09)', async ({
+    page,
+  }) => {
+    const { weddingId } = await weddingWithParties({ db, page });
+    const created = await page.request.post(`${API_URL}/v1/weddings/${weddingId}/tags`, {
+      headers: { origin: APP_ORIGIN },
+      data: { name: 'Vizinhos' },
+    });
+    const { id: tagId } = (await created.json()) as { id: string };
+    await page.request.delete(`${API_URL}/v1/weddings/${weddingId}/tags/${tagId}`, {
+      headers: { origin: APP_ORIGIN },
+    });
+    await page.goto('/app/convidados?q=helena');
+    await page.getByRole('link', { name: 'Vó Helena' }).click();
+    await page
+      .locator('.kore-party-panel__link')
+      .locator('..')
+      .getByRole('button', { name: 'Mover para a lixeira' })
+      .click();
+    await page
+      .getByRole('alertdialog')
+      .getByRole('button', { name: 'Mover para a lixeira' })
+      .click();
+    await expect(page).toHaveURL(/\/app\/convidados$/);
+
+    await page
+      .getByRole('navigation', { name: 'Convidados' })
+      .getByRole('link', { name: 'Lixeira' })
+      .click();
+    await expect(
+      page.getByText('Itens na lixeira são apagados de vez depois de 30 dias.'),
+    ).toBeVisible();
+    const party = page.getByRole('listitem').filter({ hasText: 'Grupo · Vó Helena' });
+    await expect(party).toContainText(
+      /1 convidado · removido em \d{2}\/\d{2} · apagado depois de \d{2}\/\d{2}/,
+    );
+    await party.getByRole('button', { name: 'Restaurar' }).click();
+    await expect(toast({ page, text: 'Vó Helena voltou para a lista.' })).toBeVisible();
+    await expect(party).toHaveCount(0);
+
+    await page
+      .getByRole('listitem')
+      .filter({ hasText: 'Tag · Vizinhos' })
+      .getByRole('button', { name: 'Restaurar' })
+      .click();
+    await expect(toast({ page, text: 'A tag Vizinhos voltou.' })).toBeVisible();
+    await expect(page.getByRole('navigation', { name: 'Convidados' })).toContainText(
+      'Tags · 1 de 10',
+    );
+  });
+
   test.describe('computador', () => {
     test.use({ viewport: { width: 1440, height: 900 }, isMobile: false, hasTouch: false });
 
