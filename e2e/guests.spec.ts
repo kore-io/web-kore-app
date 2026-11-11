@@ -454,6 +454,49 @@ test.describe('Convidados › Grupos e convidados (RN13)', () => {
     ).toBeVisible();
   });
 
+  test('Colar a lista: a prévia com nomes faltando, o Remover pessoa e a importação (Importação RN10 a RN12)', async ({
+    page,
+  }) => {
+    await weddingWithParties({ db, page });
+    await page.goto('/app/convidados/importar');
+    await page.getByRole('button', { name: 'Colar a lista' }).click();
+    await page
+      .getByRole('textbox', { name: 'Colar a lista' })
+      .fill(
+        'Família Moreira: Jorge, jorge, Célia\nCarla Nunes + 2 filhos\nRafael E Bianca\nMárcia Rocha + 99\n+ 0',
+      );
+    await page.getByRole('button', { name: 'Continuar' }).click();
+
+    const moreira = page.getByRole('region', { name: 'Família Moreira: Jorge, jorge, Célia' });
+    await expect(moreira.getByText('Já existe um grupo com este nome.')).toBeVisible();
+    await expect(moreira.getByText('Um nome repetido neste grupo ficou de fora.')).toBeVisible();
+    await expect(
+      page
+        .getByRole('region', { name: 'Márcia Rocha + 99' })
+        .getByText('Usem de + 1 a + 20 por linha.'),
+    ).toBeVisible();
+    await expect(page.getByText('4 grupos e 8 convidados serão criados.')).toBeVisible();
+    const carla = page.getByRole('region', { name: 'Carla Nunes + 2 filhos' });
+    await expect(carla.getByText('Qual é o nome de cada pessoa deste grupo?')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Importar 8 convidados' })).toBeDisabled();
+
+    await carla.getByRole('button', { name: 'Remover pessoa' }).last().click();
+    await carla.getByRole('textbox', { name: 'Nome da 2ª pessoa' }).fill('Lucas Nunes');
+    const confirm = page.waitForRequest(
+      (request) => request.method() === 'POST' && request.url().endsWith('/guest-imports/paste'),
+    );
+    await page.getByRole('button', { name: 'Importar 7 convidados' }).click();
+    // RN14: 1 pessoa removida + 1 Jorge repetido (duplicatesRemoved) + 1 linha "+ 0" que saiu.
+    expect(((await confirm).postDataJSON() as { removedInPreview: number }).removedInPreview).toBe(
+      3,
+    );
+    await expect(toast({ page, text: '4 grupos importados' })).toBeVisible();
+    await expect(page).toHaveURL(/\/app\/convidados$/);
+    await expect(
+      page.getByText('38 convidados em 31 grupos · 0 confirmados, 0 recusados e 38 pendentes'),
+    ).toBeVisible();
+  });
+
   test.describe('computador', () => {
     test.use({ viewport: { width: 1440, height: 900 }, isMobile: false, hasTouch: false });
 
