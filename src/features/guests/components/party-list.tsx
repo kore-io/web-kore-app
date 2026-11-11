@@ -12,6 +12,8 @@ import {
 import { Check, Clock, Send } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router';
+import { guestPartyPath } from '../../../app/paths';
 import type {
   PartyListItemResponse,
   PartyListItemResponseDeliveryStatus,
@@ -41,8 +43,8 @@ interface PartyListProps {
 }
 
 /**
- * Tabela de grupos (RN13) com a seleção múltipla e a rolagem infinita (decisão 197). O
- * Painel do grupo e o menu ⋮ chegam no PR do Painel.
+ * Tabela de grupos (RN13) com a seleção múltipla e a rolagem infinita (decisão 197); o
+ * nome do grupo abre o Painel do grupo (RN13).
  */
 export function PartyList({
   parties,
@@ -95,7 +97,11 @@ export function PartyList({
                   onChange={() => selection.toggle(party.id)}
                 />
               }
-              name={party.name}
+              name={
+                <Link to={guestPartyPath({ partyId: party.id })} className="kore-party-list__name">
+                  {party.name}
+                </Link>
+              }
               contact={contactText({ t, party })}
               people={{ value: party.people, label: t('row.people', { count: party.people }) }}
               responses={responsesText({ t, counts: party.counts })}

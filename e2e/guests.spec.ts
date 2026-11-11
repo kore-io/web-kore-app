@@ -134,6 +134,38 @@ test.describe('Convidados › Grupos e convidados (RN13)', () => {
     await expect(page).toHaveURL(/\?envio=respondido$/);
   });
 
+  test('Painel do grupo: abre pela lista, mascara o telefone, copia e regenera o link (RN11, RN12, RN14)', async ({
+    page,
+    context,
+  }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await weddingWithParties({ db, page });
+    await page.goto('/app/convidados?q=moreira');
+    await page.getByRole('link', { name: 'Família Moreira' }).click();
+    await expect(page).toHaveURL(/\/app\/convidados\/grupos\/[0-9a-f-]+$/);
+    await expect(page.getByRole('heading', { name: 'Família Moreira', level: 1 })).toBeVisible();
+    await expect(page.getByText('3 convidados · Contato: Célia Moreira')).toBeVisible();
+    await expect(page.getByText('(19) 9****-3310')).toBeVisible();
+
+    const link = page.locator('.kore-party-panel__link');
+    const oldUrl = (await link.textContent()) ?? '';
+    expect(oldUrl).toMatch(/^http:\/\/localhost:5173\/e2e-[^/]+\/grupo\/\S+$/);
+    await page.getByRole('button', { name: 'Copiar link' }).click();
+    await expect(page.getByText('Link copiado.')).toBeVisible();
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(oldUrl);
+
+    await page.getByRole('button', { name: 'Regenerar link' }).click();
+    const dialog = page.getByRole('alertdialog', {
+      name: 'Regenerar o link do grupo Família Moreira?',
+    });
+    await dialog.getByRole('button', { name: 'Regenerar link' }).click();
+    await expect(dialog).toBeHidden();
+    await expect(link).not.toHaveText(oldUrl);
+
+    await page.getByRole('link', { name: '‹ Voltar para Convidados' }).click();
+    await expect(page).toHaveURL(/\/app\/convidados$/);
+  });
+
   test.describe('computador', () => {
     test.use({ viewport: { width: 1440, height: 900 }, isMobile: false, hasTouch: false });
 

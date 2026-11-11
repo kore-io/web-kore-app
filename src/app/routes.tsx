@@ -8,6 +8,7 @@ import { SignInPage } from '../features/access/pages/sign-in-page';
 import { SignUpPage } from '../features/access/pages/sign-up-page';
 import { DashboardPage } from '../features/dashboard/pages/dashboard-page';
 import { GuestsPage } from '../features/guests/pages/guests-page';
+import { PartyPanelPage } from '../features/guests/pages/party-panel-page';
 import { AppRoot } from './app-root';
 import { CoupleAreaLayout } from './layout/couple-area-layout';
 import { paths } from './paths';
@@ -31,6 +32,7 @@ export const routes: RouteObject[] = [
         children: [
           { id: 'dashboard', index: true, element: <DashboardPage /> },
           { id: 'guests', path: 'convidados', element: <GuestsPage /> },
+          { id: 'guest-party', path: 'convidados/grupos/:partyId', element: <PartyPanelPage /> },
         ],
       },
       // Sem página de "não encontrado" no DS: o caminho desconhecido volta para a área.

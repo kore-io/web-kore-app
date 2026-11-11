@@ -78,3 +78,9 @@
 .kore-party-list__loading {
   @apply flex justify-center py-4;
 }
+
+/* Nome do grupo: link para o Painel, com o texto da linha e o foco do DS. */
+.kore-party-list__name {
+  @apply rounded-sm hover:underline;
+  @apply focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}

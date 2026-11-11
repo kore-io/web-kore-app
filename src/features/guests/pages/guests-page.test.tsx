@@ -129,6 +129,10 @@ describe('Convidados › Grupos e convidados (RN13)', () => {
       within(rows[1] as HTMLElement).getByText('1 recusado · 1 vaga pendente'),
     ).toBeInTheDocument();
     expect(screen.getByText('Mostrando 2 de 58 grupos')).toBeInTheDocument();
+    // O nome do grupo abre o Painel do grupo (RN13).
+    expect(
+      within(rows[0] as HTMLElement).getByRole('link', { name: 'Família Moreira' }),
+    ).toHaveAttribute('href', '/app/convidados/grupos/p1');
   });
 
   it('a busca e os filtros vão para a URL e para a API, com a busca esperando a digitação', async () => {
