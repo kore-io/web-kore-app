@@ -4,22 +4,32 @@
  * Kore API
  * OpenAPI spec version: 1
  */
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import type {
+  DataTag,
+  DefinedInitialDataOptions,
+  DefinedUseQueryResult,
   MutationFunction,
   QueryClient,
+  QueryFunction,
+  QueryKey,
+  UndefinedInitialDataOptions,
   UseMutationOptions,
   UseMutationResult,
+  UseQueryOptions,
+  UseQueryResult,
 } from '@tanstack/react-query';
 
 import type {
   ActionNotAllowedErrorBody,
   AlreadyRespondedErrorBody,
   EmptyPlusOneErrorBody,
+  ExportControllerExportV1Params,
   GuestNotFoundErrorBody,
   LastGuestErrorBody,
   MoveGuestBody,
   MoveGuestResponse,
+  NothingToExportErrorBody,
   OriginNotAllowedErrorBody,
   RateLimitedErrorBody,
   SessionExpiredErrorBody,
@@ -32,6 +42,21 @@ import { httpClient } from '../../http-client';
 import type { ErrorType } from '../../http-client';
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKey: K } => {
+  const result = { queryKey } as T & { queryKey: K };
+  for (const key of Object.keys(query)) {
+    // The explicit queryKey always wins, matching the previous
+    // `{ ...query, queryKey }` spread where it was set last.
+    if (key === 'queryKey') continue;
+    Object.defineProperty(result, key, {
+      enumerable: true,
+      configurable: true,
+      get: () => (query as Record<string, unknown>)[key],
+    });
+  }
+  return result;
+};
 
 export const getGuestsControllerTrashV1Url = (weddingId: string, guestId: string) => {
   return `/v1/weddings/${weddingId}/guests/${guestId}`;
@@ -295,3 +320,205 @@ export const useGuestsControllerMoveV1 = <
 > => {
   return useMutation(getGuestsControllerMoveV1MutationOptions(options), queryClient);
 };
+export const getExportControllerExportV1Url = (
+  weddingId: string,
+  params: ExportControllerExportV1Params,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/v1/weddings/${weddingId}/guests/export?${stringifiedParams}`
+    : `/v1/weddings/${weddingId}/guests/export`;
+};
+
+/**
+ * @summary Exportar: o arquivo na hora, sem cache (Exportação RN01 a RN10).
+ */
+export const exportControllerExportV1 = async (
+  weddingId: string,
+  params: ExportControllerExportV1Params,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<Blob> => {
+  return httpClient<Blob>(getExportControllerExportV1Url(weddingId, params), {
+    ...options,
+    method: 'GET',
+  });
+};
+
+export const getExportControllerExportV1QueryKey = (
+  weddingId: string,
+  params?: ExportControllerExportV1Params,
+) => {
+  return [`/v1/weddings/${weddingId}/guests/export`, ...(params ? [params] : [])] as const;
+};
+
+export const getExportControllerExportV1QueryOptions = <
+  TData = Awaited<ReturnType<typeof exportControllerExportV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | Blob
+    | SessionExpiredErrorBody
+    | WeddingNotFoundErrorBody
+    | NothingToExportErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  weddingId: string,
+  params: ExportControllerExportV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof exportControllerExportV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getExportControllerExportV1QueryKey(weddingId, params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof exportControllerExportV1>>> = ({
+    signal,
+  }) => exportControllerExportV1(weddingId, params, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: weddingId !== null && weddingId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof exportControllerExportV1>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+};
+
+export type ExportControllerExportV1QueryResult = NonNullable<
+  Awaited<ReturnType<typeof exportControllerExportV1>>
+>;
+export type ExportControllerExportV1QueryError = ErrorType<
+  | ValidationErrorBody
+  | Blob
+  | SessionExpiredErrorBody
+  | WeddingNotFoundErrorBody
+  | NothingToExportErrorBody
+  | RateLimitedErrorBody
+>;
+
+export function useExportControllerExportV1<
+  TData = Awaited<ReturnType<typeof exportControllerExportV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | Blob
+    | SessionExpiredErrorBody
+    | WeddingNotFoundErrorBody
+    | NothingToExportErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  weddingId: string,
+  params: ExportControllerExportV1Params,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof exportControllerExportV1>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportControllerExportV1>>,
+          TError,
+          Awaited<ReturnType<typeof exportControllerExportV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useExportControllerExportV1<
+  TData = Awaited<ReturnType<typeof exportControllerExportV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | Blob
+    | SessionExpiredErrorBody
+    | WeddingNotFoundErrorBody
+    | NothingToExportErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  weddingId: string,
+  params: ExportControllerExportV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof exportControllerExportV1>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportControllerExportV1>>,
+          TError,
+          Awaited<ReturnType<typeof exportControllerExportV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useExportControllerExportV1<
+  TData = Awaited<ReturnType<typeof exportControllerExportV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | Blob
+    | SessionExpiredErrorBody
+    | WeddingNotFoundErrorBody
+    | NothingToExportErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  weddingId: string,
+  params: ExportControllerExportV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof exportControllerExportV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Exportar: o arquivo na hora, sem cache (Exportação RN01 a RN10).
+ */
+
+export function useExportControllerExportV1<
+  TData = Awaited<ReturnType<typeof exportControllerExportV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | Blob
+    | SessionExpiredErrorBody
+    | WeddingNotFoundErrorBody
+    | NothingToExportErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  weddingId: string,
+  params: ExportControllerExportV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof exportControllerExportV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getExportControllerExportV1QueryOptions(weddingId, params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}

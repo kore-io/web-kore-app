@@ -15,13 +15,19 @@ import type {
 import type {
   ActionNotAllowedErrorBody,
   DuplicateErrorBody,
+  FileTooLargeErrorBody,
   ImportResultResponse,
+  NothingToImportErrorBody,
   OriginNotAllowedErrorBody,
   PasteImportBody,
   PastePreviewBody,
   PastePreviewResponse,
   RateLimitedErrorBody,
   SessionExpiredErrorBody,
+  SpreadsheetImportResponse,
+  SpreadsheetPreviewResponse,
+  SpreadsheetRefusedErrorBody,
+  SpreadsheetUploadBody,
   TooManyGuestsErrorBody,
   ValidationErrorBody,
   WeddingNotFoundErrorBody,
@@ -32,6 +38,264 @@ import type { ErrorType } from '../../http-client';
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
+export const getGuestImportsControllerSpreadsheetPreviewV1Url = (weddingId: string) => {
+  return `/v1/weddings/${weddingId}/guest-imports/spreadsheet/preview`;
+};
+
+/**
+ * @summary A planilha, prévia: nada é gravado e o arquivo não é guardado (Importação RN03 a RN09).
+ */
+export const guestImportsControllerSpreadsheetPreviewV1 = async (
+  weddingId: string,
+  spreadsheetUploadBody: SpreadsheetUploadBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<SpreadsheetPreviewResponse> => {
+  const formData = new FormData();
+  formData.append(`file`, spreadsheetUploadBody.file);
+
+  return httpClient<SpreadsheetPreviewResponse>(
+    getGuestImportsControllerSpreadsheetPreviewV1Url(weddingId),
+    {
+      ...options,
+      method: 'POST',
+      body: formData,
+    },
+  );
+};
+
+export const getGuestImportsControllerSpreadsheetPreviewV1MutationKey = () =>
+  ['guestImportsControllerSpreadsheetPreviewV1'] as const;
+
+export const getGuestImportsControllerSpreadsheetPreviewV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | FileTooLargeErrorBody
+    | SpreadsheetRefusedErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof guestImportsControllerSpreadsheetPreviewV1>>,
+    TError,
+    GuestImportsControllerSpreadsheetPreviewV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof guestImportsControllerSpreadsheetPreviewV1>>,
+  TError,
+  GuestImportsControllerSpreadsheetPreviewV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getGuestImportsControllerSpreadsheetPreviewV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof guestImportsControllerSpreadsheetPreviewV1>>,
+    GuestImportsControllerSpreadsheetPreviewV1MutationVariables
+  > = (props) => {
+    const { weddingId, data } = props ?? {};
+
+    return guestImportsControllerSpreadsheetPreviewV1(weddingId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type GuestImportsControllerSpreadsheetPreviewV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof guestImportsControllerSpreadsheetPreviewV1>>
+>;
+export type GuestImportsControllerSpreadsheetPreviewV1MutationBody = SpreadsheetUploadBody;
+export type GuestImportsControllerSpreadsheetPreviewV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | ActionNotAllowedErrorBody
+  | WeddingNotFoundErrorBody
+  | FileTooLargeErrorBody
+  | SpreadsheetRefusedErrorBody
+  | RateLimitedErrorBody
+>;
+export type GuestImportsControllerSpreadsheetPreviewV1MutationVariables = {
+  weddingId: string;
+  data: SpreadsheetUploadBody;
+};
+
+/**
+ * @summary A planilha, prévia: nada é gravado e o arquivo não é guardado (Importação RN03 a RN09).
+ */
+export const useGuestImportsControllerSpreadsheetPreviewV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | FileTooLargeErrorBody
+    | SpreadsheetRefusedErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof guestImportsControllerSpreadsheetPreviewV1>>,
+      TError,
+      GuestImportsControllerSpreadsheetPreviewV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof guestImportsControllerSpreadsheetPreviewV1>>,
+  TError,
+  GuestImportsControllerSpreadsheetPreviewV1MutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getGuestImportsControllerSpreadsheetPreviewV1MutationOptions(options),
+    queryClient,
+  );
+};
+export const getGuestImportsControllerSpreadsheetV1Url = (weddingId: string) => {
+  return `/v1/weddings/${weddingId}/guest-imports/spreadsheet`;
+};
+
+/**
+ * @summary A planilha, importar: valida de novo e grava só as linhas válidas (RN01, RN09 e RN14).
+ */
+export const guestImportsControllerSpreadsheetV1 = async (
+  weddingId: string,
+  spreadsheetUploadBody: SpreadsheetUploadBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<SpreadsheetImportResponse> => {
+  const formData = new FormData();
+  formData.append(`file`, spreadsheetUploadBody.file);
+
+  return httpClient<SpreadsheetImportResponse>(
+    getGuestImportsControllerSpreadsheetV1Url(weddingId),
+    {
+      ...options,
+      method: 'POST',
+      body: formData,
+    },
+  );
+};
+
+export const getGuestImportsControllerSpreadsheetV1MutationKey = () =>
+  ['guestImportsControllerSpreadsheetV1'] as const;
+
+export const getGuestImportsControllerSpreadsheetV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | NothingToImportErrorBody
+    | FileTooLargeErrorBody
+    | SpreadsheetRefusedErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof guestImportsControllerSpreadsheetV1>>,
+    TError,
+    GuestImportsControllerSpreadsheetV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof guestImportsControllerSpreadsheetV1>>,
+  TError,
+  GuestImportsControllerSpreadsheetV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getGuestImportsControllerSpreadsheetV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof guestImportsControllerSpreadsheetV1>>,
+    GuestImportsControllerSpreadsheetV1MutationVariables
+  > = (props) => {
+    const { weddingId, data } = props ?? {};
+
+    return guestImportsControllerSpreadsheetV1(weddingId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type GuestImportsControllerSpreadsheetV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof guestImportsControllerSpreadsheetV1>>
+>;
+export type GuestImportsControllerSpreadsheetV1MutationBody = SpreadsheetUploadBody;
+export type GuestImportsControllerSpreadsheetV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | ActionNotAllowedErrorBody
+  | WeddingNotFoundErrorBody
+  | NothingToImportErrorBody
+  | FileTooLargeErrorBody
+  | SpreadsheetRefusedErrorBody
+  | RateLimitedErrorBody
+>;
+export type GuestImportsControllerSpreadsheetV1MutationVariables = {
+  weddingId: string;
+  data: SpreadsheetUploadBody;
+};
+
+/**
+ * @summary A planilha, importar: valida de novo e grava só as linhas válidas (RN01, RN09 e RN14).
+ */
+export const useGuestImportsControllerSpreadsheetV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | NothingToImportErrorBody
+    | FileTooLargeErrorBody
+    | SpreadsheetRefusedErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof guestImportsControllerSpreadsheetV1>>,
+      TError,
+      GuestImportsControllerSpreadsheetV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof guestImportsControllerSpreadsheetV1>>,
+  TError,
+  GuestImportsControllerSpreadsheetV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getGuestImportsControllerSpreadsheetV1MutationOptions(options), queryClient);
+};
 export const getGuestImportsControllerPastePreviewV1Url = (weddingId: string) => {
   return `/v1/weddings/${weddingId}/guest-imports/paste/preview`;
 };

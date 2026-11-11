@@ -13,8 +13,11 @@ export interface PasteImportBody {
    */
   groups: PastedGroupBody[];
   /**
-   * As pessoas removidas, as duplicadas tiradas e 1 por grupo que saiu (o linhas_erro).
+   * As pessoas removidas, as duplicadas tiradas e 1 por grupo que saiu (o
+   * linhas_erro). O teto é o do texto colado: não sai mais que um item por
+   * caractere, e o evento não fica distorcido (sugestão do Crivo).
    * @minimum 0
+   * @maximum 100000
    */
   removedInPreview: number;
 }
