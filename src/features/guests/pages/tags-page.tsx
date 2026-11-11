@@ -1,5 +1,5 @@
 import { Button, Dialog, Input, Spinner, Tag } from '@kore-io/design';
-import { useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TagResponse } from '../../../shared/api/generated/model';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
@@ -27,6 +27,17 @@ function TagsView({ weddingId, audience }: { weddingId: string; audience: Audien
   // Para onde o foco volta ao fechar o Excluir: o Editar da linha, ou o campo do nome
   // quando a tag saiu da lista (a linha some junto com o Editar).
   const afterDelete = useRef<HTMLElement | null>(null);
+  // Depois de excluir, o foco vai ao campo assim que a lista recarrega e o campo está
+  // habilitado (com 10 tags, ele ainda está desabilitado quando o Dialog fecha).
+  const focusNameField = useRef(false);
+  const fieldDisabled = tags.atLimit;
+  const tagCount = tags.tags.length;
+  useEffect(() => {
+    if (focusNameField.current && !fieldDisabled) {
+      focusNameField.current = false;
+      nameField.current?.focus();
+    }
+  }, [fieldDisabled, tagCount]);
 
   if (tags.isLoading) {
     return (
@@ -156,7 +167,11 @@ function TagsView({ weddingId, audience }: { weddingId: string; audience: Audien
                   tagId: deleting.id,
                   name: deleting.name,
                   onDone: ({ deleted }) => {
-                    if (deleted) afterDelete.current = nameField.current;
+                    if (deleted) {
+                      // A linha some: o Dialog não devolve o foco a ela; o efeito acima foca o campo.
+                      afterDelete.current = null;
+                      focusNameField.current = true;
+                    }
                     setDeleting(null);
                   },
                 })
