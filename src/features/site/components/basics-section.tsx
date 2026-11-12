@@ -130,6 +130,11 @@ export function BasicsSection({
       });
       return;
     }
+    // Corrida: o papel mudou ou o site foi publicado enquanto se editava (RN04, RN05). O
+    // Editor recarrega, e a seção volta com os campos no estado novo (sugestão do Crivo).
+    if (code === 'FIELD_NOT_ALLOWED' || code === 'SLUG_LOCKED') {
+      void queryClient.invalidateQueries({ queryKey: getSiteControllerGetV1QueryKey(weddingId) });
+    }
     showToast({
       tone: 'danger',
       message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,

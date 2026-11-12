@@ -385,6 +385,23 @@ describe('Site › Dados básicos (RN02 a RN08, RN10)', () => {
     await waitFor(() => expect(calls.at(-1)?.body).toEqual({ coverImageId: null }));
   });
 
+  it('na corrida (403 FIELD_NOT_ALLOWED), o Editor recarrega o site (sugestão do Crivo)', async () => {
+    const user = userEvent.setup();
+    gets.count = 0;
+    mockBasics({
+      patch: () =>
+        apiError({ status: 403, body: { error: 'FIELD_NOT_ALLOWED', fields: ['state'] } }),
+    });
+    renderRoute({ url: '/app/site/dados-basicos' });
+    await user.selectOptions(await screen.findByRole('combobox', { name: 'UF' }), 'RJ');
+    const before = gets.count;
+    await user.click(screen.getByRole('button', { name: 'Salvar' }));
+    expect(
+      await screen.findByText('Não foi possível continuar. Confira sua conexão e tente de novo.'),
+    ).toBeInTheDocument();
+    await waitFor(() => expect(gets.count).toBeGreaterThan(before));
+  });
+
   it('é acessível', async () => {
     mockBasics();
     const { container } = renderRoute({ url: '/app/site/dados-basicos' });
