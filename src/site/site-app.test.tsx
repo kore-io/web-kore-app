@@ -484,6 +484,9 @@ describe('Site do casal › a prévia (Pré-visualização RN03 a RN06)', () => 
       mode: 'party',
       partyId: 'p1',
     });
+    // A busca aparece sempre, mesmo com poucos grupos, e sem a linha de apoio (229(b)).
+    expect(screen.getByRole('searchbox', { name: 'Buscar um grupo' })).toBeInTheDocument();
+    expect(screen.queryByText(/Mostrando/)).not.toBeInTheDocument();
     await user.selectOptions(screen.getByRole('combobox', { name: 'Grupo' }), 'Família Rocha');
     expect(await screen.findByText('Convite para Família Rocha')).toBeInTheDocument();
     await user.click(screen.getByText('Visitante'));
