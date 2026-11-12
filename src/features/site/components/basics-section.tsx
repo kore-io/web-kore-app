@@ -27,6 +27,7 @@ import {
   type BasicsField,
 } from '../basics-draft';
 import { useSectionForm } from '../section-form';
+import { CoverField } from './cover-field';
 import { timezoneLabelKey } from '../timezones';
 
 /** A mesma pausa do Cadastro antes de conferir o endereço (RN06). */
@@ -35,7 +36,7 @@ const NAME_MAX = 80;
 
 type SlugConflict = { reason: 'taken' | 'reserved'; slug: string; suggestion: string | null };
 
-/** Dados básicos (RN02 a RN08); a foto de capa (RN09) entra com as imagens. */
+/** Dados básicos (RN02 a RN09). */
 export function BasicsSection({
   weddingId,
   site,
@@ -308,6 +309,14 @@ export function BasicsSection({
           />
         )}
       </FormField>
+
+      <CoverField
+        weddingId={weddingId}
+        audience={audience}
+        cover={draft.cover}
+        coupleNames={site.partners.map((partner) => partner.name.split(' ')[0]).join(' & ')}
+        onChange={(cover) => set('cover', cover)}
+      />
     </div>
   );
 

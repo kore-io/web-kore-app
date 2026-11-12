@@ -1,7 +1,11 @@
-import type { SiteEditorResponse, UpdateSiteBody } from '../../shared/api/generated/model';
+import type {
+  SiteEditorResponse,
+  SiteImageRefResponse,
+  UpdateSiteBody,
+} from '../../shared/api/generated/model';
 import { isValidSlug } from '../access/wedding-slug';
 
-/** O que o casal edita em Dados básicos (RN02); a capa entra com as imagens (A4). */
+/** O que o casal edita em Dados básicos (RN02), com a foto de capa (RN09). */
 export interface BasicsDraft {
   names: string[];
   eventDate: string;
@@ -10,6 +14,8 @@ export interface BasicsDraft {
   slug: string;
   whatsapp: string;
   email: string;
+  /** A capa: a imagem pronta ou nenhuma (Remover foto). */
+  cover: Pick<SiteImageRefResponse, 'id' | 'url' | 'thumbUrl'> | null;
 }
 
 export type BasicsField =
@@ -39,6 +45,9 @@ export function draftFromSite(site: SiteEditorResponse): BasicsDraft {
     slug: site.slug ?? '',
     whatsapp: formatWhatsapp(site.contactWhatsapp),
     email: site.contactEmail ?? '',
+    cover: site.cover
+      ? { id: site.cover.id, url: site.cover.url, thumbUrl: site.cover.thumbUrl }
+      : null,
   };
 }
 
@@ -60,6 +69,7 @@ function normalize(draft: BasicsDraft) {
     city: draft.city.trim(),
     whatsapp: draft.whatsapp.trim(),
     email: draft.email.trim(),
+    cover: draft.cover?.id ?? null,
   };
 }
 
@@ -88,6 +98,7 @@ export function toPatchBody({
   if (now.slug !== before.slug) body.slug = now.slug;
   if (now.whatsapp !== before.whatsapp) body.contactWhatsapp = now.whatsapp || null;
   if (now.email !== before.email) body.contactEmail = now.email || null;
+  if (now.cover !== before.cover) body.coverImageId = now.cover;
   return body;
 }
 
