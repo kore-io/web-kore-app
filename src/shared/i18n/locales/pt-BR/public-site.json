@@ -205,6 +205,8 @@
       "confirmed_one": "Vocês confirmaram {{count}} pessoa.",
       "confirmed_other": "Vocês confirmaram {{count}} pessoas.",
       "declined": "Recebemos sua resposta."
-    }
+    },
+    "canChangeUntil": "Dá para alterar até {{date}}.",
+    "plusOneSlot": "Acompanhante {{n}}"
   }
 }

@@ -1,8 +1,16 @@
+/** O caminho do Confirmar presença: `/<slug>/confirmar-presenca` (decisão 232(1)). */
+export const RSVP_SEGMENT = 'confirmar-presenca';
+
+export function rsvpPath(slug: string): string {
+  return `/${slug}/${RSVP_SEGMENT}`;
+}
+
 /** O que o endereço do site pede (Site público RN01 e RN06). */
 export type SiteRoute =
   | { kind: 'simulator' }
   | { kind: 'site'; slug: string }
   | { kind: 'party'; slug: string; token: string }
+  | { kind: 'rsvp'; slug: string }
   | { kind: 'none' };
 
 /**
@@ -28,6 +36,9 @@ export function parseSiteRoute(
     return simulatorEnabled ? { kind: 'simulator' } : { kind: 'none' };
   }
   if (parts.length === 1) return { kind: 'site', slug: slug.toLowerCase() };
+  // Confirmar presença, página própria do grupo (decisão 232(1)).
+  if (parts.length === 2 && second === RSVP_SEGMENT)
+    return { kind: 'rsvp', slug: slug.toLowerCase() };
   if (parts.length === 3 && second === 'grupo' && token) {
     return { kind: 'party', slug: slug.toLowerCase(), token };
   }

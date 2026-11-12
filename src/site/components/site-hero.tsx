@@ -9,7 +9,16 @@ import { daysUntil, LONG_DATE } from '../../features/site/site-texts';
  * a foto escurecida; sem capa,
  * o fundo do site com um filete no destaque.
  */
-export function SiteHero({ site, now }: { site: PublicSiteResponse; now: Date }) {
+export function SiteHero({
+  site,
+  now,
+  rsvpHref = null,
+}: {
+  site: PublicSiteResponse;
+  now: Date;
+  /** O Confirmar presença do grupo (Confirmar presença RN01); o visitante não vê. */
+  rsvpHref?: string | null;
+}) {
   const { t } = useTranslation('publicSite');
   const place = [site.city, site.state && `(${site.state})`].filter(Boolean).join(' ');
   const line = [site.eventDate && LONG_DATE.format(new Date(`${site.eventDate}T12:00:00Z`)), place]
@@ -45,6 +54,11 @@ export function SiteHero({ site, now }: { site: PublicSiteResponse; now: Date })
         </h1>
         {line && <p className="kore-site-hero__line">{line}</p>}
         {countdown && <p className="kore-site-hero__countdown">{countdown}</p>}
+        {rsvpHref && (
+          <a className="kore-site-hero__action" href={rsvpHref}>
+            {t('rsvp.open')}
+          </a>
+        )}
       </div>
     </section>
   );

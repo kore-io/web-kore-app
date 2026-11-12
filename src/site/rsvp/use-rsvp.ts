@@ -9,9 +9,10 @@ export const rsvpQueryKey = (slug: string) => ['rsvp', slug] as const;
  * O RSVP do grupo pelo `GET /v1/sites/{slug}/rsvp` (Confirmar presença RN01, RN03, RN08):
  * com o cookie do grupo ou, na prévia como grupo, o da prévia (`state: preview`).
  */
-export function useRsvp({ slug }: { slug: string }) {
+export function useRsvp({ slug, enabled = true }: { slug: string; enabled?: boolean }) {
   return useQuery({
     queryKey: rsvpQueryKey(slug),
+    enabled,
     queryFn: () => rsvpControllerGetV1(slug),
     retry: false,
     refetchOnWindowFocus: false,
