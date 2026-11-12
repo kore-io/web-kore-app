@@ -85,10 +85,11 @@ test.describe('Site do casal › o bundle público na 5174 (B1; Site público RN
     await expect(page.getByText('sábado, 15 de maio de 2027 · Campinas (SP)')).toBeVisible();
     await expect(page.getByText(/^Faltam \d+ dias$/)).toBeVisible();
     await expect(page.locator('html')).toHaveAttribute('data-site-fonts', 'romantico');
+    // Com o Simule ligado no local, o "Feito com Kore" leva a ele (Site público RN10).
     const footer = page.getByRole('contentinfo');
     await expect(footer.getByRole('link', { name: 'Feito com Kore' })).toHaveAttribute(
       'href',
-      'https://kore.com.br/',
+      '/simule?origem=site',
     );
     // O menu (celular) abre pelo botão: a Cerimônia está ligada, mas vazia; a contagem
     // não entra no menu. Sem seção no menu, o botão nem aparece.

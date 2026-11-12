@@ -27,7 +27,8 @@ export default defineConfig({
       reuseExistingServer: true,
     },
     {
-      command: 'pnpm dev:site',
+      // O Simule fica ligado no local (Simule RN01); a variável da linha vale sobre o .env.
+      command: 'VITE_SIMULATOR_ENABLED=true pnpm dev:site',
       url: SITE_ORIGIN,
       reuseExistingServer: true,
     },
