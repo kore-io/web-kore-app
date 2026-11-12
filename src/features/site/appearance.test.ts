@@ -42,5 +42,9 @@ describe('contraste da Aparência, igual ao da API (RN01, RN04, RN05; decisão 2
     expect(
       matchingPalette({ key: null, primaryColor: '#A94F37', accentColor: '#7A8B69' }),
     ).toBeNull();
+    // Só o destaque diferente também tira a paleta.
+    expect(
+      matchingPalette({ key: 'terracota', primaryColor: '#A94F37', accentColor: '#1F2A44' }),
+    ).toBeNull();
   });
 });
