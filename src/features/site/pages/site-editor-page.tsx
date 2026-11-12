@@ -16,6 +16,7 @@ import {
   FaqSection,
   LodgingSection,
 } from '../sections/section-forms';
+import { StorySection } from '../sections/story-section';
 import { SitePreview } from '../components/site-preview';
 import { PreviewAppearanceProvider } from '../preview-appearance';
 import { SectionFormProvider, type SectionForm } from '../section-form';
@@ -201,6 +202,7 @@ function SiteEditor({
                   const section = data.sections.find((item) => item.type === sectionKey);
                   if (!section) return null;
                   const props = { weddingId, site: data, section, audience };
+                  if (section.type === 'story') return <StorySection {...props} />;
                   if (section.type === 'countdown') return <CountdownSection {...props} />;
                   if (section.type === 'ceremony') return <CeremonySection {...props} />;
                   if (section.type === 'lodging') return <LodgingSection {...props} />;

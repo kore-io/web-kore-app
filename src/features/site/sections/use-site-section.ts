@@ -36,12 +36,15 @@ export function useSiteSection<C>({
   fromResponse,
   toBody,
   validate,
+  canSave = true,
 }: {
   weddingId: string;
   section: SiteSectionResponse;
   fromResponse: (content: Record<string, unknown>) => C;
   toBody: (content: C) => Record<string, unknown>;
   validate: (content: C) => SectionErrors;
+  /** Falso trava o Salvar (ex.: fotos ainda subindo). */
+  canSave?: boolean;
 }) {
   const { t } = useTranslation('site');
   const { t: tAccess } = useTranslation('access');
@@ -68,7 +71,7 @@ export function useSiteSection<C>({
 
   useSectionForm({
     dirty,
-    canSave: true,
+    canSave,
     save: async () => {
       const local: SectionErrors = { ...validate(draft.content) };
       if (hasTitle && !draft.title.trim()) local.title = 'TITLE_MISSING';
