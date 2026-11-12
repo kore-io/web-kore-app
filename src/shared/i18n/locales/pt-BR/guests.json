@@ -174,6 +174,38 @@
         "couple": "Mostrando {{shown}} de {{total}} grupos. Busquem pelo nome para achar os outros.",
         "planner": "Mostrando {{shown}} de {{total}} grupos. Busque pelo nome para achar os outros."
       }
+    },
+    "history": {
+      "title": "Histórico",
+      "at": "{{date}} às {{time}}",
+      "sent": {
+        "whatsapp": "Convite enviado pelo WhatsApp",
+        "email": "Convite enviado por e-mail",
+        "link": "Mensagem do convite copiada",
+        "qr": "QR code do convite baixado"
+      },
+      "save_the_date": {
+        "whatsapp": "Save the date enviado pelo WhatsApp",
+        "email": "Save the date enviado por e-mail",
+        "link": "Mensagem do save the date copiada",
+        "qr": "QR code do save the date baixado"
+      },
+      "reminder": {
+        "whatsapp": "Lembrete enviado pelo WhatsApp",
+        "email": "Lembrete enviado por e-mail",
+        "link": "Mensagem do lembrete copiada",
+        "qr": "QR code do lembrete baixado"
+      },
+      "viewed": "Convite aberto",
+      "respondedBy": "Respondido por {{name}}: {{totals}}",
+      "respondedByParty": "Respondido pelo grupo: {{totals}}",
+      "confirmed_one": "{{count}} confirmado",
+      "confirmed_other": "{{count}} confirmados",
+      "declined_one": "{{count}} recusado",
+      "declined_other": "{{count}} recusados",
+      "changed": "Resposta alterada por {{name}}: {{guest}} {{answer}}",
+      "goes": "vai",
+      "notGoes": "não vai"
     }
   },
   "tags": {
