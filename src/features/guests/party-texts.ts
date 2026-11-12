@@ -57,7 +57,7 @@ export function responsesText({ t, counts }: { t: GuestsT; counts: PartyCountsRe
 }
 
 /**
- * Respondido em (Fase 4): "12/09 às 20h14" e "por Célia"; hora cheia sem minutos
+ * Respondido em (Prazo RN07): "12/09 às 20h14" e "por Célia" ou "alterada por Ana"; hora cheia sem minutos
  * ("21/06 às 9h", regra das datas curtas em listas da Voz).
  */
 export function respondedAtText({ t, party }: { t: GuestsT; party: PartyListItemResponse }) {
@@ -67,9 +67,14 @@ export function respondedAtText({ t, party }: { t: GuestsT; party: PartyListItem
   const date = `${two(at.getDate())}/${two(at.getMonth() + 1)}`;
   const time =
     at.getMinutes() === 0 ? `${at.getHours()}h` : `${at.getHours()}h${two(at.getMinutes())}`;
-  return {
-    primary: t('row.respondedAt', { date, time }),
-    secondary:
-      party.respondedBy === null ? undefined : t('row.respondedBy', { name: party.respondedBy }),
-  };
+  // Quem respondeu (Prazo RN07): "por Célia" (o grupo, quem assinou) ou "alterada por Ana"
+  // (o casal ou a cerimonialista, quem alterou); sem nome, só a data.
+  const last = party.lastResponse;
+  const secondary =
+    last?.actor === 'couple' && last.actorName
+      ? t('row.changedBy', { name: last.actorName })
+      : last?.actor === 'party' && last.signedByName
+        ? t('row.respondedBy', { name: last.signedByName })
+        : undefined;
+  return { primary: t('row.respondedAt', { date, time }), secondary };
 }

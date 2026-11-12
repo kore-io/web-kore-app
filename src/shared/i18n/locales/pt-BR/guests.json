@@ -97,7 +97,8 @@
     "menu": {
       "label": "Ações de {{name}}",
       "open": "Abrir"
-    }
+    },
+    "changedBy": "alterada por {{name}}"
   },
   "selected_one": "{{count}} grupo selecionado",
   "selected_other": "{{count}} grupos selecionados",
