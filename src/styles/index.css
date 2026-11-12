@@ -24,3 +24,4 @@
 @import '../features/guests/pages/export-page.css' layer(components);
 @import '../features/guests/components/party-form.css' layer(components);
 @import '../features/site/pages/site-editor-page.css' layer(components);
+@import '../features/publication/pages/publish-page.css' layer(components);
