@@ -21,6 +21,8 @@ export function CoupleAreaLayout() {
   const signOut = useSignOut();
   const onGuests = useMatch({ path: paths.guests, end: false }) !== null;
   const onSite = useMatch({ path: paths.site, end: false }) !== null;
+  // O Dashboard só em /app: telas sem item na Sidebar (ex.: Publicar o site) não marcam nada.
+  const onDashboard = useMatch({ path: paths.coupleArea, end: true }) !== null;
 
   // Sem os dados da pessoa, sem o AppShell: o aviso no meio da tela (decisão 164).
   if (failed) return <LoadError onRetry={retry} />;
@@ -38,7 +40,7 @@ export function CoupleAreaLayout() {
       userMenuGroups={[[{ id: 'sign-out', label: t('signOut'), onSelect: signOut }]]}
       navigation={
         <>
-          <NavItem asChild icon={<LayoutDashboard />} current={!onGuests && !onSite}>
+          <NavItem asChild icon={<LayoutDashboard />} current={onDashboard}>
             <Link to={paths.coupleArea}>{t('nav.dashboard')}</Link>
           </NavItem>
           <NavItem asChild icon={<Users />} current={onGuests}>
