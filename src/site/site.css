@@ -5,6 +5,7 @@
  */
 @import 'tailwindcss';
 @import '@kore-io/design/tailwind.css';
+@import '@kore-io/design/components.css';
 
 @import './site-layout.css' layer(components);
 @import './site-sections.css' layer(components);

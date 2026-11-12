@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../tests/a11y';
@@ -367,6 +367,145 @@ describe('Site do casal › o link do grupo (Site público RN06)', () => {
     const { container } = render(<SiteApp pathname="/ana-e-marcos/grupo/q3Xv8LmN2pRtY7wK1cZb4A" />);
     await screen.findByText('Convite para Família Moreira');
     await expectNoA11yViolations({ container });
+  });
+});
+
+let previewExtra: { published: boolean; audience: 'couple' | 'planner' } = {
+  published: false,
+  audience: 'couple',
+};
+
+const previewSite = (as: 'visitor' | 'party', name?: string) =>
+  ({
+    ...site,
+    viewer: { kind: 'preview', party: name ? { name } : null, preview: { as, ...previewExtra } },
+  }) as unknown as PublicSiteResponse;
+
+function mockPreview({
+  session = () => Response.json({ slug: 'ana-e-marcos', mode: 'visitor', party: null }),
+  total = 2,
+}: { session?: () => Response; total?: number } = {}) {
+  const calls: Call[] = [];
+  let mode: { as: 'visitor' | 'party'; name?: string } = { as: 'visitor' };
+  const parties = [
+    { id: 'p1', name: 'Família Moreira' },
+    { id: 'p2', name: 'Família Rocha' },
+  ];
+  mockApi(({ method, path, body }) => {
+    calls.push({ method, path, body });
+    if (path.endsWith('/preview-session') && method === 'POST') return session();
+    if (path.endsWith('/preview-session') && method === 'PATCH') {
+      const data = body as { mode: 'visitor' | 'party'; partyId?: string };
+      const party = parties.find((item) => item.id === data.partyId) ?? null;
+      mode = { as: data.mode, ...(party && { name: party.name }) };
+      return Response.json({ mode: data.mode, party });
+    }
+    if (path.startsWith('/v1/sites/ana-e-marcos/preview-parties'))
+      return Response.json({ data: parties, total });
+    if (path === '/v1/sites/ana-e-marcos' && method === 'GET')
+      return Response.json(previewSite(mode.as, mode.name));
+    return apiError({ status: 404, body: { error: 'X' } });
+  });
+  return calls;
+}
+
+describe('Site do casal › a prévia (Pré-visualização RN03 a RN06)', () => {
+  afterEach(() => {
+    window.history.replaceState(null, '', '/');
+    previewExtra = { published: false, audience: 'couple' };
+  });
+
+  it('site já publicado: "Prévia do site." e "Prévia como {grupo}." (caso de borda da RN06)', async () => {
+    const user = userEvent.setup();
+    previewExtra = { published: true, audience: 'couple' };
+    mockPreview();
+    render(<SiteApp pathname="/ana-e-marcos" search="?previa=q3Xv8LmN2pRtY7wK1cZb4A" />);
+    expect(await screen.findByText('Prévia do site.')).toBeInTheDocument();
+    await user.click(screen.getByText('Grupo'));
+    expect(await screen.findByText('Prévia como Família Moreira.')).toBeInTheDocument();
+  });
+
+  it('a cerimonialista lê a linha de apoio no singular (decisão 203)', async () => {
+    const user = userEvent.setup();
+    previewExtra = { published: false, audience: 'planner' };
+    mockPreview({ total: 230 });
+    render(<SiteApp pathname="/ana-e-marcos" search="?previa=q3Xv8LmN2pRtY7wK1cZb4A" />);
+    await screen.findByText('Prévia. O site ainda não foi publicado.');
+    await user.click(screen.getByText('Grupo'));
+    expect(
+      await screen.findByText(
+        'Mostrando 100 de 230 grupos. Busque pelo nome para achar os outros.',
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('tira o token do endereço, troca pelo cookie e mostra a barra como visitante', async () => {
+    window.history.replaceState(null, '', '/ana-e-marcos?previa=q3Xv8LmN2pRtY7wK1cZb4A');
+    const calls = mockPreview();
+    render(<SiteApp pathname="/ana-e-marcos" search="?previa=q3Xv8LmN2pRtY7wK1cZb4A" />);
+    expect(await screen.findByText('Prévia. O site ainda não foi publicado.')).toBeInTheDocument();
+    expect(window.location.search).toBe('');
+    expect(calls[0]).toEqual({
+      method: 'POST',
+      path: '/v1/sites/ana-e-marcos/preview-session',
+      body: { token: 'q3Xv8LmN2pRtY7wK1cZb4A' },
+    });
+    const viewAs = screen.getByRole('radiogroup', { name: 'Ver como' });
+    expect(within(viewAs).getByRole('radio', { name: 'Visitante' })).toBeChecked();
+    expect(screen.queryByRole('combobox', { name: 'Grupo' })).not.toBeInTheDocument();
+  });
+
+  it('a prévia que não vale mais (usada, vencida ou sem vínculo)', async () => {
+    mockPreview({ session: () => apiError({ status: 404, body: { error: 'PREVIEW_INVALID' } }) });
+    render(<SiteApp pathname="/ana-e-marcos" search="?previa=q3Xv8LmN2pRtY7wK1cZb4A" />);
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Esta prévia não vale mais.' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Cada prévia vale uma vez só, por poucos minutos. O botão Pré-visualizar do Editor do site abre uma nova.',
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('Grupo troca pelo PATCH e recarrega como o grupo; o Select troca de grupo', async () => {
+    const user = userEvent.setup();
+    const calls = mockPreview();
+    render(<SiteApp pathname="/ana-e-marcos" search="?previa=q3Xv8LmN2pRtY7wK1cZb4A" />);
+    await screen.findByText('Prévia. O site ainda não foi publicado.');
+    await user.click(screen.getByText('Grupo'));
+    expect(
+      await screen.findByText('Prévia como Família Moreira. O site ainda não foi publicado.'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Convite para Família Moreira')).toBeInTheDocument();
+    expect(calls.find((call) => call.method === 'PATCH')?.body).toEqual({
+      mode: 'party',
+      partyId: 'p1',
+    });
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Grupo' }), 'Família Rocha');
+    expect(await screen.findByText('Convite para Família Rocha')).toBeInTheDocument();
+    await user.click(screen.getByText('Visitante'));
+    expect(await screen.findByText('Prévia. O site ainda não foi publicado.')).toBeInTheDocument();
+    expect(screen.queryByText(/Convite para/)).not.toBeInTheDocument();
+  });
+
+  it('com mais de 100 grupos, a busca e a linha de apoio (decisão 203)', async () => {
+    const user = userEvent.setup();
+    const calls = mockPreview({ total: 230 });
+    render(<SiteApp pathname="/ana-e-marcos" search="?previa=q3Xv8LmN2pRtY7wK1cZb4A" />);
+    await screen.findByText('Prévia. O site ainda não foi publicado.');
+    await user.click(screen.getByText('Grupo'));
+    expect(
+      await screen.findByText(
+        'Mostrando 100 de 230 grupos. Busquem pelo nome para achar os outros.',
+      ),
+    ).toBeInTheDocument();
+    await user.type(screen.getByRole('searchbox', { name: 'Buscar um grupo' }), 'Rocha');
+    await waitFor(() =>
+      expect(
+        calls.some((call) => call.path === '/v1/sites/ana-e-marcos/preview-parties?q=Rocha'),
+      ).toBe(true),
+    );
   });
 });
 
