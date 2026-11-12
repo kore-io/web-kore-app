@@ -388,6 +388,26 @@ describe('Envios › a fila (Envios RN07, RN08)', () => {
     );
   });
 
+  it('depois de editar a mensagem, a fila de vários grupos é lida de novo (RN06, RN07)', async () => {
+    const user = userEvent.setup();
+    const calls = mockSend();
+    preset(['p1', 'p2']);
+    const { router } = renderRoute({ url: '/app/envios/convites?etapa=fila' });
+    await screen.findByText('0 de 2 enviados');
+    const queueReads = () =>
+      calls.filter(
+        (call) => call.path.includes('partyIds=p1%2Cp2') || call.path.includes('partyIds=p1,p2'),
+      ).length;
+    expect(queueReads()).toBe(1);
+    await router.navigate('/app/envios/convites?etapa=canal');
+    const message = await screen.findByRole('textbox', { name: 'Mensagem' });
+    await user.type(message, ' Até lá!');
+    await user.click(screen.getByRole('button', { name: 'Ir para a fila (2 grupos)' }));
+    await waitFor(() => expect(router.state.location.search).toBe('?etapa=fila'));
+    await screen.findByText('0 de 2 enviados');
+    await waitFor(() => expect(queueReads()).toBe(2));
+  });
+
   it('Parar e continuar depois volta aos grupos da aba', async () => {
     const user = userEvent.setup();
     mockSend();

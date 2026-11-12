@@ -91,11 +91,10 @@ function ChannelForm({
     await queryClient.invalidateQueries({
       queryKey: getMessageTemplatesControllerAllV1QueryKey(weddingId),
     });
+    // Todas as filas do casamento, e não só a da prévia: a fila de vários grupos tem outra
+    // chave e sairia com as URLs da mensagem antiga (ponto do Crivo no C4).
     await queryClient.invalidateQueries({
-      queryKey: getDeliveriesControllerGetQueueV1QueryKey(weddingId, {
-        kind,
-        partyIds: first ?? '',
-      }),
+      queryKey: getDeliveriesControllerGetQueueV1QueryKey(weddingId),
     });
   }
 

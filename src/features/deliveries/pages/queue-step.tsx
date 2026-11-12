@@ -48,7 +48,15 @@ export function QueueStep({
   const queue = useDeliveriesControllerGetQueueV1(
     weddingId,
     { kind, partyIds: ids.join(',') },
-    { query: { enabled: ids.length > 0, staleTime: Infinity, refetchOnWindowFocus: false } },
+    {
+      query: {
+        enabled: ids.length > 0,
+        // Relê ao abrir a fila (a mensagem pode ter mudado), e não ao voltar à aba.
+        refetchOnMount: 'always',
+        staleTime: Infinity,
+        refetchOnWindowFocus: false,
+      },
+    },
   );
   const [sent, setSent] = useState<Sent>({});
 
