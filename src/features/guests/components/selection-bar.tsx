@@ -14,6 +14,8 @@ interface SelectionBarProps {
   isApplying: boolean;
   onApplyTag: (tagId: string) => void;
   onTrash: () => void;
+  /** Lembrar pendentes (Envios RN04; Penpot A9): a fila do lembrete com os marcados. */
+  onRemind?: () => void;
 }
 
 /**
@@ -29,8 +31,10 @@ export function SelectionBar({
   isApplying,
   onApplyTag,
   onTrash,
+  onRemind,
 }: SelectionBarProps) {
   const { t } = useTranslation('guests');
+  const { t: tDeliveries } = useTranslation('deliveries');
   // Acima de 200 marcados, o apply recusaria: o botão fica desabilitado com o aviso (206).
   const tooMany = count > APPLY_TAG_MAX_PARTIES;
   const hintId = useId();
@@ -61,6 +65,17 @@ export function SelectionBar({
             })),
           ]}
         />
+        {onRemind && (
+          <Button
+            variant="secondary"
+            size="sm"
+            disabled={tooMany}
+            aria-describedby={tooMany ? hintId : undefined}
+            onClick={onRemind}
+          >
+            {tDeliveries('tabs.reminder')}
+          </Button>
+        )}
         <Button
           variant="destructive"
           size="sm"
