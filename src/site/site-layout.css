@@ -120,3 +120,12 @@
 .kore-site-skeleton__hero {
   @apply h-96 animate-pulse bg-gray-100;
 }
+
+/* A faixa do grupo identificado (Penpot: "Convite para Família Moreira"), acima da Topbar. */
+.kore-site__party {
+  @apply m-0 border-b border-site-border bg-site-background px-4 py-2 text-center type-label text-site-foreground;
+}
+
+.kore-site__contact {
+  @apply whitespace-nowrap text-site-foreground underline;
+}

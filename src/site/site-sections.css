@@ -163,3 +163,46 @@
 .kore-site-faq__answer {
   @apply pb-4 type-body-md text-site-foreground;
 }
+
+/* Cerimônia & Recepção para o grupo: os cartões dos locais, lado a lado no desktop. */
+.kore-site-venues {
+  @apply m-0 grid w-full list-none gap-4 p-0 text-start lg:grid-cols-2;
+}
+
+.kore-site-venue {
+  @apply flex flex-col gap-2 rounded-lg bg-site-surface p-6;
+}
+
+.kore-site-section--alt .kore-site-venue {
+  @apply bg-site-background;
+}
+
+.kore-site-venue__title {
+  @apply m-0 type-overline text-site-muted-foreground;
+}
+
+.kore-site-venue__place {
+  @apply m-0 font-site-display type-heading text-site-foreground;
+}
+
+.kore-site-venue__when {
+  @apply m-0 type-label text-site-foreground;
+}
+
+.kore-site-venue__address {
+  @apply m-0 type-body-md text-site-muted-foreground;
+}
+
+.kore-site-venue__routes {
+  @apply m-0 mt-2 flex flex-wrap gap-2;
+}
+
+.kore-site-venue__route {
+  @apply inline-flex min-h-11 items-center rounded-full border border-site-primary px-3 type-caption font-semibold text-site-foreground;
+  @apply hover:bg-site-primary hover:text-site-primary-foreground;
+  @apply focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}
+
+.kore-site-venue__new-tab {
+  @apply sr-only;
+}

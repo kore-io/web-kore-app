@@ -2,6 +2,7 @@ import { ChevronDown, ChevronRight, Info } from 'lucide-react';
 import { useId, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { PublicSectionResponse } from '../../shared/api/generated/model';
+import { routeLinks, venueDateLine } from '../venue-format';
 import { PhotoViewer } from './photo-viewer';
 import { sectionAnchor } from './site-layout';
 import { SiteText } from './site-text';
@@ -157,13 +158,62 @@ function Story({
   );
 }
 
+interface Venue {
+  title: string;
+  placeName: string;
+  date: string | null;
+  time: string | null;
+  address: string;
+}
+
 /**
  * Cerimônia & Recepção (RN07): para o visitante, o cartão fechado, sem local nem horário
- * (o servidor nem manda). Os cartões dos locais, para o grupo, chegam no link do grupo.
+ * (o servidor nem manda); para o grupo, os cartões dos locais com a data, a hora, o
+ * endereço e os botões de rota, que abrem em nova aba.
  */
 function Ceremony({ section }: { section: PublicSectionResponse }) {
   const { t } = useTranslation('publicSite');
-  if (!section.locked) return null;
+  if (!section.locked) {
+    const venues = (
+      Array.isArray(section.content?.venues) ? section.content.venues : []
+    ) as Venue[];
+    return (
+      <ul className="kore-site-venues">
+        {venues.map((venue, index) => {
+          const links = routeLinks(venue.address);
+          const when = venueDateLine({ date: venue.date, time: venue.time });
+          return (
+            <li key={index} className="kore-site-venue">
+              <p className="kore-site-venue__title">{venue.title}</p>
+              <h3 className="kore-site-venue__place">{venue.placeName}</h3>
+              {when && <p className="kore-site-venue__when">{when}</p>}
+              <p className="kore-site-venue__address">{venue.address}</p>
+              <p className="kore-site-venue__routes">
+                <a
+                  className="kore-site-venue__route"
+                  href={links.googleMaps}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t('sections.venue.googleMaps')}{' '}
+                  <span className="kore-site-venue__new-tab">{t('sections.venue.newTab')}</span>
+                </a>
+                <a
+                  className="kore-site-venue__route"
+                  href={links.waze}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {t('sections.venue.waze')}{' '}
+                  <span className="kore-site-venue__new-tab">{t('sections.venue.newTab')}</span>
+                </a>
+              </p>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  }
   return (
     <div className="kore-site-card kore-site-card--locked">
       <Info className="kore-site-card__icon" aria-hidden="true" />

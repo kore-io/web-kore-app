@@ -2,6 +2,7 @@ import { Menu, X } from 'lucide-react';
 import { useId, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { PublicSiteResponse } from '../../shared/api/generated/model';
+import { formatPhone } from '../../features/guests/party-form';
 import { LONG_DATE } from '../../features/site/site-texts';
 import { EDITOR_SECTIONS } from '../../features/site/sections';
 import { companyLine, KORE_URL, PRIVACY_URL, TERMS_URL } from '../links';
@@ -100,6 +101,7 @@ export function SiteLayout({
       <footer className="kore-site__footer">
         <p className="kore-site__footer-names">{site.names}</p>
         {dateLine && <p className="kore-site__footer-line">{dateLine}</p>}
+        <Contact contact={site.contact} />
         <p className="kore-site__footer-links">
           <a className="kore-site__made-with" href={KORE_URL}>
             {t('footer.madeWith')}
@@ -111,4 +113,41 @@ export function SiteLayout({
       </footer>
     </div>
   );
+}
+
+/**
+ * O contato do casal, só para o grupo (RN05 e RN10): o WhatsApp (`wa.me`) ou, sem ele, o
+ * e-mail (`mailto:`). Para o visitante, o servidor manda nulo.
+ */
+function Contact({ contact }: { contact: PublicSiteResponse['contact'] }) {
+  const { t } = useTranslation('publicSite');
+  if (contact?.whatsapp) {
+    const number = formatPhone(contact.whatsapp);
+    const [before, after] = t('footer.contactWhatsapp', { number: '{{link}}' }).split('{{link}}');
+    return (
+      <p className="kore-site__footer-line">
+        {before}
+        <a
+          className="kore-site__contact"
+          href={`https://wa.me/${contact.whatsapp.replace(/\D/g, '')}`}
+        >
+          {number}
+        </a>
+        {after}
+      </p>
+    );
+  }
+  if (contact?.email) {
+    const [before, after] = t('footer.contactEmail', { email: '{{link}}' }).split('{{link}}');
+    return (
+      <p className="kore-site__footer-line">
+        {before}
+        <a className="kore-site__contact" href={`mailto:${contact.email}`}>
+          {contact.email}
+        </a>
+        {after}
+      </p>
+    );
+  }
+  return null;
 }
