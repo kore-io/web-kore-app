@@ -44,6 +44,23 @@ export function todayIn({ timezone, now }: { timezone: string | null; now: Date 
   }).format(now);
 }
 
+/** Dias de calendário de hoje até a data, no fuso do casamento (Seções RN06); sem data, nulo. */
+export function daysUntil({
+  eventDate,
+  timezone,
+  now,
+}: {
+  eventDate: string | null;
+  timezone: string | null;
+  now: Date;
+}): number | null {
+  if (!eventDate) return null;
+  const today = todayIn({ timezone, now });
+  return Math.round(
+    (Date.parse(`${eventDate}T00:00:00Z`) - Date.parse(`${today}T00:00:00Z`)) / 86_400_000,
+  );
+}
+
 /** "Faltam 49 dias" · "Falta 1 dia" · "É hoje"; depois do casamento, nada (Seções RN06). */
 export function countdownText({
   t,
@@ -56,17 +73,13 @@ export function countdownText({
   timezone: string | null;
   now: Date;
 }): string | null {
-  if (!eventDate) return null;
-  const today = todayIn({ timezone, now });
-  const days = Math.round(
-    (Date.parse(`${eventDate}T00:00:00Z`) - Date.parse(`${today}T00:00:00Z`)) / 86_400_000,
-  );
-  if (days < 0) return null;
+  const days = daysUntil({ eventDate, timezone, now });
+  if (days === null || days < 0) return null;
   if (days === 0) return t('preview.today');
   return t('preview.countdown', { count: days });
 }
 
-const LONG_DATE = new Intl.DateTimeFormat('pt-BR', {
+export const LONG_DATE = new Intl.DateTimeFormat('pt-BR', {
   weekday: 'long',
   day: 'numeric',
   month: 'long',
