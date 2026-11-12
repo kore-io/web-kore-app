@@ -9,7 +9,7 @@ export default {
   },
   overrides: [
     {
-      files: ['src/styles/index.css'],
+      files: ['src/styles/index.css', 'src/site/site.css'],
       rules: { 'kore/at-rule-ds-only': null },
     },
   ],

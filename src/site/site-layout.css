@@ -1,0 +1,122 @@
+/*
+ * O site do casal nas cores e fontes da Aparência (site.*): a Topbar com os nomes e o
+ * menu, que vira botão abaixo de 1024 px; o Hero com e sem capa; o rodapé (Penpot,
+ * Área do Convidado, Início).
+ */
+.kore-site {
+  @apply flex min-h-dvh flex-col bg-site-background font-site-body text-site-foreground;
+}
+
+.kore-site__skip {
+  @apply sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-site-surface focus:px-4 focus:py-3 focus:text-site-foreground focus:shadow-focus-ring;
+}
+
+.kore-site__topbar {
+  @apply relative flex min-h-16 items-center justify-between gap-4 border-b border-site-border bg-site-background px-4 md:px-8;
+}
+
+.kore-site__names {
+  @apply font-site-display text-site-foreground type-heading;
+}
+
+.kore-site__menu-button {
+  @apply flex size-11 cursor-pointer items-center justify-center rounded-md text-site-foreground lg:hidden;
+  @apply focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}
+
+.kore-site__menu {
+  @apply absolute inset-x-0 top-full z-40 hidden border-b border-site-border bg-site-background px-4 pb-4 md:px-8;
+  @apply lg:static lg:block lg:border-0 lg:bg-transparent lg:p-0;
+}
+
+.kore-site__menu[data-open='true'] {
+  @apply block;
+}
+
+.kore-site__menu-list {
+  @apply m-0 flex list-none flex-col gap-1 p-0 lg:flex-row lg:gap-6;
+}
+
+.kore-site__menu-link {
+  @apply flex min-h-11 items-center text-site-foreground type-body-md;
+  @apply hover:underline focus-visible:rounded-sm focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}
+
+.kore-site__main {
+  @apply flex-1 outline-none;
+}
+
+.kore-site__footer {
+  @apply flex flex-col items-center gap-2 border-t border-site-border px-4 py-12 text-center;
+}
+
+.kore-site__footer-names {
+  @apply m-0 font-site-display text-site-foreground type-heading;
+}
+
+.kore-site__footer-line {
+  @apply m-0 type-body-md text-site-foreground;
+}
+
+.kore-site__footer-links {
+  @apply m-0 flex flex-wrap items-center justify-center gap-x-3 type-caption text-site-muted-foreground;
+}
+
+.kore-site__footer-links a {
+  @apply inline-flex min-h-11 items-center hover:underline;
+}
+
+.kore-site__made-with {
+  @apply text-site-kore-seal underline;
+}
+
+.kore-site__company {
+  @apply m-0 type-caption text-site-muted-foreground;
+}
+
+/* Hero */
+.kore-site-hero {
+  @apply relative flex min-h-96 items-center justify-center border-b-4 border-site-accent bg-site-background px-4 py-24 text-center;
+}
+
+.kore-site-hero--cover {
+  @apply border-b-0 bg-overlay text-white;
+}
+
+.kore-site-hero__image {
+  @apply absolute inset-0 size-full object-cover;
+}
+
+.kore-site-hero__scrim {
+  @apply absolute inset-0 bg-overlay;
+}
+
+.kore-site-hero__content {
+  @apply relative z-10 flex max-w-2xl flex-col items-center gap-3;
+}
+
+.kore-site-hero__overline {
+  @apply m-0 type-overline;
+}
+
+.kore-site-hero__names {
+  @apply m-0 font-site-display type-display-xl;
+}
+
+.kore-site-hero__line,
+.kore-site-hero__countdown {
+  @apply m-0 type-body-md;
+}
+
+/* Carregando */
+.kore-site-skeleton {
+  @apply min-h-dvh bg-paper;
+}
+
+.kore-site-skeleton__topbar {
+  @apply h-16 border-b border-gray-300;
+}
+
+.kore-site-skeleton__hero {
+  @apply h-96 animate-pulse bg-gray-100;
+}

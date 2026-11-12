@@ -1,6 +1,13 @@
 interface ImportMetaEnv {
   /** Endereço da API, sem barra no fim (ex.: http://localhost:3000). */
   readonly VITE_API_URL: string;
+  /**
+   * A linha da empresa no rodapé do site do casal (Site público RN10; decisão 123 D9).
+   * Vazios, a linha não aparece.
+   */
+  readonly VITE_COMPANY_NAME?: string;
+  readonly VITE_COMPANY_CNPJ?: string;
+  readonly VITE_COMPANY_ADDRESS?: string;
 }
 
 interface ImportMeta {
