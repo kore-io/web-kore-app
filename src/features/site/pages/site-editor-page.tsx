@@ -9,6 +9,12 @@ import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { useActiveWedding, type Audience } from '../../guests/hooks/use-active-wedding';
 import { AppearanceSection } from '../components/appearance-section';
 import { BasicsSection } from '../components/basics-section';
+import {
+  CountdownSection,
+  DressCodeSection,
+  FaqSection,
+  LodgingSection,
+} from '../sections/section-forms';
 import { SitePreview } from '../components/site-preview';
 import { PreviewAppearanceProvider } from '../preview-appearance';
 import { SectionFormProvider, type SectionForm } from '../section-form';
@@ -190,6 +196,16 @@ function SiteEditor({
                 {sectionKey === 'appearance' && (
                   <AppearanceSection weddingId={weddingId} site={data} audience={audience} />
                 )}
+                {(() => {
+                  const section = data.sections.find((item) => item.type === sectionKey);
+                  if (!section) return null;
+                  const props = { weddingId, site: data, section, audience };
+                  if (section.type === 'countdown') return <CountdownSection {...props} />;
+                  if (section.type === 'lodging') return <LodgingSection {...props} />;
+                  if (section.type === 'dress_code') return <DressCodeSection {...props} />;
+                  if (section.type === 'faq') return <FaqSection {...props} />;
+                  return null;
+                })()}
               </section>
             </SectionFormProvider>
           </PreviewAppearanceProvider>

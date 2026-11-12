@@ -193,5 +193,51 @@
       "dark": "Escuro"
     },
     "help": "Trocar a aparência não apaga textos nem fotos."
+  },
+  "section": {
+    "show": "Mostrar a seção no site",
+    "empty": "Esta seção está ligada, mas ainda não tem conteúdo, então não aparece no site. Ela aparece quando for preenchida.",
+    "title": "Título da seção",
+    "text": "Texto",
+    "counter": "{{count}}/{{max}}",
+    "errors": {
+      "titleMissing": {
+        "couple": "Deem um título à seção.",
+        "planner": "Dê um título à seção."
+      },
+      "required": {
+        "couple": "Preencham este campo.",
+        "planner": "Preencha este campo."
+      }
+    },
+    "countdown": {
+      "switch": "Mostrar a contagem no site",
+      "help": "O site mostra quantos dias faltam, como “Faltam 3 dias”. No dia, mostra “É hoje”. Depois do casamento, a contagem some.",
+      "noDate": {
+        "couple": "Informem a data do casamento em Dados básicos para mostrar a contagem.",
+        "seller": "Informe a data do casamento em Dados básicos para mostrar a contagem.",
+        "planner": "A contagem aparece quando o casal informar a data do casamento."
+      },
+      "goToBasics": "Ir para Dados básicos"
+    },
+    "lodging": {
+      "placeholder": "Ex.: hotéis perto da festa, como chegar, se haverá van"
+    },
+    "dressCode": {
+      "photo": "Foto de referência (opcional)"
+    },
+    "faq": {
+      "item": "Pergunta {{n}}",
+      "question": "Pergunta",
+      "answer": "Resposta",
+      "up": "Subir pergunta {{n}}",
+      "down": "Descer pergunta {{n}}",
+      "remove": "Remover pergunta {{n}}",
+      "add": "Adicionar pergunta",
+      "limit": {
+        "couple": "Vocês já têm 30 perguntas, o limite do site. Removam uma para adicionar outra.",
+        "planner": "Este site já tem 30 perguntas, o limite. Remova uma para adicionar outra."
+      }
+    }
   }
 }
