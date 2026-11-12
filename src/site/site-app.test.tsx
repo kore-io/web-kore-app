@@ -137,6 +137,25 @@ describe('Site do casal › layout (Site público RN10, RN11)', () => {
     expect(screen.getByText(/^(Faltam \d+ dias|Falta 1 dia|É hoje)$/)).toBeInTheDocument();
   });
 
+  // A contagem conta no fuso do casamento (Seções RN06), com o relógio fixo.
+  it.each([
+    ['11/11 às 23h30 em Brasília (02h30 UTC do dia 12)', '2026-11-12T02:30:00Z', 'Faltam 3 dias'],
+    ['no dia do casamento', '2026-11-14T15:00:00Z', 'É hoje'],
+    ['depois do casamento', '2026-11-15T15:00:00Z', null],
+  ])('a contagem do Hero %s', async (_when, now, text) => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(now));
+    try {
+      mockSite(() => Response.json(site));
+      render(<SiteApp pathname="/ana-e-marcos" />);
+      await screen.findByText('Vamos nos casar');
+      if (text) expect(screen.getByText(text)).toBeInTheDocument();
+      else expect(screen.queryByText(/Faltam|Falta 1|É hoje/)).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('o botão do menu abre e fecha a lista, e o Esc fecha', async () => {
     const user = userEvent.setup();
     mockSite(() => Response.json(site));
