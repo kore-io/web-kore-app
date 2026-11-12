@@ -2,13 +2,29 @@ import type { TFunction } from 'i18next';
 
 type SiteT = TFunction<'site'>;
 
-/** "salvo às 10h31"; com minuto zero, "salvo às 10h" (Voz; textos-f2). Hora do aparelho. */
-export function savedAtText({ t, at }: { t: SiteT; at: string | null }): string | null {
+/**
+ * "salvo às 10h31"; com minuto zero, "salvo às 10h" (Voz; textos-f2), no fuso do
+ * casamento (Dados básicos RN10).
+ */
+export function savedAtText({
+  t,
+  at,
+  timezone,
+}: {
+  t: SiteT;
+  at: string | null;
+  timezone: string | null;
+}): string | null {
   if (!at) return null;
-  const date = new Date(at);
-  const minutes = date.getMinutes();
-  const time = `${date.getHours()}h${minutes === 0 ? '' : String(minutes).padStart(2, '0')}`;
-  return t('savedAt', { time });
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: timezone ?? 'America/Sao_Paulo',
+    hour: 'numeric',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(new Date(at));
+  const hour = Number(parts.find((part) => part.type === 'hour')?.value ?? '0');
+  const minute = parts.find((part) => part.type === 'minute')?.value ?? '00';
+  return t('savedAt', { time: `${hour}h${minute === '00' ? '' : minute}` });
 }
 
 const STATUS = ['awaiting_couple', 'draft', 'published', 'post_event', 'expired'] as const;
