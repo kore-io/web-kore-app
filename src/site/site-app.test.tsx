@@ -58,6 +58,8 @@ describe('Site do casal › endereço e estados (Site público RN01, RN04, RN12)
     });
     expect(parseSiteRoute('/')).toEqual({ kind: 'none' });
     expect(parseSiteRoute('/ana-e-marcos/outra')).toEqual({ kind: 'none' });
+    // Um "%" malformado não derruba a página: vira o endereço que não existe.
+    expect(parseSiteRoute('/ana%E0%A4%A')).toEqual({ kind: 'none' });
   });
 
   it('rascunho: a página do Kore, sem nome do casal (RN04)', async () => {
