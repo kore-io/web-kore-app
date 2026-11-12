@@ -207,6 +207,24 @@ describe('Confirmar presença (Confirmar presença RN01 a RN14)', () => {
     expect(within(choice('Quem está respondendo?')).getByLabelText('Carla')).toBeChecked();
   });
 
+  it('enviar sem mudar nada volta à confirmação, com a mesma version (RN09)', async () => {
+    const user = userEvent.setup();
+    const answered = rsvp({
+      guests: rsvp().guests.map((guest) =>
+        guest.isPlusOne ? guest : { ...guest, rsvpStatus: 'confirmed' as const },
+      ),
+    });
+    // A API devolve o mesmo RSVP, com a mesma version, quando nada mudou.
+    const calls = mockRsvp({ data: answered, put: () => Response.json(answered) });
+    renderRsvp();
+    await user.click(await screen.findByRole('button', { name: 'Alterar respostas' }));
+    await user.click(within(choice('Quem está respondendo?')).getByLabelText('Carla'));
+    await user.click(send());
+    expect(await screen.findByText('Vocês confirmaram 2 pessoas.')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Enviar respostas' })).toBeNull();
+    expect(calls).toHaveLength(1);
+  });
+
   it('só recusas: "Recebemos sua resposta." (RN09)', async () => {
     mockRsvp({
       data: rsvp({

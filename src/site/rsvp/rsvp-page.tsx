@@ -139,6 +139,10 @@ function RsvpBody({
     setSending(false);
     if (result.kind === 'saved') {
       rememberSigner({ partyId: rsvp.party.id, guestId: signer });
+      // Sem mudança, a API devolve a mesma version e o formulário não remonta: a volta à
+      // confirmação é explícita (RN09; ponto do Crivo).
+      setGuests(formFromRsvp(result.rsvp));
+      setEditing(false);
       queryClient.setQueryData(rsvpQueryKey(slug), result.rsvp);
       return;
     }
