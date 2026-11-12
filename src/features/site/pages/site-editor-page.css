@@ -347,3 +347,36 @@
 .kore-site-venue__when > :last-child {
   @apply col-span-2;
 }
+
+/* Nossa história: as fotos em grade de 3, com o Remover no canto (Penpot 1.8) */
+.kore-site-story {
+  @apply flex flex-col gap-3;
+}
+
+.kore-site-story__grid {
+  @apply m-0 grid list-none grid-cols-3 gap-3 p-0;
+}
+
+.kore-site-story__photo {
+  @apply relative aspect-video overflow-hidden rounded-md bg-gray-100;
+}
+
+.kore-site-story__photo--pending {
+  @apply flex items-end p-3;
+}
+
+.kore-site-story__thumb {
+  @apply block size-full object-cover;
+}
+
+.kore-site-story__remove {
+  @apply absolute top-1 right-1 bg-white;
+}
+
+.kore-site-story__bar {
+  @apply w-full;
+}
+
+.kore-site-story__sending {
+  @apply m-0 type-caption text-gray-700;
+}

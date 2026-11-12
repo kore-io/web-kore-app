@@ -44,7 +44,7 @@ type Section = ReturnType<typeof useSiteSection<unknown>>;
  * O que toda seção de conteúdo tem (Seções RN03, RN11, RN12): o Switch "Mostrar a seção
  * no site", o aviso de ligada e vazia e o Título da seção.
  */
-function SectionFrame({
+export function SectionFrame({
   state,
   audience,
   empty,
@@ -96,7 +96,7 @@ function SectionFrame({
 }
 
 /** Texto com o contador do Penpot ("0/5.000"); o limite trava a digitação (RN12). */
-function TextWithCounter({
+export function TextWithCounter({
   label,
   value,
   max,

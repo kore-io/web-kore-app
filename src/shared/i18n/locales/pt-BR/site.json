@@ -263,6 +263,21 @@
         "first": "Cerimônia",
         "second": "Recepção"
       }
+    },
+    "story": {
+      "photos": "Fotos do casal ({{count}} de {{max}})",
+      "drop": {
+        "couple": "Arrastem as fotos ou cliquem para escolher",
+        "planner": "Arraste as fotos ou clique para escolher"
+      },
+      "dropHint": "JPG ou PNG, até 12 fotos.",
+      "help": "Esta seção é pública: é aqui que vão as fotos do ensaio.",
+      "limit": {
+        "couple": "Vocês já têm 12 fotos, o limite da seção. Removam uma para incluir outra.",
+        "planner": "Esta seção já tem 12 fotos, o limite. Remova uma para incluir outra."
+      },
+      "remove": "Remover foto {{n}}",
+      "alt": "Foto {{n}} de {{total}} de {{title}}"
     }
   }
 }
