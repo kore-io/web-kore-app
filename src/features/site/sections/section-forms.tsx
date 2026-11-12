@@ -1,4 +1,4 @@
-import { Alert, Button, IconButton, Input, Switch, Textarea } from '@kore-io/design';
+import { Alert, Button, DateField, IconButton, Input, Switch, Textarea } from '@kore-io/design';
 import { ChevronDown, ChevronUp, X } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +18,18 @@ const DRESS_MAX = 2000;
 const QUESTION_MAX = 200;
 const ANSWER_MAX = 1000;
 export const FAQ_MAX = 30;
+export const VENUES_MAX = 4;
+const VENUE_TITLE_MAX = 40;
+const PLACE_NAME_MAX = 80;
+const ADDRESS_MAX = 200;
+
+/** Move o item da posição `index` uma casa para cima (-1) ou para baixo (1). */
+function moveItem<T>(items: readonly T[], index: number, by: -1 | 1): T[] {
+  const next = [...items];
+  const [item] = next.splice(index, 1);
+  if (item !== undefined) next.splice(index + by, 0, item);
+  return next;
+}
 
 interface SectionProps {
   weddingId: string;
@@ -36,11 +48,14 @@ function SectionFrame({
   state,
   audience,
   empty,
+  notice,
   children,
 }: {
   state: Pick<Section, 'draft' | 'errors' | 'setEnabled' | 'setTitle' | 'clearError'>;
   audience: Audience;
   empty: boolean;
+  /** O aviso fixo da seção, embaixo do título (Penpot 1.4). */
+  notice?: ReactNode;
   children: ReactNode;
 }) {
   const { t } = useTranslation('site');
@@ -74,6 +89,7 @@ function SectionFrame({
           />
         )}
       </FormField>
+      {notice}
       {children}
     </div>
   );
@@ -263,14 +279,8 @@ export function FaqSection({ weddingId, section, audience }: SectionProps) {
   const full = items.length >= FAQ_MAX;
   const required = t(`section.errors.required.${audience}`);
 
-  function move(index: number, by: -1 | 1) {
-    state.setContent((current) => {
-      const next = [...current];
-      const [item] = next.splice(index, 1);
-      if (item) next.splice(index + by, 0, item);
-      return next;
-    });
-  }
+  const move = (index: number, by: -1 | 1) =>
+    state.setContent((current) => moveItem(current, index, by));
 
   return (
     <SectionFrame state={state} audience={audience} empty={items.length === 0}>
@@ -363,6 +373,216 @@ export function FaqSection({ weddingId, section, audience }: SectionProps) {
         {full && (
           <p id="kore-site-faq-limit" className="kore-site-section__help">
             {t(`section.faq.limit.${audience}`)}
+          </p>
+        )}
+      </div>
+    </SectionFrame>
+  );
+}
+
+interface Venue {
+  key: string;
+  title: string;
+  placeName: string;
+  date: string;
+  time: string;
+  address: string;
+}
+
+type VenueField = 'title' | 'placeName' | 'date' | 'time' | 'address';
+
+/**
+ * Cerimônia & Recepção (RN07): até 4 locais, cada um com Título, Nome do lugar e
+ * Endereço obrigatórios, e Data e Hora opcionais, no horário local do casamento. O 1º
+ * local novo vem com "Cerimônia", o 2º com "Recepção", e a data é a do casamento.
+ */
+export function CeremonySection({ weddingId, site, section, audience }: SectionProps) {
+  const { t } = useTranslation('site');
+  const state = useSiteSection<Venue[]>({
+    weddingId,
+    section,
+    fromResponse: (content) =>
+      (Array.isArray(content.venues)
+        ? (content.venues as {
+            title: string;
+            placeName: string;
+            date: string | null;
+            time: string | null;
+            address: string;
+          }[])
+        : []
+      ).map((venue) => ({
+        key: nextKey(),
+        title: venue.title,
+        placeName: venue.placeName,
+        date: venue.date ?? '',
+        time: venue.time ?? '',
+        address: venue.address,
+      })),
+    toBody: (venues) => ({
+      venues: venues.map((venue) => ({
+        title: venue.title.trim(),
+        placeName: venue.placeName.trim(),
+        date: venue.date || null,
+        time: venue.time || null,
+        address: venue.address.trim(),
+      })),
+    }),
+    validate: (venues) => {
+      const errors: SectionErrors = {};
+      venues.forEach((venue, index) => {
+        for (const field of ['title', 'placeName', 'address'] as const) {
+          if (!venue[field].trim()) errors[`content.venues.${index}.${field}`] = 'REQUIRED';
+        }
+      });
+      return errors;
+    },
+  });
+  const venues = state.draft.content;
+  const full = venues.length >= VENUES_MAX;
+  const required = t(`section.errors.required.${audience}`);
+
+  function add() {
+    state.setContent((current) => {
+      const title =
+        current.length === 0
+          ? t('section.ceremony.defaultTitle.first')
+          : current.length === 1
+            ? t('section.ceremony.defaultTitle.second')
+            : '';
+      return [
+        ...current,
+        { key: nextKey(), title, placeName: '', date: site.eventDate ?? '', time: '', address: '' },
+      ];
+    });
+  }
+
+  return (
+    <SectionFrame
+      state={state}
+      audience={audience}
+      empty={venues.length === 0}
+      notice={<Alert tone="info">{t('section.ceremony.notice')}</Alert>}
+    >
+      <ol className="kore-site-faq">
+        {venues.map((venue, index) => {
+          const n = index + 1;
+          // O rótulo das ações diz o local; sem título, o número do cartão (RN07).
+          const name = venue.title.trim() || t('section.ceremony.item', { n });
+          const path = (field: VenueField) => `content.venues.${index}.${field}`;
+          const fieldError = (field: VenueField) =>
+            state.errors[path(field)] ? { hint: required, hintTone: 'danger' as const } : {};
+          const set = (field: VenueField, value: string) => {
+            state.clearError(path(field));
+            state.setContent((current) =>
+              current.map((entry) =>
+                entry.key === venue.key ? { ...entry, [field]: value } : entry,
+              ),
+            );
+          };
+          const text = (field: 'title' | 'placeName', label: string, max: number) => (
+            <FormField label={label} {...fieldError(field)}>
+              {({ id, describedBy, invalid }) => (
+                <Input
+                  id={id}
+                  aria-describedby={describedBy}
+                  invalid={invalid}
+                  maxLength={max}
+                  value={venue[field]}
+                  onChange={(event) => set(field, event.target.value)}
+                />
+              )}
+            </FormField>
+          );
+          return (
+            <li key={venue.key} className="kore-site-faq__item">
+              <div className="kore-site-faq__head">
+                <span className="kore-site-faq__label">{t('section.ceremony.item', { n })}</span>
+                <span className="kore-site-faq__actions">
+                  <IconButton
+                    icon={<ChevronUp />}
+                    label={t('section.ceremony.up', { title: name })}
+                    disabled={index === 0}
+                    onClick={() => state.setContent((current) => moveItem(current, index, -1))}
+                  />
+                  <IconButton
+                    icon={<ChevronDown />}
+                    label={t('section.ceremony.down', { title: name })}
+                    disabled={index === venues.length - 1}
+                    onClick={() => state.setContent((current) => moveItem(current, index, 1))}
+                  />
+                  <IconButton
+                    icon={<X />}
+                    label={t('section.ceremony.remove', { title: name })}
+                    onClick={() =>
+                      state.setContent((current) =>
+                        current.filter((entry) => entry.key !== venue.key),
+                      )
+                    }
+                  />
+                </span>
+              </div>
+              {text('title', t('section.ceremony.title'), VENUE_TITLE_MAX)}
+              {text('placeName', t('section.ceremony.placeName'), PLACE_NAME_MAX)}
+              <div className="kore-site-venue__when">
+                <FormField label={t('section.ceremony.date')}>
+                  {({ id, describedBy }) => (
+                    <DateField
+                      id={id}
+                      aria-describedby={describedBy}
+                      value={venue.date}
+                      onChange={(event) => set('date', event.target.value)}
+                    />
+                  )}
+                </FormField>
+                <FormField label={t('section.ceremony.time')}>
+                  {({ id, describedBy }) => (
+                    <Input
+                      id={id}
+                      type="time"
+                      aria-describedby={describedBy}
+                      value={venue.time}
+                      onChange={(event) => set('time', event.target.value)}
+                    />
+                  )}
+                </FormField>
+              </div>
+              <FormField
+                label={t('section.ceremony.address')}
+                {...(state.errors[path('address')]
+                  ? { hint: required, hintTone: 'danger' as const }
+                  : {
+                      hint: t(`section.ceremony.addressHelp.${audience}`),
+                      hintTone: 'neutral' as const,
+                    })}
+              >
+                {({ id, describedBy, invalid }) => (
+                  <Input
+                    id={id}
+                    aria-describedby={describedBy}
+                    invalid={invalid}
+                    maxLength={ADDRESS_MAX}
+                    value={venue.address}
+                    onChange={(event) => set('address', event.target.value)}
+                  />
+                )}
+              </FormField>
+            </li>
+          );
+        })}
+      </ol>
+      <div className="kore-site-faq__add">
+        <Button
+          variant="secondary"
+          disabled={full}
+          {...(full && { 'aria-describedby': 'kore-site-venue-limit' })}
+          onClick={add}
+        >
+          {t('section.ceremony.add')}
+        </Button>
+        {full && (
+          <p id="kore-site-venue-limit" className="kore-site-section__help">
+            {t(`section.ceremony.limit.${audience}`)}
           </p>
         )}
       </div>

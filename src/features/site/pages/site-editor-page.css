@@ -334,3 +334,16 @@
 .kore-site-faq__add {
   @apply flex flex-col items-start gap-2;
 }
+
+/* Data e Hora do local lado a lado, a Data mais larga, como no Penpot 1.4 */
+.kore-site-venue__when {
+  @apply grid grid-cols-5 gap-4;
+}
+
+.kore-site-venue__when > :first-child {
+  @apply col-span-3;
+}
+
+.kore-site-venue__when > :last-child {
+  @apply col-span-2;
+}
