@@ -97,6 +97,16 @@ describe('Site do casal › endereço e estados (Site público RN01, RN04, RN12)
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it('/simule com o simulador desligado: o endereço não existe (Simule RN01)', async () => {
+    // O vitest.config fixa VITE_SIMULATOR_ENABLED=false, como em homologação e produção.
+    const fetchMock = mockSite(() => Response.json(site));
+    render(<SiteApp pathname="/simule" />);
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Não encontramos este endereço.' }),
+    ).toBeInTheDocument();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it('erro ao carregar: a página com Tentar de novo, que chama de novo (RN12)', async () => {
     const user = userEvent.setup();
     let fail = true;

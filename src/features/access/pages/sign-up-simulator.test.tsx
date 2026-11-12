@@ -196,6 +196,21 @@ describe('Cadastro com o rascunho do Simule (Cadastro RN12; Simule RN08 a RN10)'
     expect(window.localStorage.getItem(APP_DRAFT_KEY)).not.toBeNull();
   });
 
+  it('quem não tem casamento próprio (colaboradora) leva o rascunho aos Dados (Cadastro RN12)', async () => {
+    store(draft());
+    mockApi((request) =>
+      request.path === '/v1/me'
+        ? Response.json(meBody([{ role: 'collaborator', weddingId: 'w9' }]))
+        : (available(request) ?? noSession()),
+    );
+    renderRoute({ url: '/cadastro' });
+    expect(await screen.findByRole('textbox', { name: 'Seu nome' })).toHaveValue('Ana');
+    expect(screen.getByRole('textbox', { name: 'Com quem você vai casar?' })).toHaveValue('Marcos');
+    expect(screen.getByRole('group', { name: 'Aparência do simulador' })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: 'Cidade' })).toHaveValue('Campinas');
+    expect(screen.queryByText('Você já tem um casamento no Kore.')).not.toBeInTheDocument();
+  });
+
   it('o Entrar com next=couple_signup volta ao cadastro, também para quem tem outros perfis', () => {
     expect(destinationAfterLogin({ next: 'choose_profile', returnPath: '/cadastro' })).toEqual({
       kind: 'route',
