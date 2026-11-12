@@ -9,6 +9,7 @@ export * from './parties/parties';
 export * from './referrals/referrals';
 export * from './site/site';
 export * from './site-images/site-images';
+export * from './sites/sites';
 export * from './tags/tags';
 export * from './trash/trash';
 export * from './weddings/weddings';

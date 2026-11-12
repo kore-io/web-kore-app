@@ -7,7 +7,10 @@
 import type { UpdatePartyGuestBody } from './updatePartyGuestBody';
 
 export interface UpdatePartyBody {
-  /** Os editados (com id) e os novos (sem id). Não tira convidado: tirar é a lixeira. */
+  /**
+   * Os editados (com id) e os novos (sem id). Não tira convidado: tirar é a lixeira.
+   * @maxItems 100
+   */
   guests?: UpdatePartyGuestBody[];
   /**
    * @minimum 0
