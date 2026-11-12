@@ -1,0 +1,50 @@
+/*
+ * Quadro das telas de acesso (Acessos, Penpot). Celular: 24/16 de respiro, 40 px entre
+ * logo, conteúdo e a linha legal no pé. Tablet: cartão branco de 480 px, raio lg,
+ * shadow.sm e 40 px de respiro, com a linha legal 24 px abaixo. Computador: painel da
+ * marca de 600 px em primary.dark (64 px de respiro, logo à esquerda, x = 64, decisão
+ * 161) e a coluna de 400 px centralizada.
+ */
+.kore-access {
+  @apply flex min-h-dvh bg-background;
+}
+
+.kore-access__brand {
+  @apply hidden w-150 shrink-0 flex-col items-start justify-between bg-primary-dark p-16 lg:flex;
+}
+
+.kore-access__pitch {
+  @apply flex flex-col gap-4;
+}
+
+.kore-access__headline {
+  @apply type-display-xl text-white;
+}
+
+.kore-access__description {
+  @apply type-body-lg text-primary-tint;
+}
+
+.kore-access__site {
+  @apply type-caption text-primary-tint;
+}
+
+.kore-access__main {
+  @apply flex flex-1 flex-col gap-10 px-4 py-6;
+  @apply md:items-center md:justify-center md:gap-6 md:px-6 md:py-12;
+  @apply lg:gap-8 lg:p-0;
+}
+
+.kore-access__card {
+  @apply flex flex-col gap-10;
+  @apply md:w-120 md:rounded-lg md:bg-card md:p-10 md:shadow-sm;
+  @apply lg:w-100 lg:rounded-none lg:bg-transparent lg:p-0 lg:shadow-none;
+}
+
+.kore-access__top {
+  @apply flex h-8 items-center lg:hidden;
+}
+
+.kore-access__legal {
+  @apply type-caption mt-auto text-center text-gray-700 md:mt-0 md:w-120 lg:w-100;
+}

@@ -1,0 +1,97 @@
+/*
+ * Painel do grupo (Penpot, Área do Casal, página 05): o voltar em type.link primary.dark;
+ * cartões brancos com borda gray.300, raio lg, 20 px de respiro e 10 px entre os itens,
+ * dois por linha no computador (16 px entre eles); título do cartão em type.overline
+ * gray.700; linhas rótulo (body.md gray.700) e valor (type.label ink) nas pontas;
+ * convidado com o nome em type.label e a faixa etária em caption, o selo à direita.
+ */
+.kore-party-panel {
+  @apply flex flex-col gap-6;
+}
+
+.kore-party-panel__back {
+  @apply type-link self-start text-primary-dark;
+  @apply focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}
+
+.kore-party-panel__cards {
+  @apply grid items-start gap-6 lg:grid-cols-2 lg:gap-4;
+}
+
+.kore-party-panel__card {
+  @apply flex min-w-0 flex-col gap-2.5 rounded-lg border border-gray-300 bg-white p-5;
+}
+
+.kore-party-panel__card-title {
+  @apply type-overline text-gray-700;
+}
+
+.kore-party-panel__rows {
+  @apply flex flex-col gap-2.5;
+}
+
+.kore-party-panel__row {
+  @apply flex items-center justify-between gap-3;
+}
+
+.kore-party-panel__label {
+  @apply type-body-md text-gray-700;
+}
+
+.kore-party-panel__value {
+  @apply type-label min-w-0 text-right break-words text-ink;
+}
+
+.kore-party-panel__tags {
+  @apply flex flex-wrap justify-end gap-1;
+}
+
+.kore-party-panel__note {
+  @apply type-caption text-gray-700;
+}
+
+.kore-party-panel__guests {
+  @apply flex flex-col gap-3;
+}
+
+.kore-party-panel__guest {
+  @apply flex items-center justify-between gap-3;
+}
+
+.kore-party-panel__guest-text {
+  @apply flex min-w-0 flex-col gap-0.5;
+}
+
+.kore-party-panel__guest-name {
+  @apply type-label text-ink;
+}
+
+.kore-party-panel__guest-status {
+  @apply flex shrink-0 items-center gap-2;
+}
+
+.kore-party-panel__guest-actions {
+  @apply flex;
+}
+
+.kore-party-panel__guest-details {
+  @apply type-caption text-gray-700;
+}
+
+.kore-party-panel__link {
+  @apply type-body-md truncate text-ink;
+}
+
+.kore-party-panel__actions {
+  @apply flex flex-wrap gap-2;
+}
+
+/* Mover de grupo: a busca e o Select dos grupos, 12 px entre eles. */
+.kore-move-guest {
+  @apply flex flex-col gap-3;
+}
+
+.kore-move-guest__more,
+.kore-move-guest__empty {
+  @apply type-caption text-gray-700;
+}

@@ -1,0 +1,82 @@
+/*
+ * Passo do e-mail da tela Entrar (Acessos, Penpot): 24 px entre os blocos; título em
+ * display.md com 8 px até o apoio em body.lg gray.700; "ou" em caption entre linhas, com
+ * 12 px; rótulo e campo com 6 px; botão G na largura toda; links do rodapé centralizados,
+ * 8 px entre as linhas e 4 px entre a pergunta e o link.
+ */
+.kore-sign-in,
+.kore-sign-in__form {
+  @apply flex flex-col gap-6;
+}
+
+.kore-sign-in__heading {
+  @apply flex flex-col gap-2;
+}
+
+.kore-sign-in__title {
+  @apply type-display-md text-ink;
+}
+
+.kore-sign-in__description {
+  @apply type-body-lg text-gray-700;
+}
+
+.kore-sign-in__google,
+.kore-sign-in__submit {
+  @apply w-full;
+}
+
+.kore-sign-in__or {
+  @apply flex items-center gap-3;
+}
+
+.kore-sign-in__or-text {
+  @apply type-caption shrink-0 text-gray-700;
+}
+
+.kore-sign-in__links {
+  @apply flex flex-col items-center gap-2;
+}
+
+/*
+ * Duas linhas de ação empilhadas ("Vão casar?" / "É cerimonialista?", Reenviar código /
+ * Usar outro e-mail): 24 px entre elas para as áreas de toque de 44 px se encostarem sem
+ * se sobrepor (decisão 158; no Penpot eram 8 px).
+ */
+.kore-sign-in__links--actions {
+  @apply gap-6;
+}
+
+.kore-sign-in__link-row {
+  @apply type-body-md text-gray-700;
+}
+
+.kore-sign-in__link {
+  @apply type-link text-primary-dark;
+}
+
+.kore-sign-in__or > .kore-divider {
+  @apply flex-1;
+}
+
+/* Controle único de reenviar (decisão 150): contagem em body.md gray.700, link no zero. */
+/*
+ * Ação de texto fora de frase, inclusive os links do rodapé ("Vão casar? Criar meu site"),
+ * decisão 158: área de toque de 44 px por pseudo-elemento, 12 px acima e abaixo do texto de
+ * 20 px e 4 px dos lados (o "Entrar" tem 39 px de largura), sem mudar o desenho. Só o link
+ * no meio de um texto (o e-mail do suporte no aviso) fica na exceção da WCAG 2.5.8.
+ */
+.kore-sign-in__link--standalone,
+.kore-sign-in__resend {
+  @apply relative before:absolute before:-inset-x-1 before:-inset-y-3;
+}
+
+.kore-sign-in__resend {
+  @apply type-body-md text-gray-700;
+  @apply enabled:type-link enabled:cursor-pointer enabled:text-primary-dark;
+}
+
+.kore-sign-in__link {
+  @apply cursor-pointer;
+  @apply focus-visible:rounded-sm focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}

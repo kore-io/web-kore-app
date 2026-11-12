@@ -1,0 +1,4 @@
+# Cabeçalhos do Cloudflare Pages (hospedagem do app).
+# Decisão 139: o token das rotas de e-mail não vaza no Referer.
+/*
+  Referrer-Policy: no-referrer

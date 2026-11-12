@@ -1,0 +1,58 @@
+# CI do web-kore-app (ADR "GitHub Actions para CI-CD", decisão 145): roda em todo
+# push, em qualquer branch; o PR mostra o resultado do último push.
+name: CI
+
+# Actions fixadas pelo SHA do commit (cadeia de fornecimento); a tag fica no comentário.
+
+on:
+  push:
+
+permissions:
+  contents: read
+  # O @kore-io/design vem do GitHub Packages da org.
+  packages: read
+
+# Um push novo cancela o anterior na mesma branch, menos em homolog e production.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/homolog' && github.ref != 'refs/heads/production' }}
+
+jobs:
+  commitlint:
+    name: Commits (Conventional Commits)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: wagoid/commitlint-github-action@b948419dd99f3fd78a6548d48f94e3df7f6bf3ed # v6.2.1
+
+  check:
+    name: Formatação, lint, tipos, testes e build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # A versão do pnpm vem do packageManager do package.json; a do Node, do .nvmrc.
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+          # Grava um .npmrc de usuário (fora do repositório) com o token do job para o
+          # GitHub Packages; o pnpm não expande variável em credencial do .npmrc do projeto.
+          registry-url: https://npm.pkg.github.com
+          scope: '@kore-io'
+
+      - run: pnpm install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # O client gerado (Orval) tem que bater com a cópia do OpenAPI (decisão 149).
+      - run: pnpm api:check
+      - run: pnpm format:check
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build

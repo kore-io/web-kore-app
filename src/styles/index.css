@@ -1,0 +1,25 @@
+/*
+ * Entrada do CSS do app (decisão 131): o Tailwind, o preset e o CSS dos componentes do
+ * @kore-io/design. O CSS das features entra aqui por @import, na camada components;
+ * nele só vale @apply das utilitárias do preset (regras do Stylelint da lib).
+ */
+@import 'tailwindcss';
+@import '@kore-io/design/tailwind.css';
+@import '@kore-io/design/components.css';
+
+/* CSS do app, na camada components, depois do da lib. */
+@import '../app/layout/app-shell.css' layer(components);
+@import '../features/access/components/access-layout.css' layer(components);
+@import '../features/access/components/sign-in-email-step.css' layer(components);
+@import '../features/access/components/profile-option.css' layer(components);
+@import '../shared/components/form-field.css' layer(components);
+@import '../shared/components/load-error.css' layer(components);
+@import '../features/access/components/sign-up.css' layer(components);
+@import '../features/guests/pages/guests-page.css' layer(components);
+@import '../features/guests/pages/party-panel-page.css' layer(components);
+@import '../features/guests/pages/tags-page.css' layer(components);
+@import '../features/guests/pages/trash-page.css' layer(components);
+@import '../features/guests/pages/import-page.css' layer(components);
+@import '../features/guests/pages/paste-list.css' layer(components);
+@import '../features/guests/pages/export-page.css' layer(components);
+@import '../features/guests/components/party-form.css' layer(components);

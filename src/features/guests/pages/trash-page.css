@@ -1,0 +1,29 @@
+/*
+ * Aba Lixeira (Penpot, Área do Casal, página 05): o Alert de aviso com os dois textos da
+ * RN08 e o cartão branco (borda gray.300, raio lg, 20 px de respiro) com uma linha por
+ * item: "Tipo · nome" em type.body.md ink, os detalhes em type.caption gray.700 e o
+ * Restaurar à direita.
+ */
+.kore-trash {
+  @apply flex flex-col gap-6;
+}
+
+.kore-trash__list {
+  @apply flex flex-col gap-2 rounded-lg border border-gray-300 bg-white p-5;
+}
+
+.kore-trash__item {
+  @apply flex min-h-11 items-center gap-3;
+}
+
+.kore-trash__text {
+  @apply flex min-w-0 flex-1 flex-col gap-0.5;
+}
+
+.kore-trash__title {
+  @apply type-body-md text-ink;
+}
+
+.kore-trash__details {
+  @apply type-caption text-gray-700;
+}

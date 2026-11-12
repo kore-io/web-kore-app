@@ -1,0 +1,42 @@
+/*
+ * Colar a lista e a prévia dela (Penpot, Área do Casal, página 05). O texto usa o
+ * Textarea do DS e o cartão do envio. Na prévia, um cartão branco por grupo (borda
+ * gray.300, raio lg, 20 px de respiro, 12 px entre os itens): a pergunta em
+ * type.overline gray.700, a linha original em type.body.md ink e um campo por pessoa;
+ * o Remover pessoa (ghost) ao lado do campo vazio. Decisão 210.
+ */
+.kore-import > .kore-paste__text {
+  @apply self-stretch;
+}
+
+.kore-paste__actions {
+  @apply flex flex-col-reverse gap-3 self-stretch md:flex-row md:justify-end;
+}
+
+.kore-paste-group {
+  @apply flex flex-col gap-3 rounded-lg border border-gray-300 bg-white p-5;
+}
+
+.kore-paste-group__ask {
+  @apply type-overline text-gray-700;
+}
+
+.kore-paste-group__source {
+  @apply type-body-md wrap-anywhere text-ink;
+}
+
+.kore-paste-group__guests {
+  @apply flex flex-col gap-3;
+}
+
+.kore-paste-group__guest {
+  @apply flex flex-col gap-1.5;
+}
+
+.kore-paste-group__guest-row {
+  @apply flex items-center gap-2;
+}
+
+.kore-paste-group__guest-input {
+  @apply min-w-0 flex-1;
+}

@@ -1,0 +1,211 @@
+{
+  "brandPanel": {
+    "headline": "O casamento organizado, para o casal e para quem cuida dele.",
+    "description": "Lista de convidados, site e confirmações num lugar só. O casal acompanha tudo, e quem faz o cerimonial acompanha todos os casamentos num painel.",
+    "site": "kore.com.br"
+  },
+  "legal": "Ao continuar, você concorda com os Termos de uso e a Política de privacidade do Kore.",
+  "signIn": {
+    "title": "Entre no Kore",
+    "description": "Use sua conta Google ou receba um código no seu e-mail. Não tem senha.",
+    "google": "Continuar com Google",
+    "or": "ou",
+    "emailLabel": "E-mail",
+    "emailPlaceholder": "seu@email.com",
+    "submit": "Receber código",
+    "couplePrompt": "Vão casar?",
+    "coupleLink": "Criar meu site",
+    "plannerPrompt": "É cerimonialista?",
+    "plannerLink": "Fazer parceria",
+    "emailInvalid": "Informe um e-mail válido."
+  },
+  "sessionExpired": {
+    "title": "Sua sessão terminou",
+    "description": "Entre de novo para continuar. Suas informações estão salvas."
+  },
+  "code": {
+    "title": "Confira seu e-mail",
+    "description": "Enviamos um código de 6 números para {{email}}. Você também pode entrar pelo botão que está no mesmo e-mail.",
+    "submit": "Entrar",
+    "resendIn": "Reenviar código em {{time}}",
+    "resend": "Reenviar código",
+    "useAnotherEmail": "Usar outro e-mail",
+    "resent": "Enviamos um código novo para {{email}}.",
+    "inputLabel": "Código de 6 números",
+    "digitLabel": "Número {{n}} de {{length}}"
+  },
+  "alerts": {
+    "wrongCode": {
+      "title": "Esse código não confere",
+      "description_one": "Confira os números no e-mail e tente de novo. Você ainda tem {{count}} tentativa; depois disso, pedimos um código novo para você.",
+      "description_other": "Confira os números no e-mail e tente de novo. Você ainda tem {{count}} tentativas; depois disso, pedimos um código novo para você."
+    },
+    "codeExpired": {
+      "title": "Esse código não vale mais",
+      "description": "Peça um novo em Reenviar código. Se você pediu mais de um, use o do e-mail mais recente."
+    },
+    "tooManyRequests": {
+      "title": "Você pediu muitos códigos",
+      "description_one": "Tente de novo em {{count}} minuto.",
+      "description_other": "Tente de novo em {{count}} minutos."
+    },
+    "newCodeSent": {
+      "title": "Pedimos um código novo para você",
+      "description": "Depois de 5 tentativas, enviamos outro para {{email}}. Use o código do e-mail mais recente."
+    },
+    "locked": {
+      "title": "Esse código não vale mais",
+      "description_one": "Você pediu muitos códigos. Tente de novo em {{count}} minuto.",
+      "description_other": "Você pediu muitos códigos. Tente de novo em {{count}} minutos."
+    },
+    "googleUnverified": {
+      "title": "O Google não confirmou seu e-mail",
+      "description": "Para entrar, receba um código no seu e-mail."
+    },
+    "blocked": {
+      "title": "Não foi possível entrar com esta conta",
+      "description": "Escreva para <supportLink>{{supportEmail}}</supportLink>."
+    },
+    "googleFailed": {
+      "title": "Não foi possível entrar com o Google",
+      "description": "Tente de novo ou receba um código no seu e-mail."
+    },
+    "rateLimited": {
+      "title": "Você pediu muitos códigos",
+      "description": "Espere um pouco e tente de novo."
+    },
+    "generic": {
+      "title": "Não foi possível continuar",
+      "description": "Confira sua conexão e tente de novo."
+    }
+  },
+  "profiles": {
+    "chooseTitle": "Com qual perfil você quer entrar?",
+    "chooseDescription": "{{name}}, sua conta tem dois perfis. Você pode trocar depois pelo menu, sem sair.",
+    "noneTitle": "Como você quer usar o Kore?",
+    "noneDescription": "Ainda não há nenhum perfil com {{email}}. Escolha um para começar; dá para criar outro depois.",
+    "lastUsed": "Último usado",
+    "useAnotherAccount": "Entrar com outra conta",
+    "planner": "Cerimonialista",
+    "createWedding": "Criar o site do casamento",
+    "createWeddingDescription": "Para o casal: site, lista de convidados e confirmações",
+    "partner": "Quero fazer parceria",
+    "partnerDescription": "Para cerimonialistas: todos os casamentos num painel e comissão por casal",
+    "plannerWeddings_zero": "{{organization}} · Nenhum casamento ainda",
+    "plannerWeddings_one": "{{organization}} · {{count}} casamento",
+    "plannerWeddings_other": "{{organization}} · {{count}} casamentos",
+    "weddingTitle": "Casamento {{couple}}",
+    "weddingPlace": "{{city}} ({{state}})",
+    "dateToBeDefined": "Data a definir"
+  },
+  "invite": {
+    "otherAccount": {
+      "title": "Confira a conta",
+      "description": "O convite foi enviado para {{invitedEmail}}, mas você entrou como {{currentEmail}}.",
+      "alertTitle": "O casamento vai ficar nesta conta",
+      "alertDescription": "Para entrar depois, use sempre {{currentEmail}}.",
+      "confirm": "Sim, usar {{currentEmail}}",
+      "useAnotherAccount": "Entrar com outra conta"
+    },
+    "invalid": {
+      "title": "Este convite não vale mais",
+      "description": "Convites valem por 30 dias e só podem ser usados uma vez. Este expirou, já foi usado ou foi cancelado por quem convidou.",
+      "alertTitle": "Peça um convite novo",
+      "alertDescription": "Quem convidou você pode reenviar o convite pelo Kore em poucos segundos.",
+      "signIn": "Entrar no Kore"
+    },
+    "declined": "Convite recusado."
+  },
+  "brandPanelCouple": {
+    "headline": "A lista de convidados organizada sozinha.",
+    "description": "Um link por grupo, a família responde por cada pessoa, e vocês veem o número real de convidados sem perguntar para ninguém."
+  },
+  "brandPanelPlanner": {
+    "headline": "Todos os seus casamentos num só painel.",
+    "description": "Monte o site dos seus clientes, acompanhe as respostas de cada casamento e ganhe comissão por cada casal que publicar. De graça."
+  },
+  "signUp": {
+    "title": "Crie o site do casamento",
+    "description": "É grátis para montar. Vocês só pagam quando publicarem.",
+    "referralTitle": "Indicação de {{name}}",
+    "referralDescription": "Vocês ganham {{percent}}% de desconto na ativação do site.",
+    "submit": "Continuar",
+    "signInPrompt": "Já tem conta?",
+    "signInLink": "Entrar"
+  },
+  "weddingDetails": {
+    "title": "Conte sobre o casamento",
+    "description": "Só o essencial. Dá para mudar tudo depois.",
+    "myName": "Seu nome",
+    "myTitle": "Você é o noivo ou a noiva?",
+    "bride": "Noiva",
+    "groom": "Noivo",
+    "partnerName": "Com quem você vai casar?",
+    "eventDate": "Data do casamento",
+    "eventDateHint": "Opcional. Se ainda não tiverem a data, deixem em branco.",
+    "city": "Cidade",
+    "state": "UF",
+    "statePlaceholder": "UF",
+    "slug": "Endereço do site",
+    "slugAvailable": "Disponível: <address>kore.com.br/{{slug}}</address>",
+    "slugTaken": "<address>kore.com.br/{{slug}}</address> já está em uso. Que tal <address>kore.com.br/{{suggestion}}</address>?",
+    "submit": "Criar nosso site",
+    "errors": {
+      "myName": "Informe seu nome.",
+      "myTitle": "Escolha noivo ou noiva.",
+      "partnerName": "Informe o nome de quem vai casar com você.",
+      "city": "Informe a cidade.",
+      "state": "Escolha a UF.",
+      "slug": "Informe o endereço do site.",
+      "slugFormat": "Use só letras minúsculas, números e hífen.",
+      "email": "Informe um e-mail válido."
+    }
+  },
+  "alreadyOwner": {
+    "title": "Você já tem um casamento no Kore.",
+    "description": "Cada pessoa é dona de um casamento por vez. O rascunho do simulador continua só neste navegador.",
+    "open": "Abrir meu casamento"
+  },
+  "invitePartner": {
+    "title": "Convide {{name}}",
+    "description": "{{name}} vai ter o próprio login, com as mesmas permissões que você. O convite vale por 30 dias.",
+    "emailLabel": "E-mail de {{name}}",
+    "submit": "Enviar convite",
+    "later": "Fazer isso depois",
+    "laterNote": "Dá para convidar depois pelo Dashboard.",
+    "sent": "Convite enviado para {{email}}."
+  },
+  "whoAreYou": {
+    "title": "Quem é você?",
+    "description": "Escolha o seu nome para entrar no casamento.",
+    "submit": "Continuar"
+  },
+  "partnerInvite": {
+    "title": "{{inviter}} convidou você para o casamento",
+    "description": "Entre para montar o site e a lista junto com {{inviter}}. Vocês terão as mesmas permissões.",
+    "accept": "Aceitar convite",
+    "decline": "Recusar convite"
+  },
+  "coupleInvite": {
+    "title": "{{name}} preparou o site do casamento de vocês",
+    "description": "Confiram tudo antes de aceitar. Ao aceitar, vocês viram os donos do casamento, e {{name}} continua ajudando na organização.",
+    "titleSeller": "{{name}}, do Kore, preparou o site do casamento de vocês",
+    "descriptionSeller": "Confiram tudo antes de aceitar. Ao aceitar, vocês viram os donos do casamento.",
+    "previewLabel": "Prévia do site",
+    "rsvp": "Confirmar presença",
+    "accept": "Aceitar e virar dono",
+    "viewSite": "Ver o site completo",
+    "emailNote": "Vocês entram com o Google ou com um código no e-mail {{email}}."
+  },
+  "plannerInvite": {
+    "title": "{{couple}} convidaram você como cerimonialista",
+    "description": "O casamento vai aparecer em Meus casamentos, e você ajuda a montar o site e a lista.",
+    "canEdit": "Editar o site, os convidados e os envios",
+    "canFollow": "Acompanhar as respostas no painel",
+    "coupleOnly": "Publicar, pagar ou mexer na chave Pix: só o casal",
+    "nameLabel": "Seu nome",
+    "nameError": "Informe seu nome.",
+    "accept": "Aceitar convite",
+    "decline": "Recusar convite"
+  }
+}

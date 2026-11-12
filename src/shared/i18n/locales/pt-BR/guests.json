@@ -1,0 +1,505 @@
+{
+  "title": "Convidados",
+  "summary": {
+    "guests_zero": "{{count}} convidados",
+    "guests_one": "{{count}} convidado",
+    "guests_other": "{{count}} convidados",
+    "parties_zero": "em {{count}} grupos",
+    "parties_one": "em {{count}} grupo",
+    "parties_other": "em {{count}} grupos",
+    "confirmed_zero": "{{count}} confirmados",
+    "confirmed_one": "{{count}} confirmado",
+    "confirmed_other": "{{count}} confirmados",
+    "declined_zero": "{{count}} recusados",
+    "declined_one": "{{count}} recusado",
+    "declined_other": "{{count}} recusados",
+    "pending_zero": "{{count}} pendentes",
+    "pending_one": "{{count}} pendente",
+    "pending_other": "{{count}} pendentes",
+    "line": "{{guests}} {{parties}} · {{confirmed}}, {{declined}} e {{pending}}"
+  },
+  "tabs": {
+    "label": "Convidados",
+    "parties": "Grupos e convidados",
+    "partiesShort": "Grupos",
+    "tags": "Tags · {{count}} de {{limit}}",
+    "tagsShort": "Tags",
+    "trash": "Lixeira",
+    "import": "Importar",
+    "export": "Exportar"
+  },
+  "filters": {
+    "search": "Buscar por nome",
+    "open": "Filtros",
+    "title": "Filtros",
+    "apply": "Mostrar resultados",
+    "clear": "Limpar",
+    "rsvp": {
+      "label": "Resposta",
+      "all": "Resposta: todas",
+      "confirmed": "Resposta: confirmados",
+      "declined": "Resposta: recusados",
+      "pending": "Resposta: pendentes"
+    },
+    "sent": {
+      "label": "Envio",
+      "all": "Envio: todos",
+      "not_sent": "Envio: não enviado",
+      "sent": "Envio: enviado",
+      "viewed": "Envio: visualizado",
+      "responded": "Envio: respondido"
+    },
+    "openCount": "Filtros ({{count}})",
+    "tag": {
+      "label": "Tag",
+      "all": "Tag: todas",
+      "option": "Tag: {{name}}"
+    }
+  },
+  "table": {
+    "label": "Grupos e convidados",
+    "selectAll": "Selecionar todos os grupos",
+    "select": "Selecionar {{name}}",
+    "columns": {
+      "group": "Grupo",
+      "people": "Pessoas",
+      "responses": "Respostas",
+      "delivery": "Envio",
+      "respondedAt": "Respondido em",
+      "tags": "Tags",
+      "actions": "Ações"
+    }
+  },
+  "row": {
+    "contact": "{{name}} · {{phone}}",
+    "noContact": "{{name}} · sem telefone ou e-mail",
+    "people_one": "{{count}} pessoa",
+    "people_other": "{{count}} pessoas",
+    "confirmed_zero": "nenhum confirmado",
+    "confirmed_one": "{{count}} confirmado",
+    "confirmed_other": "{{count}} confirmados",
+    "noneDeclinedOrPending": "nenhum recusado ou pendente",
+    "noneDeclined": "nenhum recusado",
+    "declined_one": "{{count}} recusado",
+    "declined_other": "{{count}} recusados",
+    "pending_one": "{{count}} pendente",
+    "pending_other": "{{count}} pendentes",
+    "pendingPlusOnes_one": "{{count}} vaga pendente",
+    "pendingPlusOnes_other": "{{count}} vagas pendentes",
+    "respondedAt": "{{date}} às {{time}}",
+    "respondedBy": "por {{name}}",
+    "delivery": {
+      "not_sent": "Não enviado",
+      "sent": "Enviado",
+      "viewed": "Visualizado",
+      "responded": "Respondido"
+    },
+    "menu": {
+      "label": "Ações de {{name}}",
+      "open": "Abrir"
+    }
+  },
+  "selected_one": "{{count}} grupo selecionado",
+  "selected_other": "{{count}} grupos selecionados",
+  "showing_one": "Mostrando {{shown}} de {{count}} grupo",
+  "showing_other": "Mostrando {{shown}} de {{count}} grupos",
+  "loadingMore": "Carregando mais grupos",
+  "empty": {
+    "couple": "Vocês ainda não cadastraram convidados.",
+    "planner": "Este casamento ainda não tem convidados."
+  },
+  "noResults": "Nenhum grupo encontrado.",
+  "loading": "Carregando os grupos",
+  "panel": {
+    "back": "‹ Voltar para Convidados",
+    "summary": {
+      "guests_one": "{{count}} convidado",
+      "guests_other": "{{count}} convidados",
+      "contact": "Contato: {{name}}"
+    },
+    "regenerate": "Regenerar link",
+    "group": {
+      "title": "Grupo",
+      "contact": "Convidado de contato",
+      "phone": "Telefone",
+      "email": "E-mail",
+      "plusOneSlots": "Vagas de acompanhante",
+      "plusOneSlotsNone": "nenhuma",
+      "tags": "Tags",
+      "internalNote": "Observação interna: {{note}}"
+    },
+    "guests": {
+      "title": "Convidados",
+      "plusOne": "Acompanhante",
+      "ageGroup": {
+        "adult": "Adulto",
+        "child": "Criança",
+        "baby": "Bebê"
+      },
+      "rsvp": {
+        "pending": "Pendente",
+        "confirmed": "Confirmado",
+        "declined": "Recusado"
+      },
+      "actions": "Ações de {{name}}"
+    },
+    "link": {
+      "title": "Link do grupo",
+      "caption": "Quem abre este link responde pelo grupo {{name}}.",
+      "copy": "Copiar link",
+      "copied": "Link copiado."
+    },
+    "regenerateDialog": {
+      "title": "Regenerar o link do grupo {{name}}?",
+      "couple": "O link antigo para de funcionar na hora. Vocês vão precisar enviar o link novo ao grupo.",
+      "planner": "O link antigo para de funcionar na hora. Você vai precisar enviar o link novo ao grupo.",
+      "cancel": "Cancelar",
+      "confirm": "Regenerar link"
+    },
+    "move": {
+      "action": "Mover de grupo",
+      "title": "Mover {{name}} para outro grupo",
+      "search": "Buscar por nome",
+      "group": "Grupo",
+      "cancel": "Cancelar",
+      "confirm": "Mover",
+      "moved": "{{name}} foi para {{group}}.",
+      "lastGuest": {
+        "couple": "O grupo precisa de pelo menos um convidado. Para tirar todos, movam o grupo para a lixeira.",
+        "planner": "O grupo precisa de pelo menos um convidado. Para tirar todos, mova o grupo para a lixeira."
+      },
+      "more": {
+        "couple": "Mostrando {{shown}} de {{total}} grupos. Busquem pelo nome para achar os outros.",
+        "planner": "Mostrando {{shown}} de {{total}} grupos. Busque pelo nome para achar os outros."
+      }
+    }
+  },
+  "tags": {
+    "counter": "{{count}} de {{limit}} tags",
+    "newName": "Nome da tag nova",
+    "create": "Criar tag",
+    "guests_zero": "{{count}} convidados",
+    "guests_one": "{{count}} convidado",
+    "guests_other": "{{count}} convidados",
+    "edit": "Editar",
+    "caption": {
+      "couple": "Um convidado pode ter várias tags. Vocês podem criar até 10.",
+      "planner": "Um convidado pode ter várias tags. Este casamento pode ter até 10."
+    },
+    "limit": {
+      "couple": "Vocês já têm 10 tags. Excluam uma para criar outra.",
+      "planner": "Este casamento já tem 10 tags. Exclua uma para criar outra."
+    },
+    "nameTaken": "Já existe uma tag com este nome.",
+    "nameEmpty": {
+      "couple": "Deem um nome à tag.",
+      "planner": "Dê um nome à tag."
+    },
+    "editDialog": {
+      "title": "Editar tag",
+      "name": "Nome da tag",
+      "color": "Cor",
+      "cancel": "Cancelar",
+      "save": "Salvar alterações",
+      "delete": "Excluir tag"
+    },
+    "colors": {
+      "none": "Sem cor",
+      "wine": "Vinho",
+      "champagne": "Champanhe",
+      "green": "Verde",
+      "amber": "Âmbar",
+      "red": "Vermelho",
+      "blue": "Azul"
+    },
+    "saved": "Alterações salvas.",
+    "deleteDialog": {
+      "title": "Excluir a tag {{name}}?",
+      "description": "A tag sai dos grupos e dos convidados e fica 30 dias na lixeira. Depois, é apagada de vez.",
+      "cancel": "Cancelar",
+      "confirm": "Excluir tag"
+    },
+    "deleted": "A tag {{name}} foi para a lixeira.",
+    "loading": "Carregando as tags"
+  },
+  "selection": {
+    "addTag": "Adicionar tag",
+    "applied_one": "Tag aplicada a {{count}} grupo.",
+    "applied_other": "Tag aplicada a {{count}} grupos.",
+    "tooMany": {
+      "couple": "Marquem até 200 grupos para adicionar uma tag ou mover para a lixeira.",
+      "planner": "Marque até 200 grupos para adicionar uma tag ou mover para a lixeira."
+    }
+  },
+  "trash": {
+    "action": "Mover para a lixeira",
+    "cancel": "Cancelar",
+    "party": {
+      "title": "Mover o grupo {{name}} para a lixeira?",
+      "description_one": "O grupo e o convidado dele ficam 30 dias na lixeira e saem das contagens. Depois, são apagados de vez.",
+      "description_other": "O grupo e os {{count}} convidados ficam 30 dias na lixeira e saem das contagens. Depois, são apagados de vez."
+    },
+    "guest": {
+      "title": "Mover {{name}} para a lixeira?",
+      "description": "O convidado fica 30 dias na lixeira e sai das contagens. Depois, é apagado de vez."
+    },
+    "many": {
+      "title": "Mover {{count}} grupos para a lixeira?",
+      "description": "Os grupos e os convidados deles ficam 30 dias na lixeira e saem das contagens. Depois, são apagados de vez."
+    },
+    "moved": "{{name}} foi para a lixeira.",
+    "movedMany_one": "{{count}} grupo foi para a lixeira.",
+    "movedMany_other": "{{count}} grupos foram para a lixeira.",
+    "skipped_one": "{{count}} grupo que já respondeu ficou: só o casal pode excluí-lo.",
+    "skipped_other": "{{count}} grupos que já responderam ficaram: só o casal pode excluí-los.",
+    "alreadyResponded": {
+      "party": "Só o casal pode excluir um grupo que já respondeu.",
+      "guest": "Só o casal pode excluir quem já respondeu."
+    }
+  },
+  "trashPage": {
+    "loading": "Carregando a lixeira",
+    "warning": "Itens na lixeira são apagados de vez depois de 30 dias.",
+    "restoreInfo": "Restaurar devolve o item com as respostas e as tags que ele tinha.",
+    "restore": "Restaurar",
+    "party": {
+      "title": "Grupo · {{name}}",
+      "details": "{{guests}} · removido em {{removed}} · apagado depois de {{purge}}"
+    },
+    "guest": {
+      "title": "Convidado · {{name}}",
+      "details": "do grupo {{party}} · removido em {{removed}} · apagado depois de {{purge}}"
+    },
+    "tag": {
+      "title": "Tag · {{name}}",
+      "details": "{{guests}} · removida em {{removed}} · apagada depois de {{purge}}"
+    },
+    "guests_zero": "{{count}} convidados",
+    "guests_one": "{{count}} convidado",
+    "guests_other": "{{count}} convidados",
+    "restored": "{{name}} voltou para a lista.",
+    "tagRestored": "A tag {{name}} voltou.",
+    "tagLimit": {
+      "couple": "Vocês já têm 10 tags. Excluam uma para restaurar esta.",
+      "planner": "Este casamento já tem 10 tags. Exclua uma para restaurar esta."
+    },
+    "tagNameTaken": {
+      "couple": "Já existe uma tag {{name}}. Mudem o nome dela para restaurar esta.",
+      "planner": "Já existe uma tag {{name}}. Mude o nome dela para restaurar esta."
+    },
+    "empty": "A lixeira está vazia."
+  },
+  "importSheet": {
+    "headerButton": "Importar planilha",
+    "step1": "1. Baixar o modelo",
+    "step1Text": "Uma linha por convidado. Convidados do mesmo grupo repetem o nome do grupo.",
+    "download": "Baixar modelo (.xlsx)",
+    "step2": "2. Enviar a planilha preenchida",
+    "drop": {
+      "couple": "Arrastem a planilha ou cliquem para escolher",
+      "planner": "Arraste a planilha ou clique para escolher"
+    },
+    "dropHint": "Excel (.xlsx) com até 1.000 linhas",
+    "previewNote": "Antes de criar os grupos, mostramos uma prévia com as linhas que têm erro.",
+    "reading": "Lendo a planilha",
+    "fileCounts": "{{parties}} · {{guests}}",
+    "parties_zero": "{{count}} grupos",
+    "parties_one": "{{count}} grupo",
+    "parties_other": "{{count}} grupos",
+    "guests_zero": "{{count}} convidados",
+    "guests_one": "{{count}} convidado",
+    "guests_other": "{{count}} convidados",
+    "removeFile": "Enviar outra planilha",
+    "valid": "Válidas",
+    "validDetail_one": "viram {{count}} grupo",
+    "validDetail_other": "viram {{count}} grupos",
+    "errors": "Com erro",
+    "duplicates": "Duplicadas",
+    "leftOut": "ficam de fora",
+    "skippedTitle": "Linhas que ficam de fora",
+    "row": "Linha {{row}} · {{name}}",
+    "noName": "sem nome",
+    "summary": "{{parties}} e {{guests}} serão criados.",
+    "summaryLeftOut": {
+      "couple_one": "A linha que ficou de fora vocês cadastram depois.",
+      "couple_other": "As {{count}} linhas que ficaram de fora vocês cadastram depois, uma a uma.",
+      "planner_one": "A linha que ficou de fora você cadastra depois.",
+      "planner_other": "As {{count}} linhas que ficaram de fora você cadastra depois, uma a uma."
+    },
+    "sendAnother": "Enviar outra planilha",
+    "import_zero": "Importar {{count}} convidados",
+    "import_one": "Importar {{count}} convidado",
+    "import_other": "Importar {{count}} convidados",
+    "imported_one": "{{count}} grupo importado",
+    "imported_other": "{{count}} grupos importados",
+    "partyExists": "{{party}}: já existe um grupo com este nome.",
+    "tagLimit": {
+      "couple": "A tag {{tag}} não foi criada: vocês já têm 10 tags.",
+      "planner": "A tag {{tag}} não foi criada: este casamento já tem 10 tags."
+    },
+    "rowErrors": {
+      "NAME_MISSING": {
+        "couple": "Falta o nome do convidado. Preencham a coluna Nome.",
+        "planner": "Falta o nome do convidado. Preencha a coluna Nome."
+      },
+      "PARTY_MISSING": {
+        "couple": "Falta o grupo. Preencham a coluna Grupo.",
+        "planner": "Falta o grupo. Preencha a coluna Grupo."
+      },
+      "PHONE_TOO_SHORT": {
+        "couple": "O telefone tem {{n}} números. Usem DDD + número, ex.: (19) 99999-9999.",
+        "planner": "O telefone tem {{n}} números. Use DDD + número, ex.: (19) 99999-9999."
+      },
+      "PHONE_TOO_LONG": {
+        "couple": "O telefone tem {{n}} números. Se for de fora do Brasil, comecem com + e o código do país.",
+        "planner": "O telefone tem {{n}} números. Se for de fora do Brasil, comece com + e o código do país."
+      },
+      "PHONE_INVALID": "O telefone tem {{n}} números. Um número de fora do Brasil tem de 8 a 15, com o código do país.",
+      "EMAIL_INVALID": {
+        "couple": "O e-mail não parece certo. Confiram a coluna E-mail.",
+        "planner": "O e-mail não parece certo. Confira a coluna E-mail."
+      },
+      "AGE_GROUP_INVALID": {
+        "couple": "Usem Adulto, Criança ou Bebê na Faixa etária.",
+        "planner": "Use Adulto, Criança ou Bebê na Faixa etária."
+      },
+      "TOO_LONG_name": "O nome passa de 80 caracteres.",
+      "TOO_LONG_dietaryRestriction": "A restrição alimentar passa de 200 caracteres.",
+      "TOO_LONG_tags": "A tag {{tag}} passa de 40 caracteres.",
+      "DUPLICATE": "Repetido: já está na linha {{row}}, no grupo {{party}}."
+    },
+    "refused": {
+      "TEMPLATE_MISMATCH": {
+        "couple": "Esta planilha não está no modelo do Kore. Baixem o modelo ou usem Colar a lista.",
+        "planner": "Esta planilha não está no modelo do Kore. Baixe o modelo ou use Colar a lista."
+      },
+      "TOO_MANY_ROWS": {
+        "couple": "A planilha tem mais de 1.000 linhas. Dividam em duas.",
+        "planner": "A planilha tem mais de 1.000 linhas. Divida em duas."
+      },
+      "NOT_XLSX": {
+        "couple": "Este arquivo não é uma planilha do Excel (.xlsx). Baixem o modelo ou usem Colar a lista.",
+        "planner": "Este arquivo não é uma planilha do Excel (.xlsx). Baixe o modelo ou use Colar a lista."
+      },
+      "FILE_TOO_LARGE": {
+        "couple": "A planilha passa de 5 MB. Dividam em duas.",
+        "planner": "A planilha passa de 5 MB. Divida em duas."
+      }
+    }
+  },
+  "pasteList": {
+    "open": "Colar a lista",
+    "title": "Colar a lista",
+    "intro": {
+      "couple": "Uma linha por grupo. Podem colar do jeito que está na planilha.",
+      "planner": "Uma linha por grupo. Pode colar do jeito que está na planilha."
+    },
+    "placeholder": "Família Moreira: Luiz, Célia, Pedro\nCarla Nunes + 2 filhos\nRafael e Bianca\nMárcia Rocha",
+    "continue": "Continuar",
+    "back": "Voltar",
+    "tooMany": {
+      "couple": "A lista passa de 1.000 convidados. Dividam em duas.",
+      "planner": "A lista passa de 1.000 convidados. Divida em duas."
+    },
+    "groups": "Grupos",
+    "groupsDetail": "da lista colada",
+    "guests": "Convidados",
+    "guestsDetail": "depois dos nomes",
+    "missing": "Faltam nomes",
+    "missingDetail_one": "num grupo",
+    "missingDetail_other": "em {{count}} grupos",
+    "askNames": "Qual é o nome de cada pessoa deste grupo?",
+    "personName": "Nome da {{n}}ª pessoa",
+    "groupName": "Nome do grupo",
+    "removePerson": "Remover pessoa",
+    "tooLong": "O nome passa de 80 caracteres.",
+    "duplicateName": "Este nome já está neste grupo.",
+    "partyExists": "Já existe um grupo com este nome.",
+    "duplicateRemoved": "Um nome repetido neste grupo ficou de fora.",
+    "plusOutOfRange": {
+      "couple": "Usem de + 1 a + 20 por linha.",
+      "planner": "Use de + 1 a + 20 por linha."
+    }
+  },
+  "exportList": {
+    "format": "Formato",
+    "xlsx": "Excel (.xlsx)",
+    "pdf": "PDF para impressão",
+    "who": "Quem entra",
+    "all": "Todos ({{count}})",
+    "confirmed": "Confirmados ({{count}})",
+    "tag": "Por tag",
+    "tagLabel": "Tag",
+    "tagOption": "{{name}} ({{count}})",
+    "columns": "Colunas",
+    "column": {
+      "name": "Nome",
+      "party": "Grupo",
+      "ageGroup": "Faixa etária",
+      "dietaryRestriction": "Restrição alimentar",
+      "rsvp": "Resposta",
+      "phone": "Telefone de contato",
+      "tags": "Tags"
+    },
+    "buffet_one": "Para o buffet: nome, faixa etária e restrição alimentar de {{count}} confirmado.",
+    "buffet_other": "Para o buffet: nome, faixa etária e restrição alimentar dos {{count}} confirmados.",
+    "export_zero": "Exportar {{count}} convidados",
+    "export_one": "Exportar {{count}} convidado",
+    "export_other": "Exportar {{count}} convidados"
+  },
+  "partyForm": {
+    "newButton": "Novo grupo",
+    "editButton": "Editar grupo",
+    "newTitle": "Novo grupo",
+    "editTitle": "Editar grupo",
+    "intro": "O convite vai para o convidado de contato, e o grupo responde por todos no mesmo link.",
+    "groupName": "Nome do grupo",
+    "guests": "Convidados",
+    "guestName": "Nome",
+    "ageGroup": "Faixa etária",
+    "ages": {
+      "adult": "Adulto",
+      "child": "Criança",
+      "baby": "Bebê",
+      "none": "Sem faixa etária"
+    },
+    "phone": "Telefone",
+    "phonePlaceholder": "(00) 00000-0000",
+    "email": "E-mail",
+    "emailPlaceholder": "nome@email.com",
+    "contact": "Convidado de contato (recebe o convite)",
+    "addGuest": "+ Adicionar convidado",
+    "plusOnes": "Vagas de acompanhante",
+    "plusOnesNone": "Nenhuma",
+    "plusOnesCount_one": "{{count}} vaga",
+    "plusOnesCount_other": "{{count}} vagas",
+    "plusOnesHint": "A vaga aparece no convite como \"Acompanhante\", sem nome.",
+    "tags": "Tags",
+    "note": "Observação interna (só vocês veem)",
+    "notePlaceholder": "Ex.: chegam de São Paulo no sábado",
+    "cancel": "Cancelar",
+    "save": "Salvar grupo",
+    "saveChanges": "Salvar alterações",
+    "created": "Grupo criado.",
+    "saved": "Alterações salvas.",
+    "answered": "Esta pessoa já respondeu. Salvar as alterações mesmo assim?",
+    "errors": {
+      "groupNameMissing": {
+        "couple": "Informem o nome do grupo.",
+        "planner": "Informe o nome do grupo."
+      },
+      "guestNameMissing": {
+        "couple": "Informem o nome do convidado.",
+        "planner": "Informe o nome do convidado."
+      },
+      "tooLong": "O nome passa de 80 caracteres.",
+      "noteTooLong": "A observação passa de 500 caracteres.",
+      "emailInvalid": {
+        "couple": "Informem um e-mail válido.",
+        "planner": "Informe um e-mail válido."
+      },
+      "plusOnesInUse_one": "Já há {{count}} acompanhante com resposta neste grupo.",
+      "plusOnesInUse_other": "Já há {{count}} acompanhantes com resposta neste grupo."
+    }
+  }
+}

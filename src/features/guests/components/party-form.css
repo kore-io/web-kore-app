@@ -1,0 +1,55 @@
+/*
+ * Formulário do grupo (Penpot "Novo grupo", D/T/C): cartão branco de até 720 px, borda
+ * gray.300, raio lg, 20 px de respiro e 20 px entre os blocos. Cada convidado num
+ * bloco gray.100 de raio md e 16 px de respiro: Nome e Faixa etária (160 px) na mesma
+ * linha, Telefone e E-mail lado a lado, e o contato embaixo; no celular, tudo em
+ * coluna. Os botões à direita; no celular, em coluna com o principal em cima.
+ */
+.kore-party-form {
+  @apply flex max-w-180 flex-col gap-5 rounded-lg border border-gray-300 bg-white p-5;
+}
+
+.kore-party-form__guests,
+.kore-party-form__tags {
+  @apply m-0 flex min-w-0 flex-col gap-4 border-0 p-0;
+}
+
+.kore-party-form__legend {
+  @apply type-label mb-4 p-0 text-ink;
+}
+
+.kore-party-form__guest {
+  @apply flex flex-col gap-3 rounded-md bg-gray-100 p-4;
+}
+
+.kore-party-form__row {
+  @apply grid gap-3 md:grid-cols-2;
+}
+
+.kore-party-form__row--name {
+  @apply flex flex-col md:flex-row;
+}
+
+.kore-party-form__row--name > :first-child {
+  @apply flex-1;
+}
+
+.kore-party-form__row--name > :last-child {
+  @apply md:w-40;
+}
+
+.kore-party-form__add {
+  @apply self-start;
+}
+
+.kore-party-form__tag-list {
+  @apply flex flex-wrap gap-x-6 gap-y-3;
+}
+
+.kore-party-form__actions {
+  @apply flex flex-col-reverse gap-3 md:flex-row md:justify-end;
+}
+
+.kore-party-form-page {
+  @apply flex flex-col gap-6;
+}

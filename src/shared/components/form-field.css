@@ -1,0 +1,20 @@
+/* Campo das telas (Penpot "Campo /"): rótulo, controle e ajuda com 6 px entre eles. */
+.kore-form-field {
+  @apply flex min-w-0 flex-col gap-1.5;
+}
+
+.kore-form-field__hint {
+  @apply type-caption;
+}
+
+.kore-form-field__hint--neutral {
+  @apply text-gray-700;
+}
+
+.kore-form-field__hint--success {
+  @apply text-success-text;
+}
+
+.kore-form-field__hint--danger {
+  @apply text-danger-text;
+}
