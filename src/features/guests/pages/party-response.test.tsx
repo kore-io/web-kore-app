@@ -70,7 +70,14 @@ type Call = { method: string; path: string; body: unknown };
 function mockPanel({
   party = moreira(),
   response = () => Response.json({ partyId: 'p1', version: 8 }),
-}: { party?: PartyResponse; response?: () => Response } = {}) {
+  deadline = null,
+  status = 'published',
+}: {
+  party?: PartyResponse;
+  response?: () => Response;
+  deadline?: string | null;
+  status?: string;
+} = {}) {
   const calls: Call[] = [];
   mockApi(({ method, path, body }) => {
     if (path === '/v1/me') return Response.json(meFor(me));
@@ -79,9 +86,10 @@ function mockPanel({
       calls.push({ method, path, body });
       return response();
     }
-    if (path.startsWith('/v1/weddings/w1/dashboard')) {
-      return apiError({ status: 404, body: { error: 'NOT_FOUND' } });
+    if (path === '/v1/weddings/w1/dashboard') {
+      return Response.json({ rsvpDeadline: deadline, site: { status } });
     }
+    if (path === '/v1/weddings/w1/site') return Response.json({ timezone: 'America/Sao_Paulo' });
     if (path.startsWith('/v1/weddings/w1/parties')) {
       return Response.json({ data: [], total: 0, nextCursor: null, summary: null });
     }
@@ -242,5 +250,67 @@ describe('o Histórico do grupo no Painel (Prazo e respostas RN05)', () => {
     renderRoute({ url: '/app/convidados/grupos/p1' });
     await screen.findByRole('heading', { name: 'Família Moreira', level: 1 });
     expect(screen.queryByRole('heading', { name: 'Histórico' })).toBeNull();
+  });
+});
+
+describe('o que a colaboradora não pode (Prazo e respostas RN04 e RN08)', () => {
+  it('depois do prazo, o Alterar resposta desabilitado com o motivo; quem respondeu não vai à lixeira', async () => {
+    profileUnderTest.current = 'planner';
+    const user = userEvent.setup();
+    const calls = mockPanel({ deadline: '2020-01-10' });
+    renderAreaScreen({ url: '/app/convidados/grupos/p1' });
+    await user.click(await screen.findByRole('button', { name: 'Ações de Célia Moreira' }));
+    const change = await screen.findByRole('menuitem', { name: 'Alterar resposta' });
+    await waitFor(() => expect(change).toHaveAttribute('aria-disabled', 'true'));
+    expect(change).toHaveAccessibleDescription(
+      'Só o casal pode alterar respostas depois do prazo.',
+    );
+    const trash = screen.getByRole('menuitem', { name: 'Mover para a lixeira' });
+    expect(trash).toHaveAttribute('aria-disabled', 'true');
+    expect(trash).toHaveAccessibleDescription('Só o casal pode excluir quem já respondeu.');
+    await user.click(change);
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(calls).toHaveLength(0);
+    // O grupo que já respondeu: o botão do cartão Link do grupo também (RN08).
+    await user.keyboard('{Escape}');
+    const groupTrash = screen.getByRole('button', { name: 'Mover para a lixeira' });
+    expect(groupTrash).toBeDisabled();
+    expect(groupTrash).toHaveAccessibleDescription(
+      'Só o casal pode excluir um grupo que já respondeu.',
+    );
+  });
+
+  it('no pós-evento também; antes do prazo, a colaboradora altera', async () => {
+    profileUnderTest.current = 'planner';
+    const user = userEvent.setup();
+    mockPanel({ status: 'post_event' });
+    const view = renderAreaScreen({ url: '/app/convidados/grupos/p1' });
+    await user.click(await screen.findByRole('button', { name: 'Ações de Pedro Moreira' }));
+    await waitFor(() =>
+      expect(screen.getByRole('menuitem', { name: 'Alterar resposta' })).toHaveAttribute(
+        'aria-disabled',
+        'true',
+      ),
+    );
+    view.unmount();
+    mockPanel({ deadline: '2099-01-10' });
+    renderAreaScreen({ url: '/app/convidados/grupos/p1' });
+    await user.click(await screen.findByRole('button', { name: 'Ações de Pedro Moreira' }));
+    expect(screen.getByRole('menuitem', { name: 'Alterar resposta' })).not.toHaveAttribute(
+      'aria-disabled',
+    );
+  });
+
+  it('o dono altera e exclui depois do prazo', async () => {
+    const user = userEvent.setup();
+    mockPanel({ deadline: '2020-01-10' });
+    renderRoute({ url: '/app/convidados/grupos/p1' });
+    await user.click(await screen.findByRole('button', { name: 'Ações de Célia Moreira' }));
+    expect(screen.getByRole('menuitem', { name: 'Alterar resposta' })).not.toHaveAttribute(
+      'aria-disabled',
+    );
+    expect(screen.getByRole('menuitem', { name: 'Mover para a lixeira' })).not.toHaveAttribute(
+      'aria-disabled',
+    );
   });
 });

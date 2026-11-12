@@ -25,6 +25,7 @@ import { TrashDialog } from '../components/trash-dialog';
 import { useOpenPreview } from '../../site/preview/use-open-preview';
 import { useActiveWedding, type Audience } from '../hooks/use-active-wedding';
 import { useMoveGuest } from '../hooks/use-move-guest';
+import { useResponseLock } from '../hooks/use-response-lock';
 import { useTrash } from '../hooks/use-trash';
 import { usePartyPanel } from '../hooks/use-party-panel';
 
@@ -38,21 +39,24 @@ const rsvpBadges: Record<PartyGuestResponseRsvpStatus, { tone: BadgeTone; icon: 
 /** Painel do grupo (RN14 de Grupos e convidados), em /app/convidados/grupos/:partyId. */
 export function PartyPanelPage() {
   const { partyId = '' } = useParams();
-  const { weddingId, audience } = useActiveWedding();
+  const { weddingId, audience, role } = useActiveWedding();
   if (!weddingId) return null;
-  return <PartyPanel weddingId={weddingId} partyId={partyId} audience={audience} />;
+  return <PartyPanel weddingId={weddingId} partyId={partyId} audience={audience} role={role} />;
 }
 
 function PartyPanel({
   weddingId,
   partyId,
   audience,
+  role,
 }: {
   weddingId: string;
   partyId: string;
   audience: Audience;
+  role: string | undefined;
 }) {
   const { t } = useTranslation('guests');
+  const lock = useResponseLock({ weddingId, role });
   const panel = usePartyPanel({ weddingId, partyId });
   const mover = useMoveGuest({ weddingId, audience });
   const trash = useTrash({ weddingId, audience });
@@ -94,6 +98,8 @@ function PartyPanel({
         <GroupCard party={party} />
         <GuestsCard
           guests={party.guests}
+          collaborator={lock.collaborator}
+          afterDeadline={lock.afterDeadline}
           onChangeResponse={({ guest, trigger }) => {
             menuButton.current = trigger;
             setAnswering(guest);
@@ -118,6 +124,10 @@ function PartyPanel({
         <LinkCard
           party={party}
           audience={audience}
+          // A colaboradora não exclui o grupo que já respondeu (Prazo RN08; Lixeira RN07).
+          trashLocked={
+            lock.collaborator && party.guests.some((guest) => guest.rsvpStatus !== 'pending')
+          }
           onPreview={() => openPreview({ mode: 'party', partyId: party.id })}
           onCopy={(url) => void panel.copyLink({ url })}
           onTrash={() => setTrashingParty(true)}
@@ -294,11 +304,15 @@ type ResponseAction = (args: { guest: PartyGuestResponse; trigger: HTMLElement |
 
 function GuestsCard({
   guests,
+  collaborator,
+  afterDeadline,
   onChangeResponse,
   onMove,
   onTrash,
 }: {
   guests: PartyGuestResponse[];
+  collaborator: boolean;
+  afterDeadline: boolean;
   onChangeResponse: ResponseAction;
   onMove: GuestAction;
   onTrash: GuestAction;
@@ -311,6 +325,8 @@ function GuestsCard({
           <GuestItem
             key={guest.id}
             guest={guest}
+            collaborator={collaborator}
+            afterDeadline={afterDeadline}
             onChangeResponse={onChangeResponse}
             onMove={onMove}
             onTrash={onTrash}
@@ -328,16 +344,29 @@ function GuestsCard({
  */
 function GuestItem({
   guest,
+  collaborator,
+  afterDeadline,
   onChangeResponse,
   onMove,
   onTrash,
 }: {
   guest: PartyGuestResponse;
+  collaborator: boolean;
+  afterDeadline: boolean;
   onChangeResponse: ResponseAction;
   onMove: GuestAction;
   onTrash: GuestAction;
 }) {
   const { t } = useTranslation('guests');
+  // A colaboradora: sem alterar depois do prazo (RN04) e sem excluir quem respondeu (RN08).
+  const responseLock = {
+    disabled: afterDeadline,
+    disabledReason: t('panel.response.afterDeadline'),
+  };
+  const trashLock = {
+    disabled: collaborator && guest.rsvpStatus !== 'pending',
+    disabledReason: t('trash.alreadyResponded.guest'),
+  };
   const actions = useRef<HTMLSpanElement>(null);
   const badge = rsvpBadges[guest.rsvpStatus];
   const { name } = guest;
@@ -369,6 +398,7 @@ function GuestItem({
                       {
                         id: 'response',
                         label: t('panel.response.action'),
+                        ...responseLock,
                         onSelect: () =>
                           onChangeResponse({
                             guest,
@@ -382,6 +412,7 @@ function GuestItem({
                       {
                         id: 'response',
                         label: t('panel.response.action'),
+                        ...responseLock,
                         onSelect: () =>
                           onChangeResponse({
                             guest,
@@ -403,6 +434,7 @@ function GuestItem({
                         id: 'trash',
                         label: t('trash.action'),
                         destructive: true,
+                        ...trashLock,
                         onSelect: () =>
                           onTrash({
                             guest: { id: guest.id, name },
@@ -440,12 +472,15 @@ function HistoryCard({ party }: { party: PartyResponse }) {
 function LinkCard({
   party,
   audience,
+  trashLocked,
   onPreview,
   onCopy,
   onTrash,
 }: {
   party: PartyResponse;
   audience: Audience;
+  /** A colaboradora não exclui o grupo que já respondeu (Prazo RN08). */
+  trashLocked: boolean;
   /** Ver como este grupo (Pré-visualização RN01): a prévia como o grupo, em nova aba. */
   onPreview: () => void;
   onCopy: (url: string) => void;
@@ -455,6 +490,7 @@ function LinkCard({
   const { t: tSite } = useTranslation('site');
   const { url } = party.link;
   const helpId = useId();
+  const trashHelpId = useId();
   return (
     <Card title={t('panel.link.title')}>
       <p className="kore-party-panel__link">{url ?? '—'}</p>
@@ -479,10 +515,21 @@ function LinkCard({
         >
           {t('panel.link.preview')}
         </Button>
-        <Button variant="destructive" size="sm" onClick={onTrash}>
+        <Button
+          variant="destructive"
+          size="sm"
+          disabled={trashLocked}
+          {...(trashLocked && { 'aria-describedby': trashHelpId })}
+          onClick={onTrash}
+        >
           {t('trash.action')}
         </Button>
       </div>
+      {trashLocked && (
+        <p id={trashHelpId} className="kore-party-panel__note">
+          {t('trash.alreadyResponded.party')}
+        </p>
+      )}
       {url === null && (
         <p id={helpId} className="kore-party-panel__note">
           {tSite(`previewSite.noSlug.${audience}`)}
