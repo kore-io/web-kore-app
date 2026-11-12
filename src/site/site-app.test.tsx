@@ -218,6 +218,158 @@ describe('Site do casal › layout (Site público RN10, RN11)', () => {
   });
 });
 
+const partySite = {
+  ...site,
+  viewer: { kind: 'party', party: { name: 'Família Moreira' }, preview: null },
+  contact: { whatsapp: '+5519987654521', email: 'ana@exemplo.com' },
+  sections: [
+    { type: 'countdown', content: {} },
+    {
+      type: 'ceremony',
+      title: 'Cerimônia & Recepção',
+      locked: false,
+      content: {
+        venues: [
+          {
+            title: 'Cerimônia',
+            placeName: 'Capela Nossa Senhora das Graças',
+            date: '2026-11-14',
+            time: '16:30',
+            address: 'Rua Barão de Jaguara, 1200, Centro, Campinas, SP',
+          },
+          {
+            title: 'Recepção',
+            placeName: 'Espaço Villa Toscana',
+            date: '2026-11-14',
+            time: '18:30',
+            address: 'Rua A & B, 10 #2',
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as PublicSiteResponse;
+
+type Call = { method: string; path: string; body: unknown };
+
+function mockParty(session: () => Response, get: () => Response = () => Response.json(partySite)) {
+  const calls: Call[] = [];
+  mockApi(({ method, path, body }) => {
+    calls.push({ method, path, body });
+    if (path.endsWith('/party-session') && method === 'POST') return session();
+    if (path.startsWith('/v1/sites/') && method === 'GET') return get();
+    return apiError({ status: 404, body: { error: 'X' } });
+  });
+  return calls;
+}
+
+describe('Site do casal › o link do grupo (Site público RN06)', () => {
+  afterEach(() => {
+    window.history.replaceState(null, '', '/');
+  });
+
+  it('troca o token pelo cookie, tira o token do endereço e abre o site do grupo', async () => {
+    window.history.replaceState(null, '', '/ana-e-marcos/grupo/q3Xv8LmN2pRtY7wK1cZb4A');
+    const calls = mockParty(() =>
+      Response.json({ slug: 'ana-e-marcos', party: { name: 'Família Moreira' } }),
+    );
+    render(<SiteApp pathname="/ana-e-marcos/grupo/q3Xv8LmN2pRtY7wK1cZb4A" />);
+    expect(await screen.findByText('Convite para Família Moreira')).toBeInTheDocument();
+    expect(window.location.pathname).toBe('/ana-e-marcos');
+    expect(calls.map((call) => `${call.method} ${call.path}`)).toEqual([
+      'POST /v1/sites/ana-e-marcos/party-session',
+      'GET /v1/sites/ana-e-marcos',
+    ]);
+    expect(calls[0]?.body).toEqual({ token: 'q3Xv8LmN2pRtY7wK1cZb4A' });
+  });
+
+  it('o slug errado vai ao endereço certo do casamento do token', async () => {
+    const calls = mockParty(() =>
+      Response.json({ slug: 'ana-e-marcos', party: { name: 'Família Moreira' } }),
+    );
+    render(<SiteApp pathname="/outro-endereco/grupo/q3Xv8LmN2pRtY7wK1cZb4A" />);
+    expect(await screen.findByText('Convite para Família Moreira')).toBeInTheDocument();
+    expect(window.location.pathname).toBe('/ana-e-marcos');
+    expect(calls[1]?.path).toBe('/v1/sites/ana-e-marcos');
+  });
+
+  it('o link que não funciona mais, também no limite de tentativas; o token sai do endereço', async () => {
+    mockParty(() => apiError({ status: 404, body: { error: 'LINK_INVALID' } }));
+    const { unmount } = render(<SiteApp pathname="/ana-e-marcos/grupo/q3Xv8LmN2pRtY7wK1cZb4A" />);
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Este link não funciona mais.' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Peça um novo link ao casal.')).toBeInTheDocument();
+    expect(window.location.pathname).toBe('/ana-e-marcos');
+    unmount();
+    mockParty(() => apiError({ status: 429, body: { error: 'RATE_LIMITED' } }));
+    render(<SiteApp pathname="/ana-e-marcos/grupo/q3Xv8LmN2pRtY7wK1cZb4A" />);
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Este link não funciona mais.' }),
+    ).toBeInTheDocument();
+  });
+
+  it('rascunho pelo link: a mesma página do rascunho, sem chamar o site', async () => {
+    const calls = mockParty(() => apiError({ status: 404, body: { error: 'SITE_DRAFT' } }));
+    render(<SiteApp pathname="/ana-e-marcos/grupo/q3Xv8LmN2pRtY7wK1cZb4A" />);
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Este site ainda não foi publicado.' }),
+    ).toBeInTheDocument();
+    expect(calls).toHaveLength(1);
+  });
+
+  it('o grupo vê os locais com a data, a hora, o endereço e as rotas em nova aba, e o contato (RN05, RN10)', async () => {
+    mockParty(() => Response.json({ slug: 'ana-e-marcos', party: { name: 'Família Moreira' } }));
+    render(<SiteApp pathname="/ana-e-marcos/grupo/q3Xv8LmN2pRtY7wK1cZb4A" />);
+    const place = await screen.findByRole('heading', {
+      level: 3,
+      name: 'Capela Nossa Senhora das Graças',
+    });
+    const card = place.closest('li') as HTMLElement;
+    expect(within(card).getByText('Cerimônia')).toBeInTheDocument();
+    expect(within(card).getByText('Sáb., 14 de nov. de 2026 · 16h30')).toBeInTheDocument();
+    const maps = within(card).getByRole('link', {
+      name: 'Abrir no Google Maps (abre em nova aba)',
+    });
+    expect(maps).toHaveAttribute(
+      'href',
+      expect.stringContaining('query=Rua%20Bar%C3%A3o%20de%20Jaguara'),
+    );
+    expect(maps).toHaveAttribute('target', '_blank');
+    expect(maps).toHaveAttribute('rel', 'noopener noreferrer');
+    expect(
+      within(card).getByRole('link', { name: 'Abrir no Waze (abre em nova aba)' }),
+    ).toHaveAttribute('href', expect.stringContaining('&navigate=yes'));
+    const footer = screen.getByRole('contentinfo');
+    expect(footer).toHaveTextContent('Dúvidas? Fale com o casal pelo WhatsApp (19) 98765-4521');
+    expect(within(footer).getByRole('link', { name: '(19) 98765-4521' })).toHaveAttribute(
+      'href',
+      'https://wa.me/5519987654521',
+    );
+  });
+
+  it('sem WhatsApp, o e-mail do casal', async () => {
+    mockParty(
+      () => Response.json({ slug: 'ana-e-marcos', party: { name: 'Família Moreira' } }),
+      () => Response.json({ ...partySite, contact: { whatsapp: null, email: 'ana@exemplo.com' } }),
+    );
+    render(<SiteApp pathname="/ana-e-marcos/grupo/q3Xv8LmN2pRtY7wK1cZb4A" />);
+    const footer = await screen.findByRole('contentinfo');
+    expect(footer).toHaveTextContent('Dúvidas? Escreva para o casal: ana@exemplo.com');
+    expect(within(footer).getByRole('link', { name: 'ana@exemplo.com' })).toHaveAttribute(
+      'href',
+      'mailto:ana@exemplo.com',
+    );
+  });
+
+  it('é acessível com o grupo', async () => {
+    mockParty(() => Response.json({ slug: 'ana-e-marcos', party: { name: 'Família Moreira' } }));
+    const { container } = render(<SiteApp pathname="/ana-e-marcos/grupo/q3Xv8LmN2pRtY7wK1cZb4A" />);
+    await screen.findByText('Convite para Família Moreira');
+    await expectNoA11yViolations({ container });
+  });
+});
+
 describe('Site do casal › peças', () => {
   it('a linha da empresa junta o que houver; vazia, some', () => {
     expect(

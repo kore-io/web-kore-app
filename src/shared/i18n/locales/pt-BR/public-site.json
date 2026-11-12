@@ -14,7 +14,9 @@
   "footer": {
     "madeWith": "Feito com Kore",
     "terms": "Termos",
-    "privacy": "Privacidade"
+    "privacy": "Privacidade",
+    "contactWhatsapp": "Dúvidas? Fale com o casal pelo WhatsApp {{number}}",
+    "contactEmail": "Dúvidas? Escreva para o casal: {{email}}"
   },
   "states": {
     "notFound": {
@@ -29,6 +31,10 @@
       "title": "Não foi possível carregar o site.",
       "description": "Confira sua conexão e tente de novo.",
       "retry": "Tentar de novo"
+    },
+    "linkInvalid": {
+      "title": "Este link não funciona mais.",
+      "description": "Peça um novo link ao casal."
     }
   },
   "sections": {
@@ -41,12 +47,20 @@
     "storyAlt": "Foto {{n}} de {{total}} de {{title}}",
     "dressCodeAlt": "Foto de referência do dress code",
     "ceremonyLocked": "Entre pelo link do seu convite para ver o local e o horário.",
-    "ceremonyLockedHint": "O link chegou junto com o convite do casal."
+    "ceremonyLockedHint": "O link chegou junto com o convite do casal.",
+    "venue": {
+      "googleMaps": "Abrir no Google Maps",
+      "waze": "Abrir no Waze",
+      "newTab": "(abre em nova aba)"
+    }
   },
   "viewer": {
     "close": "Fechar",
     "previous": "Foto anterior",
     "next": "Próxima foto",
     "counter": "{{n}} de {{total}}"
+  },
+  "party": {
+    "banner": "Convite para {{name}}"
   }
 }
