@@ -3,11 +3,14 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate, useBlocker, useNavigate, useParams } from 'react-router';
 import { siteSectionPath } from '../../../app/paths';
+import type { SiteEditorAppearanceResponse } from '../../../shared/api/generated/model';
 import { useSiteControllerGetV1 } from '../../../shared/api/generated/site/site';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { useActiveWedding, type Audience } from '../../guests/hooks/use-active-wedding';
+import { AppearanceSection } from '../components/appearance-section';
 import { BasicsSection } from '../components/basics-section';
 import { SitePreview } from '../components/site-preview';
+import { PreviewAppearanceProvider } from '../preview-appearance';
 import { SectionFormProvider, type SectionForm } from '../section-form';
 import {
   EDITOR_SECTIONS,
@@ -61,6 +64,9 @@ function SiteEditor({
   }, [dirty]);
 
   const register = useCallback((next: SectionForm | null) => setForm(next), []);
+  const [previewAppearance, setPreviewAppearance] = useState<SiteEditorAppearanceResponse | null>(
+    null,
+  );
 
   if (site.isError) return <LoadErrorNotice onRetry={() => void site.refetch()} />;
   if (!site.data) {
@@ -163,25 +169,33 @@ function SiteEditor({
               ))}
             </Select>
           </div>
-          <SectionFormProvider onChange={register}>
-            <section className="kore-site-editor__panel" aria-labelledby="kore-site-section-title">
-              <h2 id="kore-site-section-title" className="kore-site-editor__panel-title">
-                {t(`sections.names.${sectionKey}`)}
-              </h2>
-              {sectionKey === 'basics' && (
-                <BasicsSection
-                  // O que cada um pode mudar e a publicação mudam os campos: a seção remonta.
-                  key={`${data.publishedAt ?? ''}:${JSON.stringify(data.editable)}`}
-                  weddingId={weddingId}
-                  site={data}
-                  audience={audience}
-                />
-              )}
-            </section>
-          </SectionFormProvider>
+          <PreviewAppearanceProvider onChange={setPreviewAppearance}>
+            <SectionFormProvider onChange={register}>
+              <section
+                className="kore-site-editor__panel"
+                aria-labelledby="kore-site-section-title"
+              >
+                <h2 id="kore-site-section-title" className="kore-site-editor__panel-title">
+                  {t(`sections.names.${sectionKey}`)}
+                </h2>
+                {sectionKey === 'basics' && (
+                  <BasicsSection
+                    // O que cada um pode mudar e a publicação mudam os campos: a seção remonta.
+                    key={`${data.publishedAt ?? ''}:${JSON.stringify(data.editable)}`}
+                    weddingId={weddingId}
+                    site={data}
+                    audience={audience}
+                  />
+                )}
+                {sectionKey === 'appearance' && (
+                  <AppearanceSection weddingId={weddingId} site={data} audience={audience} />
+                )}
+              </section>
+            </SectionFormProvider>
+          </PreviewAppearanceProvider>
         </div>
         <div className="kore-site-editor__preview-column">
-          <SitePreview site={data} />
+          <SitePreview site={data} {...(previewAppearance && { appearance: previewAppearance })} />
         </div>
       </div>
 
