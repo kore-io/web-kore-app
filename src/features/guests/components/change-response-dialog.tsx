@@ -99,14 +99,20 @@ function ChangeResponseForm({
       onClose();
     } catch (error) {
       const code = apiErrorCode({ error });
-      refresh();
-      onClose();
+      // O grupo mudou (409) ou o prazo passou para a colaboradora (403): o Dialog fecha e o
+      // Painel recarrega. Rede ou 5xx: fica aberto, com o que foi marcado (sugestão do Crivo).
+      const conflict =
+        code === 'RSVP_CHANGED' || (code === 'ACTION_NOT_ALLOWED' && error instanceof ApiError);
+      if (conflict) {
+        refresh();
+        onClose();
+      }
       showToast({
         tone: 'danger',
         message:
           code === 'RSVP_CHANGED'
             ? t(`panel.response.changed.${audience}`)
-            : code === 'ACTION_NOT_ALLOWED' && error instanceof ApiError
+            : conflict
               ? t('panel.response.afterDeadline')
               : `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
       });

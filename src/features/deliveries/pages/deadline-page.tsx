@@ -31,7 +31,17 @@ function Deadline({ weddingId, audience }: { weddingId: string; audience: Audien
   const dashboard = useDashboardControllerGetV1(weddingId);
   // O fuso do casamento (o Dashboard não traz): as contas do prazo são nele (RN01).
   const site = useSiteControllerGetV1(weddingId);
-  if (dashboard.isError) return <LoadErrorNotice onRetry={() => void dashboard.refetch()} />;
+  // Sem o Dashboard ou sem o site (o fuso), o aviso com o Tentar de novo, e não o Spinner.
+  if (dashboard.isError || site.isError) {
+    return (
+      <LoadErrorNotice
+        onRetry={() => {
+          if (dashboard.isError) void dashboard.refetch();
+          if (site.isError) void site.refetch();
+        }}
+      />
+    );
+  }
   if (!dashboard.data || !site.data) {
     return (
       <div className="kore-deadline__loading">

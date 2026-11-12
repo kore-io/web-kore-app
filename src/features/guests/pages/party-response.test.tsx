@@ -195,6 +195,22 @@ describe('Alterar resposta pelo casal (Prazo e respostas RN04; Penpot A8)', () =
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 
+  it('numa falha de rede, o Dialog fica aberto com o que foi marcado', async () => {
+    const user = userEvent.setup();
+    mockPanel({ response: () => apiError({ status: 500, body: {} }) });
+    renderRoute({ url: '/app/convidados/grupos/p1' });
+    const dialog = await openChange(user, 'Pedro Moreira');
+    await user.click(within(dialog).getByRole('radio', { name: 'Não vai' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Salvar resposta' }));
+    expect(
+      await screen.findByText(/Tente de novo|tente de novo|Tentem de novo/),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('dialog')).getByRole('radio', { name: 'Não vai' }),
+    ).toBeChecked();
+  });
+
   it('o Dialog é acessível', async () => {
     const user = userEvent.setup();
     mockPanel();

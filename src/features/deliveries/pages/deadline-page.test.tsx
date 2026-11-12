@@ -216,6 +216,22 @@ describe('Envios › Prazo de resposta (Prazo e respostas RN01 a RN03; Penpot A7
     );
   });
 
+  it('se o site não carrega, o aviso com o Tentar de novo, e não o Spinner', async () => {
+    mockApi(({ path }) => {
+      if (path === '/v1/me') return Response.json(meFor(me));
+      if (path === '/v1/weddings/w1/dashboard') {
+        return Response.json({
+          rsvpDeadline: null,
+          eventDate: '2027-11-14',
+          reminderQueue: { parties: 0, guests: 0, notReminded: 0 },
+        });
+      }
+      return apiError({ status: 500, body: {} });
+    });
+    renderRoute({ url: '/app/envios/prazo' });
+    expect(await screen.findByRole('button', { name: 'Tentar de novo' })).toBeInTheDocument();
+  });
+
   it('é acessível', async () => {
     mockDeadline();
     const { container } = renderRoute({ url: '/app/envios/prazo' });
