@@ -30,7 +30,7 @@ function sentence(text: string): string {
   return text.replace(/\.\.$/, '.');
 }
 
-type Notice = 'limit' | 'network' | 'linkInvalid';
+type Notice = 'limit' | 'rateLimited' | 'network' | 'linkInvalid';
 
 /**
  * Confirmar presença (RN01 a RN14; Penpot, Área do Convidado, seção B; decisão 232): a
@@ -167,7 +167,9 @@ function RsvpBody({
       return;
     }
     setNotice(
-      result.kind === 'linkInvalid' ? 'linkInvalid' : result.kind === 'limit' ? 'limit' : 'network',
+      result.kind === 'linkInvalid' || result.kind === 'limit' || result.kind === 'rateLimited'
+        ? result.kind
+        : 'network',
     );
   }
 
@@ -235,7 +237,9 @@ function RsvpBody({
             ? `${t('states.linkInvalid.title')} ${t('states.linkInvalid.description')}`
             : notice === 'limit'
               ? t('rsvp.errors.limit')
-              : t('rsvp.errors.network')}
+              : notice === 'rateLimited'
+                ? t('rsvp.errors.rateLimited')
+                : t('rsvp.errors.network')}
         </RsvpNotice>
       )}
       <button

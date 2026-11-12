@@ -310,6 +310,19 @@ describe('Confirmar presença (Confirmar presença RN01 a RN14)', () => {
       'Este grupo já mudou as respostas muitas vezes hoje. Tentem de novo amanhã ou falem com o casal.',
     );
     view.unmount();
+    // O 429 por minuto (decisão 232(6)).
+    mockRsvp({ put: () => apiError({ status: 429, body: { error: 'RSVP_RATE_LIMITED' } }) });
+    const minute = renderRsvp();
+    await user.click(
+      within(await screen.findByRole('group', { name: 'Carla Nunes' })).getByLabelText('Não vou'),
+    );
+    await user.click(within(choice('Rafael Nunes')).getByLabelText('Não vou'));
+    await user.click(within(choice('Quem está respondendo?')).getByLabelText('Rafael'));
+    await user.click(send());
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Muitas tentativas seguidas. Esperem um minuto e enviem de novo. O que vocês marcaram continua na tela.',
+    );
+    minute.unmount();
     mockRsvp({ put: () => apiError({ status: 401, body: { error: 'PARTY_SESSION_INVALID' } }) });
     renderRsvp();
     await user.click(

@@ -16,7 +16,8 @@ describe('o envio do RSVP (Confirmar presença RN07 a RN11, RN14)', () => {
     [401, { statusCode: 401, error: 'PARTY_SESSION_INVALID' }, 'linkInvalid'],
     [403, { statusCode: 403, error: 'PREVIEW_READ_ONLY' }, 'previewReadOnly'],
     [429, { statusCode: 429, error: 'RSVP_LIMIT' }, 'limit'],
-    [429, { statusCode: 429, error: 'RSVP_RATE_LIMITED' }, 'failed'],
+    [429, { statusCode: 429, error: 'RSVP_RATE_LIMITED' }, 'rateLimited'],
+    [429, { statusCode: 429, error: 'Too Many Requests' }, 'failed'],
     [500, { statusCode: 500 }, 'failed'],
   ])('%i %j → %s', async (status, error, kind) => {
     mockApi(() => apiError({ status, body: error }));

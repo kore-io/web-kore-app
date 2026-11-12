@@ -193,7 +193,8 @@
       "nameTooLong": "O nome passa de 80 caracteres.",
       "changed": "As respostas deste grupo mudaram enquanto vocês preenchiam. O formulário agora mostra as respostas atuais: confiram e enviem de novo.",
       "limit": "Este grupo já mudou as respostas muitas vezes hoje. Tentem de novo amanhã ou falem com o casal.",
-      "network": "Não foi possível enviar as respostas. Confiram a conexão e tentem de novo. O que vocês marcaram continua na tela."
+      "network": "Não foi possível enviar as respostas. Confiram a conexão e tentem de novo. O que vocês marcaram continua na tela.",
+      "rateLimited": "Muitas tentativas seguidas. Esperem um minuto e enviem de novo. O que vocês marcaram continua na tela."
     },
     "closed": {
       "deadline": "O prazo terminou. Se algo mudou, fale com o casal.",

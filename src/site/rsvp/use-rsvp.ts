@@ -28,6 +28,7 @@ export type SendResult =
   | { kind: 'linkInvalid' }
   | { kind: 'previewReadOnly' }
   | { kind: 'limit' }
+  | { kind: 'rateLimited' }
   | { kind: 'failed' };
 
 /** O `PUT /v1/sites/{slug}/rsvp`, com cada recusa do contrato no resultado. */
@@ -53,7 +54,9 @@ function failure(error: unknown): SendResult {
   if (error.status === 401) return { kind: 'linkInvalid' };
   if (code === 'PREVIEW_READ_ONLY') return { kind: 'previewReadOnly' };
   if (code === 'RSVP_LIMIT') return { kind: 'limit' };
-  // O 429 por minuto (RSVP_RATE_LIMITED), a rede e o 5xx: tentar de novo, com o que foi marcado.
+  // O 429 por minuto tem o texto dele (decisão 232(6)).
+  if (code === 'RSVP_RATE_LIMITED') return { kind: 'rateLimited' };
+  // A rede, o 5xx e o 429 geral: tentar de novo, com o que foi marcado.
   return { kind: 'failed' };
 }
 
