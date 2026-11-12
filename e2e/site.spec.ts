@@ -411,4 +411,88 @@ test.describe('Site › Editor (decisão 214)', () => {
       ((await refused.json()) as { errors: { path: string }[] }).errors.map((error) => error.path),
     ).toEqual(['content.venues']);
   });
+  test('Nossa história: texto e 3 fotos de verdade na ordem, salvas e reabertas; remover uma (S3 RN05; S4 RN04)', async ({
+    page,
+  }) => {
+    const email = `e2e-site-${unique()}@exemplo.kore.local`;
+    const userId = await createUser({ db, email, name: 'Ana Beatriz Moreira' });
+    await createWedding({
+      db,
+      partners: ['Ana Beatriz Moreira', 'Marcos Vinícius Rocha'],
+      eventDate: '2027-05-15',
+      city: 'Campinas',
+      status: 'draft',
+      createdByUserId: userId,
+      owners: [userId, null],
+    });
+    await signIn({ page, email });
+    await page.goto('/app/site/nossa-historia');
+    await page.getByRole('switch', { name: 'Mostrar a seção no site' }).locator('..').click();
+    await page.getByRole('textbox', { name: 'Texto' }).fill('A gente se conheceu em 2019.');
+
+    // Três fotos de verdade, de cores diferentes, desenhadas no navegador.
+    const photos = await page.evaluate(() =>
+      ['#A94F37', '#7A8B69', '#2F4B6E'].map((color) => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 1200;
+        canvas.height = 800;
+        const context = canvas.getContext('2d');
+        if (context) {
+          context.fillStyle = color;
+          context.fillRect(0, 0, 1200, 800);
+        }
+        return canvas.toDataURL('image/jpeg', 0.9);
+      }),
+    );
+    await page.getByLabel(/Arrastem as fotos/).setInputFiles(
+      photos.map((dataUrl, index) => ({
+        name: `ensaio-${index + 1}.jpg`,
+        mimeType: 'image/jpeg',
+        buffer: Buffer.from(dataUrl.split(',')[1] ?? '', 'base64'),
+      })),
+    );
+    await expect(page.getByRole('group', { name: 'Fotos do casal (3 de 12)' })).toBeVisible({
+      timeout: 30_000,
+    });
+    await expect(page.getByRole('button', { name: 'Salvar' })).toBeEnabled();
+    await page.getByRole('button', { name: 'Salvar' }).click();
+    await expect(toast({ page, text: 'Alterações salvas.' })).toBeVisible();
+
+    await page.reload();
+    const thumbs = page.getByRole('group', { name: 'Fotos do casal (3 de 12)' }).getByRole('img');
+    await expect(thumbs).toHaveCount(3);
+    await expect(thumbs.first()).toHaveAccessibleName('Foto 1 de 3 de Nossa história');
+    // A ordem é a da escolha: a 1ª é a vermelha, a 3ª a azul (a cor do pixel do meio).
+    const colorOf = async (index: number) => {
+      // O canvas não lê pixel de outra origem: os bytes vêm pelo Playwright.
+      const src = (await thumbs.nth(index).getAttribute('src')) ?? '';
+      const bytes = (await (await page.request.get(src)).body()).toString('base64');
+      return page.evaluate(async (data) => {
+        const img = new Image();
+        img.src = `data:image/jpeg;base64,${data}`;
+        await img.decode();
+        const canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        const context = canvas.getContext('2d', { willReadFrequently: true });
+        if (!context) return [0, 0, 0];
+        context.drawImage(img, 0, 0);
+        const [x, y] = [img.naturalWidth / 2, img.naturalHeight / 2];
+        return Array.from(context.getImageData(x, y, 1, 1).data.slice(0, 3));
+      }, bytes);
+    };
+    // #A94F37: o vermelho domina; #2F4B6E: o azul passa do vermelho (a verde, não).
+    const [firstRed = 0, , firstBlue = 0] = await colorOf(0);
+    const [lastRed = 0, , lastBlue = 0] = await colorOf(2);
+    expect(firstRed).toBeGreaterThan(firstBlue + 60);
+    expect(lastBlue).toBeGreaterThan(lastRed + 40);
+
+    await page.getByRole('button', { name: 'Remover foto 2' }).click();
+    await page.getByRole('button', { name: 'Salvar' }).click();
+    await expect(toast({ page, text: 'Alterações salvas.' })).toBeVisible();
+    await page.reload();
+    await expect(
+      page.getByRole('group', { name: 'Fotos do casal (2 de 12)' }).getByRole('img'),
+    ).toHaveCount(2);
+  });
 });
