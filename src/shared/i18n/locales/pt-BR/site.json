@@ -279,5 +279,14 @@
       "remove": "Remover foto {{n}}",
       "alt": "Foto {{n}} de {{total}} de {{title}}"
     }
+  },
+  "previewSite": {
+    "open": "Pré-visualizar",
+    "blocked": "O navegador bloqueou a nova aba.",
+    "openAction": "Abrir a prévia",
+    "noSlug": {
+      "couple": "Escolham o endereço do site em Dados básicos para ver a prévia.",
+      "planner": "Escolha o endereço do site em Dados básicos para ver a prévia."
+    }
   }
 }

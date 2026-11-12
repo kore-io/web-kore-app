@@ -17,6 +17,7 @@ import {
   LodgingSection,
 } from '../sections/section-forms';
 import { StorySection } from '../sections/story-section';
+import { useOpenPreview } from '../preview/use-open-preview';
 import { SitePreview } from '../components/site-preview';
 import { PreviewAppearanceProvider } from '../preview-appearance';
 import { SectionFormProvider, type SectionForm } from '../section-form';
@@ -57,6 +58,11 @@ function SiteEditor({
   const [saving, setSaving] = useState(false);
   const [tab, setTab] = useState<MobileTab>('edit');
   const dirty = form?.dirty === true;
+  const openPreview = useOpenPreview({ weddingId });
+  // Pré-visualizar com mudança não salva: antes, o Dialog de descartar (Pré-visualização
+  // RN01). Descartar remonta a seção (a chave muda), que volta ao que está salvo.
+  const [previewPending, setPreviewPending] = useState(false);
+  const [formKey, setFormKey] = useState(0);
 
   // Trocar de seção (ou sair do Editor) com mudança pede o Dialog (Dados básicos RN10).
   const blocker = useBlocker(
@@ -137,12 +143,30 @@ function SiteEditor({
         title={t('title')}
         description={subtitle}
         actions={
-          <Button
-            disabled={!dirty || form?.canSave === false || saving}
-            onClick={() => void save()}
-          >
-            {t('save')}
-          </Button>
+          <div className="kore-site-editor__actions">
+            <Button
+              variant="secondary"
+              disabled={!data.slug}
+              {...(!data.slug && { 'aria-describedby': 'kore-site-preview-help' })}
+              onClick={() => {
+                if (dirty) setPreviewPending(true);
+                else openPreview({ mode: 'visitor' });
+              }}
+            >
+              {t('previewSite.open')}
+            </Button>
+            <Button
+              disabled={!dirty || form?.canSave === false || saving}
+              onClick={() => void save()}
+            >
+              {t('save')}
+            </Button>
+            {!data.slug && (
+              <p id="kore-site-preview-help" className="kore-site-editor__preview-help">
+                {t(`previewSite.noSlug.${audience}`)}
+              </p>
+            )}
+          </div>
         }
       />
 
@@ -180,6 +204,7 @@ function SiteEditor({
           <PreviewAppearanceProvider onChange={setPreviewAppearance}>
             <SectionFormProvider onChange={register}>
               <section
+                key={formKey}
                 className="kore-site-editor__panel"
                 aria-labelledby="kore-site-section-title"
               >
@@ -220,19 +245,38 @@ function SiteEditor({
       </div>
 
       <Dialog
-        open={blocker.state === 'blocked'}
+        open={blocker.state === 'blocked' || previewPending}
         onOpenChange={(open) => {
-          if (!open) blocker.reset?.();
+          if (open) return;
+          blocker.reset?.();
+          setPreviewPending(false);
         }}
         title={t('discard.title')}
         description={t('discard.description', { section: sectionName(sectionKey) })}
         stackActions
         actions={
           <>
-            <Button variant="secondary" onClick={() => blocker.reset?.()}>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                blocker.reset?.();
+                setPreviewPending(false);
+              }}
+            >
               {t('discard.keep')}
             </Button>
-            <Button variant="destructive" onClick={() => blocker.proceed?.()}>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (blocker.state === 'blocked') {
+                  blocker.proceed?.();
+                  return;
+                }
+                setPreviewPending(false);
+                setFormKey((key) => key + 1);
+                openPreview({ mode: 'visitor' });
+              }}
+            >
               {t('discard.confirm')}
             </Button>
           </>

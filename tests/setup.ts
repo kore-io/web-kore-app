@@ -28,6 +28,14 @@ if (hasDom && !HTMLDialogElement.prototype.showModal) {
   };
 }
 
+// O jsdom não tem a captura de ponteiro, que o Toast do Radix usa ao receber o clique na
+// ação (o arrastar para fechar).
+if (hasDom && !Element.prototype.hasPointerCapture) {
+  Element.prototype.hasPointerCapture = () => false;
+  Element.prototype.setPointerCapture = () => undefined;
+  Element.prototype.releasePointerCapture = () => undefined;
+}
+
 /** IntersectionObserver de mentira: o teste chama `intersect()` para simular a rolagem. */
 export const intersectionObservers: { callback: IntersectionObserverCallback }[] = [];
 class FakeIntersectionObserver {

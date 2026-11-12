@@ -147,7 +147,8 @@
       "title": "Link do grupo",
       "caption": "Quem abre este link responde pelo grupo {{name}}.",
       "copy": "Copiar link",
-      "copied": "Link copiado."
+      "copied": "Link copiado.",
+      "preview": "Ver como este grupo"
     },
     "regenerateDialog": {
       "title": "Regenerar o link do grupo {{name}}?",

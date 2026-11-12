@@ -112,15 +112,26 @@ export type Call = { method: string; path: string; body: Record<string, unknown>
 export function mockSite({
   site = siteWith(),
   put,
+  preview,
 }: {
   site?: SiteEditorResponse;
   put?: (type: string, body: Record<string, unknown>) => Response;
+  /** A resposta do POST …/site-previews (o padrão é a url da prévia). */
+  preview?: () => Response;
 } = {}) {
   const calls: Call[] = [];
   let uploads = 0;
   mockApi(({ method, path, body }) => {
     if (path === '/v1/me') return Response.json(meFor(me));
     if (path === '/v1/weddings/w1/site' && method === 'GET') return Response.json(site);
+    if (path === '/v1/weddings/w1/site-previews' && method === 'POST') {
+      calls.push({ method, path, body: body as Record<string, unknown> });
+      if (preview) return preview();
+      return Response.json(
+        { url: 'http://localhost:5174/ana-e-marcos?previa=tok', expiresAt: '2026-11-11T12:05:00Z' },
+        { status: 201 },
+      );
+    }
     // O envio de fotos (Imagens RN04): cada autorização ganha um id novo, e a confirmação
     // devolve a foto pronta com esse id.
     if (path === '/v1/weddings/w1/site-images/upload-authorizations') {
