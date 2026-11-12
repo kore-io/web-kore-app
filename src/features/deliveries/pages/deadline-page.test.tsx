@@ -78,7 +78,7 @@ describe('Envios › Prazo de resposta (Prazo e respostas RN01 a RN03; Penpot A7
   it('com prazo: a data, os dias que faltam com o que o grupo vê, o aviso, os pendentes e os botões', async () => {
     const deadline = dayFromToday(19);
     mockDeadline({ deadline });
-    renderRoute({ url: '/app/envios' });
+    renderRoute({ url: '/app/envios/prazo' });
     expect(await screen.findByRole('heading', { name: 'Envios', level: 1 })).toBeInTheDocument();
     expect(await screen.findByLabelText('Prazo de resposta')).toHaveValue(deadline);
     expect(field()).toHaveAccessibleDescription(

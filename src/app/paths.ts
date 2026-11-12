@@ -33,8 +33,15 @@ export const paths = {
   /** Novo grupo e Editar grupo (decisão 213(9)). */
   guestNew: '/app/convidados/novo',
   guestPartyEdit: '/app/convidados/grupos/:partyId/editar',
-  /** Envios (IA da Área do Casal); no C3 da F4, só a aba Prazo de resposta. */
+  /** Envios (IA da Área do Casal; decisão 235): abre em Enviar convites. */
   deliveries: '/app/envios',
+  /**
+   * Envios › Enviar convites, Save the date e Lembrar pendentes (decisão 235): as etapas
+   * (Grupos → Canal e mensagem → Fila) no mesmo caminho, com ?etapa=canal e ?etapa=fila.
+   */
+  deliveryInvites: '/app/envios/convites',
+  deliverySaveTheDate: '/app/envios/save-the-date',
+  deliveryReminder: '/app/envios/lembrete',
   /** Envios › Prazo de resposta (Prazo e respostas RN02; decisão 217(13)). */
   deliveryDeadline: '/app/envios/prazo',
   /** Site › Editor (decisão 214): /app/site abre os Dados básicos. */

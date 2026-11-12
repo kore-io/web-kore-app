@@ -271,6 +271,20 @@ describe('Convidados › Grupos e convidados (RN13)', () => {
     expect(screen.queryByText(/selecionad/)).toBeNull();
   });
 
+  it('Lembrar pendentes leva os marcados à aba do lembrete (Envios RN04; Penpot A9)', async () => {
+    const user = userEvent.setup();
+    window.sessionStorage.clear();
+    mockList(() => Response.json(page([party('p1', 'Família Moreira'), party('p2', 'Tio Jorge')])));
+    const { router } = renderRoute({ url: '/app/convidados' });
+    await screen.findByRole('table');
+    await user.click(screen.getByRole('checkbox', { name: 'Selecionar Tio Jorge' }));
+    await user.click(screen.getByRole('button', { name: 'Lembrar pendentes' }));
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app/envios/lembrete'));
+    expect(
+      JSON.parse(window.sessionStorage.getItem('kore.deliveries.w1.reminder') ?? '{}').ids,
+    ).toEqual(['p2']);
+  });
+
   it('Adicionar tag a 1 grupo: o Toast no singular "Tag aplicada a 1 grupo." (Tags RN08)', async () => {
     const user = userEvent.setup();
     mockList(() => Response.json(page([party('p1', 'Família Moreira'), party('p2', 'Tio Jorge')])));

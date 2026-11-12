@@ -1,3 +1,6 @@
+import { useNavigate } from 'react-router';
+import { paths } from '../../../app/paths';
+import { presetDeliverySelection } from '../../deliveries/hooks/use-delivery-selection';
 import { EmptyState, Spinner } from '@kore-io/design';
 import { SearchX, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -34,6 +37,7 @@ function PartiesView({
   role: string | undefined;
 }) {
   const { t } = useTranslation('guests');
+  const navigate = useNavigate();
   const { filters: urlFilters, setFilters } = usePartyFilters();
   const tags = useTagsControllerListV1(weddingId);
   // A tag da URL só vale se for uma tag ativa (excluída ou de um link antigo, cai).
@@ -109,6 +113,14 @@ function PartiesView({
         <SelectionBar
           count={selection.count}
           audience={audience}
+          onRemind={() => {
+            presetDeliverySelection({
+              weddingId,
+              kind: 'reminder',
+              ids: marked.map((party) => party.id),
+            });
+            void navigate(paths.deliveryReminder);
+          }}
           tags={tags.data?.data ?? []}
           isApplying={applyTag.isApplying}
           onApplyTag={(tagId) =>
