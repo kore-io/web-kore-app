@@ -106,3 +106,33 @@
 .kore-editor-preview__caption {
   @apply type-caption text-gray-700;
 }
+
+/*
+ * Dados básicos (Penpot 1.2): os nomes lado a lado; Cidade e UF (160 px) lado a lado no
+ * tablet e no computador, empilhados no celular; o link "Usar …" em primary.dark,
+ * sublinhado, dentro da ajuda em danger.
+ */
+.kore-site-basics {
+  @apply flex flex-col gap-5;
+}
+
+.kore-site-basics__row {
+  @apply grid gap-3 md:grid-cols-2;
+}
+
+.kore-site-basics__row--city {
+  @apply flex flex-col gap-3 md:flex-row;
+}
+
+.kore-site-basics__row--city > :first-child {
+  @apply md:flex-1;
+}
+
+.kore-site-basics__row--city > :last-child {
+  @apply md:w-40;
+}
+
+.kore-site-basics__suggestion {
+  @apply cursor-pointer text-primary-dark underline;
+  @apply focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}
