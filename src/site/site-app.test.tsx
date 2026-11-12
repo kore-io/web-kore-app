@@ -1,5 +1,6 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { StrictMode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../tests/a11y';
 import { apiError, mockApi } from '../../tests/render-route';
@@ -96,6 +97,16 @@ describe('Site do casal › endereço e estados (Site público RN01, RN04, RN12)
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  it('/simule com o simulador desligado: o endereço não existe (Simule RN01)', async () => {
+    // O vitest.config fixa VITE_SIMULATOR_ENABLED=false, como em homologação e produção.
+    const fetchMock = mockSite(() => Response.json(site));
+    render(<SiteApp pathname="/simule" />);
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Não encontramos este endereço.' }),
+    ).toBeInTheDocument();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it('erro ao carregar: a página com Tentar de novo, que chama de novo (RN12)', async () => {
     const user = userEvent.setup();
     let fail = true;
@@ -135,6 +146,25 @@ describe('Site do casal › layout (Site público RN10, RN11)', () => {
     expect(screen.getByText('Vamos nos casar')).toBeInTheDocument();
     expect(screen.getByText('sábado, 14 de novembro de 2026 · Campinas (SP)')).toBeInTheDocument();
     expect(screen.getByText(/^(Faltam \d+ dias|Falta 1 dia|É hoje)$/)).toBeInTheDocument();
+  });
+
+  // A contagem conta no fuso do casamento (Seções RN06), com o relógio fixo.
+  it.each([
+    ['11/11 às 23h30 em Brasília (02h30 UTC do dia 12)', '2026-11-12T02:30:00Z', 'Faltam 3 dias'],
+    ['no dia do casamento', '2026-11-14T15:00:00Z', 'É hoje'],
+    ['depois do casamento', '2026-11-15T15:00:00Z', null],
+  ])('a contagem do Hero %s', async (_when, now, text) => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(now));
+    try {
+      mockSite(() => Response.json(site));
+      render(<SiteApp pathname="/ana-e-marcos" />);
+      await screen.findByText('Vamos nos casar');
+      if (text) expect(screen.getByText(text)).toBeInTheDocument();
+      else expect(screen.queryByText(/Faltam|Falta 1|É hoje/)).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('o botão do menu abre e fecha a lista, e o Esc fecha', async () => {
@@ -392,6 +422,7 @@ function mockPreview({
   const parties = [
     { id: 'p1', name: 'Família Moreira' },
     { id: 'p2', name: 'Família Rocha' },
+    { id: 'p3', name: 'Família Duarte' },
   ];
   mockApi(({ method, path, body }) => {
     calls.push({ method, path, body });
@@ -402,8 +433,11 @@ function mockPreview({
       mode = { as: data.mode, ...(party && { name: party.name }) };
       return Response.json({ mode: data.mode, party });
     }
-    if (path.startsWith('/v1/sites/ana-e-marcos/preview-parties'))
-      return Response.json({ data: parties, total });
+    if (path.startsWith('/v1/sites/ana-e-marcos/preview-parties')) {
+      const q = new URLSearchParams(path.split('?')[1]).get('q')?.toLowerCase();
+      const data = q ? parties.filter((party) => party.name.toLowerCase().includes(q)) : parties;
+      return Response.json({ data, total });
+    }
     if (path === '/v1/sites/ana-e-marcos' && method === 'GET')
       return Response.json(previewSite(mode.as, mode.name));
     return apiError({ status: 404, body: { error: 'X' } });
@@ -457,6 +491,43 @@ describe('Site do casal › a prévia (Pré-visualização RN03 a RN06)', () => 
     expect(screen.queryByRole('combobox', { name: 'Grupo' })).not.toBeInTheDocument();
   });
 
+  it('no StrictMode, o token da prévia é trocado uma vez só (RN03)', async () => {
+    const calls = mockPreview();
+    render(
+      <StrictMode>
+        <SiteApp pathname="/ana-e-marcos" search="?previa=q3Xv8LmN2pRtY7wK1cZb4A" />
+      </StrictMode>,
+    );
+    await screen.findByText('Prévia. O site ainda não foi publicado.');
+    expect(
+      calls.filter((call) => call.method === 'POST' && call.path.endsWith('/preview-session')),
+    ).toHaveLength(1);
+  });
+
+  it('Trocar o grupo na barra: buscar "Duarte" e escolher a Família Duarte (RN06; 229(b))', async () => {
+    const user = userEvent.setup();
+    const calls = mockPreview();
+    const { container } = render(
+      <SiteApp pathname="/ana-e-marcos" search="?previa=q3Xv8LmN2pRtY7wK1cZb4A" />,
+    );
+    await screen.findByText('Prévia. O site ainda não foi publicado.');
+    await expectNoA11yViolations({ container });
+    await user.click(screen.getByText('Grupo'));
+    await screen.findByText('Prévia como Família Moreira. O site ainda não foi publicado.');
+    await user.type(screen.getByRole('searchbox', { name: 'Buscar um grupo' }), 'Duarte');
+    const select = screen.getByRole('combobox', { name: 'Grupo' });
+    await waitFor(() =>
+      expect(within(select).getByRole('option', { name: 'Família Duarte' })).toBeInTheDocument(),
+    );
+    await user.selectOptions(select, 'Família Duarte');
+    expect(await screen.findByText('Convite para Família Duarte')).toBeInTheDocument();
+    expect(calls.filter((call) => call.method === 'PATCH').at(-1)?.body).toEqual({
+      mode: 'party',
+      partyId: 'p3',
+    });
+    await expectNoA11yViolations({ container });
+  });
+
   it('a prévia que não vale mais (usada, vencida ou sem vínculo)', async () => {
     mockPreview({ session: () => apiError({ status: 404, body: { error: 'PREVIEW_INVALID' } }) });
     render(<SiteApp pathname="/ana-e-marcos" search="?previa=q3Xv8LmN2pRtY7wK1cZb4A" />);
@@ -468,6 +539,7 @@ describe('Site do casal › a prévia (Pré-visualização RN03 a RN06)', () => 
         'Cada prévia vale uma vez só, por poucos minutos. O botão Pré-visualizar do Editor do site abre uma nova.',
       ),
     ).toBeInTheDocument();
+    await expectNoA11yViolations({ container: document.body, disabledRules: ['region'] });
   });
 
   it('Grupo troca pelo PATCH e recarrega como o grupo; o Select troca de grupo', async () => {
@@ -484,6 +556,9 @@ describe('Site do casal › a prévia (Pré-visualização RN03 a RN06)', () => 
       mode: 'party',
       partyId: 'p1',
     });
+    // A busca aparece sempre, mesmo com poucos grupos, e sem a linha de apoio (229(b)).
+    expect(screen.getByRole('searchbox', { name: 'Buscar um grupo' })).toBeInTheDocument();
+    expect(screen.queryByText(/Mostrando/)).not.toBeInTheDocument();
     await user.selectOptions(screen.getByRole('combobox', { name: 'Grupo' }), 'Família Rocha');
     expect(await screen.findByText('Convite para Família Rocha')).toBeInTheDocument();
     await user.click(screen.getByText('Visitante'));

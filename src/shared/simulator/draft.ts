@@ -148,9 +148,17 @@ export function parseDraft(value: unknown): SimulatorDraft | null {
   };
 }
 
-/** Vencido: mais de 7 dias desde a última mudança (RN05). */
+/** A folga para o relógio do aparelho num `savedAt` adiante de agora. */
+const CLOCK_SKEW_MS = 5 * 60 * 1000;
+
+/**
+ * Vencido: mais de 7 dias desde a última mudança (RN05). Um `savedAt` no futuro (além da
+ * folga do relógio) também conta como vencido: um rascunho adulterado não vale para sempre
+ * (sugestão do Crivo no DoD da F2).
+ */
 export function isExpired({ draft, now }: { draft: SimulatorDraft; now: Date }): boolean {
-  return now.getTime() - Date.parse(draft.savedAt) > DRAFT_TTL_MS;
+  const age = now.getTime() - Date.parse(draft.savedAt);
+  return age > DRAFT_TTL_MS || age < -CLOCK_SKEW_MS;
 }
 
 function toBase64Url(text: string): string {

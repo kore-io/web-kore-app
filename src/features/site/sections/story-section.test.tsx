@@ -174,4 +174,15 @@ describe('Site › Nossa história (S3 RN05; S4 RN04)', () => {
     await screen.findByRole('group', { name: 'Fotos do casal (3 de 12)' });
     await expectNoA11yViolations({ container });
   });
+
+  it('cerimonialista: a área de envio no singular (RN05; 198(2))', async () => {
+    profileUnderTest.current = 'planner';
+    mockSite({ site: storyWith([]) });
+    renderAreaScreen({ url: '/app/site/nossa-historia' });
+    expect(
+      await screen.findByLabelText(
+        'Arraste as fotos ou clique para escolher JPG ou PNG, até 12 fotos.',
+      ),
+    ).toBeInTheDocument();
+  });
 });

@@ -273,6 +273,80 @@ describe('Site › Aparência (S2; decisão 218)', () => {
     );
   });
 
+  it('cerimonialista: a cor que some no fundo, no singular (RN04; 198(2))', async () => {
+    profileUnderTest.current = 'planner';
+    const user = userEvent.setup();
+    mockAppearance();
+    renderAreaScreen({ url: '/app/site/aparencia' });
+    await typeHex(
+      user,
+      await screen.findByRole('textbox', { name: 'Cor principal (botões)' }),
+      '#EFE6DA',
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Essa cor fica pouco visível neste fundo. Escolha um tom mais escuro ou mais claro, ou outro fundo.',
+    );
+  });
+
+  it('trocar de Escuro para Claro com uma cor que some no Claro bloqueia (RN04)', async () => {
+    const user = userEvent.setup();
+    mockAppearance();
+    renderRoute({ url: '/app/site/aparencia' });
+    await user.click(await screen.findByRole('radio', { name: 'Escuro' }));
+    await typeHex(user, primary(), '#E7D3B0');
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Salvar' })).toBeEnabled();
+    await user.click(screen.getByRole('radio', { name: 'Claro' }));
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Essa cor fica pouco visível neste fundo. Escolham um tom mais escuro ou mais claro, ou outro fundo.',
+    );
+    expect(screen.getByRole('button', { name: 'Salvar' })).toBeDisabled();
+  });
+
+  it('a prévia troca de fonte com o par: Moderno em DM Serif Display e Inter (RN08)', async () => {
+    const user = userEvent.setup();
+    mockAppearance();
+    const { container } = renderRoute({ url: '/app/site/aparencia' });
+    const fonts = await screen.findByRole('group', { name: 'Tipografia' });
+    await user.click(within(fonts).getByRole('radio', { name: /Moderno/ }));
+    const card = container.querySelector<HTMLElement>('.kore-editor-preview__card');
+    expect(card?.style.fontFamily).toContain('Inter');
+    expect(
+      card?.querySelector<HTMLElement>('.kore-editor-preview__names')?.style.fontFamily,
+    ).toContain('DM Serif Display');
+  });
+
+  it('trocar só o destaque também tira a paleta: o PUT leva starterPaletteKey nulo (RN07)', async () => {
+    const user = userEvent.setup();
+    const calls = mockAppearance();
+    renderRoute({ url: '/app/site/aparencia' });
+    await typeHex(
+      user,
+      await screen.findByRole('textbox', { name: 'Destaque (detalhes e ícones)' }),
+      '#1F2A44',
+    );
+    const palettes = screen.getByRole('radiogroup', { name: 'Paleta de partida' });
+    expect(within(palettes).queryByRole('radio', { checked: true })).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Salvar' }));
+    await waitFor(() =>
+      expect(calls[0]?.body).toMatchObject({
+        starterPaletteKey: null,
+        primaryColor: '#A94F37',
+        accentColor: '#1F2A44',
+      }),
+    );
+  });
+
+  it('a Noite: o texto dos botões em preto na legenda (RN06)', async () => {
+    const user = userEvent.setup();
+    mockAppearance();
+    renderRoute({ url: '/app/site/aparencia' });
+    await user.click(await screen.findByRole('radio', { name: 'Noite' }));
+    expect(primary()).toHaveAccessibleDescription(
+      'Texto dos botões em preto · contraste 11,2:1 · sobre o fundo 12,2:1',
+    );
+  });
+
   it('é acessível', async () => {
     mockAppearance();
     const { container } = renderRoute({ url: '/app/site/aparencia' });

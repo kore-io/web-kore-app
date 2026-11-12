@@ -1,6 +1,10 @@
 # Site do casal (Site público RN02 e RN03): fora dos buscadores, sem cache de resposta de
-# grupo e sem Referer. A Pages Function (B6) repete os cabeçalhos no HTML de /<slug>.
+# grupo e sem Referer. A Pages Function (B6) repete os cabeçalhos no HTML de /<slug>, com a
+# CSP que libera a API e as imagens (o _headers não vale para a resposta da função). Aqui, a
+# CSP só serve à raiz e aos arquivos, que não chamam a API: igual a siteCsp() sem as origens
+# (src/site/edge/csp.test.ts confere).
 /*
   X-Robots-Tag: noindex, nofollow
   Referrer-Policy: no-referrer
   X-Content-Type-Options: nosniff
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'

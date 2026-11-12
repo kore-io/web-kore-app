@@ -13,7 +13,7 @@ import { putFile } from './put-file';
 const ACCEPTED = ['image/jpeg', 'image/png'];
 export const IMAGE_ACCEPT = '.jpg,.jpeg,.png,image/jpeg,image/png';
 
-type UploadFailure = 'type' | 'tooBig' | 'network' | 'limit' | 'rate' | 'generic';
+type UploadFailure = 'type' | 'tooBig' | 'network' | 'limit' | 'rate' | 'processing' | 'generic';
 
 /**
  * Envio de uma foto do site (Imagens RN02 a RN07): confere o tipo (JPG ou PNG) e os
@@ -93,6 +93,8 @@ export function useSiteImageUpload({
 function failureOf(error: unknown): UploadFailure {
   const code = apiErrorCode({ error });
   if (code === 'SITE_IMAGE_LIMIT') return 'limit';
+  // A confirmação de uma foto que ainda está sendo processada (decisão 229(g)).
+  if (code === 'IMAGE_PROCESSING') return 'processing';
   if (error instanceof ApiError && error.status === 429) return 'rate';
   if (!(error instanceof ApiError)) return 'network';
   return 'generic';

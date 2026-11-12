@@ -8,7 +8,7 @@ import {
   type BadgeTone,
 } from '@kore-io/design';
 import { Check, Clock, X } from 'lucide-react';
-import { useRef, useState, type ReactNode } from 'react';
+import { useId, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate, useNavigate, useParams } from 'react-router';
 import { guestPartyEditPath, paths } from '../../../app/paths';
@@ -108,6 +108,7 @@ function PartyPanel({
         />
         <LinkCard
           party={party}
+          audience={audience}
           onPreview={() => openPreview({ mode: 'party', partyId: party.id })}
           onCopy={(url) => void panel.copyLink({ url })}
           onTrash={() => setTrashingParty(true)}
@@ -365,18 +366,22 @@ function GuestItem({
 
 function LinkCard({
   party,
+  audience,
   onPreview,
   onCopy,
   onTrash,
 }: {
   party: PartyResponse;
+  audience: Audience;
   /** Ver como este grupo (Pré-visualização RN01): a prévia como o grupo, em nova aba. */
   onPreview: () => void;
   onCopy: (url: string) => void;
   onTrash: () => void;
 }) {
   const { t } = useTranslation('guests');
+  const { t: tSite } = useTranslation('site');
   const { url } = party.link;
+  const helpId = useId();
   return (
     <Card title={t('panel.link.title')}>
       <p className="kore-party-panel__link">{url ?? '—'}</p>
@@ -390,14 +395,26 @@ function LinkCard({
         >
           {t('panel.link.copy')}
         </Button>
-        {/* Sem endereço do site, não há link nem prévia (RN01; o servidor daria 409). */}
-        <Button variant="secondary" size="sm" disabled={url === null} onClick={onPreview}>
+        {/* Sem endereço do site, não há link nem prévia: desabilitado com a mesma ajuda do
+            Editor (Pré-visualização RN01; o servidor daria 409). */}
+        <Button
+          variant="secondary"
+          size="sm"
+          disabled={url === null}
+          {...(url === null && { 'aria-describedby': helpId })}
+          onClick={onPreview}
+        >
           {t('panel.link.preview')}
         </Button>
         <Button variant="destructive" size="sm" onClick={onTrash}>
           {t('trash.action')}
         </Button>
       </div>
+      {url === null && (
+        <p id={helpId} className="kore-party-panel__note">
+          {tSite(`previewSite.noSlug.${audience}`)}
+        </p>
+      )}
     </Card>
   );
 }

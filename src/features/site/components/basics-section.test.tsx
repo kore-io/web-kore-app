@@ -1,11 +1,13 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import i18next from 'i18next';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../../../tests/a11y';
 import { meFor, profileUnderTest } from '../../../../tests/profile';
 import { apiError, mockApi, renderAreaScreen, renderRoute } from '../../../../tests/render-route';
 import type { SiteEditorResponse } from '../../../shared/api/generated/model';
 import { compressImage } from '../images/compress-image';
+import { basicsErrorText } from './basics-section';
 import { putFile } from '../images/put-file';
 
 vi.mock('../images/compress-image', async (original) => ({
@@ -208,6 +210,60 @@ describe('Site › Dados básicos (RN02 a RN08, RN10)', () => {
       }),
     );
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/site/faq'));
+  });
+
+  it('fechar a aba com mudança não salva pede o aviso do navegador; sem mudança, não (RN10)', async () => {
+    const user = userEvent.setup();
+    mockBasics();
+    renderRoute({ url: '/app/site/dados-basicos' });
+    const city = await screen.findByRole('textbox', { name: 'Cidade' });
+    const unload = () => {
+      const event = new Event('beforeunload', { cancelable: true });
+      window.dispatchEvent(event);
+      return event.defaultPrevented;
+    };
+    expect(unload()).toBe(false);
+    await user.type(city, ' Centro');
+    expect(unload()).toBe(true);
+    await user.clear(city);
+    await user.type(city, 'Campinas');
+    expect(unload()).toBe(false);
+  });
+
+  it('o nome sem título leva o rótulo "Nome" (RN02)', async () => {
+    mockBasics({
+      data: site({
+        partners: [
+          { id: 'pa', title: null, name: 'Ana Beatriz Moreira' },
+          { id: 'pm', title: 'groom', name: 'Marcos Vinícius Rocha' },
+        ] as SiteEditorResponse['partners'],
+      }),
+    });
+    renderRoute({ url: '/app/site/dados-basicos' });
+    expect(await screen.findByRole('textbox', { name: 'Nome' })).toHaveValue('Ana Beatriz Moreira');
+    expect(field('Noivo')).toHaveValue('Marcos Vinícius Rocha');
+  });
+
+  it('o vendedor antes do aceite lê a ajuda da data no singular (RN02)', async () => {
+    profileUnderTest.current = 'seller';
+    mockBasics();
+    renderAreaScreen({ url: '/app/site/dados-basicos' });
+    expect(await screen.findByLabelText('Data do casamento')).toHaveAccessibleDescription(
+      'Opcional. Se o casal ainda não tiver a data, deixe em branco.',
+    );
+  });
+
+  it('os erros dos campos nas duas vozes (RN03 e RN06; 198(2))', () => {
+    const t = i18next.getFixedT('pt-BR', 'site');
+    const tGuests = i18next.getFixedT('pt-BR', 'guests');
+    const text = (code: string, audience: 'couple' | 'planner') =>
+      basicsErrorText({ t, tGuests, error: { code, params: {} }, audience });
+    expect(text('NAME_MISSING', 'planner')).toBe('Informe o nome.');
+    expect(text('EMAIL_INVALID', 'planner')).toBe('Informe um e-\u2060mail válido.');
+    expect(text('SLUG_MISSING', 'planner')).toBe('Informe o endereço do site.');
+    expect(text('SLUG_FORMAT', 'planner')).toBe('Use só letras minúsculas, números e hífen.');
+    expect(text('STATE_MISSING', 'couple')).toBe('Escolham a UF.');
+    expect(text('STATE_MISSING', 'planner')).toBe('Escolha a UF.');
   });
 
   it('nome e cidade vazios: os avisos do casal, sem chamar a API (RN03)', async () => {

@@ -6,14 +6,18 @@
  *   `console.log` do request), porque o link inteiro é o convite (RN06).
  * - A prévia vem do `GET /v1/public/sites/{slug}/preview`: publicado, os nomes e a og.jpg
  *   da capa; rascunho ou endereço que não existe, a prévia genérica do Kore, sem nome.
- * - Sempre `noindex`, `private, no-store` e `no-referrer` (RN02 e RN03).
+ * - Sempre `noindex`, `private, no-store`, `no-referrer` e a CSP (RN01 a RN03).
  * - Se a API falhar ou passar de 2,5 s, sai o HTML com a prévia genérica: o site carrega e
  *   mostra o dele.
  */
 
+import { siteCsp } from './csp';
+
 export interface SitePageEnv {
   /** O endereço da API (ex.: https://api.kore.com.br). */
   API_URL: string;
+  /** A origem pública das imagens do casal, para a CSP (ex.: https://img.kore.com.br). */
+  IMAGES_ORIGIN?: string;
   /**
    * Outra imagem padrão do Kore para a prévia genérica e sem capa (1200 × 630, até 300 KB).
    * Sem ela, vale a `og-kore.jpg` servida pelo próprio site (site/public).
@@ -167,5 +171,14 @@ export async function handleSitePage({
       defaultImage: env.DEFAULT_OG_IMAGE ?? new URL(DEFAULT_OG_PATH, url.origin).toString(),
     }),
   });
-  return new Response(body, { status: 200, headers: SITE_HEADERS });
+  return new Response(body, {
+    status: 200,
+    headers: {
+      ...SITE_HEADERS,
+      'Content-Security-Policy': siteCsp({
+        apiUrl: env.API_URL,
+        imagesOrigin: env.IMAGES_ORIGIN,
+      }),
+    },
+  });
 }

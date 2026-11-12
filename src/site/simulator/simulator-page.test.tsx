@@ -17,13 +17,16 @@ vi.mock('../../features/site/images/compress-image', async (original) => ({
 }));
 
 const events: string[] = [];
+const requested: string[] = [];
 const assign = vi.fn();
 
 beforeEach(() => {
   events.length = 0;
+  requested.length = 0;
   window.localStorage.clear();
   window.sessionStorage.clear();
   mockApi(({ path, body }) => {
+    requested.push(path);
     if (path === '/v1/product-events/simulator') events.push((body as { name: string }).name);
     return new Response(null, { status: 204 });
   });
@@ -255,5 +258,78 @@ describe('Simule (Simule RN01 a RN12; decisão 226)', () => {
   it('é acessível', async () => {
     const { container } = render(<SimulatorPage search="" />);
     await expectNoA11yViolations({ container });
+  });
+
+  it('no Outra cor, o #808080 na Terracota não deixa ler os botões; uma cor boa diz o texto branco (RN03)', async () => {
+    const user = userEvent.setup();
+    render(<SimulatorPage search="" />);
+    await fillToStyle(user);
+    await user.click(screen.getByRole('button', { name: 'Outra cor' }));
+    const sheet = screen.getByRole('dialog', { name: 'Escolham a cor' });
+    const hex = within(sheet).getByRole('textbox', { name: 'Cor' });
+    await user.clear(hex);
+    await user.type(hex, '808080');
+    expect(within(sheet).getByRole('alert')).toHaveTextContent(
+      'Essa cor deixa o texto dos botões difícil de ler. Escolham um tom mais escuro ou mais claro.',
+    );
+    await user.clear(hex);
+    await user.type(hex, '8B3A2E');
+    expect(
+      within(sheet).getByText('Boa leitura: o texto dos botões fica branco.'),
+    ).toBeInTheDocument();
+    await expectNoA11yViolations({ container: document.body, disabledRules: ['region'] });
+  });
+
+  it('o Voltar do Passo 1: com a página de origem, volta a ela; sem, vai ao Início do Kore (RN07)', async () => {
+    const user = userEvent.setup();
+    const back = vi.spyOn(window.history, 'back').mockImplementation(() => undefined);
+    const referrer = vi.spyOn(document, 'referrer', 'get');
+    referrer.mockReturnValue('https://kore.com.br/precos');
+    window.history.pushState(null, '', '/simule');
+    const { unmount } = render(<SimulatorPage search="" />);
+    await user.click(screen.getByRole('button', { name: 'Voltar' }));
+    expect(back).toHaveBeenCalledTimes(1);
+    expect(assign).not.toHaveBeenCalled();
+    unmount();
+    referrer.mockReturnValue('');
+    render(<SimulatorPage search="" />);
+    await user.click(screen.getByRole('button', { name: 'Voltar' }));
+    expect(assign).toHaveBeenCalledWith('https://kore.com.br/');
+    expect(back).toHaveBeenCalledTimes(1);
+    back.mockRestore();
+    referrer.mockRestore();
+  });
+
+  it('nada vai ao servidor além das métricas, nem a foto; acima de 25 MB, o aviso (RN02, RN04, RN05)', async () => {
+    const user = userEvent.setup({ applyAccept: false });
+    render(<SimulatorPage search="" />);
+    await fillToStyle(user);
+    await user.click(screen.getByRole('button', { name: 'Continuar' }));
+    const drop = screen.getByLabelText(/Escolher uma foto/);
+    const big = new File(['x'], 'grande.jpg', { type: 'image/jpeg' });
+    Object.defineProperty(big, 'size', { value: 25 * 1024 * 1024 + 1 });
+    await user.upload(drop, big);
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Esta foto passa de 25 MB. Escolham uma foto menor.',
+    );
+    await user.upload(drop, new File(['x'], 'capa.jpg', { type: 'image/jpeg' }));
+    await user.click(screen.getByRole('button', { name: 'Continuar' }));
+    await waitFor(() => expect(events).toContain('simule_pronto'));
+    expect(requested.length).toBeGreaterThan(0);
+    expect(new Set(requested)).toEqual(new Set(['/v1/product-events/simulator']));
+  });
+
+  it('o Pronto e o Retomar são acessíveis', async () => {
+    const user = userEvent.setup();
+    const { container, unmount } = render(<SimulatorPage search="" />);
+    await fillToStyle(user);
+    await user.click(screen.getByRole('button', { name: 'Continuar' }));
+    await user.click(screen.getByRole('button', { name: 'Pular este passo' }));
+    await screen.findByRole('heading', { name: 'O site de vocês já tem cara de casamento' });
+    await expectNoA11yViolations({ container });
+    unmount();
+    const retake = render(<SimulatorPage search="" />);
+    await screen.findByRole('heading', { name: 'Continuar de onde pararam?' });
+    await expectNoA11yViolations({ container: retake.container });
   });
 });

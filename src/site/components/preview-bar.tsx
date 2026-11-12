@@ -13,7 +13,8 @@ const MAX_LISTED = 100;
 /**
  * A barra da prévia (Pré-visualização RN06; Penpot "Barra da prévia"): fixa no topo, nas
  * cores do Kore. O texto da prévia, o "Ver como" (Visitante · Grupo) e, como grupo, o
- * Select dos grupos (até 100; com mais, a busca e a linha de apoio). Trocar chama o
+ * Select dos grupos com a busca sempre (decisão 229(b)); com mais de 100, a linha de apoio.
+ * Trocar chama o
  * `PATCH …/preview-session` e recarrega o site.
  */
 export function PreviewBar({ site }: { site: PublicSiteResponse }) {
@@ -74,17 +75,15 @@ export function PreviewBar({ site }: { site: PublicSiteResponse }) {
         />
         {mode === 'party' && (
           <div className="kore-site-preview__party">
-            {(total > MAX_LISTED || search) && (
-              <Input
-                id={searchId}
-                type="search"
-                className="kore-site-preview__search"
-                placeholder={t('preview.search')}
-                aria-label={t('preview.search')}
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-              />
-            )}
+            <Input
+              id={searchId}
+              type="search"
+              className="kore-site-preview__search"
+              placeholder={t('preview.search')}
+              aria-label={t('preview.search')}
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
             <Select
               aria-label={t('preview.party')}
               className="kore-site-preview__select"

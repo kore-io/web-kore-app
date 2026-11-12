@@ -7,6 +7,11 @@ import { apiError, renderAreaScreen, renderRoute } from '../../../../tests/rende
 import { mockSite, siteWith, withSection } from './section-test-fixtures';
 
 vi.mock('../site-fonts', () => ({ loadEditorFonts: vi.fn(async () => undefined) }));
+vi.mock('../images/compress-image', async (original) => ({
+  ...(await original<typeof import('../images/compress-image')>()),
+  compressImage: vi.fn(async () => new Blob(['x'], { type: 'image/jpeg' })),
+}));
+vi.mock('../images/put-file', () => ({ putFile: vi.fn(async () => undefined) }));
 
 const save = () => screen.getByRole('button', { name: 'Salvar' });
 
@@ -422,5 +427,123 @@ describe('Site › Seções de conteúdo (S3)', () => {
     const { container } = renderRoute({ url: '/app/site/cerimonia-e-recepcao' });
     await user.click(await screen.findByRole('button', { name: 'Adicionar local' }));
     await expectNoA11yViolations({ container });
+  });
+
+  it('cerimonialista: o título vazio e a pergunta sem resposta no singular (RN12; 198(2))', async () => {
+    profileUnderTest.current = 'planner';
+    const user = userEvent.setup();
+    mockSite();
+    renderAreaScreen({ url: '/app/site/hospedagem-e-transporte' });
+    const title = await screen.findByRole('textbox', { name: 'Título da seção' });
+    await user.clear(title);
+    await user.click(save());
+    expect(title).toHaveAccessibleDescription('Dê um título à seção.');
+    await user.click(screen.getByRole('link', { name: /FAQ/ }));
+    await user.click(
+      within(await screen.findByRole('alertdialog')).getByRole('button', {
+        name: 'Descartar alterações',
+      }),
+    );
+    await user.click(await screen.findByRole('button', { name: 'Adicionar pergunta' }));
+    await user.type(screen.getByRole('textbox', { name: 'Pergunta' }), 'E se chover?');
+    await user.click(save());
+    expect(screen.getByRole('textbox', { name: 'Resposta' })).toHaveAccessibleDescription(
+      'Preencha este campo.',
+    );
+  });
+
+  it('Contagem sem data, vendedor antes do aceite: o texto dele, com o link (RN06)', async () => {
+    profileUnderTest.current = 'seller';
+    mockSite({ site: siteWith({ eventDate: null }) });
+    renderAreaScreen({ url: '/app/site/contagem-regressiva' });
+    expect(
+      await screen.findByText(
+        /Informe a data do casamento em Dados básicos para mostrar a contagem\./,
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Ir para Dados básicos' })).toBeInTheDocument();
+  });
+
+  it('Dress code sem foto: a área de envio; escolher a foto mostra Trocar foto e salva o imageId (RN09)', async () => {
+    const user = userEvent.setup();
+    const calls = mockSite({
+      site: siteWith({
+        sections: withSection({
+          type: 'dress_code',
+          title: 'Dress code',
+          content: { text: 'Passeio completo.', image: null },
+          enabled: true,
+          empty: false,
+        }),
+      }),
+    });
+    renderRoute({ url: '/app/site/dress-code' });
+    const photo = await screen.findByRole('group', { name: 'Foto de referência (opcional)' });
+    const drop = within(photo).getByLabelText(/Arrastem uma foto ou cliquem para escolher/);
+    expect(within(photo).getByText('JPG ou PNG.')).toBeInTheDocument();
+    await user.upload(drop, new File(['x'], 'traje.jpg', { type: 'image/jpeg' }));
+    expect(await within(photo).findByRole('button', { name: 'Trocar foto' })).toBeInTheDocument();
+    await user.click(save());
+    await waitFor(() => expect(calls.filter((call) => call.method === 'PUT')).toHaveLength(1));
+    expect(calls.find((call) => call.method === 'PUT')?.body).toEqual({
+      enabled: true,
+      title: 'Dress code',
+      content: { text: 'Passeio completo.', imageId: 'new1' },
+    });
+  });
+
+  it('Dress code sem foto, cerimonialista: a área de envio no singular (RN09; 198(2))', async () => {
+    profileUnderTest.current = 'planner';
+    mockSite({
+      site: siteWith({
+        sections: withSection({
+          type: 'dress_code',
+          title: 'Dress code',
+          content: { text: '', image: null },
+          enabled: true,
+          empty: true,
+        }),
+      }),
+    });
+    renderAreaScreen({ url: '/app/site/dress-code' });
+    const photo = await screen.findByRole('group', { name: 'Foto de referência (opcional)' });
+    expect(
+      within(photo).getByLabelText(/Arraste uma foto ou clique para escolher/),
+    ).toBeInTheDocument();
+  });
+
+  it('os rótulos das ações dizem o local e os campos têm os limites do app (RN07, RN10, RN12)', async () => {
+    const user = userEvent.setup();
+    mockSite();
+    renderRoute({ url: '/app/site/cerimonia-e-recepcao' });
+    expect(await screen.findByRole('textbox', { name: 'Título da seção' })).toHaveAttribute(
+      'maxlength',
+      '80',
+    );
+    await user.click(screen.getByRole('button', { name: 'Adicionar local' }));
+    await user.click(screen.getByRole('button', { name: 'Adicionar local' }));
+    expect(screen.getByRole('button', { name: 'Descer Cerimônia' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Remover Recepção' })).toBeInTheDocument();
+    expect(screen.getAllByRole('textbox', { name: 'Título' })[0]).toHaveAttribute(
+      'maxlength',
+      '40',
+    );
+    expect(screen.getAllByRole('textbox', { name: 'Nome do lugar' })[0]).toHaveAttribute(
+      'maxlength',
+      '80',
+    );
+    expect(screen.getAllByRole('textbox', { name: 'Endereço' })[0]).toHaveAttribute(
+      'maxlength',
+      '200',
+    );
+    await user.click(screen.getByRole('link', { name: /FAQ/ }));
+    await user.click(
+      within(await screen.findByRole('alertdialog')).getByRole('button', {
+        name: 'Descartar alterações',
+      }),
+    );
+    await user.click(await screen.findByRole('button', { name: 'Adicionar pergunta' }));
+    expect(screen.getByRole('textbox', { name: 'Pergunta' })).toHaveAttribute('maxlength', '200');
+    expect(screen.getByRole('textbox', { name: 'Resposta' })).toHaveAttribute('maxlength', '1000');
   });
 });

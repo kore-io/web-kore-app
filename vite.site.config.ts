@@ -25,5 +25,8 @@ export default defineConfig({
   build: {
     outDir: fileURLToPath(new URL('./dist-site', import.meta.url)),
     emptyOutDir: true,
+    // As fontes vão sempre como arquivo, nunca como `data:` no CSS: a CSP do site tem
+    // `font-src 'self'` (src/site/edge/csp.ts).
+    assetsInlineLimit: (file) => (/\.(woff2?|ttf|otf)$/.test(file) ? false : undefined),
   },
 });

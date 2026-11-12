@@ -2,12 +2,20 @@ import {
   APP_DRAFT_KEY,
   clearDraft,
   decodeDraft,
+  isExpired,
   loadDraft,
   saveDraft,
   type SimulatorDraft,
 } from '../../shared/simulator/draft';
 
 const FRAGMENT_PREFIX = '#simule=';
+
+/**
+ * A cópia em memória do rascunho do fragmento (caso de borda do Simule): num navegador que
+ * bloqueia o `localStorage`, o rascunho fica na página até o fim do cadastro pelo e-mail. O
+ * Google recarrega a página e o perde, como a spec aceita.
+ */
+let memoryDraft: SimulatorDraft | null = null;
 
 /**
  * O rascunho do Simule que chega no fragmento (Simule RN08): validado inteiro (um rascunho
@@ -18,8 +26,9 @@ export function captureSimulatorDraft({ now = new Date() }: { now?: Date } = {})
   const { hash, pathname, search } = window.location;
   if (!hash.startsWith(FRAGMENT_PREFIX)) return false;
   const draft = decodeDraft(hash.slice(FRAGMENT_PREFIX.length));
-  if (draft && now.getTime() - Date.parse(draft.savedAt) <= 7 * 24 * 60 * 60 * 1000) {
+  if (draft && !isExpired({ draft, now })) {
     saveDraft({ key: APP_DRAFT_KEY, draft });
+    memoryDraft = draft;
   }
   window.history.replaceState(window.history.state, '', `${pathname}${search}`);
   return true;
@@ -29,10 +38,14 @@ export function captureSimulatorDraft({ now = new Date() }: { now?: Date } = {})
 export function storedSimulatorDraft({
   now = new Date(),
 }: { now?: Date } = {}): SimulatorDraft | null {
-  return loadDraft({ key: APP_DRAFT_KEY, now });
+  const stored = loadDraft({ key: APP_DRAFT_KEY, now });
+  if (stored) return stored;
+  if (memoryDraft && isExpired({ draft: memoryDraft, now })) memoryDraft = null;
+  return memoryDraft;
 }
 
 /** Depois do 201 do cadastro, o rascunho vira o casamento e sai do aparelho (RN10). */
 export function clearSimulatorDraft(): void {
   clearDraft({ key: APP_DRAFT_KEY });
+  memoryDraft = null;
 }

@@ -5,6 +5,7 @@ import {
   decodeDraft,
   emptyDraft,
   encodeDraft,
+  isExpired,
   loadDraft,
   parseDraft,
   saveDraft,
@@ -89,6 +90,17 @@ describe('Simule › o rascunho (Simule RN05, RN08)', () => {
     window.localStorage.setItem(APP_DRAFT_KEY, '{"v":1}');
     expect(loadDraft({ key: APP_DRAFT_KEY, now })).toBeNull();
     expect(window.localStorage.getItem(APP_DRAFT_KEY)).toBeNull();
+  });
+
+  it('um savedAt no futuro, além da folga do relógio, conta como vencido', () => {
+    const later = (minutes: number) => ({
+      ...draft(),
+      savedAt: new Date(now.getTime() + minutes * 60 * 1000).toISOString(),
+    });
+    expect(isExpired({ draft: later(4), now })).toBe(false);
+    expect(isExpired({ draft: later(6), now })).toBe(true);
+    saveDraft({ key: APP_DRAFT_KEY, draft: later(60 * 24 * 365) });
+    expect(loadDraft({ key: APP_DRAFT_KEY, now })).toBeNull();
   });
 
   it('sem localStorage (navegação privada), não quebra: só não retoma', () => {
