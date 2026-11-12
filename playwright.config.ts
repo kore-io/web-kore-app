@@ -4,8 +4,11 @@ import { defineConfig, devices } from '@playwright/test';
  * E2E do DoD (Playwright), contra a API local de verdade: o api-kore-api (API e worker)
  * em http://localhost:3000, com GOOGLE_PROVIDER=dev, ALLOWED_ORIGINS com a origem do app
  * e o Mailpit do compose em http://localhost:8025 (os e-mails de código chegam lá).
- * O app sobe sozinho (ou reaproveita o que já estiver na 5173).
+ * O app sobe sozinho (ou reaproveita o que já estiver na 5173), e o site do casal também,
+ * na 5174 (Site público RN08), com o SITE_URL da API apontando para ela.
  */
+export const SITE_ORIGIN = 'http://localhost:5174';
+
 export default defineConfig({
   testDir: 'e2e',
   workers: 1,
@@ -17,9 +20,17 @@ export default defineConfig({
     // O celular é o uso principal do casal; o computador já é coberto pelos prints.
     ...devices['Pixel 7'],
   },
-  webServer: {
-    command: 'pnpm dev --port 5173 --strictPort',
-    url: 'http://localhost:5173',
-    reuseExistingServer: true,
-  },
+  webServer: [
+    {
+      command: 'pnpm dev --port 5173 --strictPort',
+      url: 'http://localhost:5173',
+      reuseExistingServer: true,
+    },
+    {
+      // O Simule fica ligado no local (Simule RN01); a variável da linha vale sobre o .env.
+      command: 'VITE_SIMULATOR_ENABLED=true pnpm dev:site',
+      url: SITE_ORIGIN,
+      reuseExistingServer: true,
+    },
+  ],
 });

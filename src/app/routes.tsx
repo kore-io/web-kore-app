@@ -10,6 +10,7 @@ import { DashboardPage } from '../features/dashboard/pages/dashboard-page';
 import { GuestsLayout } from '../features/guests/pages/guests-layout';
 import { GuestsPage } from '../features/guests/pages/guests-page';
 import { ExportPage } from '../features/guests/pages/export-page';
+import { SiteEditorPage } from '../features/site/pages/site-editor-page';
 import { ImportPage } from '../features/guests/pages/import-page';
 import { EditPartyPage, NewPartyPage } from '../features/guests/pages/party-form-page';
 import { PartyPanelPage } from '../features/guests/pages/party-panel-page';
@@ -17,7 +18,8 @@ import { TagsPage } from '../features/guests/pages/tags-page';
 import { TrashPage } from '../features/guests/pages/trash-page';
 import { AppRoot } from './app-root';
 import { CoupleAreaLayout } from './layout/couple-area-layout';
-import { paths } from './paths';
+import { FIRST_SECTION_SLUG } from '../features/site/sections';
+import { paths, siteSectionPath } from './paths';
 
 export const routes: RouteObject[] = [
   {
@@ -50,6 +52,12 @@ export const routes: RouteObject[] = [
           },
           { id: 'guest-party', path: 'convidados/grupos/:partyId', element: <PartyPanelPage /> },
           { id: 'guest-new', path: 'convidados/novo', element: <NewPartyPage /> },
+          {
+            id: 'site',
+            path: 'site',
+            element: <Navigate to={siteSectionPath({ section: FIRST_SECTION_SLUG })} replace />,
+          },
+          { id: 'site-editor', path: 'site/:section', element: <SiteEditorPage /> },
           {
             id: 'guest-party-edit',
             path: 'convidados/grupos/:partyId/editar',

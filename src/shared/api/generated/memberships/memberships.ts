@@ -28,6 +28,7 @@ import type {
   OriginNotAllowedErrorBody,
   RateLimitedErrorBody,
   SessionExpiredErrorBody,
+  WeddingHasNoOwnerErrorBody,
   WeddingMembersResponse,
   WeddingNotFoundErrorBody,
 } from '../model';
@@ -223,6 +224,7 @@ export const getWeddingMembersControllerRemoveV1MutationOptions = <
     | MembershipNotFoundErrorBody
     | CannotRemoveOwnerErrorBody
     | LastOwnerErrorBody
+    | WeddingHasNoOwnerErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -271,6 +273,7 @@ export type WeddingMembersControllerRemoveV1MutationError = ErrorType<
   | MembershipNotFoundErrorBody
   | CannotRemoveOwnerErrorBody
   | LastOwnerErrorBody
+  | WeddingHasNoOwnerErrorBody
   | RateLimitedErrorBody
 >;
 export type WeddingMembersControllerRemoveV1MutationVariables = { weddingId: string; id: string };
@@ -287,6 +290,7 @@ export const useWeddingMembersControllerRemoveV1 = <
     | MembershipNotFoundErrorBody
     | CannotRemoveOwnerErrorBody
     | LastOwnerErrorBody
+    | WeddingHasNoOwnerErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,

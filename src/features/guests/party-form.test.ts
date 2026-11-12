@@ -26,6 +26,7 @@ const party: PartyResponse = {
   deliveryStatus: 'not_sent',
   tags: [{ id: 't1', name: 'Família da Ana', color: 'wine' }],
   history: [],
+  version: 1,
   link: { url: 'https://kore.com.br/c/x', regeneratedAt: null },
   guests: [
     {

@@ -4,11 +4,13 @@
  * Kore API
  * OpenAPI spec version: 1
  */
-import type { SiteAppearanceResponse } from './siteAppearanceResponse';
 import type { SiteEditableResponse } from './siteEditableResponse';
+import type { SiteEditorAppearanceResponse } from './siteEditorAppearanceResponse';
 import type { SiteImageRefResponse } from './siteImageRefResponse';
 import type { SitePartnerResponse } from './sitePartnerResponse';
+import type { SitePublicationResponse } from './sitePublicationResponse';
 import type { SiteSectionResponse } from './siteSectionResponse';
+import type { SiteSongQuestionResponse } from './siteSongQuestionResponse';
 
 export interface SiteEditorResponse {
   /** @nullable */
@@ -35,8 +37,10 @@ export interface SiteEditorResponse {
   contactEmail: string | null;
   /** @nullable */
   cover: SiteImageRefResponse | null;
-  appearance: SiteAppearanceResponse;
+  appearance: SiteEditorAppearanceResponse;
   sections: SiteSectionResponse[];
   editable: SiteEditableResponse;
+  publication: SitePublicationResponse;
+  songQuestion: SiteSongQuestionResponse;
   status: string;
 }

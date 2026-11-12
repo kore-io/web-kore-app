@@ -36,7 +36,9 @@ import type {
   OriginNotAllowedErrorBody,
   OwnersFullErrorBody,
   PlannerAlreadyErrorBody,
+  PlannerProfileExistsErrorBody,
   RateLimitedErrorBody,
+  SelfReferralErrorBody,
   SellerCannotBePlannerErrorBody,
   SendAccessInvitationsBody,
   SendAccessInvitationsResponse,
@@ -544,6 +546,8 @@ export const getInvitationAcceptanceControllerAcceptV1MutationOptions = <
     | OwnersFullErrorBody
     | PlannerAlreadyErrorBody
     | SellerCannotBePlannerErrorBody
+    | SelfReferralErrorBody
+    | PlannerProfileExistsErrorBody
     | InvitationInvalidErrorBody
     | RateLimitedErrorBody
   >,
@@ -595,6 +599,8 @@ export type InvitationAcceptanceControllerAcceptV1MutationError = ErrorType<
   | OwnersFullErrorBody
   | PlannerAlreadyErrorBody
   | SellerCannotBePlannerErrorBody
+  | SelfReferralErrorBody
+  | PlannerProfileExistsErrorBody
   | InvitationInvalidErrorBody
   | RateLimitedErrorBody
 >;
@@ -617,6 +623,8 @@ export const useInvitationAcceptanceControllerAcceptV1 = <
     | OwnersFullErrorBody
     | PlannerAlreadyErrorBody
     | SellerCannotBePlannerErrorBody
+    | SelfReferralErrorBody
+    | PlannerProfileExistsErrorBody
     | InvitationInvalidErrorBody
     | RateLimitedErrorBody
   >,

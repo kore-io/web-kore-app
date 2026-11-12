@@ -44,6 +44,7 @@ const row: PartyListItemResponse = {
   deliveryStatus: 'not_sent',
   respondedAt: null,
   respondedBy: null,
+  lastResponse: null,
   tags: [],
 };
 

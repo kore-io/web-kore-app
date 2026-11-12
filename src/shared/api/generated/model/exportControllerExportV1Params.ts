@@ -11,11 +11,11 @@ export type ExportControllerExportV1Params = {
   /** xlsx ou pdf (RN01). */
   format: ExportControllerExportV1Format;
   who: ExportControllerExportV1Who;
-  /**
-   * Separadas por vírgula: name, party, ageGroup, dietaryRestriction, rsvp, phone, tags
-   * @minItems 1
-   */
-  columns: string;
   /** Id de uma tag ativa; obrigatório com who=tag. */
   tag?: string;
+  /**
+   * Uma ou mais, separadas por vírgula: name, party, ageGroup, dietaryRestriction, rsvp, phone, tags.
+   * @pattern ^(name|party|ageGroup|dietaryRestriction|rsvp|phone|tags)(,(name|party|ageGroup|dietaryRestriction|rsvp|phone|tags))*$
+   */
+  columns: string;
 };

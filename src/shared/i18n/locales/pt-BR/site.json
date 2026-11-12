@@ -1,0 +1,296 @@
+{
+  "title": "Site",
+  "address": "kore.com.br/{{slug}}",
+  "savedAt": "salvo às {{time}}",
+  "status": {
+    "awaiting_couple": "Aguardando o casal",
+    "draft": "Rascunho",
+    "published": "Publicado",
+    "post_event": "Pós-evento",
+    "expired": "Expirado"
+  },
+  "save": "Salvar",
+  "saved": "Alterações salvas.",
+  "sections": {
+    "title": "Seções",
+    "select": "Seção",
+    "option": "Seção: {{name}}",
+    "names": {
+      "basics": "Dados básicos",
+      "appearance": "Aparência",
+      "story": "Nossa história",
+      "countdown": "Contagem regressiva",
+      "ceremony": "Cerimônia & Recepção",
+      "lodging": "Hospedagem e transporte",
+      "dress_code": "Dress code",
+      "faq": "FAQ"
+    },
+    "state": {
+      "on": "ligada",
+      "off": "desligada",
+      "empty": "vazia"
+    }
+  },
+  "tabs": {
+    "label": "Editor do site",
+    "sections": "Seções",
+    "edit": "Editar",
+    "preview": "Prévia"
+  },
+  "discard": {
+    "title": "Descartar as alterações?",
+    "description": "O que mudou em {{section}} ainda não foi salvo.",
+    "keep": "Continuar editando",
+    "confirm": "Descartar alterações"
+  },
+  "preview": {
+    "title": "Prévia do site",
+    "caption": "Visão de visitante",
+    "countdown_one": "Falta {{count}} dia",
+    "countdown_other": "Faltam {{count}} dias",
+    "today": "É hoje",
+    "button": "Abrir no Google Maps"
+  },
+  "loading": "Carregando o site",
+  "basics": {
+    "bride": "Noiva",
+    "groom": "Noivo",
+    "name": "Nome",
+    "eventDate": "Data do casamento",
+    "eventDateHelp": {
+      "couple": "Opcional. Se ainda não tiverem a data, deixem em branco.",
+      "planner": "Opcional. Se o casal ainda não tiver a data, deixe em branco."
+    },
+    "identityLocked": "Só o casal pode mudar a data, a UF e o endereço.",
+    "city": "Cidade",
+    "state": "UF",
+    "timezone": "Fuso horário",
+    "timezoneHelp": "Vem da UF. Os horários do site usam este fuso.",
+    "timezones": {
+      "brasilia": "Horário de Brasília",
+      "minus1": "1 hora a menos que Brasília",
+      "minus2": "2 horas a menos que Brasília"
+    },
+    "slug": "Endereço do site",
+    "slugDraftHelp": "O endereço só muda enquanto o site está em rascunho.",
+    "slugPublishedHelp": "O site já foi publicado, então o endereço não muda mais.",
+    "slugTaken": "Este endereço já está em uso. Que tal {{suggestion}}?",
+    "slugReserved": "Este endereço é reservado pelo Kore. Que tal {{suggestion}}?",
+    "useSuggestion": "Usar {{suggestion}}",
+    "whatsapp": "WhatsApp do casal (opcional)",
+    "email": "E-mail do casal (opcional)",
+    "contactHelp": "O contato aparece no rodapé do site, só para quem entra pelo link do convite.",
+    "errors": {
+      "nameMissing": {
+        "couple": "Informem o nome.",
+        "planner": "Informe o nome."
+      },
+      "cityMissing": {
+        "couple": "Informem a cidade.",
+        "planner": "Informe a cidade."
+      },
+      "stateMissing": {
+        "couple": "Escolham a UF.",
+        "planner": "Escolha a UF."
+      },
+      "emailInvalid": {
+        "couple": "Informem um e-mail válido.",
+        "planner": "Informe um e-mail válido."
+      },
+      "slugMissing": {
+        "couple": "Informem o endereço do site.",
+        "planner": "Informe o endereço do site."
+      },
+      "slugFormat": {
+        "couple": "Usem só letras minúsculas, números e hífen.",
+        "planner": "Use só letras minúsculas, números e hífen."
+      }
+    },
+    "cover": "Foto de capa",
+    "coverHelp": "A foto de capa aparece no topo do site e junto do link quando ele é compartilhado no WhatsApp e nas redes. Quem tiver o endereço vê esta foto."
+  },
+  "images": {
+    "drop": {
+      "couple": "Arrastem uma foto ou cliquem para escolher",
+      "planner": "Arraste uma foto ou clique para escolher"
+    },
+    "dropHint": "JPG ou PNG.",
+    "change": "Trocar foto",
+    "remove": "Remover foto",
+    "sending": "Enviando {{current}} de {{total}}",
+    "errors": {
+      "type": {
+        "couple": "Não foi possível usar esta foto. Escolham uma foto JPG ou PNG.",
+        "planner": "Não foi possível usar esta foto. Escolha uma foto JPG ou PNG."
+      },
+      "tooBig": {
+        "couple": "Esta foto passa de 25 MB. Escolham uma foto menor.",
+        "planner": "Esta foto passa de 25 MB. Escolha uma foto menor."
+      },
+      "network": {
+        "couple": "Não foi possível enviar a foto. Confiram a conexão e tentem de novo.",
+        "planner": "Não foi possível enviar a foto. Confira a conexão e tente de novo."
+      },
+      "limit": {
+        "couple": "Muitas fotos foram trocadas neste site hoje. Tentem de novo amanhã.",
+        "planner": "Muitas fotos foram trocadas neste site hoje. Tente de novo amanhã."
+      },
+      "rate": {
+        "couple": "Muitas fotos ao mesmo tempo. Esperem um minuto e tentem de novo.",
+        "planner": "Muitas fotos ao mesmo tempo. Espere um minuto e tente de novo."
+      },
+      "processing": {
+        "couple": "A foto ainda está sendo processada. Tentem de novo em instantes.",
+        "planner": "A foto ainda está sendo processada. Tente de novo em instantes."
+      }
+    }
+  },
+  "appearance": {
+    "typography": "Tipografia",
+    "inUse": "Em uso",
+    "fonts": {
+      "romantico": "Romântico",
+      "classico": "Clássico",
+      "leve": "Leve",
+      "moderno": "Moderno"
+    },
+    "colors": "Cores",
+    "colorsHelp": {
+      "couple": "Comecem por uma paleta e, se quiserem, troquem a cor principal e o destaque.",
+      "planner": "Comece por uma paleta e, se quiser, troque a cor principal e o destaque."
+    },
+    "palettesLabel": "Paleta de partida",
+    "palettes": {
+      "terracota": "Terracota",
+      "salvia": "Sálvia",
+      "rose": "Rosé",
+      "marfim": "Marfim",
+      "marinho": "Marinho",
+      "areia": "Areia",
+      "por-do-sol": "Pôr do sol",
+      "grafite": "Grafite",
+      "noite": "Noite"
+    },
+    "primary": "Cor principal (botões)",
+    "accent": "Destaque (detalhes e ícones)",
+    "colorPicker": "Escolher a cor: {{label}}",
+    "primaryLegend": {
+      "white": "Texto dos botões em branco · contraste {{text}} · sobre o fundo {{background}}",
+      "dark": "Texto dos botões em preto · contraste {{text}} · sobre o fundo {{background}}"
+    },
+    "accentLegend": "Sobre o fundo: {{ratio}}",
+    "accentLow": "O destaque fica pouco visível neste fundo.",
+    "blocked": {
+      "primary_foreground": {
+        "couple": "Essa cor deixa o texto dos botões difícil de ler. Escolham um tom mais escuro ou mais claro.",
+        "planner": "Essa cor deixa o texto dos botões difícil de ler. Escolha um tom mais escuro ou mais claro."
+      },
+      "primary_background": {
+        "couple": "Essa cor fica pouco visível neste fundo. Escolham um tom mais escuro ou mais claro, ou outro fundo.",
+        "planner": "Essa cor fica pouco visível neste fundo. Escolha um tom mais escuro ou mais claro, ou outro fundo."
+      }
+    },
+    "background": "Fundo",
+    "backgrounds": {
+      "light": "Claro",
+      "cream": "Creme",
+      "dark": "Escuro"
+    },
+    "help": "Trocar a aparência não apaga textos nem fotos."
+  },
+  "section": {
+    "show": "Mostrar a seção no site",
+    "empty": "Esta seção está ligada, mas ainda não tem conteúdo, então não aparece no site. Ela aparece quando for preenchida.",
+    "title": "Título da seção",
+    "text": "Texto",
+    "counter": "{{count}}/{{max}}",
+    "errors": {
+      "titleMissing": {
+        "couple": "Deem um título à seção.",
+        "planner": "Dê um título à seção."
+      },
+      "required": {
+        "couple": "Preencham este campo.",
+        "planner": "Preencha este campo."
+      }
+    },
+    "countdown": {
+      "switch": "Mostrar a contagem no site",
+      "help": "O site mostra quantos dias faltam, como “Faltam 3 dias”. No dia, mostra “É hoje”. Depois do casamento, a contagem some.",
+      "noDate": {
+        "couple": "Informem a data do casamento em Dados básicos para mostrar a contagem.",
+        "seller": "Informe a data do casamento em Dados básicos para mostrar a contagem.",
+        "planner": "A contagem aparece quando o casal informar a data do casamento."
+      },
+      "goToBasics": "Ir para Dados básicos"
+    },
+    "lodging": {
+      "placeholder": "Ex.: hotéis perto da festa, como chegar, se haverá van"
+    },
+    "dressCode": {
+      "photo": "Foto de referência (opcional)"
+    },
+    "faq": {
+      "item": "Pergunta {{n}}",
+      "question": "Pergunta",
+      "answer": "Resposta",
+      "up": "Subir pergunta {{n}}",
+      "down": "Descer pergunta {{n}}",
+      "remove": "Remover pergunta {{n}}",
+      "add": "Adicionar pergunta",
+      "limit": {
+        "couple": "Vocês já têm 30 perguntas, o limite do site. Removam uma para adicionar outra.",
+        "planner": "Este site já tem 30 perguntas, o limite. Remova uma para adicionar outra."
+      }
+    },
+    "ceremony": {
+      "notice": "Só quem entra pelo link do convite vê os locais, os horários e os botões de rota. Quem abre o site sem o link vê um aviso.",
+      "item": "Local {{n}}",
+      "title": "Título",
+      "placeName": "Nome do lugar",
+      "date": "Data",
+      "time": "Hora",
+      "address": "Endereço",
+      "addressHelp": {
+        "couple": "Escrevam o endereço como ele aparece no Google Maps. Os botões Abrir no Google Maps e Abrir no Waze usam este texto.",
+        "planner": "Escreva o endereço como ele aparece no Google Maps. Os botões Abrir no Google Maps e Abrir no Waze usam este texto."
+      },
+      "up": "Subir {{title}}",
+      "down": "Descer {{title}}",
+      "remove": "Remover {{title}}",
+      "add": "Adicionar local",
+      "limit": {
+        "couple": "Vocês já têm 4 locais, o limite do site. Removam um para adicionar outro.",
+        "planner": "Este site já tem 4 locais, o limite. Remova um para adicionar outro."
+      },
+      "defaultTitle": {
+        "first": "Cerimônia",
+        "second": "Recepção"
+      }
+    },
+    "story": {
+      "photos": "Fotos do casal ({{count}} de {{max}})",
+      "drop": {
+        "couple": "Arrastem as fotos ou cliquem para escolher",
+        "planner": "Arraste as fotos ou clique para escolher"
+      },
+      "dropHint": "JPG ou PNG, até 12 fotos.",
+      "help": "Esta seção é pública: é aqui que vão as fotos do ensaio.",
+      "limit": {
+        "couple": "Vocês já têm 12 fotos, o limite da seção. Removam uma para incluir outra.",
+        "planner": "Esta seção já tem 12 fotos, o limite. Remova uma para incluir outra."
+      },
+      "remove": "Remover foto {{n}}",
+      "alt": "Foto {{n}} de {{total}} de {{title}}"
+    }
+  },
+  "previewSite": {
+    "open": "Pré-visualizar",
+    "blocked": "O navegador bloqueou a nova aba.",
+    "openAction": "Abrir a prévia",
+    "noSlug": {
+      "couple": "Escolham o endereço do site em Dados básicos para ver a prévia.",
+      "planner": "Escolha o endereço do site em Dados básicos para ver a prévia."
+    }
+  }
+}

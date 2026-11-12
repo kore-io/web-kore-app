@@ -22,6 +22,7 @@ import type {
 
 import type {
   AlreadyOwnerErrorBody,
+  ContrastTooLowErrorBody,
   CreateWeddingBody,
   CreateWeddingResponse,
   OriginNotAllowedErrorBody,
@@ -278,6 +279,7 @@ export const getWeddingsControllerCreateV1MutationOptions = <
     | SlugUnavailableErrorBody
     | AlreadyOwnerErrorBody
     | TermsVersionOutdatedErrorBody
+    | ContrastTooLowErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -325,6 +327,7 @@ export type WeddingsControllerCreateV1MutationError = ErrorType<
   | SlugUnavailableErrorBody
   | AlreadyOwnerErrorBody
   | TermsVersionOutdatedErrorBody
+  | ContrastTooLowErrorBody
   | RateLimitedErrorBody
 >;
 export type WeddingsControllerCreateV1MutationVariables = { data: CreateWeddingBody };
@@ -342,6 +345,7 @@ export const useWeddingsControllerCreateV1 = <
     | SlugUnavailableErrorBody
     | AlreadyOwnerErrorBody
     | TermsVersionOutdatedErrorBody
+    | ContrastTooLowErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,

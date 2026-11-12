@@ -7,6 +7,7 @@
 import type { CreateWeddingBodyMyTitle } from './createWeddingBodyMyTitle';
 import type { CreateWeddingBodySignupSource } from './createWeddingBodySignupSource';
 import type { CreateWeddingBodyState } from './createWeddingBodyState';
+import type { UpdateSiteAppearanceBody } from './updateSiteAppearanceBody';
 
 export interface CreateWeddingBody {
   myTitle: CreateWeddingBodyMyTitle;
@@ -26,6 +27,11 @@ export interface CreateWeddingBody {
   termsVersion: string;
   /** Origem do cadastro; padrão direct (decisões 135 e 166). */
   signupSource?: CreateWeddingBodySignupSource;
+  /**
+   * A aparência do simulador (Simule RN10; opcional): as regras e o guarda-corpo
+   * da Aparência do site. Sem ela, Romântico + Terracota + Creme.
+   */
+  appearance?: UpdateSiteAppearanceBody;
   /**
    * @minLength 1
    * @maxLength 80

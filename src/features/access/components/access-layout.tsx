@@ -11,8 +11,11 @@ export function AccessLayout({
   children,
   showLegal = true,
   pitch = 'default',
+  aside,
 }: {
   children: ReactNode;
+  /** No lugar do texto do painel da marca (ex.: a prévia do site do Simule, Cadastro RN12). */
+  aside?: ReactNode;
   /** A Seleção de perfil não tem a linha legal (Penpot e Voz). */
   showLegal?: boolean;
   /**
@@ -32,10 +35,12 @@ export function AccessLayout({
     <div className="kore-access">
       <aside className="kore-access__brand">
         <Logo variant="white" label={tCommon('appName')} />
-        <div className="kore-access__pitch">
-          <p className="kore-access__headline">{t(`${panel[pitch]}.headline`)}</p>
-          <p className="kore-access__description">{t(`${panel[pitch]}.description`)}</p>
-        </div>
+        {aside ?? (
+          <div className="kore-access__pitch">
+            <p className="kore-access__headline">{t(`${panel[pitch]}.headline`)}</p>
+            <p className="kore-access__description">{t(`${panel[pitch]}.description`)}</p>
+          </div>
+        )}
         <p className="kore-access__site">{t('brandPanel.site')}</p>
       </aside>
       <main className="kore-access__main">

@@ -22,15 +22,32 @@ import type {
 
 import type {
   ActionNotAllowedErrorBody,
+  ContrastTooLowErrorBody,
+  CourtesyDisabledErrorBody,
+  EndDateOutOfRangeErrorBody,
+  EventDateMissingErrorBody,
+  NotDraftErrorBody,
   OriginNotAllowedErrorBody,
+  PreviewModeBody,
+  PublicationResponse,
+  PublishWeddingBody,
   RateLimitedErrorBody,
   SessionExpiredErrorBody,
+  SiteAppearanceResponse,
   SiteEditorResponse,
   SiteFieldNotAllowedErrorBody,
   SiteImageNotFoundErrorBody,
+  SitePartyNotFoundErrorBody,
+  SitePreviewResponse,
+  SiteSectionResponse,
   SiteSlugLockedErrorBody,
+  SiteSlugMissingErrorBody,
   SiteSlugUnavailableErrorBody,
+  SiteSongQuestionResponse,
+  UpdateSiteAppearanceBody,
   UpdateSiteBody,
+  UpdateSiteSectionBody,
+  UpdateSongQuestionBody,
   ValidationErrorBody,
   WeddingNotFoundErrorBody,
 } from '../model';
@@ -55,6 +72,418 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   return result;
 };
 
+export const getSiteControllerSongQuestionV1Url = (weddingId: string) => {
+  return `/v1/weddings/${weddingId}/site/song-question`;
+};
+
+/**
+ * @summary A pergunta de música do RSVP: ligada e o texto (Música RN01 e RN02).
+ */
+export const siteControllerSongQuestionV1 = async (
+  weddingId: string,
+  updateSongQuestionBody: UpdateSongQuestionBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<SiteSongQuestionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<SiteSongQuestionResponse>(getSiteControllerSongQuestionV1Url(weddingId), {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateSongQuestionBody),
+  });
+};
+
+export const getSiteControllerSongQuestionV1MutationKey = () =>
+  ['siteControllerSongQuestionV1'] as const;
+
+export const getSiteControllerSongQuestionV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof siteControllerSongQuestionV1>>,
+    TError,
+    SiteControllerSongQuestionV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof siteControllerSongQuestionV1>>,
+  TError,
+  SiteControllerSongQuestionV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getSiteControllerSongQuestionV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof siteControllerSongQuestionV1>>,
+    SiteControllerSongQuestionV1MutationVariables
+  > = (props) => {
+    const { weddingId, data } = props ?? {};
+
+    return siteControllerSongQuestionV1(weddingId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SiteControllerSongQuestionV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof siteControllerSongQuestionV1>>
+>;
+export type SiteControllerSongQuestionV1MutationBody = UpdateSongQuestionBody;
+export type SiteControllerSongQuestionV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | ActionNotAllowedErrorBody
+  | WeddingNotFoundErrorBody
+  | RateLimitedErrorBody
+>;
+export type SiteControllerSongQuestionV1MutationVariables = {
+  weddingId: string;
+  data: UpdateSongQuestionBody;
+};
+
+/**
+ * @summary A pergunta de música do RSVP: ligada e o texto (Música RN01 e RN02).
+ */
+export const useSiteControllerSongQuestionV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof siteControllerSongQuestionV1>>,
+      TError,
+      SiteControllerSongQuestionV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof siteControllerSongQuestionV1>>,
+  TError,
+  SiteControllerSongQuestionV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getSiteControllerSongQuestionV1MutationOptions(options), queryClient);
+};
+export const getSiteControllerSectionV1Url = (
+  weddingId: string,
+  type: 'faq' | 'story' | 'countdown' | 'ceremony' | 'lodging' | 'dress_code',
+) => {
+  return `/v1/weddings/${weddingId}/site/sections/${type}`;
+};
+
+/**
+ * @summary Grava uma seção inteira: ligada, título e conteúdo (Seções RN04 a RN13).
+ */
+export const siteControllerSectionV1 = async (
+  weddingId: string,
+  type: 'faq' | 'story' | 'countdown' | 'ceremony' | 'lodging' | 'dress_code',
+  updateSiteSectionBody: UpdateSiteSectionBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<SiteSectionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<SiteSectionResponse>(getSiteControllerSectionV1Url(weddingId, type), {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateSiteSectionBody),
+  });
+};
+
+export const getSiteControllerSectionV1MutationKey = () => ['siteControllerSectionV1'] as const;
+
+export const getSiteControllerSectionV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | SiteImageNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof siteControllerSectionV1>>,
+    TError,
+    SiteControllerSectionV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof siteControllerSectionV1>>,
+  TError,
+  SiteControllerSectionV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getSiteControllerSectionV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof siteControllerSectionV1>>,
+    SiteControllerSectionV1MutationVariables
+  > = (props) => {
+    const { weddingId, type, data } = props ?? {};
+
+    return siteControllerSectionV1(weddingId, type, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SiteControllerSectionV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof siteControllerSectionV1>>
+>;
+export type SiteControllerSectionV1MutationBody = UpdateSiteSectionBody;
+export type SiteControllerSectionV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | ActionNotAllowedErrorBody
+  | WeddingNotFoundErrorBody
+  | SiteImageNotFoundErrorBody
+  | RateLimitedErrorBody
+>;
+export type SiteControllerSectionV1MutationVariables = {
+  weddingId: string;
+  type: 'faq' | 'story' | 'countdown' | 'ceremony' | 'lodging' | 'dress_code';
+  data: UpdateSiteSectionBody;
+};
+
+/**
+ * @summary Grava uma seção inteira: ligada, título e conteúdo (Seções RN04 a RN13).
+ */
+export const useSiteControllerSectionV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | SiteImageNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof siteControllerSectionV1>>,
+      TError,
+      SiteControllerSectionV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof siteControllerSectionV1>>,
+  TError,
+  SiteControllerSectionV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getSiteControllerSectionV1MutationOptions(options), queryClient);
+};
+export const getSiteControllerAppearanceV1Url = (weddingId: string) => {
+  return `/v1/weddings/${weddingId}/site/appearance`;
+};
+
+/**
+ * @summary Grava a Aparência inteira, com o guarda-corpo de contraste (Aparência RN01 a RN07).
+ */
+export const siteControllerAppearanceV1 = async (
+  weddingId: string,
+  updateSiteAppearanceBody: UpdateSiteAppearanceBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<SiteAppearanceResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<SiteAppearanceResponse>(getSiteControllerAppearanceV1Url(weddingId), {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateSiteAppearanceBody),
+  });
+};
+
+export const getSiteControllerAppearanceV1MutationKey = () =>
+  ['siteControllerAppearanceV1'] as const;
+
+export const getSiteControllerAppearanceV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | ContrastTooLowErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof siteControllerAppearanceV1>>,
+    TError,
+    SiteControllerAppearanceV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof siteControllerAppearanceV1>>,
+  TError,
+  SiteControllerAppearanceV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getSiteControllerAppearanceV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof siteControllerAppearanceV1>>,
+    SiteControllerAppearanceV1MutationVariables
+  > = (props) => {
+    const { weddingId, data } = props ?? {};
+
+    return siteControllerAppearanceV1(weddingId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SiteControllerAppearanceV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof siteControllerAppearanceV1>>
+>;
+export type SiteControllerAppearanceV1MutationBody = UpdateSiteAppearanceBody;
+export type SiteControllerAppearanceV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | ActionNotAllowedErrorBody
+  | WeddingNotFoundErrorBody
+  | ContrastTooLowErrorBody
+  | RateLimitedErrorBody
+>;
+export type SiteControllerAppearanceV1MutationVariables = {
+  weddingId: string;
+  data: UpdateSiteAppearanceBody;
+};
+
+/**
+ * @summary Grava a Aparência inteira, com o guarda-corpo de contraste (Aparência RN01 a RN07).
+ */
+export const useSiteControllerAppearanceV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | ContrastTooLowErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof siteControllerAppearanceV1>>,
+      TError,
+      SiteControllerAppearanceV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof siteControllerAppearanceV1>>,
+  TError,
+  SiteControllerAppearanceV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getSiteControllerAppearanceV1MutationOptions(options), queryClient);
+};
 export const getSiteControllerGetV1Url = (weddingId: string) => {
   return `/v1/weddings/${weddingId}/site`;
 };
@@ -273,6 +702,7 @@ export const getSiteControllerPatchV1MutationOptions = <
     | SiteImageNotFoundErrorBody
     | SiteSlugLockedErrorBody
     | SiteSlugUnavailableErrorBody
+    | EndDateOutOfRangeErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -323,6 +753,7 @@ export type SiteControllerPatchV1MutationError = ErrorType<
   | SiteImageNotFoundErrorBody
   | SiteSlugLockedErrorBody
   | SiteSlugUnavailableErrorBody
+  | EndDateOutOfRangeErrorBody
   | RateLimitedErrorBody
 >;
 export type SiteControllerPatchV1MutationVariables = { weddingId: string; data: UpdateSiteBody };
@@ -341,6 +772,7 @@ export const useSiteControllerPatchV1 = <
     | SiteImageNotFoundErrorBody
     | SiteSlugLockedErrorBody
     | SiteSlugUnavailableErrorBody
+    | EndDateOutOfRangeErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -362,4 +794,293 @@ export const useSiteControllerPatchV1 = <
   TContext
 > => {
   return useMutation(getSiteControllerPatchV1MutationOptions(options), queryClient);
+};
+export const getSitePreviewsControllerCreateV1Url = (weddingId: string) => {
+  return `/v1/weddings/${weddingId}/site-previews`;
+};
+
+/**
+ * @summary O token da prévia e a `url` do site com ele; vale 5 minutos e uma vez só.
+ */
+export const sitePreviewsControllerCreateV1 = async (
+  weddingId: string,
+  previewModeBody: PreviewModeBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<SitePreviewResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<SitePreviewResponse>(getSitePreviewsControllerCreateV1Url(weddingId), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(previewModeBody),
+  });
+};
+
+export const getSitePreviewsControllerCreateV1MutationKey = () =>
+  ['sitePreviewsControllerCreateV1'] as const;
+
+export const getSitePreviewsControllerCreateV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | SitePartyNotFoundErrorBody
+    | SiteSlugMissingErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof sitePreviewsControllerCreateV1>>,
+    TError,
+    SitePreviewsControllerCreateV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof sitePreviewsControllerCreateV1>>,
+  TError,
+  SitePreviewsControllerCreateV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getSitePreviewsControllerCreateV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof sitePreviewsControllerCreateV1>>,
+    SitePreviewsControllerCreateV1MutationVariables
+  > = (props) => {
+    const { weddingId, data } = props ?? {};
+
+    return sitePreviewsControllerCreateV1(weddingId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SitePreviewsControllerCreateV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof sitePreviewsControllerCreateV1>>
+>;
+export type SitePreviewsControllerCreateV1MutationBody = PreviewModeBody;
+export type SitePreviewsControllerCreateV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | ActionNotAllowedErrorBody
+  | WeddingNotFoundErrorBody
+  | SitePartyNotFoundErrorBody
+  | SiteSlugMissingErrorBody
+  | RateLimitedErrorBody
+>;
+export type SitePreviewsControllerCreateV1MutationVariables = {
+  weddingId: string;
+  data: PreviewModeBody;
+};
+
+/**
+ * @summary O token da prévia e a `url` do site com ele; vale 5 minutos e uma vez só.
+ */
+export const useSitePreviewsControllerCreateV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | SitePartyNotFoundErrorBody
+    | SiteSlugMissingErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof sitePreviewsControllerCreateV1>>,
+      TError,
+      SitePreviewsControllerCreateV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof sitePreviewsControllerCreateV1>>,
+  TError,
+  SitePreviewsControllerCreateV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getSitePreviewsControllerCreateV1MutationOptions(options), queryClient);
+};
+export const getPublicationControllerCreateV1Url = (weddingId: string) => {
+  return `/v1/weddings/${weddingId}/publication`;
+};
+
+/**
+ * @summary Publica o site sem pagamento, com a data de saída do ar (Publicação RN01 a RN06).
+ */
+export const publicationControllerCreateV1 = async (
+  weddingId: string,
+  publishWeddingBody: PublishWeddingBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<PublicationResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<PublicationResponse>(getPublicationControllerCreateV1Url(weddingId), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(publishWeddingBody),
+  });
+};
+
+export const getPublicationControllerCreateV1MutationKey = () =>
+  ['publicationControllerCreateV1'] as const;
+
+export const getPublicationControllerCreateV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | CourtesyDisabledErrorBody
+    | NotDraftErrorBody
+    | SiteSlugMissingErrorBody
+    | EventDateMissingErrorBody
+    | EndDateOutOfRangeErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof publicationControllerCreateV1>>,
+    TError,
+    PublicationControllerCreateV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof publicationControllerCreateV1>>,
+  TError,
+  PublicationControllerCreateV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getPublicationControllerCreateV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof publicationControllerCreateV1>>,
+    PublicationControllerCreateV1MutationVariables
+  > = (props) => {
+    const { weddingId, data } = props ?? {};
+
+    return publicationControllerCreateV1(weddingId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PublicationControllerCreateV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof publicationControllerCreateV1>>
+>;
+export type PublicationControllerCreateV1MutationBody = PublishWeddingBody;
+export type PublicationControllerCreateV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | ActionNotAllowedErrorBody
+  | WeddingNotFoundErrorBody
+  | CourtesyDisabledErrorBody
+  | NotDraftErrorBody
+  | SiteSlugMissingErrorBody
+  | EventDateMissingErrorBody
+  | EndDateOutOfRangeErrorBody
+  | RateLimitedErrorBody
+>;
+export type PublicationControllerCreateV1MutationVariables = {
+  weddingId: string;
+  data: PublishWeddingBody;
+};
+
+/**
+ * @summary Publica o site sem pagamento, com a data de saída do ar (Publicação RN01 a RN06).
+ */
+export const usePublicationControllerCreateV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | CourtesyDisabledErrorBody
+    | NotDraftErrorBody
+    | SiteSlugMissingErrorBody
+    | EventDateMissingErrorBody
+    | EndDateOutOfRangeErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof publicationControllerCreateV1>>,
+      TError,
+      PublicationControllerCreateV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof publicationControllerCreateV1>>,
+  TError,
+  PublicationControllerCreateV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getPublicationControllerCreateV1MutationOptions(options), queryClient);
 };

@@ -1,0 +1,41 @@
+/*
+ * Páginas de sistema do site (Penpot, Área do Convidado, página 03): nas cores e fontes do
+ * Kore. O ícone de 24 px num círculo de 64 px em primary.tint, o título em display, a
+ * linha de apoio em gray.700 e "Feito com Kore" no pé.
+ */
+.kore-site-system {
+  @apply flex min-h-dvh flex-col bg-paper font-body text-ink;
+}
+
+.kore-site-system__main {
+  @apply flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center;
+}
+
+.kore-site-system__icon {
+  @apply flex size-16 items-center justify-center rounded-full bg-primary-tint text-primary-dark;
+}
+
+.kore-site-system__icon > svg {
+  @apply size-6;
+}
+
+.kore-site-system__title {
+  @apply m-0 max-w-xl font-display type-display-md text-ink;
+}
+
+.kore-site-system__description {
+  @apply m-0 max-w-md type-body-lg text-gray-700;
+}
+
+.kore-site-system__action {
+  @apply mt-2 inline-flex min-h-11 cursor-pointer items-center rounded-md bg-primary px-5 type-label text-primary-foreground hover:bg-primary-hover;
+  @apply focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}
+
+.kore-site-system__footer {
+  @apply flex justify-center pb-10;
+}
+
+.kore-site-system__made-with {
+  @apply inline-flex min-h-11 items-center type-caption text-primary-dark hover:underline;
+}

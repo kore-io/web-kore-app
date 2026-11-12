@@ -1,0 +1,13 @@
+/*
+ * Entrada do CSS do site do casal (Site público RN01 e RN11): o Tailwind e o preset do
+ * @kore-io/design, com os tokens site.* da Aparência. O CSS do site entra por @import, na
+ * camada components; nele só vale @apply das utilitárias do preset.
+ */
+@import 'tailwindcss';
+@import '@kore-io/design/tailwind.css';
+@import '@kore-io/design/components.css';
+
+@import './site-layout.css' layer(components);
+@import './site-sections.css' layer(components);
+@import './site-system.css' layer(components);
+@import './simulator/simulator.css' layer(components);

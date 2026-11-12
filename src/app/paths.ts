@@ -33,6 +33,9 @@ export const paths = {
   /** Novo grupo e Editar grupo (decisão 213(9)). */
   guestNew: '/app/convidados/novo',
   guestPartyEdit: '/app/convidados/grupos/:partyId/editar',
+  /** Site › Editor (decisão 214): /app/site abre os Dados básicos. */
+  site: '/app/site',
+  siteSection: '/app/site/:section',
 } as const;
 
 /** Caminho do Painel de um grupo. */
@@ -49,3 +52,7 @@ export const externalUrls = {
   /** "Fazer parceria" na F0 (decisões 150(4) e 157(4)); na F6, o cadastro do cerimonialista. */
   plannerPartnership: 'https://kore.com.br/cerimonialistas',
 } as const;
+
+export function siteSectionPath({ section }: { section: string }) {
+  return paths.siteSection.replace(':section', encodeURIComponent(section));
+}

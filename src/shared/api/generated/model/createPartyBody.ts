@@ -10,6 +10,7 @@ export interface CreatePartyBody {
   /**
    * Um ou mais, na ordem do grupo (RN03, RN17).
    * @minItems 1
+   * @maxItems 100
    */
   guests: CreatePartyGuestBody[];
   /**

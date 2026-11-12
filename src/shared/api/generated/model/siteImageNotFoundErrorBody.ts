@@ -11,4 +11,6 @@ export interface SiteImageNotFoundErrorBody {
   statusCode: SiteImageNotFoundErrorBodyStatusCode;
   error: SiteImageNotFoundErrorBodyError;
   message: string;
+  /** Nas seções: os ids que não são imagens prontas deste casamento. */
+  imageIds?: string[];
 }

@@ -1,0 +1,166 @@
+{
+  "skipToContent": "Pular para o conteúdo",
+  "menu": {
+    "label": "Menu principal",
+    "open": "Abrir menu",
+    "close": "Fechar menu"
+  },
+  "hero": {
+    "overline": "Vamos nos casar",
+    "countdown_one": "Falta {{count}} dia",
+    "countdown_other": "Faltam {{count}} dias",
+    "today": "É hoje"
+  },
+  "footer": {
+    "madeWith": "Feito com Kore",
+    "terms": "Termos",
+    "privacy": "Privacidade",
+    "contactWhatsapp": "Dúvidas? Fale com o casal pelo WhatsApp {{number}}",
+    "contactEmail": "Dúvidas? Escreva para o casal: {{email}}"
+  },
+  "states": {
+    "notFound": {
+      "title": "Não encontramos este endereço.",
+      "description": "Confira o link que você recebeu."
+    },
+    "draft": {
+      "title": "Este site ainda não foi publicado.",
+      "description": "Quando o casal publicar, ele aparece neste endereço."
+    },
+    "loadError": {
+      "title": "Não foi possível carregar o site.",
+      "description": "Confira sua conexão e tente de novo.",
+      "retry": "Tentar de novo"
+    },
+    "linkInvalid": {
+      "title": "Este link não funciona mais.",
+      "description": "Peça um novo link ao casal."
+    },
+    "previewInvalid": {
+      "title": "Esta prévia não vale mais.",
+      "description": "Cada prévia vale uma vez só, por poucos minutos. O botão Pré-visualizar do Editor do site abre uma nova."
+    }
+  },
+  "sections": {
+    "overline": {
+      "story": "Nossa história",
+      "ceremony": "O grande dia",
+      "dress_code": "Para a festa",
+      "faq": "Dúvidas"
+    },
+    "storyAlt": "Foto {{n}} de {{total}} de {{title}}",
+    "dressCodeAlt": "Foto de referência do dress code",
+    "ceremonyLocked": "Entre pelo link do seu convite para ver o local e o horário.",
+    "ceremonyLockedHint": "O link chegou junto com o convite do casal.",
+    "venue": {
+      "googleMaps": "Abrir no Google Maps",
+      "waze": "Abrir no Waze",
+      "newTab": "(abre em nova aba)"
+    }
+  },
+  "viewer": {
+    "close": "Fechar",
+    "previous": "Foto anterior",
+    "next": "Próxima foto",
+    "counter": "{{n}} de {{total}}"
+  },
+  "party": {
+    "banner": "Convite para {{name}}"
+  },
+  "preview": {
+    "draft": "Prévia. O site ainda não foi publicado.",
+    "draftParty": "Prévia como {{name}}. O site ainda não foi publicado.",
+    "published": "Prévia do site.",
+    "publishedParty": "Prévia como {{name}}.",
+    "viewAs": "Ver como",
+    "visitor": "Visitante",
+    "party": "Grupo",
+    "search": "Buscar um grupo",
+    "more": {
+      "couple": "Mostrando 100 de {{total}} grupos. Busquem pelo nome para achar os outros.",
+      "planner": "Mostrando 100 de {{total}} grupos. Busque pelo nome para achar os outros."
+    }
+  },
+  "simulator": {
+    "back": "Voltar",
+    "step": "Passo {{n}} de 4",
+    "done": "Pronto",
+    "saved": "Rascunho guardado",
+    "continue": "Continuar",
+    "preview": {
+      "overline": "Nosso casamento",
+      "button": "Abrir no Google Maps",
+      "cover": "Foto de capa"
+    },
+    "names": {
+      "title": "Como vocês se chamam?",
+      "help": "Do jeito que vai aparecer no site.",
+      "mine": "Seu nome",
+      "mineExample": "Ex.: Ana",
+      "partner": "Nome do seu amor",
+      "partnerExample": "Ex.: Marcos"
+    },
+    "when": {
+      "title": "Quando e onde vai ser?",
+      "help": "Se ainda não sabem a data, tudo bem. Dá para mudar depois.",
+      "date": "Data do casamento",
+      "noDate": "Ainda não sabemos a data",
+      "city": "Cidade"
+    },
+    "style": {
+      "title": "Qual é o estilo de vocês?",
+      "help": "A prévia muda na hora. Testem à vontade.",
+      "colors": "Cores",
+      "otherHelp": "Tem a cor do casamento de vocês? Toquem no círculo colorido.",
+      "other": "Outra cor",
+      "fonts": "Fontes"
+    },
+    "picker": {
+      "title": "Escolham a cor",
+      "close": "Fechar",
+      "color": "Cor",
+      "pick": "Escolher a cor",
+      "use": "Usar esta cor",
+      "good": {
+        "white": "Boa leitura: o texto dos botões fica branco.",
+        "dark": "Boa leitura: o texto dos botões fica preto."
+      },
+      "blocked": {
+        "primary_foreground": "Essa cor deixa o texto dos botões difícil de ler. Escolham um tom mais escuro ou mais claro.",
+        "primary_background": "Essa cor fica pouco visível neste fundo. Escolham um tom mais escuro ou mais claro."
+      }
+    },
+    "photo": {
+      "title": "Querem colocar uma foto?",
+      "help": "Ela aparece no topo do site. Se preferirem, escolham depois.",
+      "drop": "Escolher uma foto",
+      "dropHint": "JPG ou PNG.",
+      "notice": "A foto aparece só nesta prévia e não fica guardada. Quando criarem a conta, escolham a foto de novo no Editor do site.",
+      "skip": "Pular este passo",
+      "change": "Trocar foto",
+      "remove": "Remover foto",
+      "errors": {
+        "type": "Não foi possível usar esta foto. Escolham uma foto JPG ou PNG.",
+        "tooBig": "Esta foto passa de 25 MB. Escolham uma foto menor."
+      }
+    },
+    "ready": {
+      "title": "O site de vocês já tem cara de casamento",
+      "help": "Criem a conta para guardar tudo. Montar é grátis; vocês só pagam quando publicarem.",
+      "google": "Continuar com Google",
+      "email": "Criar com e-mail",
+      "photoNotice": "A foto não vai para a conta. Vocês a escolhem de novo no Editor do site.",
+      "draftNotice": "O que vocês montarem fica guardado só neste navegador, por 7 dias, até criarem a conta.",
+      "signIn": "Já têm conta? Entrar",
+      "guests": "Montem a lista de convidados",
+      "invites": "Enviem os convites pelo WhatsApp de vocês",
+      "gifts": "Recebam os presentes por Pix, sem taxa"
+    },
+    "resume": {
+      "title": "Continuar de onde pararam?",
+      "help": "Encontramos o site que vocês começaram neste aparelho. Ele ainda não foi salvo numa conta.",
+      "continue": "Continuar de onde pararam",
+      "restart": "Começar de novo"
+    }
+  }
+}

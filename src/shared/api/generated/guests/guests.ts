@@ -364,7 +364,6 @@ export const getExportControllerExportV1QueryOptions = <
   TData = Awaited<ReturnType<typeof exportControllerExportV1>>,
   TError = ErrorType<
     | ValidationErrorBody
-    | Blob
     | SessionExpiredErrorBody
     | WeddingNotFoundErrorBody
     | NothingToExportErrorBody
@@ -403,7 +402,6 @@ export type ExportControllerExportV1QueryResult = NonNullable<
 >;
 export type ExportControllerExportV1QueryError = ErrorType<
   | ValidationErrorBody
-  | Blob
   | SessionExpiredErrorBody
   | WeddingNotFoundErrorBody
   | NothingToExportErrorBody
@@ -414,7 +412,6 @@ export function useExportControllerExportV1<
   TData = Awaited<ReturnType<typeof exportControllerExportV1>>,
   TError = ErrorType<
     | ValidationErrorBody
-    | Blob
     | SessionExpiredErrorBody
     | WeddingNotFoundErrorBody
     | NothingToExportErrorBody
@@ -443,7 +440,6 @@ export function useExportControllerExportV1<
   TData = Awaited<ReturnType<typeof exportControllerExportV1>>,
   TError = ErrorType<
     | ValidationErrorBody
-    | Blob
     | SessionExpiredErrorBody
     | WeddingNotFoundErrorBody
     | NothingToExportErrorBody
@@ -472,7 +468,6 @@ export function useExportControllerExportV1<
   TData = Awaited<ReturnType<typeof exportControllerExportV1>>,
   TError = ErrorType<
     | ValidationErrorBody
-    | Blob
     | SessionExpiredErrorBody
     | WeddingNotFoundErrorBody
     | NothingToExportErrorBody
@@ -497,7 +492,6 @@ export function useExportControllerExportV1<
   TData = Awaited<ReturnType<typeof exportControllerExportV1>>,
   TError = ErrorType<
     | ValidationErrorBody
-    | Blob
     | SessionExpiredErrorBody
     | WeddingNotFoundErrorBody
     | NothingToExportErrorBody

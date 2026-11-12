@@ -10,6 +10,8 @@ export type PartyHistoryEntryResponseKind =
 
 export const PartyHistoryEntryResponseKind = {
   sent: 'sent',
+  save_the_date: 'save_the_date',
+  reminder: 'reminder',
   viewed: 'viewed',
-  responded: 'responded',
+  response: 'response',
 } as const;

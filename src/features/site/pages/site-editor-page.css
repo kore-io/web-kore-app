@@ -1,0 +1,391 @@
+/*
+ * Site › Editor (Penpot, Área do Casal, página 09). Computador: a lista de seções (240 px),
+ * o formulário e a prévia (340 px), 16 px entre eles. Abaixo de 1024 px: as abas Seções ·
+ * Editar · Prévia, e na aba Editar o Select "Seção: …" em cima do formulário.
+ * A lista: cartão branco, borda gray.300, raio lg, 8 px de respiro; o título em
+ * type.overline gray.700; cada item em type.body.md ink com o estado em type.caption
+ * gray.700 à direita; o atual em primary.tint, raio md.
+ * A prévia usa a escala de tipos do DS com as famílias do site (estilo inline).
+ */
+.kore-site-editor {
+  @apply flex flex-col gap-6;
+}
+
+.kore-site-editor__loading {
+  @apply flex justify-center py-10;
+}
+
+.kore-site-editor__tabs {
+  @apply lg:hidden;
+}
+
+.kore-site-editor__body {
+  @apply flex flex-col gap-4 lg:flex-row lg:items-start;
+}
+
+.kore-site-editor__list-column {
+  @apply lg:w-60 lg:shrink-0;
+}
+
+.kore-site-editor__preview-column {
+  @apply lg:w-85 lg:shrink-0;
+}
+
+.kore-site-editor__body:not([data-tab='sections']) .kore-site-editor__list-column,
+.kore-site-editor__body:not([data-tab='edit']) .kore-site-editor__form-column,
+.kore-site-editor__body:not([data-tab='preview']) .kore-site-editor__preview-column {
+  @apply hidden lg:block;
+}
+
+.kore-site-editor__list {
+  @apply flex flex-col gap-2 rounded-lg border border-gray-300 bg-white p-2;
+}
+
+.kore-site-editor__list-title {
+  @apply type-overline px-2 pt-3 pb-1 text-gray-700;
+}
+
+.kore-site-editor__item {
+  @apply flex min-h-11 items-center justify-between gap-3 rounded-md px-3 py-2 type-body-md text-ink;
+  @apply hover:bg-gray-100;
+  @apply focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}
+
+.kore-site-editor__item[aria-current='page'] {
+  @apply bg-primary-tint text-primary-dark;
+}
+
+.kore-site-editor__state {
+  @apply type-caption shrink-0 text-gray-700;
+}
+
+.kore-site-editor__form-column {
+  @apply flex min-w-0 flex-col gap-4 lg:flex-1;
+}
+
+.kore-site-editor__select {
+  @apply lg:hidden;
+}
+
+.kore-site-editor__panel {
+  @apply flex flex-col gap-5 rounded-lg border border-gray-300 bg-white p-5;
+}
+
+.kore-site-editor__panel-title {
+  @apply type-overline text-gray-700;
+}
+
+.kore-editor-preview {
+  @apply m-0 flex flex-col items-center gap-3;
+}
+
+.kore-editor-preview__card {
+  @apply flex w-full flex-col items-center gap-2 rounded-lg border px-6 py-8 text-center;
+}
+
+.kore-editor-preview__overline {
+  @apply type-overline;
+}
+
+.kore-editor-preview__names {
+  @apply type-display-md;
+}
+
+.kore-editor-preview__rule {
+  @apply my-1 block h-0.5 w-12 rounded-full;
+}
+
+.kore-editor-preview__button {
+  @apply mt-3 inline-flex min-h-10 items-center rounded-full px-5 type-label;
+}
+
+.kore-editor-preview__date {
+  @apply type-body-md;
+}
+
+.kore-editor-preview__countdown {
+  @apply type-caption;
+}
+
+.kore-editor-preview__sections {
+  @apply mt-4 flex flex-col gap-1 type-body-md;
+}
+
+.kore-editor-preview__caption {
+  @apply type-caption text-gray-700;
+}
+
+/*
+ * Dados básicos (Penpot 1.2): os nomes lado a lado; Cidade e UF (160 px) lado a lado no
+ * tablet e no computador, empilhados no celular; o link "Usar …" em primary.dark,
+ * sublinhado, dentro da ajuda em danger.
+ */
+.kore-site-basics {
+  @apply flex flex-col gap-5;
+}
+
+.kore-site-basics__row {
+  @apply grid gap-3 md:grid-cols-2;
+}
+
+.kore-site-basics__row--city {
+  @apply flex flex-col gap-3 md:flex-row;
+}
+
+.kore-site-basics__row--city > :first-child {
+  @apply md:flex-1;
+}
+
+.kore-site-basics__row--city > :last-child {
+  @apply md:w-40;
+}
+
+.kore-site-basics__suggestion {
+  @apply cursor-pointer text-primary-dark underline;
+  @apply focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}
+
+/*
+ * Foto de capa (Penpot 1.2): a miniatura de 160 x 96 px, raio md, com Trocar foto ·
+ * Remover foto ao lado (embaixo no celular); o aviso fixo em type.caption gray.700.
+ */
+.kore-site-cover {
+  @apply flex flex-col gap-1.5;
+}
+
+.kore-site-cover__label {
+  @apply type-label text-ink;
+}
+
+.kore-site-cover__current {
+  @apply flex flex-col items-start gap-3 md:flex-row md:items-center;
+}
+
+.kore-site-cover__thumb {
+  @apply h-24 w-40 rounded-md bg-gray-100 object-cover;
+}
+
+.kore-site-cover__actions {
+  @apply flex gap-3;
+}
+
+.kore-site-cover__picker {
+  @apply hidden;
+}
+
+.kore-site-cover__sending {
+  @apply rounded-md bg-gray-100 p-4;
+}
+
+.kore-site-cover__help {
+  @apply type-caption text-gray-700;
+}
+
+/*
+ * Aparência (Penpot "Editor — Aparência"): os títulos dos grupos em type.overline
+ * gray.700; os 4 pares em cartões de 2 colunas (1 no celular), borda gray.300, raio md,
+ * com a amostra "Ana & Marcos" na fonte de títulos do par (type.display-sm) e as famílias
+ * em type.caption; o escolhido em primary.tint com a borda primary.dark e o selo "Em uso".
+ * As paletas em pílulas com as duas cores (16 px); a cor principal e o destaque com o
+ * círculo de 40 px ao lado do campo; a legenda em type.caption, success, warning ou
+ * danger. Os fundos em 3 cartões lado a lado (empilhados no celular).
+ */
+.kore-site-appearance {
+  @apply flex flex-col gap-6;
+}
+
+.kore-site-appearance__group {
+  @apply m-0 flex min-w-0 flex-col gap-4 border-0 p-0;
+}
+
+.kore-site-appearance__title {
+  @apply type-overline mb-4 p-0 text-gray-700;
+}
+
+.kore-site-appearance__help {
+  @apply type-body-md text-gray-700;
+}
+
+.kore-site-appearance__radio {
+  @apply sr-only;
+}
+
+.kore-site-appearance__fonts {
+  @apply grid gap-3 md:grid-cols-2;
+}
+
+.kore-site-appearance__card {
+  @apply flex cursor-pointer flex-col gap-1 rounded-md border border-gray-300 bg-white p-3 type-body-md text-ink;
+  @apply has-focus-visible:shadow-focus-ring;
+}
+
+.kore-site-appearance__card[data-selected='true'],
+.kore-site-appearance__palette[data-selected='true'] {
+  @apply border-1.5 border-primary-dark bg-primary-tint;
+}
+
+.kore-site-appearance__card--row {
+  @apply min-h-12 flex-row items-center gap-3;
+}
+
+.kore-site-appearance__card-head {
+  @apply flex items-center justify-between gap-2;
+}
+
+.kore-site-appearance__sample {
+  @apply type-display-sm;
+}
+
+.kore-site-appearance__families {
+  @apply type-caption text-gray-700;
+}
+
+.kore-site-appearance__palettes {
+  @apply flex flex-wrap gap-2;
+}
+
+.kore-site-appearance__palette {
+  @apply flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border border-gray-300 bg-white px-3 type-body-md text-ink;
+  @apply has-focus-visible:shadow-focus-ring;
+}
+
+.kore-site-appearance__dot {
+  @apply size-4 rounded-full;
+}
+
+.kore-site-appearance__color {
+  @apply flex flex-col gap-1.5;
+}
+
+.kore-site-appearance__color-label {
+  @apply type-label text-ink;
+}
+
+.kore-site-appearance__color-row {
+  @apply flex items-center gap-3;
+}
+
+.kore-site-appearance__picker {
+  @apply size-10 shrink-0 cursor-pointer rounded-full border border-gray-300 bg-transparent p-0;
+  @apply focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}
+
+.kore-site-appearance__hex {
+  @apply flex-1;
+}
+
+.kore-site-appearance__legend {
+  @apply type-caption;
+}
+
+.kore-site-appearance__legend--success {
+  @apply text-success-text;
+}
+
+.kore-site-appearance__legend--warning {
+  @apply text-warning-text;
+}
+
+.kore-site-appearance__legend--danger {
+  @apply text-danger-text;
+}
+
+.kore-site-appearance__backgrounds {
+  @apply grid gap-3 md:grid-cols-3;
+}
+
+.kore-site-appearance__swatch {
+  @apply size-6 shrink-0 rounded-full border border-gray-300;
+}
+
+/* Seções de conteúdo (Seções RN03, RN06, RN08 a RN11) */
+.kore-site-section {
+  @apply flex flex-col gap-5;
+}
+
+.kore-site-section__help {
+  @apply m-0 type-body-md text-gray-700;
+}
+
+.kore-site-section__link {
+  @apply font-semibold text-primary-dark underline;
+}
+
+.kore-site-faq {
+  @apply m-0 flex list-none flex-col gap-4 p-0;
+}
+
+.kore-site-faq__item {
+  @apply flex flex-col gap-4 rounded-lg border border-gray-300 p-4;
+}
+
+.kore-site-faq__head {
+  @apply flex items-center justify-between gap-2;
+}
+
+.kore-site-faq__label {
+  @apply type-label text-ink;
+}
+
+.kore-site-faq__actions {
+  @apply flex items-center gap-1;
+}
+
+.kore-site-faq__add {
+  @apply flex flex-col items-start gap-2;
+}
+
+/* Data e Hora do local lado a lado, a Data mais larga, como no Penpot 1.4 */
+.kore-site-venue__when {
+  @apply grid grid-cols-5 gap-4;
+}
+
+.kore-site-venue__when > :first-child {
+  @apply col-span-3;
+}
+
+.kore-site-venue__when > :last-child {
+  @apply col-span-2;
+}
+
+/* Nossa história: as fotos em grade de 3, com o Remover no canto (Penpot 1.8) */
+.kore-site-story {
+  @apply flex flex-col gap-3;
+}
+
+.kore-site-story__grid {
+  @apply m-0 grid list-none grid-cols-3 gap-3 p-0;
+}
+
+.kore-site-story__photo {
+  @apply relative aspect-video overflow-hidden rounded-md bg-gray-100;
+}
+
+.kore-site-story__photo--pending {
+  @apply flex items-end p-3;
+}
+
+.kore-site-story__thumb {
+  @apply block size-full object-cover;
+}
+
+.kore-site-story__remove {
+  @apply absolute top-1 right-1 bg-white;
+}
+
+.kore-site-story__bar {
+  @apply w-full;
+}
+
+.kore-site-story__sending {
+  @apply m-0 type-caption text-gray-700;
+}
+
+/* Pré-visualizar e Salvar no cabeçalho (Pré-visualização RN01) */
+.kore-site-editor__actions {
+  @apply flex flex-wrap items-center justify-end gap-2;
+}
+
+.kore-site-editor__preview-help {
+  @apply m-0 w-full text-end type-caption text-gray-700;
+}

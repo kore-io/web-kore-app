@@ -25,4 +25,6 @@ export interface MeResponse {
   referrer: MeReferrerResponse | null;
   user: MeUserResponse;
   authenticatedAt: string;
+  /** O cadastro próprio de cerimonialista está aberto (Cadastro e perfil RN02). */
+  plannerSignupEnabled: boolean;
 }

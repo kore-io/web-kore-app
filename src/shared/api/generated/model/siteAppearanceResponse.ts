@@ -4,12 +4,20 @@
  * Kore API
  * OpenAPI spec version: 1
  */
+import type { AppearanceWarning } from './appearanceWarning';
+import type { SiteAppearanceResponseBackgroundMode } from './siteAppearanceResponseBackgroundMode';
+import type { SiteAppearanceResponseFontPairKey } from './siteAppearanceResponseFontPairKey';
+import type { SiteAppearanceResponseStarterPaletteKey } from './siteAppearanceResponseStarterPaletteKey';
 
 export interface SiteAppearanceResponse {
+  fontPairKey: SiteAppearanceResponseFontPairKey;
   /** @nullable */
-  starterPaletteKey: string | null;
-  fontPairKey: string;
+  starterPaletteKey: SiteAppearanceResponseStarterPaletteKey;
+  backgroundMode: SiteAppearanceResponseBackgroundMode;
+  /** Avisos que não bloqueiam (RN04). */
+  warnings: AppearanceWarning[];
   primaryColor: string;
+  /** #FFFFFF ou #1F1F1F, o que tiver mais contraste com a primária (RN04 e RN09). */
+  primaryForeground: string;
   accentColor: string;
-  backgroundMode: string;
 }
