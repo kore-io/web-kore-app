@@ -297,3 +297,40 @@
 .kore-site-appearance__swatch {
   @apply size-6 shrink-0 rounded-full border border-gray-300;
 }
+
+/* Seções de conteúdo (Seções RN03, RN06, RN08 a RN11) */
+.kore-site-section {
+  @apply flex flex-col gap-5;
+}
+
+.kore-site-section__help {
+  @apply m-0 type-body-md text-gray-700;
+}
+
+.kore-site-section__link {
+  @apply font-semibold text-primary-dark underline;
+}
+
+.kore-site-faq {
+  @apply m-0 flex list-none flex-col gap-4 p-0;
+}
+
+.kore-site-faq__item {
+  @apply flex flex-col gap-4 rounded-lg border border-gray-300 p-4;
+}
+
+.kore-site-faq__head {
+  @apply flex items-center justify-between gap-2;
+}
+
+.kore-site-faq__label {
+  @apply type-label text-ink;
+}
+
+.kore-site-faq__actions {
+  @apply flex items-center gap-1;
+}
+
+.kore-site-faq__add {
+  @apply flex flex-col items-start gap-2;
+}

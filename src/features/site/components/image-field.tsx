@@ -1,32 +1,40 @@
 import { Button, FileUpload, Progress } from '@kore-io/design';
-import { useRef, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Audience } from '../../guests/hooks/use-active-wedding';
-import type { BasicsDraft } from '../basics-draft';
+import type { SiteImageRefResponse } from '../../../shared/api/generated/model';
 import { IMAGE_ACCEPT, useSiteImageUpload } from '../images/use-site-image-upload';
 
+export type ImageValue = Pick<SiteImageRefResponse, 'id' | 'url' | 'thumbUrl'> | null;
+
 /**
- * A foto de capa dos Dados básicos (RN09; Penpot 1.2): sem foto, a área de envio; com
- * foto, a miniatura com Trocar foto · Remover foto; embaixo, o aviso fixo. A troca só
- * vale ao Salvar (vai no PATCH com o resto da seção).
+ * Uma foto do site no Editor: a capa dos Dados básicos (RN09) e a foto de referência do
+ * Dress code (Seções RN09). Sem foto, a área de envio; com foto, a miniatura com Trocar
+ * foto · Remover foto; embaixo, a ajuda, quando houver. A troca só vale ao Salvar.
  */
-export function CoverField({
+export function ImageField({
   weddingId,
   audience,
-  cover,
-  coupleNames,
+  label,
+  help,
+  image: cover,
+  alt,
   onChange,
 }: {
   weddingId: string;
   audience: Audience;
-  cover: BasicsDraft['cover'];
-  coupleNames: string;
-  onChange: (cover: BasicsDraft['cover']) => void;
+  label: string;
+  help?: string;
+  image: ImageValue;
+  /** O texto alternativo da miniatura (Imagens RN09). */
+  alt: string;
+  onChange: (image: ImageValue) => void;
 }) {
   const { t } = useTranslation('site');
   const upload = useSiteImageUpload({ weddingId, audience });
   const picker = useRef<HTMLInputElement>(null);
   const [progress, setProgress] = useState<number | null>(null);
+  const labelId = useId();
 
   async function send(file: File) {
     setProgress(0);
@@ -36,9 +44,9 @@ export function CoverField({
   }
 
   return (
-    <div className="kore-site-cover" role="group" aria-labelledby="kore-site-cover-label">
-      <span id="kore-site-cover-label" className="kore-site-cover__label">
-        {t('basics.cover')}
+    <div className="kore-site-cover" role="group" aria-labelledby={labelId}>
+      <span id={labelId} className="kore-site-cover__label">
+        {label}
       </span>
       {progress !== null ? (
         <div className="kore-site-cover__sending">
@@ -49,7 +57,7 @@ export function CoverField({
         </div>
       ) : cover ? (
         <div className="kore-site-cover__current">
-          <img className="kore-site-cover__thumb" src={cover.thumbUrl} alt={coupleNames} />
+          <img className="kore-site-cover__thumb" src={cover.thumbUrl} alt={alt} />
           <div className="kore-site-cover__actions">
             <Button variant="secondary" size="sm" onClick={() => picker.current?.click()}>
               {t('images.change')}
@@ -80,7 +88,7 @@ export function CoverField({
           onFile={(file) => void send(file)}
         />
       )}
-      <p className="kore-site-cover__help">{t('basics.coverHelp')}</p>
+      {help !== undefined && <p className="kore-site-cover__help">{help}</p>}
     </div>
   );
 }

@@ -271,4 +271,84 @@ test.describe('Site › Editor (decisão 214)', () => {
       check: 'primary_background',
     });
   });
+  test('Seções: FAQ, Hospedagem, desligar só esconde e o servidor confere os limites (S3 RN08, RN10 a RN12)', async ({
+    page,
+  }) => {
+    const email = `e2e-site-${unique()}@exemplo.kore.local`;
+    const userId = await createUser({ db, email, name: 'Ana Beatriz Moreira' });
+    const weddingId = await createWedding({
+      db,
+      partners: ['Ana Beatriz Moreira', 'Marcos Vinícius Rocha'],
+      eventDate: '2027-05-15',
+      city: 'Campinas',
+      status: 'draft',
+      createdByUserId: userId,
+      owners: [userId, null],
+    });
+    await signIn({ page, email });
+
+    // FAQ: liga, duas perguntas, a segunda sobe, salva e reabre.
+    await page.goto('/app/site/faq');
+    await page.getByRole('switch', { name: 'Mostrar a seção no site' }).locator('..').click();
+    await expect(page.getByText(/ainda não tem conteúdo/)).toBeVisible();
+    await page.getByRole('button', { name: 'Adicionar pergunta' }).click();
+    await page.getByRole('textbox', { name: 'Pergunta', exact: true }).fill('E se chover?');
+    await page.getByRole('textbox', { name: 'Resposta' }).fill('Há área coberta.');
+    await page.getByRole('button', { name: 'Adicionar pergunta' }).click();
+    await page
+      .getByRole('textbox', { name: 'Pergunta', exact: true })
+      .nth(1)
+      .fill('Qual é o traje?');
+    await page.getByRole('button', { name: 'Salvar' }).click();
+    await expect(
+      page.getByRole('textbox', { name: 'Resposta' }).nth(1),
+    ).toHaveAccessibleDescription('Preencham este campo.');
+    await page.getByRole('textbox', { name: 'Resposta' }).nth(1).fill('Passeio completo.');
+    await page.getByRole('button', { name: 'Subir pergunta 2' }).click();
+    await page.getByRole('button', { name: 'Salvar' }).click();
+    await expect(toast({ page, text: 'Alterações salvas.' })).toBeVisible();
+    await page.reload();
+    await expect(page.getByRole('textbox', { name: 'Pergunta', exact: true }).first()).toHaveValue(
+      'Qual é o traje?',
+    );
+    await expect(page.getByRole('textbox', { name: 'Pergunta', exact: true }).nth(1)).toHaveValue(
+      'E se chover?',
+    );
+
+    // Desligar só esconde: as perguntas continuam ao religar (RN11).
+    await page.getByRole('switch', { name: 'Mostrar a seção no site' }).locator('..').click();
+    await page.getByRole('button', { name: 'Salvar' }).click();
+    await expect(toast({ page, text: 'Alterações salvas.' })).toBeVisible();
+    await page.reload();
+    await expect(page.getByRole('switch', { name: 'Mostrar a seção no site' })).not.toBeChecked();
+    await expect(page.getByRole('textbox', { name: 'Pergunta', exact: true })).toHaveCount(2);
+
+    // Hospedagem: o texto volta como foi escrito (RN04).
+    await page.goto('/app/site/hospedagem-e-transporte');
+    await page.getByRole('switch', { name: 'Mostrar a seção no site' }).locator('..').click();
+    await page.getByRole('textbox', { name: 'Texto' }).fill('<b>oi</b> veja www.exemplo.com');
+    await page.getByRole('button', { name: 'Salvar' }).click();
+    await expect(toast({ page, text: 'Alterações salvas.' })).toBeVisible();
+    await page.reload();
+    await expect(page.getByRole('textbox', { name: 'Texto' })).toHaveValue(
+      '<b>oi</b> veja www.exemplo.com',
+    );
+
+    // O servidor confere o limite (RN12).
+    const refused = await page.request.put(
+      `${API_URL}/v1/weddings/${weddingId}/site/sections/lodging`,
+      {
+        headers: { origin: APP_ORIGIN },
+        data: {
+          title: 'Hospedagem e transporte',
+          enabled: true,
+          content: { text: 'a'.repeat(5001) },
+        },
+      },
+    );
+    expect(refused.status()).toBe(400);
+    expect(
+      ((await refused.json()) as { errors: { path: string }[] }).errors.map((error) => error.path),
+    ).toEqual(['content.text']);
+  });
 });
