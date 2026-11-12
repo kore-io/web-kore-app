@@ -3,7 +3,9 @@
  * cerimonialista (decisão 198(2)) troca para 'planner' e abre a tela com o
  * renderAreaScreen. O setup volta para o casal depois de cada teste.
  */
-export const profileUnderTest: { current: 'couple' | 'planner' } = { current: 'couple' };
+export const profileUnderTest: { current: 'couple' | 'planner' | 'seller' } = {
+  current: 'couple',
+};
 
 interface MeFixture {
   activeProfile: string;
