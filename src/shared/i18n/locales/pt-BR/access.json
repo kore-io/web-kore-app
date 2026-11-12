@@ -131,7 +131,10 @@
     "referralDescription": "Vocês ganham {{percent}}% de desconto na ativação do site.",
     "submit": "Continuar",
     "signInPrompt": "Já tem conta?",
-    "signInLink": "Entrar"
+    "signInLink": "Entrar",
+    "draftTitle": "Falta só criar a conta.",
+    "draftDescription": "O site de vocês está guardado só neste navegador. Ele vira o casamento quando criarem a conta.",
+    "draftSignInPrompt": "Já têm conta?"
   },
   "weddingDetails": {
     "title": "Conte sobre o casamento",
@@ -159,7 +162,11 @@
       "slug": "Informe o endereço do site.",
       "slugFormat": "Use só letras minúsculas, números e hífen.",
       "email": "Informe um e-mail válido."
-    }
+    },
+    "myNameFromSimulator": "Veio do simulador. Confira se é o seu.",
+    "simulatorAppearance": "Aparência do simulador",
+    "simulatorAppearanceHint": "Dá para mudar depois no Editor do site.",
+    "ownColor": "Cor própria"
   },
   "alreadyOwner": {
     "title": "Você já tem um casamento no Kore.",

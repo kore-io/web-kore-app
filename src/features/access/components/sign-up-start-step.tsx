@@ -14,6 +14,11 @@ export interface SignUpStartStepProps {
   submitting?: boolean;
   signInHref: string;
   plannerHref: string;
+  /**
+   * A prévia do site do Simule (Cadastro RN12): o Início com rascunho ("Falta só criar a
+   * conta."). No celular e no tablet, a prévia aparece aqui; no desktop, no painel da marca.
+   */
+  draftPreview?: ReactNode;
 }
 
 /** Cadastro — Início (Área do Casal, Penpot; quadro do Acessos pela decisão 154). */
@@ -26,15 +31,21 @@ export function SignUpStartStep({
   submitting = false,
   signInHref,
   plannerHref,
+  draftPreview,
 }: SignUpStartStepProps) {
   const { t } = useTranslation('access');
   return (
     <div className="kore-sign-in">
       {notice}
       <div className="kore-sign-in__heading">
-        <h1 className="kore-sign-in__title">{t('signUp.title')}</h1>
-        <p className="kore-sign-in__description">{t('signUp.description')}</p>
+        <h1 className="kore-sign-in__title">
+          {draftPreview ? t('signUp.draftTitle') : t('signUp.title')}
+        </h1>
+        <p className="kore-sign-in__description">
+          {draftPreview ? t('signUp.draftDescription') : t('signUp.description')}
+        </p>
       </div>
+      {draftPreview && <div className="kore-sign-up__draft-preview">{draftPreview}</div>}
       {referral && (
         <div className="kore-referral">
           <Gift className="kore-referral__icon" aria-hidden="true" strokeWidth={1.75} />
@@ -57,7 +68,7 @@ export function SignUpStartStep({
       />
       <div className="kore-sign-in__links kore-sign-in__links--actions">
         <p className="kore-sign-in__link-row">
-          {t('signUp.signInPrompt')}{' '}
+          {draftPreview ? t('signUp.draftSignInPrompt') : t('signUp.signInPrompt')}{' '}
           <a className="kore-sign-in__link kore-sign-in__link--standalone" href={signInHref}>
             {t('signUp.signInLink')}
           </a>

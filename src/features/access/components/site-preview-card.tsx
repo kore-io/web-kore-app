@@ -1,4 +1,5 @@
 import type { SiteBackgroundName, SiteColorsName, SiteFontsName } from '@kore-io/design';
+import type { CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 // Corpo do tema padrão do site (romântico: Lato), usado no rótulo, na data e na pílula; o
 // título usa a Cormorant, já carregada pelo app. Os outros temas entram com o site.
@@ -11,6 +12,8 @@ export interface SitePreviewCardProps {
   details: string;
   /** Aparência escolhida para o site; sem ela, o padrão do DS. */
   theme?: { fonts?: SiteFontsName; colors?: SiteColorsName; background?: SiteBackgroundName };
+  /** Cor própria (o Outra cor do Simule): as variáveis por cima da paleta do tema. */
+  customColors?: { primary: string; primaryForeground: string; accent: string };
 }
 
 /**
@@ -18,11 +21,23 @@ export interface SitePreviewCardProps {
  * --site-* trocados pelos atributos data-site-* do DS), com os nomes, a data e a pílula
  * de confirmar presença, só ilustrativa.
  */
-export function SitePreviewCard({ couple, details, theme = {} }: SitePreviewCardProps) {
+export function SitePreviewCard({
+  couple,
+  details,
+  theme = {},
+  customColors,
+}: SitePreviewCardProps) {
   const { t } = useTranslation('access');
   return (
     <div
       className="kore-site-preview"
+      {...(customColors && {
+        style: {
+          '--site-primary': customColors.primary,
+          '--site-primary-foreground': customColors.primaryForeground,
+          '--site-accent': customColors.accent,
+        } as CSSProperties,
+      })}
       {...(theme.fonts && { 'data-site-fonts': theme.fonts })}
       {...(theme.colors && { 'data-site-colors': theme.colors })}
       {...(theme.background && { 'data-site-background': theme.background })}

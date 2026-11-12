@@ -130,3 +130,40 @@
 .kore-planner-invite__decline {
   @apply self-center;
 }
+
+/* Cadastro com o rascunho do Simule (Cadastro RN12; Penpot "com rascunho") */
+.kore-sign-up__draft-preview {
+  @apply lg:hidden;
+}
+
+.kore-access__brand-preview {
+  @apply flex flex-1 items-center;
+}
+
+.kore-simulator-appearance {
+  @apply flex flex-col gap-1.5;
+}
+
+.kore-simulator-appearance__label {
+  @apply m-0 type-label text-ink;
+}
+
+.kore-simulator-appearance__box {
+  @apply flex min-h-11 items-center gap-3 rounded-md border border-gray-300 bg-white px-3;
+}
+
+.kore-simulator-appearance__dots {
+  @apply flex gap-0.5;
+}
+
+.kore-simulator-appearance__dot {
+  @apply block size-4 rounded-full;
+}
+
+.kore-simulator-appearance__text {
+  @apply type-body-md text-ink;
+}
+
+.kore-simulator-appearance__hint {
+  @apply m-0 type-caption text-gray-700;
+}

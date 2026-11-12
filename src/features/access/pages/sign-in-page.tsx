@@ -19,7 +19,11 @@ export function SignInPage({ initialNotice }: { initialNotice?: SignInNotice }) 
   const [searchParams, setSearchParams] = useSearchParams();
   const { origin, originRef, notice } = readSignInLocationState({ state: location.state });
   const googleError = searchParams.get('error');
-  const returnPath = safeReturnPath({ path: searchParams.get('next') });
+  // ?next=couple_signup: o "Já têm conta? Entrar" do Simule volta ao cadastro com o rascunho
+  // (Cadastro RN12); os outros são um caminho de volta (RN10).
+  const nextParam = searchParams.get('next');
+  const returnPath =
+    nextParam === 'couple_signup' ? paths.signUp : safeReturnPath({ path: nextParam });
   const firstNotice = notice ?? noticeFromGoogleError({ error: googleError }) ?? initialNotice;
 
   const signIn = useSignIn({
