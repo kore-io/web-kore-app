@@ -49,8 +49,8 @@ test.describe('Prazo de resposta e respostas pelo casal (RN01 a RN07)', () => {
     ).json()) as { id: string };
 
     // Envios › Prazo de resposta (RN01 a RN03).
-    await page.goto('/app/envios');
-    await expect(page).toHaveURL(/\/app\/envios\/prazo$/);
+    // Envios abre em Enviar convites (decisão 235): o prazo tem o caminho dele.
+    await page.goto('/app/envios/prazo');
     await expect(
       page.getByText('Sem prazo, os convidados respondem até o dia do casamento.'),
     ).toBeVisible();
