@@ -5,12 +5,16 @@ import { countdownText, previewDateLine, savedAtText, siteStatus, todayIn } from
 const t = i18next.getFixedT('pt-BR', 'site');
 
 describe('textos do Editor do site', () => {
-  it('"salvo às 10h31"; com minuto zero, "salvo às 10h" (hora do aparelho)', () => {
-    const at = (h: number, m: number) => new Date(2026, 10, 11, h, m).toISOString();
-    expect(savedAtText({ t, at: at(10, 31) })).toBe('salvo às 10h31');
-    expect(savedAtText({ t, at: at(10, 0) })).toBe('salvo às 10h');
-    expect(savedAtText({ t, at: at(9, 5) })).toBe('salvo às 9h05');
-    expect(savedAtText({ t, at: null })).toBeNull();
+  it('"salvo às 10h31" no fuso do casamento; com minuto zero, "salvo às 10h" (RN10)', () => {
+    const tz = 'America/Sao_Paulo';
+    expect(savedAtText({ t, at: '2026-11-11T13:31:00Z', timezone: tz })).toBe('salvo às 10h31');
+    expect(savedAtText({ t, at: '2026-11-11T13:00:00Z', timezone: tz })).toBe('salvo às 10h');
+    expect(savedAtText({ t, at: '2026-11-11T12:05:00Z', timezone: tz })).toBe('salvo às 9h05');
+    // Em Rio Branco (−5 h), a mesma gravação é 8h31.
+    expect(savedAtText({ t, at: '2026-11-11T13:31:00Z', timezone: 'America/Rio_Branco' })).toBe(
+      'salvo às 8h31',
+    );
+    expect(savedAtText({ t, at: null, timezone: tz })).toBeNull();
   });
 
   it('o status do casamento vira o selo; o desconhecido, nada', () => {

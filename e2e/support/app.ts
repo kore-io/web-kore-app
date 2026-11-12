@@ -14,4 +14,6 @@ export async function signIn({ page, email }: { page: Page; email: string }) {
   await page.getByLabel('E-mail').fill(email);
   await page.getByRole('button', { name: 'Entrar' }).click();
   await expect(page).toHaveURL(/\/(app|perfis)$/);
+  // A navegação que fecha o login termina antes de o teste ir para outra página.
+  await page.waitForLoadState('networkidle');
 }

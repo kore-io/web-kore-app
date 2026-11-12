@@ -38,7 +38,7 @@ const me = {
 function site(overrides: Partial<SiteEditorResponse> = {}): SiteEditorResponse {
   return {
     publishedAt: '2026-10-01T12:00:00Z',
-    siteUpdatedAt: new Date(2026, 10, 11, 10, 31).toISOString(),
+    siteUpdatedAt: '2026-11-11T13:31:00Z',
     partners: [
       { id: 'pa', title: 'bride', name: 'Ana Beatriz Moreira' },
       { id: 'pm', title: 'groom', name: 'Marcos Vinícius Rocha' },

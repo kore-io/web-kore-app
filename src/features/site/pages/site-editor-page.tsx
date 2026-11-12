@@ -5,7 +5,8 @@ import { Link, Navigate, useBlocker, useNavigate, useParams } from 'react-router
 import { siteSectionPath } from '../../../app/paths';
 import { useSiteControllerGetV1 } from '../../../shared/api/generated/site/site';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
-import { useActiveWedding } from '../../guests/hooks/use-active-wedding';
+import { useActiveWedding, type Audience } from '../../guests/hooks/use-active-wedding';
+import { BasicsSection } from '../components/basics-section';
 import { SitePreview } from '../components/site-preview';
 import { SectionFormProvider, type SectionForm } from '../section-form';
 import {
@@ -21,15 +22,23 @@ type MobileTab = 'sections' | 'edit' | 'preview';
 
 /** Site › Editor (Dados básicos RN01, RN10, RN11; decisão 214). */
 export function SiteEditorPage() {
-  const { weddingId } = useActiveWedding();
+  const { weddingId, audience } = useActiveWedding();
   const { section: slug } = useParams();
   const section = sectionBySlug(slug);
   if (!section) return <Navigate to={siteSectionPath({ section: FIRST_SECTION_SLUG })} replace />;
   if (!weddingId) return null;
-  return <SiteEditor weddingId={weddingId} sectionKey={section.key} />;
+  return <SiteEditor weddingId={weddingId} sectionKey={section.key} audience={audience} />;
 }
 
-function SiteEditor({ weddingId, sectionKey }: { weddingId: string; sectionKey: SectionKey }) {
+function SiteEditor({
+  weddingId,
+  sectionKey,
+  audience,
+}: {
+  weddingId: string;
+  sectionKey: SectionKey;
+  audience: Audience;
+}) {
   const { t } = useTranslation('site');
   const navigate = useNavigate();
   const site = useSiteControllerGetV1(weddingId);
@@ -70,7 +79,7 @@ function SiteEditor({ weddingId, sectionKey }: { weddingId: string; sectionKey: 
   const subtitle = [
     data.slug && t('address', { slug: data.slug }),
     status && t(`status.${status}`),
-    savedAtText({ t, at: data.siteUpdatedAt }),
+    savedAtText({ t, at: data.siteUpdatedAt, timezone: data.timezone }),
   ]
     .filter(Boolean)
     .join(' · ');
@@ -159,6 +168,9 @@ function SiteEditor({ weddingId, sectionKey }: { weddingId: string; sectionKey: 
               <h2 id="kore-site-section-title" className="kore-site-editor__panel-title">
                 {t(`sections.names.${sectionKey}`)}
               </h2>
+              {sectionKey === 'basics' && (
+                <BasicsSection weddingId={weddingId} site={data} audience={audience} />
+              )}
             </section>
           </SectionFormProvider>
         </div>

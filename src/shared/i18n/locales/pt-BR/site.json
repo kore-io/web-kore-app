@@ -50,5 +50,60 @@
     "countdown_other": "Faltam {{count}} dias",
     "today": "É hoje"
   },
-  "loading": "Carregando o site"
+  "loading": "Carregando o site",
+  "basics": {
+    "bride": "Noiva",
+    "groom": "Noivo",
+    "name": "Nome",
+    "eventDate": "Data do casamento",
+    "eventDateHelp": {
+      "couple": "Opcional. Se ainda não tiverem a data, deixem em branco.",
+      "planner": "Opcional. Se o casal ainda não tiver a data, deixe em branco."
+    },
+    "identityLocked": "Só o casal pode mudar a data, a UF e o endereço.",
+    "city": "Cidade",
+    "state": "UF",
+    "timezone": "Fuso horário",
+    "timezoneHelp": "Vem da UF. Os horários do site usam este fuso.",
+    "timezones": {
+      "brasilia": "Horário de Brasília",
+      "minus1": "1 hora a menos que Brasília",
+      "minus2": "2 horas a menos que Brasília"
+    },
+    "slug": "Endereço do site",
+    "slugDraftHelp": "O endereço só muda enquanto o site está em rascunho.",
+    "slugPublishedHelp": "O site já foi publicado, então o endereço não muda mais.",
+    "slugTaken": "Este endereço já está em uso. Que tal {{suggestion}}?",
+    "slugReserved": "Este endereço é reservado pelo Kore. Que tal {{suggestion}}?",
+    "useSuggestion": "Usar {{suggestion}}",
+    "whatsapp": "WhatsApp do casal (opcional)",
+    "email": "E-mail do casal (opcional)",
+    "contactHelp": "O contato aparece no rodapé do site, só para quem entra pelo link do convite.",
+    "errors": {
+      "nameMissing": {
+        "couple": "Informem o nome.",
+        "planner": "Informe o nome."
+      },
+      "cityMissing": {
+        "couple": "Informem a cidade.",
+        "planner": "Informe a cidade."
+      },
+      "stateMissing": {
+        "couple": "Escolham a UF.",
+        "planner": "Escolha a UF."
+      },
+      "emailInvalid": {
+        "couple": "Informem um e-mail válido.",
+        "planner": "Informe um e-mail válido."
+      },
+      "slugMissing": {
+        "couple": "Informem o endereço do site.",
+        "planner": "Informe o endereço do site."
+      },
+      "slugFormat": {
+        "couple": "Usem só letras minúsculas, números e hífen.",
+        "planner": "Use só letras minúsculas, números e hífen."
+      }
+    }
+  }
 }
