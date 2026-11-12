@@ -351,4 +351,64 @@ test.describe('Site › Editor (decisão 214)', () => {
       ((await refused.json()) as { errors: { path: string }[] }).errors.map((error) => error.path),
     ).toEqual(['content.text']);
   });
+  test('Cerimônia & Recepção: dois locais na ordem, reabertos, e o servidor recusa o 5º (S3 RN07, RN12)', async ({
+    page,
+  }) => {
+    const email = `e2e-site-${unique()}@exemplo.kore.local`;
+    const userId = await createUser({ db, email, name: 'Ana Beatriz Moreira' });
+    const weddingId = await createWedding({
+      db,
+      partners: ['Ana Beatriz Moreira', 'Marcos Vinícius Rocha'],
+      eventDate: '2027-05-15',
+      city: 'Campinas',
+      status: 'draft',
+      createdByUserId: userId,
+      owners: [userId, null],
+    });
+    await signIn({ page, email });
+    await page.goto('/app/site/cerimonia-e-recepcao');
+    await expect(page.getByText(/ainda não tem conteúdo/)).toBeVisible();
+    const add = page.getByRole('button', { name: 'Adicionar local' });
+    await add.click();
+    await add.click();
+    const places = page.getByRole('textbox', { name: 'Nome do lugar' });
+    const addresses = page.getByRole('textbox', { name: 'Endereço' });
+    await places.first().fill('Capela Nossa Senhora das Graças');
+    await addresses.first().fill('Rua Barão de Jaguara, 1200, Centro, Campinas, SP');
+    await page.getByLabel('Hora').first().fill('16:30');
+    await places.nth(1).fill('Espaço Villa Toscana');
+    await addresses.nth(1).fill('Estrada da Rhodia, 3500, Barão Geraldo, Campinas, SP');
+    await page.getByLabel('Hora').nth(1).fill('18:30');
+    await page.getByRole('button', { name: 'Subir Recepção' }).click();
+    await page.getByRole('button', { name: 'Salvar' }).click();
+    await expect(toast({ page, text: 'Alterações salvas.' })).toBeVisible();
+
+    await page.reload();
+    await expect(page.getByRole('textbox', { name: 'Título', exact: true }).first()).toHaveValue(
+      'Recepção',
+    );
+    await expect(page.getByRole('textbox', { name: 'Título', exact: true }).nth(1)).toHaveValue(
+      'Cerimônia',
+    );
+    await expect(page.getByLabel('Data').first()).toHaveValue('2027-05-15');
+    await expect(page.getByLabel('Hora').nth(1)).toHaveValue('16:30');
+    await expect(page.getByText(/ainda não tem conteúdo/)).toHaveCount(0);
+
+    const venue = { title: 'Local', placeName: 'Lugar', date: null, time: null, address: 'Rua 1' };
+    const refused = await page.request.put(
+      `${API_URL}/v1/weddings/${weddingId}/site/sections/ceremony`,
+      {
+        headers: { origin: APP_ORIGIN },
+        data: {
+          title: 'Cerimônia & Recepção',
+          enabled: true,
+          content: { venues: Array.from({ length: 5 }, () => venue) },
+        },
+      },
+    );
+    expect(refused.status()).toBe(400);
+    expect(
+      ((await refused.json()) as { errors: { path: string }[] }).errors.map((error) => error.path),
+    ).toEqual(['content.venues']);
+  });
 });
