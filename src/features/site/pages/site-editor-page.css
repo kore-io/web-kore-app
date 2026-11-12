@@ -1,0 +1,108 @@
+/*
+ * Site › Editor (Penpot, Área do Casal, página 09). Computador: a lista de seções (240 px),
+ * o formulário e a prévia (340 px), 16 px entre eles. Abaixo de 1024 px: as abas Seções ·
+ * Editar · Prévia, e na aba Editar o Select "Seção: …" em cima do formulário.
+ * A lista: cartão branco, borda gray.300, raio lg, 8 px de respiro; o título em
+ * type.overline gray.700; cada item em type.body.md ink com o estado em type.caption
+ * gray.700 à direita; o atual em primary.tint, raio md.
+ * A prévia usa a escala de tipos do DS com as famílias do site (estilo inline).
+ */
+.kore-site-editor {
+  @apply flex flex-col gap-6;
+}
+
+.kore-site-editor__loading {
+  @apply flex justify-center py-10;
+}
+
+.kore-site-editor__tabs {
+  @apply lg:hidden;
+}
+
+.kore-site-editor__body {
+  @apply flex flex-col gap-4 lg:flex-row lg:items-start;
+}
+
+.kore-site-editor__list-column {
+  @apply lg:w-60 lg:shrink-0;
+}
+
+.kore-site-editor__preview-column {
+  @apply lg:w-85 lg:shrink-0;
+}
+
+.kore-site-editor__body:not([data-tab='sections']) .kore-site-editor__list-column,
+.kore-site-editor__body:not([data-tab='edit']) .kore-site-editor__form-column,
+.kore-site-editor__body:not([data-tab='preview']) .kore-site-editor__preview-column {
+  @apply hidden lg:block;
+}
+
+.kore-site-editor__list {
+  @apply flex flex-col gap-2 rounded-lg border border-gray-300 bg-white p-2;
+}
+
+.kore-site-editor__list-title {
+  @apply type-overline px-2 pt-3 pb-1 text-gray-700;
+}
+
+.kore-site-editor__item {
+  @apply flex min-h-11 items-center justify-between gap-3 rounded-md px-3 py-2 type-body-md text-ink;
+  @apply hover:bg-gray-100;
+  @apply focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}
+
+.kore-site-editor__item[aria-current='page'] {
+  @apply bg-primary-tint text-primary-dark;
+}
+
+.kore-site-editor__state {
+  @apply type-caption shrink-0 text-gray-700;
+}
+
+.kore-site-editor__form-column {
+  @apply flex min-w-0 flex-col gap-4 lg:flex-1;
+}
+
+.kore-site-editor__select {
+  @apply lg:hidden;
+}
+
+.kore-site-editor__panel {
+  @apply flex flex-col gap-5 rounded-lg border border-gray-300 bg-white p-5;
+}
+
+.kore-site-editor__panel-title {
+  @apply type-overline text-gray-700;
+}
+
+.kore-editor-preview {
+  @apply m-0 flex flex-col items-center gap-3;
+}
+
+.kore-editor-preview__card {
+  @apply flex w-full flex-col items-center gap-2 rounded-lg border px-6 py-8 text-center;
+}
+
+.kore-editor-preview__overline {
+  @apply type-overline;
+}
+
+.kore-editor-preview__names {
+  @apply type-display-md;
+}
+
+.kore-editor-preview__date {
+  @apply type-body-md;
+}
+
+.kore-editor-preview__countdown {
+  @apply type-caption;
+}
+
+.kore-editor-preview__sections {
+  @apply mt-4 flex flex-col gap-1 type-body-md;
+}
+
+.kore-editor-preview__caption {
+  @apply type-caption text-gray-700;
+}

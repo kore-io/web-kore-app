@@ -1,0 +1,54 @@
+{
+  "title": "Site",
+  "address": "kore.com.br/{{slug}}",
+  "savedAt": "salvo às {{time}}",
+  "status": {
+    "awaiting_couple": "Aguardando o casal",
+    "draft": "Rascunho",
+    "published": "Publicado",
+    "post_event": "Pós-evento",
+    "expired": "Expirado"
+  },
+  "save": "Salvar",
+  "saved": "Alterações salvas.",
+  "sections": {
+    "title": "Seções",
+    "select": "Seção",
+    "option": "Seção: {{name}}",
+    "names": {
+      "basics": "Dados básicos",
+      "appearance": "Aparência",
+      "story": "Nossa história",
+      "countdown": "Contagem regressiva",
+      "ceremony": "Cerimônia & Recepção",
+      "lodging": "Hospedagem e transporte",
+      "dress_code": "Dress code",
+      "faq": "FAQ"
+    },
+    "state": {
+      "on": "ligada",
+      "off": "desligada",
+      "empty": "vazia"
+    }
+  },
+  "tabs": {
+    "label": "Editor do site",
+    "sections": "Seções",
+    "edit": "Editar",
+    "preview": "Prévia"
+  },
+  "discard": {
+    "title": "Descartar as alterações?",
+    "description": "O que mudou em {{section}} ainda não foi salvo.",
+    "keep": "Continuar editando",
+    "confirm": "Descartar alterações"
+  },
+  "preview": {
+    "title": "Prévia do site",
+    "caption": "Visão de visitante",
+    "countdown_one": "Falta {{count}} dia",
+    "countdown_other": "Faltam {{count}} dias",
+    "today": "É hoje"
+  },
+  "loading": "Carregando o site"
+}

@@ -1,5 +1,5 @@
 import { NavItem } from '@kore-io/design';
-import { LayoutDashboard, Users } from 'lucide-react';
+import { Globe, LayoutDashboard, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, Outlet, useMatch } from 'react-router';
 import { useCoupleSession } from '../../features/access/hooks/use-couple-session';
@@ -20,6 +20,7 @@ export function CoupleAreaLayout() {
   const { me, failed, retry } = useCoupleSession();
   const signOut = useSignOut();
   const onGuests = useMatch({ path: paths.guests, end: false }) !== null;
+  const onSite = useMatch({ path: paths.site, end: false }) !== null;
 
   // Sem os dados da pessoa, sem o AppShell: o aviso no meio da tela (decisão 164).
   if (failed) return <LoadError onRetry={retry} />;
@@ -37,11 +38,14 @@ export function CoupleAreaLayout() {
       userMenuGroups={[[{ id: 'sign-out', label: t('signOut'), onSelect: signOut }]]}
       navigation={
         <>
-          <NavItem asChild icon={<LayoutDashboard />} current={!onGuests}>
+          <NavItem asChild icon={<LayoutDashboard />} current={!onGuests && !onSite}>
             <Link to={paths.coupleArea}>{t('nav.dashboard')}</Link>
           </NavItem>
           <NavItem asChild icon={<Users />} current={onGuests}>
             <Link to={paths.guests}>{t('nav.guests')}</Link>
+          </NavItem>
+          <NavItem asChild icon={<Globe />} current={onSite}>
+            <Link to={paths.site}>{t('nav.site')}</Link>
           </NavItem>
         </>
       }
