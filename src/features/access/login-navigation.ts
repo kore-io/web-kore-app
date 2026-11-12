@@ -45,6 +45,11 @@ export function destinationAfterLogin({
   next: VerifyLoginChallengeResponseNext;
   returnPath?: string | undefined;
 }): LoginDestination {
+  // Voltar ao cadastro (o Entrar do Simule, Cadastro RN12) vale sobre a Seleção de perfil:
+  // quem só colabora em outros casamentos segue para os Dados do casamento.
+  if (returnPath === paths.signUp && next !== 'invite' && next !== 'planner_signup') {
+    return { kind: 'route', path: paths.signUp };
+  }
   switch (next) {
     case 'home':
       return { kind: 'route', path: returnPath ?? paths.coupleArea };

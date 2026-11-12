@@ -191,18 +191,9 @@ test.describe('Login sem senha (Login sem senha e sessão)', () => {
     await page.goto('/perfis');
     await expect(page).toHaveURL(/\/app$/);
 
-    // RN06: dono de um casamento ativo não cria outro.
+    // RN06: dono de um casamento ativo não vê o cadastro: o aviso vem direto, sem o formulário.
     await page.goto('/cadastro');
-    await page.getByRole('textbox', { name: 'Seu nome' }).fill(`Ana${unique} Moreira`);
-    await page
-      .locator('label')
-      .filter({ hasText: /^Noivo$/ })
-      .click();
-    await page.getByRole('textbox', { name: 'Com quem você vai casar?' }).fill('Paula');
-    await page.getByRole('textbox', { name: 'Cidade' }).fill('Campinas');
-    await page.getByRole('combobox', { name: 'UF' }).selectOption('SP');
-    await expect(page.getByRole('button', { name: 'Criar nosso site' })).toBeEnabled();
-    await page.getByRole('button', { name: 'Criar nosso site' }).click();
+    await expect(page.getByRole('textbox', { name: 'Seu nome' })).toHaveCount(0);
     await expect(page.getByText('Você já tem um casamento no Kore.')).toBeVisible();
   });
 });

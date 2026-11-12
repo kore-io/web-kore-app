@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router';
 import { saveReferralCode } from '../referral-storage';
+import { captureSimulatorDraft } from '../simulator-draft';
 import { originFromUrl, saveSignupOrigin, SIGNUP_ORIGIN_PARAMS } from '../signup-origin-storage';
 
 const ARRIVAL_PARAMS = ['indicacao', ...SIGNUP_ORIGIN_PARAMS];
@@ -8,10 +9,16 @@ const ARRIVAL_PARAMS = ['indicacao', ...SIGNUP_ORIGIN_PARAMS];
 /**
  * Guarda o que a chegada traz na URL, em qualquer rota, e tira esses parâmetros dela: o
  * ?indicacao={código} (decisão 165(1); o site leva kore.com.br/i/{código} até o app) e a
- * origem do cadastro, as UTM e o ?origem=site (decisão 169(2)).
+ * origem do cadastro, as UTM e o ?origem=site (decisão 169(2)). E o rascunho do Simule,
+ * que chega no fragmento #simule= (Simule RN08).
  */
 export function useCaptureArrival() {
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // O rascunho do Simule no fragmento (Simule RN08): sai da URL na primeira renderização.
+  useEffect(() => {
+    captureSimulatorDraft();
+  }, []);
   const hasArrivalParams = ARRIVAL_PARAMS.some((name) => searchParams.has(name));
 
   useEffect(() => {

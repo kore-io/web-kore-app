@@ -95,7 +95,7 @@ describe('Simule (Simule RN01 a RN12; decisão 226)', () => {
     await user.click(screen.getByRole('radio', { name: 'Noite' }));
     const card = container.querySelector('.kore-simule-preview__card') as HTMLElement;
     await waitFor(() => expect(card.style.getPropertyValue('--site-primary')).toBe('#E7D3B0'));
-    expect(card).toHaveAttribute('data-site-background', 'dark');
+    expect(card).toHaveAttribute('data-site-background', 'escuro');
     await user.click(screen.getByRole('button', { name: 'Outra cor' }));
     const sheet = screen.getByRole('dialog', { name: 'Escolham a cor' });
     const hex = within(sheet).getByRole('textbox', { name: 'Cor' });

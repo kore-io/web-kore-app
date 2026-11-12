@@ -7,7 +7,9 @@ import type { PublicSiteResponse } from '../shared/api/generated/model';
 import { companyLine } from './links';
 import { parseSiteRoute } from './route';
 import { SiteApp } from './site-app';
-import { applySiteTheme } from './theme';
+import { siteBackgrounds } from '@kore-io/design';
+import { BACKGROUND_MODES } from '../features/site/appearance';
+import { applySiteTheme, SITE_BACKGROUND_NAMES } from './theme';
 
 vi.mock('./fonts', () => ({ loadSiteFonts: vi.fn(async () => undefined) }));
 
@@ -204,7 +206,7 @@ describe('Site do casal › layout (Site público RN10, RN11)', () => {
     await screen.findByRole('navigation', { name: 'Menu principal' });
     const root = document.documentElement;
     expect(root).toHaveAttribute('data-site-fonts', 'classico');
-    expect(root).toHaveAttribute('data-site-background', 'light');
+    expect(root).toHaveAttribute('data-site-background', 'claro');
     expect(root.style.getPropertyValue('--site-primary')).toBe('#2F4B6E');
     expect(root.style.getPropertyValue('--site-primary-foreground')).toBe('#FFFFFF');
     expect(root.style.getPropertyValue('--site-accent')).toBe('#C9A66B');
@@ -519,6 +521,14 @@ describe('Site do casal › peças', () => {
       }),
     ).toBe('Kore Tecnologia Ltda. · CNPJ 00.000.000/0001-00 · Av. Paulista, 1000');
     expect(companyLine({})).toBeNull();
+  });
+
+  it('cada fundo da API tem o tema da lib com o mesmo fundo (o atributo que o tokens.css lê)', () => {
+    for (const mode of BACKGROUND_MODES) {
+      const name = SITE_BACKGROUND_NAMES[mode];
+      expect(name && Object.keys(siteBackgrounds)).toContain(name);
+    }
+    expect(SITE_BACKGROUND_NAMES).toEqual({ light: 'claro', cream: 'creme', dark: 'escuro' });
   });
 
   it('applySiteTheme num elemento qualquer', () => {

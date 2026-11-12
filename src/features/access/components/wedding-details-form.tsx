@@ -36,6 +36,10 @@ export interface WeddingDetailsFormProps {
   onSlugChange?: (change: { slug: string }) => void;
   onSubmit: (values: WeddingDetailsValues) => void;
   submitting?: boolean;
+  /** Os dados vieram do Simule (Cadastro RN12): a ajuda no "Seu nome". */
+  fromSimulator?: boolean;
+  /** A Aparência do simulador, mostrada para conferir, antes do Criar nosso site. */
+  simulatorAppearance?: ReactNode;
 }
 
 function read({ form }: { form: HTMLFormElement }): WeddingDetailsValues {
@@ -73,6 +77,8 @@ export function WeddingDetailsForm({
   onSlugChange,
   onSubmit,
   submitting = false,
+  fromSimulator = false,
+  simulatorAppearance,
 }: WeddingDetailsFormProps) {
   const { t } = useTranslation('access');
   const myTitleErrorId = useId();
@@ -126,7 +132,12 @@ export function WeddingDetailsForm({
         onChange={(event) => onValuesChange?.(read({ form: event.currentTarget }))}
         noValidate
       >
-        <FormField label={t('weddingDetails.myName')} {...error('myName')}>
+        <FormField
+          label={t('weddingDetails.myName')}
+          {...(errors.myName === undefined && fromSimulator
+            ? { hint: t('weddingDetails.myNameFromSimulator'), hintTone: 'neutral' as const }
+            : error('myName'))}
+        >
           {({ id, describedBy, invalid }) => (
             <Input
               id={id}
@@ -234,6 +245,7 @@ export function WeddingDetailsForm({
             />
           )}
         </FormField>
+        {simulatorAppearance}
         {/* Só com um endereço livre (RN05; Penpot e decisão 161 no Endereço em uso). */}
         <Button
           type="submit"

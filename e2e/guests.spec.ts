@@ -393,6 +393,9 @@ test.describe('Convidados › Grupos e convidados (RN13)', () => {
   test('Importar planilha: o modelo do app, a prévia com erro e repetida, e a importação (Importação RN02 a RN09)', async ({
     page,
   }) => {
+    // Gera e lê duas planilhas de verdade: passou dos 30 s uma vez na suíte inteira (Crivo,
+    // no B5a); o slow dá o triplo do tempo.
+    test.slow();
     await weddingWithParties({ db, page });
     await page.goto('/app/convidados/importar');
 
