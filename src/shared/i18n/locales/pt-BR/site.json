@@ -104,7 +104,9 @@
       "slugFormat": {
         "couple": "Usem só letras minúsculas, números e hífen.",
         "planner": "Use só letras minúsculas, números e hífen."
-      }
+      },
+      "eventDateRequiredWhenPublished": "O site já foi publicado, então a data do casamento não pode ficar em branco.",
+      "eventDateAfterEndDate": "A data do casamento precisa ser antes de {{limit}}, quando o site sai do ar."
     },
     "cover": "Foto de capa",
     "coverHelp": "A foto de capa aparece no topo do site e junto do link quando ele é compartilhado no WhatsApp e nas redes. Quem tiver o endereço vê esta foto."
@@ -291,6 +293,27 @@
     "noSlug": {
       "couple": "Escolham o endereço do site em Dados básicos para ver a prévia.",
       "planner": "Escolha o endereço do site em Dados básicos para ver a prévia."
+    }
+  },
+  "publication": {
+    "title": "Publicar o site",
+    "description": "O site vai ao ar agora, sem pagamento. A partir daí, cada grupo abre o próprio link e confirma a presença.",
+    "chooseEndDate": "Escolham até quando o site fica no ar.",
+    "endDate": "Data de saída do ar",
+    "endDateHelp": "Depois do casamento e até {{max}}.",
+    "endDateOutOfRange": "Escolham uma data depois do casamento e até {{max}}.",
+    "slugLocked": "Depois de publicar, o endereço kore.com.br/{{slug}} não muda mais.",
+    "publish": "Publicar",
+    "cancel": "Cancelar",
+    "published": "Site publicado.",
+    "alreadyPublished": "O site já está publicado.",
+    "blocked": {
+      "notOwner": "Só o casal pode publicar e pagar.",
+      "awaitingCouple": "O casal ainda não aceitou o convite.",
+      "courtesyDisabled": "A publicação ainda não está disponível. Se precisar publicar agora, escreva para suporte@kore.com.br.",
+      "slugMissing": "Escolham o endereço do site em Dados básicos para publicar.",
+      "eventDateMissing": "Informem a data do casamento em Dados básicos para publicar.",
+      "timezoneMissing": "Informem a data e a UF do casamento em Dados básicos para publicar."
     }
   }
 }

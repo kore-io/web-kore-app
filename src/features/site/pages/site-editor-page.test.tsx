@@ -74,6 +74,7 @@ function site(overrides: Partial<SiteEditorResponse> = {}): SiteEditorResponse {
     ],
     editable: { names: true, eventDate: true, state: true, slug: false },
     status: 'published',
+    publication: { courtesyEnabled: true, endDateMin: '2027-01-01', endDateMax: '2027-12-31' },
     ...overrides,
   } as SiteEditorResponse;
 }
@@ -124,6 +125,29 @@ describe('Site › Editor (Dados básicos RN01, RN10, RN11; decisão 214)', () =
       'page',
     );
     expect(screen.getByRole('heading', { name: 'Dados básicos', level: 2 })).toBeInTheDocument();
+  });
+
+  it('publicado: o cabeçalho sem o Publicar (228(5))', async () => {
+    mockSite();
+    renderRoute({ url: '/app/site/dados-basicos' });
+    await screen.findByRole('heading', { name: 'Site', level: 1 });
+    expect(screen.queryByRole('button', { name: 'Publicar' })).not.toBeInTheDocument();
+  });
+
+  it('rascunho: o Publicar secundário entre Pré-visualizar e Salvar abre a tela de publicar (Publicação RN07; 228(5))', async () => {
+    const user = userEvent.setup();
+    mockSite(() => Response.json(site({ status: 'draft', publishedAt: null })));
+    const { router } = renderRoute({ url: '/app/site/dados-basicos' });
+    await screen.findByRole('heading', { name: 'Site', level: 1 });
+    const header = screen.getByRole('button', { name: 'Salvar' }).parentElement as HTMLElement;
+    expect(
+      within(header)
+        .getAllByRole('button')
+        .map((button) => button.textContent),
+    ).toEqual(['Pré-visualizar', 'Publicar', 'Salvar']);
+    await user.click(within(header).getByRole('button', { name: 'Publicar' }));
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app/cobranca/publicar'));
+    expect(await screen.findByRole('heading', { name: 'Publicar o site' })).toBeInTheDocument();
   });
 
   it('rascunho sem endereço: só o status; sem gravação, sem o "salvo às"', async () => {

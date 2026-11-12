@@ -7,6 +7,7 @@ export * from './me/me';
 export * from './memberships/memberships';
 export * from './notifications/notifications';
 export * from './parties/parties';
+export * from './planner/planner';
 export * from './product-events/product-events';
 export * from './referrals/referrals';
 export * from './rsvp/rsvp';

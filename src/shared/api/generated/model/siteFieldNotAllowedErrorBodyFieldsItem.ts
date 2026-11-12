@@ -12,4 +12,5 @@ export const SiteFieldNotAllowedErrorBodyFieldsItem = {
   eventDate: 'eventDate',
   state: 'state',
   slug: 'slug',
+  showPlannerCredit: 'showPlannerCredit',
 } as const;

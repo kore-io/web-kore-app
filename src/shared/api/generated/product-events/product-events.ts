@@ -15,6 +15,7 @@ import type {
 import type {
   OriginNotAllowedErrorBody,
   RateLimitedErrorBody,
+  SimulatorDisabledErrorBody,
   SimulatorEventBody,
   ValidationErrorBody,
 } from '../model';
@@ -63,7 +64,12 @@ export const getSimulatorEventsControllerRecordV1MutationKey = () =>
   ['simulatorEventsControllerRecordV1'] as const;
 
 export const getSimulatorEventsControllerRecordV1MutationOptions = <
-  TError = ErrorType<ValidationErrorBody | OriginNotAllowedErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | OriginNotAllowedErrorBody
+    | SimulatorDisabledErrorBody
+    | RateLimitedErrorBody
+  >,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -103,12 +109,20 @@ export type SimulatorEventsControllerRecordV1MutationResult = NonNullable<
 >;
 export type SimulatorEventsControllerRecordV1MutationBody = SimulatorEventBody;
 export type SimulatorEventsControllerRecordV1MutationError = ErrorType<
-  ValidationErrorBody | OriginNotAllowedErrorBody | RateLimitedErrorBody
+  | ValidationErrorBody
+  | OriginNotAllowedErrorBody
+  | SimulatorDisabledErrorBody
+  | RateLimitedErrorBody
 >;
 export type SimulatorEventsControllerRecordV1MutationVariables = { data: SimulatorEventBody };
 
 export const useSimulatorEventsControllerRecordV1 = <
-  TError = ErrorType<ValidationErrorBody | OriginNotAllowedErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | OriginNotAllowedErrorBody
+    | SimulatorDisabledErrorBody
+    | RateLimitedErrorBody
+  >,
   TContext = unknown,
 >(
   options?: {

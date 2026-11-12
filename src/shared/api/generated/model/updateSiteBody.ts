@@ -42,4 +42,9 @@ export interface UpdateSiteBody {
    * @nullable
    */
   coverImageId?: string | null;
+  /**
+   * Mostrar a assinatura da assessoria no rodapé (Assinatura RN05). Aceito
+   * mesmo sem colaboradora; só o dono muda (o valor igual ao atual não é erro).
+   */
+  showPlannerCredit?: boolean;
 }

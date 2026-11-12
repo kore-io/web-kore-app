@@ -7,6 +7,7 @@
 import type { PublicAppearanceResponse } from './publicAppearanceResponse';
 import type { PublicContactResponse } from './publicContactResponse';
 import type { PublicCoverResponse } from './publicCoverResponse';
+import type { PublicPlannerCreditResponse } from './publicPlannerCreditResponse';
 import type { PublicSectionResponse } from './publicSectionResponse';
 import type { PublicViewerResponse } from './publicViewerResponse';
 
@@ -24,6 +25,11 @@ export interface PublicSiteResponse {
   contact: PublicContactResponse | null;
   /** Só as ligadas e com conteúdo, na ordem fixa. */
   sections: PublicSectionResponse[];
+  /**
+   * "Assessoria: {name}" no rodapé, sem link (Assinatura RN01 a RN03); nulo sem assinatura.
+   * @nullable
+   */
+  plannerCredit: PublicPlannerCreditResponse | null;
   slug: string;
   /** Os primeiros nomes ("Ana & Marcos"); completos se forem iguais (RN05). */
   names: string;
