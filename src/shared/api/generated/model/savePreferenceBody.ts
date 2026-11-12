@@ -8,7 +8,8 @@ import type { SavePreferenceBodyEmail } from './savePreferenceBodyEmail';
 import type { SavePreferenceBodyType } from './savePreferenceBodyType';
 
 export interface SavePreferenceBody {
+  /** Sem `weddingId`, a preferência geral da cerimonialista (RN06). */
+  weddingId?: string;
   type: SavePreferenceBodyType;
   email: SavePreferenceBodyEmail;
-  weddingId: string;
 }

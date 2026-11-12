@@ -9,12 +9,19 @@ import type { NotificationResponseType } from './notificationResponseType';
 
 export interface NotificationResponse {
   type: NotificationResponseType;
-  /** Por grupo, sem restrição, música nem nome de convidado (Central RN04). */
+  /** Os primeiros nomes do casal; o app junta. */
+  partnerNames: string[];
+  /**
+   * rsvp: por grupo, sem restrição, música nem nome de convidado (Central RN04).
+   * wedding_published e membership_removed: [{ partnerNames }] (revisão C8-3).
+   */
   payload: NotificationEntryResponse[];
   /** @nullable */
   readAt: string | null;
   updatedAt: string;
   id: string;
+  /** A central da cerimonialista junta vários casamentos (revisão C8-5). */
+  weddingId: string;
   /** Grupos distintos (1: "Família Moreira respondeu o convite"; mais: "{n} grupos responderam"). */
   count: number;
 }

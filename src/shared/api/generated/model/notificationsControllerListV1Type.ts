@@ -10,4 +10,6 @@ export type NotificationsControllerListV1Type =
 
 export const NotificationsControllerListV1Type = {
   rsvp: 'rsvp',
+  wedding_published: 'wedding_published',
+  membership_removed: 'membership_removed',
 } as const;

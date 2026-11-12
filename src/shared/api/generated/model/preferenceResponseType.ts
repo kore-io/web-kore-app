@@ -10,4 +10,6 @@ export type PreferenceResponseType =
 
 export const PreferenceResponseType = {
   rsvp: 'rsvp',
+  wedding_published: 'wedding_published',
+  membership_removed: 'membership_removed',
 } as const;

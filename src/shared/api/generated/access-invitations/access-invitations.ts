@@ -38,6 +38,7 @@ import type {
   PlannerAlreadyErrorBody,
   PlannerProfileExistsErrorBody,
   RateLimitedErrorBody,
+  SelfInvitationErrorBody,
   SelfReferralErrorBody,
   SellerCannotBePlannerErrorBody,
   SendAccessInvitationsBody,
@@ -122,6 +123,7 @@ export const getAccessInvitationsControllerSendV1MutationOptions = <
     | OwnersFullErrorBody
     | PlannerAlreadyErrorBody
     | CoupleInvitationsFullErrorBody
+    | SelfInvitationErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -171,6 +173,7 @@ export type AccessInvitationsControllerSendV1MutationError = ErrorType<
   | OwnersFullErrorBody
   | PlannerAlreadyErrorBody
   | CoupleInvitationsFullErrorBody
+  | SelfInvitationErrorBody
   | RateLimitedErrorBody
 >;
 export type AccessInvitationsControllerSendV1MutationVariables = {
@@ -191,6 +194,7 @@ export const useAccessInvitationsControllerSendV1 = <
     | OwnersFullErrorBody
     | PlannerAlreadyErrorBody
     | CoupleInvitationsFullErrorBody
+    | SelfInvitationErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -352,7 +356,7 @@ export const getInvitationAcceptanceControllerReadV1QueryKey = (token: string) =
 
 export const getInvitationAcceptanceControllerReadV1QueryOptions = <
   TData = Awaited<ReturnType<typeof invitationAcceptanceControllerReadV1>>,
-  TError = ErrorType<InvitationInvalidErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<SelfReferralErrorBody | InvitationInvalidErrorBody | RateLimitedErrorBody>,
 >(
   token: string,
   options?: {
@@ -390,12 +394,12 @@ export type InvitationAcceptanceControllerReadV1QueryResult = NonNullable<
   Awaited<ReturnType<typeof invitationAcceptanceControllerReadV1>>
 >;
 export type InvitationAcceptanceControllerReadV1QueryError = ErrorType<
-  InvitationInvalidErrorBody | RateLimitedErrorBody
+  SelfReferralErrorBody | InvitationInvalidErrorBody | RateLimitedErrorBody
 >;
 
 export function useInvitationAcceptanceControllerReadV1<
   TData = Awaited<ReturnType<typeof invitationAcceptanceControllerReadV1>>,
-  TError = ErrorType<InvitationInvalidErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<SelfReferralErrorBody | InvitationInvalidErrorBody | RateLimitedErrorBody>,
 >(
   token: string,
   options: {
@@ -420,7 +424,7 @@ export function useInvitationAcceptanceControllerReadV1<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useInvitationAcceptanceControllerReadV1<
   TData = Awaited<ReturnType<typeof invitationAcceptanceControllerReadV1>>,
-  TError = ErrorType<InvitationInvalidErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<SelfReferralErrorBody | InvitationInvalidErrorBody | RateLimitedErrorBody>,
 >(
   token: string,
   options?: {
@@ -445,7 +449,7 @@ export function useInvitationAcceptanceControllerReadV1<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useInvitationAcceptanceControllerReadV1<
   TData = Awaited<ReturnType<typeof invitationAcceptanceControllerReadV1>>,
-  TError = ErrorType<InvitationInvalidErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<SelfReferralErrorBody | InvitationInvalidErrorBody | RateLimitedErrorBody>,
 >(
   token: string,
   options?: {
@@ -466,7 +470,7 @@ export function useInvitationAcceptanceControllerReadV1<
 
 export function useInvitationAcceptanceControllerReadV1<
   TData = Awaited<ReturnType<typeof invitationAcceptanceControllerReadV1>>,
-  TError = ErrorType<InvitationInvalidErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<SelfReferralErrorBody | InvitationInvalidErrorBody | RateLimitedErrorBody>,
 >(
   token: string,
   options?: {

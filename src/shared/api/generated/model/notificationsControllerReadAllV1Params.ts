@@ -4,8 +4,9 @@
  * Kore API
  * OpenAPI spec version: 1
  */
+import type { NotificationsControllerReadAllV1Scope } from './notificationsControllerReadAllV1Scope';
 
 export type NotificationsControllerReadAllV1Params = {
-  /** O casamento ativo. */
-  weddingId: string;
+  weddingId?: string;
+  scope?: NotificationsControllerReadAllV1Scope;
 };
