@@ -148,4 +148,64 @@ test.describe('Site › Editor (decisão 214)', () => {
       page.getByText('O telefone tem 8 números. Usem DDD + número, ex.: (19) 99999-9999.'),
     ).toBeVisible();
   });
+  test('foto de capa: o envio direto ao armazenamento, a miniatura do CDN, salvar e reabrir (Imagens RN02 a RN05; Dados básicos RN09)', async ({
+    page,
+  }) => {
+    const email = `e2e-site-${unique()}@exemplo.kore.local`;
+    const userId = await createUser({ db, email, name: 'Ana Beatriz Moreira' });
+    await createWedding({
+      db,
+      partners: ['Ana Beatriz Moreira', 'Marcos Vinícius Rocha'],
+      eventDate: '2027-05-15',
+      city: 'Campinas',
+      status: 'draft',
+      createdByUserId: userId,
+      owners: [userId, null],
+    });
+    await signIn({ page, email });
+    await page.goto('/app/site/dados-basicos');
+    await expect(page.getByRole('textbox', { name: 'Cidade' })).toBeVisible();
+
+    // Uma foto de verdade, desenhada num canvas do próprio navegador (1600 x 1000).
+    const dataUrl = await page.evaluate(() => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1600;
+      canvas.height = 1000;
+      const context = canvas.getContext('2d');
+      if (!context) return '';
+      const gradient = context.createLinearGradient(0, 0, 1600, 1000);
+      gradient.addColorStop(0, '#A94F37');
+      gradient.addColorStop(1, '#F6E6EB');
+      context.fillStyle = gradient;
+      context.fillRect(0, 0, 1600, 1000);
+      return canvas.toDataURL('image/jpeg', 0.9);
+    });
+    const buffer = Buffer.from(dataUrl.split(',')[1] ?? '', 'base64');
+
+    // Um GIF é recusado no aparelho.
+    await page
+      .getByLabel(/Arrastem uma foto/)
+      .setInputFiles({ name: 'a.gif', mimeType: 'image/gif', buffer: Buffer.from('GIF89a') });
+    await expect(
+      toast({ page, text: 'Não foi possível usar esta foto. Escolham uma foto JPG ou PNG.' }),
+    ).toBeVisible();
+
+    await page
+      .getByLabel(/Arrastem uma foto/)
+      .setInputFiles({ name: 'capa.jpg', mimeType: 'image/jpeg', buffer });
+    const thumb = page.getByRole('img', { name: 'Ana & Marcos' });
+    await expect(thumb).toBeVisible({ timeout: 15_000 });
+    // A miniatura vem do bucket público, já processada (640 px).
+    await expect.poll(() => thumb.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBe(640);
+    await page.getByRole('button', { name: 'Salvar' }).click();
+    await expect(toast({ page, text: 'Alterações salvas.' })).toBeVisible();
+
+    await page.reload();
+    await expect(page.getByRole('img', { name: 'Ana & Marcos' })).toBeVisible();
+    await page.getByRole('button', { name: 'Remover foto' }).click();
+    await page.getByRole('button', { name: 'Salvar' }).click();
+    await expect(toast({ page, text: 'Alterações salvas.' })).toBeVisible();
+    await page.reload();
+    await expect(page.getByLabel(/Arrastem uma foto/)).toBeAttached();
+  });
 });
