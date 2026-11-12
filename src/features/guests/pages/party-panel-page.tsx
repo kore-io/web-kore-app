@@ -18,7 +18,9 @@ import type {
   PartyResponse,
 } from '../../../shared/api/generated/model';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
+import { ChangeResponseDialog } from '../components/change-response-dialog';
 import { MoveGuestDialog } from '../components/move-guest-dialog';
+import { historyAt, historyLine } from '../party-history';
 import { TrashDialog } from '../components/trash-dialog';
 import { useOpenPreview } from '../../site/preview/use-open-preview';
 import { useActiveWedding, type Audience } from '../hooks/use-active-wedding';
@@ -60,6 +62,7 @@ function PartyPanel({
   const [trashingGuest, setTrashingGuest] = useState<{ id: string; name: string } | null>(null);
   const [confirming, setConfirming] = useState(false);
   const [moving, setMoving] = useState<{ id: string; name: string } | null>(null);
+  const [answering, setAnswering] = useState<PartyGuestResponse | null>(null);
   // O ⋮ do convidado que abriu o Mover de grupo: o foco volta a ele (o item do menu some).
   const menuButton = useRef<HTMLElement | null>(null);
 
@@ -91,6 +94,10 @@ function PartyPanel({
         <GroupCard party={party} />
         <GuestsCard
           guests={party.guests}
+          onChangeResponse={({ guest, trigger }) => {
+            menuButton.current = trigger;
+            setAnswering(guest);
+          }}
           onTrash={({ guest, trigger }) => {
             menuButton.current = trigger;
             // O último convidado com nome não sai (Grupos RN08; Lixeira RN04).
@@ -106,6 +113,8 @@ function PartyPanel({
             else setMoving(guest);
           }}
         />
+        {/* Grupo e Convidados em cima, Histórico e Link do grupo embaixo (Penpot A8). */}
+        <HistoryCard party={party} />
         <LinkCard
           party={party}
           audience={audience}
@@ -114,6 +123,15 @@ function PartyPanel({
           onTrash={() => setTrashingParty(true)}
         />
       </div>
+      <ChangeResponseDialog
+        weddingId={weddingId}
+        partyId={party.id}
+        version={party.version}
+        audience={audience}
+        guest={answering}
+        returnFocusRef={menuButton}
+        onClose={() => setAnswering(null)}
+      />
       <MoveGuestDialog
         weddingId={weddingId}
         audience={audience}
@@ -272,12 +290,16 @@ type GuestAction = (args: {
   trigger: HTMLElement | null;
 }) => void;
 
+type ResponseAction = (args: { guest: PartyGuestResponse; trigger: HTMLElement | null }) => void;
+
 function GuestsCard({
   guests,
+  onChangeResponse,
   onMove,
   onTrash,
 }: {
   guests: PartyGuestResponse[];
+  onChangeResponse: ResponseAction;
   onMove: GuestAction;
   onTrash: GuestAction;
 }) {
@@ -286,7 +308,13 @@ function GuestsCard({
     <Card title={t('panel.guests.title')}>
       <ul className="kore-party-panel__guests">
         {guests.map((guest) => (
-          <GuestItem key={guest.id} guest={guest} onMove={onMove} onTrash={onTrash} />
+          <GuestItem
+            key={guest.id}
+            guest={guest}
+            onChangeResponse={onChangeResponse}
+            onMove={onMove}
+            onTrash={onTrash}
+          />
         ))}
       </ul>
     </Card>
@@ -300,10 +328,12 @@ function GuestsCard({
  */
 function GuestItem({
   guest,
+  onChangeResponse,
   onMove,
   onTrash,
 }: {
   guest: PartyGuestResponse;
+  onChangeResponse: ResponseAction;
   onMove: GuestAction;
   onTrash: GuestAction;
 }) {
@@ -327,40 +357,83 @@ function GuestItem({
         <Badge tone={badge.tone} icon={badge.icon}>
           {t(`panel.guests.rsvp.${guest.rsvpStatus}`)}
         </Badge>
-        {name !== null && (
-          <span ref={actions} className="kore-party-panel__guest-actions">
-            <ActionMenu
-              label={t('panel.guests.actions', { name })}
-              groups={[
-                [
-                  {
-                    id: 'move',
-                    label: t('panel.move.action'),
-                    onSelect: () =>
-                      onMove({
-                        guest: { id: guest.id, name },
-                        trigger: actions.current?.querySelector('button') ?? null,
-                      }),
-                  },
-                ],
-                [
-                  {
-                    id: 'trash',
-                    label: t('trash.action'),
-                    destructive: true,
-                    onSelect: () =>
-                      onTrash({
-                        guest: { id: guest.id, name },
-                        trigger: actions.current?.querySelector('button') ?? null,
-                      }),
-                  },
-                ],
-              ]}
-            />
-          </span>
-        )}
+        <span ref={actions} className="kore-party-panel__guest-actions">
+          <ActionMenu
+            label={t('panel.guests.actions', { name: name ?? t('panel.guests.plusOne') })}
+            // Alterar resposta (Prazo RN04), Mover de grupo e Mover para a lixeira; a vaga
+            // de acompanhante só tem o Alterar resposta. O ⋮ lido só no clique.
+            groups={
+              guest.isPlusOne || name === null
+                ? [
+                    [
+                      {
+                        id: 'response',
+                        label: t('panel.response.action'),
+                        onSelect: () =>
+                          onChangeResponse({
+                            guest,
+                            trigger: actions.current?.querySelector('button') ?? null,
+                          }),
+                      },
+                    ],
+                  ]
+                : [
+                    [
+                      {
+                        id: 'response',
+                        label: t('panel.response.action'),
+                        onSelect: () =>
+                          onChangeResponse({
+                            guest,
+                            trigger: actions.current?.querySelector('button') ?? null,
+                          }),
+                      },
+                      {
+                        id: 'move',
+                        label: t('panel.move.action'),
+                        onSelect: () =>
+                          onMove({
+                            guest: { id: guest.id, name },
+                            trigger: actions.current?.querySelector('button') ?? null,
+                          }),
+                      },
+                    ],
+                    [
+                      {
+                        id: 'trash',
+                        label: t('trash.action'),
+                        destructive: true,
+                        onSelect: () =>
+                          onTrash({
+                            guest: { id: guest.id, name },
+                            trigger: actions.current?.querySelector('button') ?? null,
+                          }),
+                      },
+                    ],
+                  ]
+            }
+          />
+        </span>
       </span>
     </li>
+  );
+}
+
+/** O Histórico do grupo (Prazo e respostas RN05): oculto enquanto vazio. */
+function HistoryCard({ party }: { party: PartyResponse }) {
+  const { t } = useTranslation('guests');
+  if (party.history.length === 0) return null;
+  return (
+    <Card title={t('panel.history.title')}>
+      <ul className="kore-party-panel__history">
+        {party.history.map((entry, index) => (
+          <li key={`${entry.at}-${index}`} className="kore-party-panel__history-item">
+            <span>{historyLine({ t, entry, plusOneLabel: t('panel.guests.plusOne') })}</span>
+            <span className="kore-party-panel__history-at">{historyAt({ t, at: entry.at })}</span>
+          </li>
+        ))}
+      </ul>
+    </Card>
   );
 }
 

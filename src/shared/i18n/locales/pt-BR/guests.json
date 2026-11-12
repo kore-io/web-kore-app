@@ -206,6 +206,30 @@
       "changed": "Resposta alterada por {{name}}: {{guest}} {{answer}}",
       "goes": "vai",
       "notGoes": "não vai"
+    },
+    "response": {
+      "action": "Alterar resposta",
+      "title": "Alterar a resposta de {{name}}",
+      "titlePlusOne": "Alterar a resposta do acompanhante",
+      "goes": "Vai",
+      "notGoes": "Não vai",
+      "diet": "Restrição alimentar (opcional)",
+      "dietPlaceholder": "Ex.: dieta vegetariana, sem lactose",
+      "dietHelp": "Conte só o que o buffet precisa saber. Ex.: vegetariano, sem glúten, alergia a amendoim.",
+      "plusOneName": "Nome do acompanhante",
+      "plusOneNameMissing": {
+        "couple": "Informem o nome do acompanhante.",
+        "planner": "Informe o nome do acompanhante."
+      },
+      "willErase": "A restrição alimentar e a música sugerida por {{name}} serão apagadas.",
+      "cancel": "Cancelar",
+      "save": "Salvar resposta",
+      "saved": "Resposta alterada.",
+      "afterDeadline": "Só o casal pode alterar respostas depois do prazo.",
+      "changed": {
+        "couple": "As respostas deste grupo mudaram. O painel agora mostra as respostas atuais: confiram e tentem de novo.",
+        "planner": "As respostas deste grupo mudaram. O painel agora mostra as respostas atuais: confira e tente de novo."
+      }
     }
   },
   "tags": {
