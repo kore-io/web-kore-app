@@ -27,7 +27,7 @@ import {
   type BasicsField,
 } from '../basics-draft';
 import { useSectionForm } from '../section-form';
-import { CoverField } from './cover-field';
+import { ImageField } from './image-field';
 import { timezoneLabelKey } from '../timezones';
 
 /** A mesma pausa do Cadastro antes de conferir o endereço (RN06). */
@@ -315,11 +315,13 @@ export function BasicsSection({
         )}
       </FormField>
 
-      <CoverField
+      <ImageField
         weddingId={weddingId}
         audience={audience}
-        cover={draft.cover}
-        coupleNames={site.partners.map((partner) => partner.name.split(' ')[0]).join(' & ')}
+        label={t('basics.cover')}
+        help={t('basics.coverHelp')}
+        image={draft.cover}
+        alt={site.partners.map((partner) => partner.name.split(' ')[0]).join(' & ')}
         onChange={(cover) => set('cover', cover)}
       />
     </div>
