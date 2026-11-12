@@ -26,7 +26,7 @@ export function captureSimulatorDraft({ now = new Date() }: { now?: Date } = {})
   const { hash, pathname, search } = window.location;
   if (!hash.startsWith(FRAGMENT_PREFIX)) return false;
   const draft = decodeDraft(hash.slice(FRAGMENT_PREFIX.length));
-  if (draft && now.getTime() - Date.parse(draft.savedAt) <= 7 * 24 * 60 * 60 * 1000) {
+  if (draft && !isExpired({ draft, now })) {
     saveDraft({ key: APP_DRAFT_KEY, draft });
     memoryDraft = draft;
   }
