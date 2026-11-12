@@ -156,4 +156,49 @@ describe('envio de foto do site (Imagens RN02 a RN07)', () => {
       await screen.findByText('Não foi possível usar esta foto. Escolham uma foto JPG ou PNG.'),
     ).toBeInTheDocument();
   });
+
+  it('acima de 25 MB, o aviso do tamanho na voz do casal (RN03)', async () => {
+    mockUpload();
+    expect(await run(jpeg(25 * 1024 * 1024 + 1))).toBeNull();
+    expect(
+      await screen.findByText('Esta foto passa de 25 MB. Escolham uma foto menor.'),
+    ).toBeInTheDocument();
+  });
+
+  it('a foto ainda em processamento, nas duas vozes (decisão 229(g))', async () => {
+    mockUpload({ confirm: () => apiError({ status: 409, body: { error: 'IMAGE_PROCESSING' } }) });
+    expect(await run(jpeg())).toBeNull();
+    expect(
+      await screen.findByText('A foto ainda está sendo processada. Tentem de novo em instantes.'),
+    ).toBeInTheDocument();
+    await run(jpeg(), 'planner');
+    expect(
+      await screen.findByText('A foto ainda está sendo processada. Tente de novo em instantes.'),
+    ).toBeInTheDocument();
+  });
+
+  it('a cerimonialista lê o tipo, a rede, o limite de 40 e o 429 no singular (198(2))', async () => {
+    mockUpload();
+    await run(new File(['x'], 'a.gif', { type: 'image/gif' }), 'planner');
+    expect(
+      await screen.findByText('Não foi possível usar esta foto. Escolha uma foto JPG ou PNG.'),
+    ).toBeInTheDocument();
+    vi.mocked(putFile).mockRejectedValueOnce(new Error('rede'));
+    await run(jpeg(), 'planner');
+    expect(
+      await screen.findByText('Não foi possível enviar a foto. Confira a conexão e tente de novo.'),
+    ).toBeInTheDocument();
+    mockUpload({ authorize: () => apiError({ status: 409, body: { error: 'SITE_IMAGE_LIMIT' } }) });
+    await run(jpeg(), 'planner');
+    expect(
+      await screen.findByText('Muitas fotos foram trocadas neste site hoje. Tente de novo amanhã.'),
+    ).toBeInTheDocument();
+    mockUpload({
+      authorize: () => apiError({ status: 429, body: { error: 'Too Many Requests' } }),
+    });
+    await run(jpeg(), 'planner');
+    expect(
+      await screen.findByText('Muitas fotos ao mesmo tempo. Espere um minuto e tente de novo.'),
+    ).toBeInTheDocument();
+  });
 });

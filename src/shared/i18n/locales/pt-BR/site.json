@@ -138,6 +138,10 @@
       "rate": {
         "couple": "Muitas fotos ao mesmo tempo. Esperem um minuto e tentem de novo.",
         "planner": "Muitas fotos ao mesmo tempo. Espere um minuto e tente de novo."
+      },
+      "processing": {
+        "couple": "A foto ainda está sendo processada. Tentem de novo em instantes.",
+        "planner": "A foto ainda está sendo processada. Tente de novo em instantes."
       }
     }
   },
