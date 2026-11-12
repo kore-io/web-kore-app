@@ -9,7 +9,9 @@ import { SiteLayout } from './components/site-layout';
 import { SiteSections } from './components/site-sections';
 import { SystemPage } from './components/system-page';
 import { loadSiteFonts } from './fonts';
-import { parseSiteRoute } from './route';
+import { parseSiteRoute, rsvpPath } from './route';
+import { RsvpPage } from './rsvp/rsvp-page';
+import { useRsvp } from './rsvp/use-rsvp';
 import { applySiteTheme } from './theme';
 import { usePartySession } from './use-party-session';
 import { SimulatorPage } from './simulator/simulator-page';
@@ -37,6 +39,8 @@ export function SiteApp({
         <PreviewEntry slug={route.slug} token={previewToken} />
       ) : route.kind === 'party' ? (
         <PartyEntry slug={route.slug} token={route.token} />
+      ) : route.kind === 'rsvp' ? (
+        <SitePage slug={route.slug} view="rsvp" />
       ) : (
         <SitePage slug={route.slug} />
       )}
@@ -120,19 +124,51 @@ function PreviewEntry({ slug, token }: { slug: string; token: string }) {
   return <SitePage slug={entry.slug} />;
 }
 
-function SitePage({ slug }: { slug: string }) {
+type SiteView = 'home' | 'rsvp';
+
+function SitePage({ slug, view = 'home' }: { slug: string; view?: SiteView }) {
   const { state, site, retry } = usePublicSite({ slug });
   if (state === 'loading') return <SiteSkeleton />;
   if (state === 'notFound') return <NotFoundPage />;
   if (state === 'draft') return <DraftPage />;
   if (state === 'error' || !site) return <LoadErrorPage retry={retry} />;
-  return <SiteHome site={site} />;
+  if (view === 'rsvp' && !site.viewer.party) return <BackToHome slug={slug} />;
+  return <SiteHome site={site} view={view} />;
 }
 
-/** O Início do site, com a Aparência do casal no documento. */
-function SiteHome({ site }: { site: PublicSiteResponse }) {
+/** Sem o cookie do grupo (ou da prévia como grupo), o Confirmar presença volta ao Início. */
+function BackToHome({ slug }: { slug: string }) {
+  useEffect(() => {
+    window.location.replace(`/${slug}`);
+  }, [slug]);
+  return <SiteSkeleton />;
+}
+
+/**
+ * A faixa do grupo (RN01): "Convite para {grupo}" e o Confirmar presença, que leva à página
+ * do RSVP; no pós-evento, sem o botão (Penpot B3).
+ */
+function PartyBanner({ site }: { site: PublicSiteResponse }) {
   const { t } = useTranslation('publicSite');
+  const rsvp = useRsvp({ slug: site.slug, enabled: site.viewer.party !== null });
+  if (!site.viewer.party) return null;
+  return (
+    <div className="kore-site__party">
+      <p className="kore-site__party-text">{t('party.banner', { name: site.viewer.party.name })}</p>
+      {rsvp.data && rsvp.data.state !== 'post_event' && (
+        <a className="kore-site__party-action" href={rsvpPath(site.slug)}>
+          {t('rsvp.open')}
+        </a>
+      )}
+    </div>
+  );
+}
+
+/** O Início do site (ou o Confirmar presença), com a Aparência do casal no documento. */
+function SiteHome({ site, view }: { site: PublicSiteResponse; view: SiteView }) {
   const { appearance } = site;
+  const rsvp = useRsvp({ slug: site.slug, enabled: site.viewer.party !== null });
+  const rsvpHref = rsvp.data && rsvp.data.state !== 'post_event' ? rsvpPath(site.slug) : null;
   useEffect(() => {
     applySiteTheme({ appearance });
     void loadSiteFonts(appearance.fontPairKey);
@@ -143,16 +179,18 @@ function SiteHome({ site }: { site: PublicSiteResponse }) {
       banner={
         <>
           {site.viewer.kind === 'preview' && <PreviewBar site={site} />}
-          {site.viewer.party && (
-            <p className="kore-site__party">
-              {t('party.banner', { name: site.viewer.party.name })}
-            </p>
-          )}
+          <PartyBanner site={site} />
         </>
       }
     >
-      <SiteHero site={site} now={new Date()} />
-      <SiteSections sections={site.sections} />
+      {view === 'rsvp' ? (
+        <RsvpPage slug={site.slug} now={new Date()} />
+      ) : (
+        <>
+          <SiteHero site={site} now={new Date()} rsvpHref={rsvpHref} />
+          <SiteSections sections={site.sections} />
+        </>
+      )}
     </SiteLayout>
   );
 }
