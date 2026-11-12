@@ -4,9 +4,33 @@
  * Kore API
  * OpenAPI spec version: 1
  */
+import type { PartyHistoryEntryResponseActor } from './partyHistoryEntryResponseActor';
+import type { PartyHistoryEntryResponseChannel } from './partyHistoryEntryResponseChannel';
 import type { PartyHistoryEntryResponseKind } from './partyHistoryEntryResponseKind';
+import type { PartyHistoryGuestResponse } from './partyHistoryGuestResponse';
 
 export interface PartyHistoryEntryResponse {
   kind: PartyHistoryEntryResponseKind;
   at: string;
+  /** Nos envios. */
+  channel?: PartyHistoryEntryResponseChannel;
+  /** Nas respostas: o grupo pelo RSVP ou o casal pelo Painel. */
+  actor?: PartyHistoryEntryResponseActor;
+  /**
+   * Quem assinou pelo grupo; nulo sem assinante ("Respondido pelo grupo").
+   * @nullable
+   */
+  signedBy?: string | null;
+  /**
+   * Quem alterou pelo casal.
+   * @nullable
+   */
+  actorName?: string | null;
+  confirmed?: number;
+  declined?: number;
+  /**
+   * Na alteração do casal: o convidado e a resposta.
+   * @nullable
+   */
+  guest?: PartyHistoryGuestResponse | null;
 }

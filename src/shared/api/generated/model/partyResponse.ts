@@ -19,10 +19,12 @@ export interface PartyResponse {
   deliveryStatus: PartyResponseDeliveryStatus;
   /** Na ordem do grupo, vagas no fim (RN17). */
   guests: PartyGuestResponse[];
-  /** Do mais novo para o mais antigo; vazio até a Fase 4. */
+  /** Do mais novo para o mais antigo, as 50 linhas mais recentes (Prazo RN05). */
   history: PartyHistoryEntryResponse[];
   id: string;
   name: string;
+  /** A versão do grupo, para o Alterar resposta (Prazo RN04). */
+  version: number;
   plusOneSlots: number;
   link: PartyLinkResponse;
 }

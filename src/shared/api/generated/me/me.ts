@@ -21,13 +21,23 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  CreatePlannerProfileBody,
+  CreatePlannerProfileResponse,
   MeResponse,
+  MyReferrerResponse,
   OriginNotAllowedErrorBody,
+  PlannerNotFoundErrorBody,
+  PlannerProfileExistsErrorBody,
+  PlannerProfileResponse,
+  PlannerSignupDisabledErrorBody,
   ProfileNotOwnedErrorBody,
   RateLimitedErrorBody,
+  SellerCannotBePlannerErrorBody,
   SessionExpiredErrorBody,
   SetActiveProfileBody,
   SetActiveProfileResponse,
+  TermsVersionOutdatedErrorBody,
+  UpdatePlannerProfileBody,
   ValidationErrorBody,
 } from '../model';
 
@@ -291,3 +301,522 @@ export const useMeControllerChooseProfileV1 = <
 > => {
   return useMutation(getMeControllerChooseProfileV1MutationOptions(options), queryClient);
 };
+export const getPlannerControllerCreateV1Url = () => {
+  return `/v1/me/planner`;
+};
+
+/**
+ * @summary Cria o perfil de cerimonialista na conta da sessão (RN02 a RN05).
+ */
+export const plannerControllerCreateV1 = async (
+  createPlannerProfileBody: CreatePlannerProfileBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<CreatePlannerProfileResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<CreatePlannerProfileResponse>(getPlannerControllerCreateV1Url(), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(createPlannerProfileBody),
+  });
+};
+
+export const getPlannerControllerCreateV1MutationKey = () => ['plannerControllerCreateV1'] as const;
+
+export const getPlannerControllerCreateV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | PlannerSignupDisabledErrorBody
+    | PlannerProfileExistsErrorBody
+    | SellerCannotBePlannerErrorBody
+    | TermsVersionOutdatedErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof plannerControllerCreateV1>>,
+    TError,
+    PlannerControllerCreateV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof plannerControllerCreateV1>>,
+  TError,
+  PlannerControllerCreateV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getPlannerControllerCreateV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof plannerControllerCreateV1>>,
+    PlannerControllerCreateV1MutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return plannerControllerCreateV1(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PlannerControllerCreateV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof plannerControllerCreateV1>>
+>;
+export type PlannerControllerCreateV1MutationBody = CreatePlannerProfileBody;
+export type PlannerControllerCreateV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | PlannerSignupDisabledErrorBody
+  | PlannerProfileExistsErrorBody
+  | SellerCannotBePlannerErrorBody
+  | TermsVersionOutdatedErrorBody
+  | RateLimitedErrorBody
+>;
+export type PlannerControllerCreateV1MutationVariables = { data: CreatePlannerProfileBody };
+
+/**
+ * @summary Cria o perfil de cerimonialista na conta da sessão (RN02 a RN05).
+ */
+export const usePlannerControllerCreateV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | PlannerSignupDisabledErrorBody
+    | PlannerProfileExistsErrorBody
+    | SellerCannotBePlannerErrorBody
+    | TermsVersionOutdatedErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof plannerControllerCreateV1>>,
+      TError,
+      PlannerControllerCreateV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof plannerControllerCreateV1>>,
+  TError,
+  PlannerControllerCreateV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getPlannerControllerCreateV1MutationOptions(options), queryClient);
+};
+export const getPlannerControllerProfileV1Url = () => {
+  return `/v1/me/planner`;
+};
+
+/**
+ * @summary Meu perfil (RN09 e RN10).
+ */
+export const plannerControllerProfileV1 = async (
+  options?: Parameters<typeof httpClient>[1],
+): Promise<PlannerProfileResponse> => {
+  return httpClient<PlannerProfileResponse>(getPlannerControllerProfileV1Url(), {
+    ...options,
+    method: 'GET',
+  });
+};
+
+export const getPlannerControllerProfileV1QueryKey = () => {
+  return [`/v1/me/planner`] as const;
+};
+
+export const getPlannerControllerProfileV1QueryOptions = <
+  TData = Awaited<ReturnType<typeof plannerControllerProfileV1>>,
+  TError = ErrorType<SessionExpiredErrorBody | PlannerNotFoundErrorBody | RateLimitedErrorBody>,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof plannerControllerProfileV1>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getPlannerControllerProfileV1QueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof plannerControllerProfileV1>>> = ({
+    signal,
+  }) => plannerControllerProfileV1({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof plannerControllerProfileV1>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type PlannerControllerProfileV1QueryResult = NonNullable<
+  Awaited<ReturnType<typeof plannerControllerProfileV1>>
+>;
+export type PlannerControllerProfileV1QueryError = ErrorType<
+  SessionExpiredErrorBody | PlannerNotFoundErrorBody | RateLimitedErrorBody
+>;
+
+export function usePlannerControllerProfileV1<
+  TData = Awaited<ReturnType<typeof plannerControllerProfileV1>>,
+  TError = ErrorType<SessionExpiredErrorBody | PlannerNotFoundErrorBody | RateLimitedErrorBody>,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof plannerControllerProfileV1>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof plannerControllerProfileV1>>,
+          TError,
+          Awaited<ReturnType<typeof plannerControllerProfileV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePlannerControllerProfileV1<
+  TData = Awaited<ReturnType<typeof plannerControllerProfileV1>>,
+  TError = ErrorType<SessionExpiredErrorBody | PlannerNotFoundErrorBody | RateLimitedErrorBody>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof plannerControllerProfileV1>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof plannerControllerProfileV1>>,
+          TError,
+          Awaited<ReturnType<typeof plannerControllerProfileV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePlannerControllerProfileV1<
+  TData = Awaited<ReturnType<typeof plannerControllerProfileV1>>,
+  TError = ErrorType<SessionExpiredErrorBody | PlannerNotFoundErrorBody | RateLimitedErrorBody>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof plannerControllerProfileV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Meu perfil (RN09 e RN10).
+ */
+
+export function usePlannerControllerProfileV1<
+  TData = Awaited<ReturnType<typeof plannerControllerProfileV1>>,
+  TError = ErrorType<SessionExpiredErrorBody | PlannerNotFoundErrorBody | RateLimitedErrorBody>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof plannerControllerProfileV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getPlannerControllerProfileV1QueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export const getPlannerControllerUpdateV1Url = () => {
+  return `/v1/me/planner`;
+};
+
+/**
+ * @summary Salva o Meu perfil, com as validações do cadastro (RN09 e RN10).
+ */
+export const plannerControllerUpdateV1 = async (
+  updatePlannerProfileBody: UpdatePlannerProfileBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<PlannerProfileResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<PlannerProfileResponse>(getPlannerControllerUpdateV1Url(), {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updatePlannerProfileBody),
+  });
+};
+
+export const getPlannerControllerUpdateV1MutationKey = () => ['plannerControllerUpdateV1'] as const;
+
+export const getPlannerControllerUpdateV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | PlannerNotFoundErrorBody
+    | TermsVersionOutdatedErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof plannerControllerUpdateV1>>,
+    TError,
+    PlannerControllerUpdateV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof plannerControllerUpdateV1>>,
+  TError,
+  PlannerControllerUpdateV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getPlannerControllerUpdateV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof plannerControllerUpdateV1>>,
+    PlannerControllerUpdateV1MutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return plannerControllerUpdateV1(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PlannerControllerUpdateV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof plannerControllerUpdateV1>>
+>;
+export type PlannerControllerUpdateV1MutationBody = UpdatePlannerProfileBody;
+export type PlannerControllerUpdateV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | PlannerNotFoundErrorBody
+  | TermsVersionOutdatedErrorBody
+  | RateLimitedErrorBody
+>;
+export type PlannerControllerUpdateV1MutationVariables = { data: UpdatePlannerProfileBody };
+
+/**
+ * @summary Salva o Meu perfil, com as validações do cadastro (RN09 e RN10).
+ */
+export const usePlannerControllerUpdateV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | PlannerNotFoundErrorBody
+    | TermsVersionOutdatedErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof plannerControllerUpdateV1>>,
+      TError,
+      PlannerControllerUpdateV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof plannerControllerUpdateV1>>,
+  TError,
+  PlannerControllerUpdateV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getPlannerControllerUpdateV1MutationOptions(options), queryClient);
+};
+export const getPlannerControllerReferrerV1Url = () => {
+  return `/v1/me/referrer`;
+};
+
+/**
+ * @summary O link de indicação e o desconto do casal (Link de indicação RN01 e RN02).
+ */
+export const plannerControllerReferrerV1 = async (
+  options?: Parameters<typeof httpClient>[1],
+): Promise<MyReferrerResponse> => {
+  return httpClient<MyReferrerResponse>(getPlannerControllerReferrerV1Url(), {
+    ...options,
+    method: 'GET',
+  });
+};
+
+export const getPlannerControllerReferrerV1QueryKey = () => {
+  return [`/v1/me/referrer`] as const;
+};
+
+export const getPlannerControllerReferrerV1QueryOptions = <
+  TData = Awaited<ReturnType<typeof plannerControllerReferrerV1>>,
+  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof plannerControllerReferrerV1>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getPlannerControllerReferrerV1QueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof plannerControllerReferrerV1>>> = ({
+    signal,
+  }) => plannerControllerReferrerV1({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof plannerControllerReferrerV1>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type PlannerControllerReferrerV1QueryResult = NonNullable<
+  Awaited<ReturnType<typeof plannerControllerReferrerV1>>
+>;
+export type PlannerControllerReferrerV1QueryError = ErrorType<
+  SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody
+>;
+
+export function usePlannerControllerReferrerV1<
+  TData = Awaited<ReturnType<typeof plannerControllerReferrerV1>>,
+  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof plannerControllerReferrerV1>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof plannerControllerReferrerV1>>,
+          TError,
+          Awaited<ReturnType<typeof plannerControllerReferrerV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePlannerControllerReferrerV1<
+  TData = Awaited<ReturnType<typeof plannerControllerReferrerV1>>,
+  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof plannerControllerReferrerV1>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof plannerControllerReferrerV1>>,
+          TError,
+          Awaited<ReturnType<typeof plannerControllerReferrerV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function usePlannerControllerReferrerV1<
+  TData = Awaited<ReturnType<typeof plannerControllerReferrerV1>>,
+  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof plannerControllerReferrerV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary O link de indicação e o desconto do casal (Link de indicação RN01 e RN02).
+ */
+
+export function usePlannerControllerReferrerV1<
+  TData = Awaited<ReturnType<typeof plannerControllerReferrerV1>>,
+  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof plannerControllerReferrerV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getPlannerControllerReferrerV1QueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}

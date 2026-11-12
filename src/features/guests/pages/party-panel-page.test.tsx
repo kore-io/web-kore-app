@@ -47,6 +47,7 @@ function moreira(overrides: Partial<PartyResponse> = {}): PartyResponse {
     deliveryStatus: 'not_sent',
     plusOneSlots: 1,
     history: [],
+    version: 1,
     link: { url: URL_ANTIGA, regeneratedAt: null },
     guests: [
       {

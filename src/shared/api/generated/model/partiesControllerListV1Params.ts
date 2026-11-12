@@ -4,12 +4,18 @@
  * Kore API
  * OpenAPI spec version: 1
  */
+import type { PartiesControllerListV1Remind } from './partiesControllerListV1Remind';
 import type { PartiesControllerListV1Rsvp } from './partiesControllerListV1Rsvp';
+import type { PartiesControllerListV1SaveTheDate } from './partiesControllerListV1SaveTheDate';
 import type { PartiesControllerListV1Sent } from './partiesControllerListV1Sent';
 
 export type PartiesControllerListV1Params = {
   rsvp?: PartiesControllerListV1Rsvp;
   sent?: PartiesControllerListV1Sent;
+  /** A fila do lembrete: enviados com convidado com nome pendente (Envios RN04; Prazo RN07). */
+  remind?: PartiesControllerListV1Remind;
+  /** O filtro do save the date: enviado ou não (Envios RN03). */
+  saveTheDate?: PartiesControllerListV1SaveTheDate;
   /**
    * @minimum 1
    * @maximum 100

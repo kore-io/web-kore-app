@@ -23,17 +23,24 @@ import type {
 import type {
   OriginNotAllowedErrorBody,
   PartySessionBody,
+  PartySessionInvalidErrorBody,
   PartySessionResponse,
   PreviewInvalidErrorBody,
   PreviewModeBody,
   PreviewModeResponse,
   PreviewPartiesResponse,
+  PreviewReadOnlyErrorBody,
   PreviewRequiredErrorBody,
   PreviewSessionBody,
   PreviewSessionResponse,
   PublicSiteControllerPreviewPartiesV1Params,
   PublicSiteResponse,
+  PutRsvpBody,
   RateLimitedErrorBody,
+  RsvpChangedErrorBody,
+  RsvpClosedErrorBody,
+  RsvpRateLimitedErrorBody,
+  RsvpResponse,
   SiteDraftErrorBody,
   SiteLinkInvalidErrorBody,
   SiteLinkPreviewResponse,
@@ -923,3 +930,294 @@ export function useSiteLinkPreviewControllerPreviewV1<
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+export const getRsvpControllerGetV1Url = (slug: string) => {
+  return `/v1/sites/${slug}/rsvp`;
+};
+
+/**
+ * @summary O formulário com as respostas atuais (RN03 e RN08).
+ */
+export const rsvpControllerGetV1 = async (
+  slug: string,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<RsvpResponse> => {
+  return httpClient<RsvpResponse>(getRsvpControllerGetV1Url(slug), {
+    ...options,
+    method: 'GET',
+  });
+};
+
+export const getRsvpControllerGetV1QueryKey = (slug: string) => {
+  return [`/v1/sites/${slug}/rsvp`] as const;
+};
+
+export const getRsvpControllerGetV1QueryOptions = <
+  TData = Awaited<ReturnType<typeof rsvpControllerGetV1>>,
+  TError = ErrorType<
+    PartySessionInvalidErrorBody | SiteNotFoundErrorBody | SiteDraftErrorBody | RateLimitedErrorBody
+  >,
+>(
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof rsvpControllerGetV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getRsvpControllerGetV1QueryKey(slug);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof rsvpControllerGetV1>>> = ({ signal }) =>
+    rsvpControllerGetV1(slug, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: slug !== null && slug !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof rsvpControllerGetV1>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+};
+
+export type RsvpControllerGetV1QueryResult = NonNullable<
+  Awaited<ReturnType<typeof rsvpControllerGetV1>>
+>;
+export type RsvpControllerGetV1QueryError = ErrorType<
+  PartySessionInvalidErrorBody | SiteNotFoundErrorBody | SiteDraftErrorBody | RateLimitedErrorBody
+>;
+
+export function useRsvpControllerGetV1<
+  TData = Awaited<ReturnType<typeof rsvpControllerGetV1>>,
+  TError = ErrorType<
+    PartySessionInvalidErrorBody | SiteNotFoundErrorBody | SiteDraftErrorBody | RateLimitedErrorBody
+  >,
+>(
+  slug: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof rsvpControllerGetV1>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof rsvpControllerGetV1>>,
+          TError,
+          Awaited<ReturnType<typeof rsvpControllerGetV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useRsvpControllerGetV1<
+  TData = Awaited<ReturnType<typeof rsvpControllerGetV1>>,
+  TError = ErrorType<
+    PartySessionInvalidErrorBody | SiteNotFoundErrorBody | SiteDraftErrorBody | RateLimitedErrorBody
+  >,
+>(
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof rsvpControllerGetV1>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof rsvpControllerGetV1>>,
+          TError,
+          Awaited<ReturnType<typeof rsvpControllerGetV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useRsvpControllerGetV1<
+  TData = Awaited<ReturnType<typeof rsvpControllerGetV1>>,
+  TError = ErrorType<
+    PartySessionInvalidErrorBody | SiteNotFoundErrorBody | SiteDraftErrorBody | RateLimitedErrorBody
+  >,
+>(
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof rsvpControllerGetV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary O formulário com as respostas atuais (RN03 e RN08).
+ */
+
+export function useRsvpControllerGetV1<
+  TData = Awaited<ReturnType<typeof rsvpControllerGetV1>>,
+  TError = ErrorType<
+    PartySessionInvalidErrorBody | SiteNotFoundErrorBody | SiteDraftErrorBody | RateLimitedErrorBody
+  >,
+>(
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof rsvpControllerGetV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getRsvpControllerGetV1QueryOptions(slug, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export const getRsvpControllerPutV1Url = (slug: string) => {
+  return `/v1/sites/${slug}/rsvp`;
+};
+
+/**
+ * @summary Grava as respostas do grupo (RN04 a RN13).
+ */
+export const rsvpControllerPutV1 = async (
+  slug: string,
+  putRsvpBody: PutRsvpBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<RsvpResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<RsvpResponse>(getRsvpControllerPutV1Url(slug), {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(putRsvpBody),
+  });
+};
+
+export const getRsvpControllerPutV1MutationKey = () => ['rsvpControllerPutV1'] as const;
+
+export const getRsvpControllerPutV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | PartySessionInvalidErrorBody
+    | OriginNotAllowedErrorBody
+    | PreviewReadOnlyErrorBody
+    | SiteNotFoundErrorBody
+    | SiteDraftErrorBody
+    | RsvpChangedErrorBody
+    | RsvpClosedErrorBody
+    | RateLimitedErrorBody
+    | RsvpRateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof rsvpControllerPutV1>>,
+    TError,
+    RsvpControllerPutV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof rsvpControllerPutV1>>,
+  TError,
+  RsvpControllerPutV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getRsvpControllerPutV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof rsvpControllerPutV1>>,
+    RsvpControllerPutV1MutationVariables
+  > = (props) => {
+    const { slug, data } = props ?? {};
+
+    return rsvpControllerPutV1(slug, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RsvpControllerPutV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof rsvpControllerPutV1>>
+>;
+export type RsvpControllerPutV1MutationBody = PutRsvpBody;
+export type RsvpControllerPutV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | PartySessionInvalidErrorBody
+  | OriginNotAllowedErrorBody
+  | PreviewReadOnlyErrorBody
+  | SiteNotFoundErrorBody
+  | SiteDraftErrorBody
+  | RsvpChangedErrorBody
+  | RsvpClosedErrorBody
+  | RateLimitedErrorBody
+  | RsvpRateLimitedErrorBody
+>;
+export type RsvpControllerPutV1MutationVariables = { slug: string; data: PutRsvpBody };
+
+/**
+ * @summary Grava as respostas do grupo (RN04 a RN13).
+ */
+export const useRsvpControllerPutV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | PartySessionInvalidErrorBody
+    | OriginNotAllowedErrorBody
+    | PreviewReadOnlyErrorBody
+    | SiteNotFoundErrorBody
+    | SiteDraftErrorBody
+    | RsvpChangedErrorBody
+    | RsvpClosedErrorBody
+    | RateLimitedErrorBody
+    | RsvpRateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof rsvpControllerPutV1>>,
+      TError,
+      RsvpControllerPutV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof rsvpControllerPutV1>>,
+  TError,
+  RsvpControllerPutV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getRsvpControllerPutV1MutationOptions(options), queryClient);
+};

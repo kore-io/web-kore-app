@@ -5,7 +5,12 @@
  * OpenAPI spec version: 1
  */
 import type { PublicPreviewModeResponseAs } from './publicPreviewModeResponseAs';
+import type { PublicPreviewModeResponseAudience } from './publicPreviewModeResponseAudience';
 
 export interface PublicPreviewModeResponse {
   as: PublicPreviewModeResponseAs;
+  /** A voz da barra pelo papel de quem gerou a prévia: dono → couple, colaborador → planner (RN06). */
+  audience: PublicPreviewModeResponseAudience;
+  /** O site já foi publicado: "Prévia do site." em vez de "O site ainda não foi publicado." (RN06). */
+  published: boolean;
 }
