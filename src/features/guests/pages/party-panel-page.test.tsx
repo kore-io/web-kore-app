@@ -233,6 +233,20 @@ describe('Painel do grupo (RN14)', () => {
     mockPanel({ party: moreira({ link: { url: null, regeneratedAt: null } }) });
     renderRoute({ url: '/app/convidados/grupos/p1' });
     expect(await screen.findByRole('button', { name: 'Copiar link' })).toBeDisabled();
+    // Pré-visualização RN01: o Ver como este grupo também, com a ajuda do Editor.
+    expect(screen.getByRole('button', { name: 'Ver como este grupo' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Ver como este grupo' })).toHaveAccessibleDescription(
+      'Escolham o endereço do site em Dados básicos para ver a prévia.',
+    );
+  });
+
+  it('sem endereço, a ajuda do Ver como este grupo na voz da cerimonialista (198(2))', async () => {
+    profileUnderTest.current = 'planner';
+    mockPanel({ party: moreira({ link: { url: null, regeneratedAt: null } }) });
+    renderAreaScreen({ url: '/app/convidados/grupos/p1' });
+    expect(
+      await screen.findByRole('button', { name: 'Ver como este grupo' }),
+    ).toHaveAccessibleDescription('Escolha o endereço do site em Dados básicos para ver a prévia.');
   });
 
   it('Regenerar link pede confirmação com o texto do casal e mostra o link novo (RN12)', async () => {
