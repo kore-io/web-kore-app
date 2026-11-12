@@ -9,6 +9,7 @@ import {
   getSiteControllerGetV1QueryKey,
   useSiteControllerPatchV1,
 } from '../../../shared/api/generated/site/site';
+import { dashboardControllerGetV1 } from '../../../shared/api/generated/rsvp/rsvp';
 import { useWeddingsControllerSlugAvailabilityV1 } from '../../../shared/api/generated/weddings/weddings';
 import { ApiError, apiErrorCode } from '../../../shared/api/http-client';
 import { BRAZIL_STATES } from '../../../shared/brazil-states';
@@ -26,6 +27,7 @@ import {
   type BasicsErrors,
   type BasicsField,
 } from '../basics-draft';
+import { shortDate } from '../../publication/publication';
 import { useSectionForm } from '../section-form';
 import { ImageField } from './image-field';
 import { timezoneLabelKey } from '../timezones';
@@ -86,7 +88,7 @@ export function BasicsSection({
     dirty,
     canSave: slugOk,
     save: async () => {
-      const local = validateBasics(draft, { slugEditable });
+      const local = validateBasics(draft, { slugEditable, published });
       setErrors(local);
       if (Object.keys(local).length > 0) return false;
       try {
@@ -111,6 +113,27 @@ export function BasicsSection({
 
   function handleError(error: unknown) {
     const code = apiErrorCode({ error });
+    // Publicado, a data nova deixa a saída do ar fora da faixa (Publicação RN11): o campo
+    // diz até quando o site fica no ar, com a data do Dashboard (decisão 228(1)).
+    if (code === 'END_DATE_OUT_OF_RANGE') {
+      void dashboardControllerGetV1(weddingId)
+        .then(({ site: dashboardSite }) => {
+          if (!dashboardSite.endDate) throw new Error('sem a data de saída do ar');
+          setErrors({
+            eventDate: {
+              code: 'EVENT_DATE_AFTER_END_DATE',
+              params: { limit: shortDate(dashboardSite.endDate) },
+            },
+          });
+        })
+        .catch(() =>
+          showToast({
+            tone: 'danger',
+            message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
+          }),
+        );
+      return;
+    }
     if (error instanceof ApiError && error.status === 400) {
       const body = error.body as {
         errors?: { path: string; code: string; params: Record<string, unknown> }[];
@@ -186,14 +209,17 @@ export function BasicsSection({
 
       <FormField
         label={t('basics.eventDate')}
-        {...(site.editable.eventDate
-          ? { hint: t(`basics.eventDateHelp.${audience}`), hintTone: 'neutral' as const }
-          : identityHint)}
+        {...(errorText('eventDate')
+          ? { hint: errorText('eventDate'), hintTone: 'danger' as const }
+          : site.editable.eventDate
+            ? { hint: t(`basics.eventDateHelp.${audience}`), hintTone: 'neutral' as const }
+            : identityHint)}
       >
-        {({ id, describedBy }) => (
+        {({ id, describedBy, invalid }) => (
           <DateField
             id={id}
             aria-describedby={describedBy}
+            invalid={invalid}
             disabled={!site.editable.eventDate}
             value={draft.eventDate}
             onChange={(event) => set('eventDate', event.target.value)}
@@ -403,6 +429,13 @@ export function basicsErrorText({
       return t(`basics.errors.emailInvalid.${audience}`);
     case 'SLUG_MISSING':
       return t(`basics.errors.slugMissing.${audience}`);
+    // Impessoais: valem para os dois perfis (decisões 219 e 228(1)).
+    case 'EVENT_DATE_REQUIRED_WHEN_PUBLISHED':
+      return t('basics.errors.eventDateRequiredWhenPublished');
+    case 'EVENT_DATE_AFTER_END_DATE':
+      return t('basics.errors.eventDateAfterEndDate', {
+        limit: (error.params as { limit?: string }).limit ?? '',
+      });
     case 'SLUG_FORMAT':
       return t(`basics.errors.slugFormat.${audience}`);
     // O WhatsApp usa os textos do telefone de Grupos e convidados (RN03; 189(4)).

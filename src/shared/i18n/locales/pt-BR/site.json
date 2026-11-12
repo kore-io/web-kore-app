@@ -104,7 +104,9 @@
       "slugFormat": {
         "couple": "Usem só letras minúsculas, números e hífen.",
         "planner": "Use só letras minúsculas, números e hífen."
-      }
+      },
+      "eventDateRequiredWhenPublished": "O site já foi publicado, então a data do casamento não pode ficar em branco.",
+      "eventDateAfterEndDate": "A data do casamento precisa ser antes de {{limit}}, quando o site sai do ar."
     },
     "cover": "Foto de capa",
     "coverHelp": "A foto de capa aparece no topo do site e junto do link quando ele é compartilhado no WhatsApp e nas redes. Quem tiver o endereço vê esta foto."

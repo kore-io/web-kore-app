@@ -30,7 +30,11 @@ export type BasicsErrorCode =
   | 'SLUG_FORMAT'
   | 'PHONE_TOO_SHORT'
   | 'PHONE_TOO_LONG'
-  | 'PHONE_INVALID';
+  | 'PHONE_INVALID'
+  /** Publicado, a data não fica em branco (decisão 219). */
+  | 'EVENT_DATE_REQUIRED_WHEN_PUBLISHED'
+  /** Publicado, a data nova deixa a saída do ar fora da faixa (Publicação RN11; 228(1)). */
+  | 'EVENT_DATE_AFTER_END_DATE';
 
 export type BasicsErrors = Partial<
   Record<BasicsField, { code: BasicsErrorCode; params: Record<string, unknown> }>
@@ -102,9 +106,17 @@ export function toPatchBody({
   return body;
 }
 
-/** O que o app confere antes de mandar (RN03 e RN06); o 80 trava a digitação, sem texto. */
-export function validateBasics(draft: BasicsDraft, { slugEditable }: { slugEditable: boolean }) {
+/**
+ * O que o app confere antes de mandar (RN03 e RN06); o 80 trava a digitação, sem texto.
+ * Publicado, a data do casamento não fica em branco (decisão 219).
+ */
+export function validateBasics(
+  draft: BasicsDraft,
+  { slugEditable, published = false }: { slugEditable: boolean; published?: boolean },
+) {
   const errors: BasicsErrors = {};
+  if (published && !draft.eventDate)
+    errors.eventDate = { code: 'EVENT_DATE_REQUIRED_WHEN_PUBLISHED', params: {} };
   draft.names.forEach((name, index) => {
     if (!name.trim())
       errors[index === 0 ? 'name0' : 'name1'] = { code: 'NAME_MISSING', params: {} };
@@ -143,23 +155,25 @@ export function serverBasicsErrors(
     const field = FIELD_BY_PATH[error.path];
     if (!field) continue;
     const code: BasicsErrorCode | null =
-      error.code === 'PHONE_TOO_SHORT' ||
-      error.code === 'PHONE_TOO_LONG' ||
-      error.code === 'PHONE_INVALID'
+      error.code === 'EVENT_DATE_REQUIRED_WHEN_PUBLISHED'
         ? error.code
-        : error.code === 'IS_EMAIL' || error.code === 'EMAIL_INVALID'
-          ? 'EMAIL_INVALID'
-          : error.code === 'IS_NOT_EMPTY' || error.code === 'NAME_MISSING'
-            ? field === 'city'
-              ? 'CITY_MISSING'
-              : field === 'state'
-                ? 'STATE_MISSING'
-                : field === 'slug'
-                  ? 'SLUG_MISSING'
-                  : 'NAME_MISSING'
-            : field === 'slug'
-              ? 'SLUG_FORMAT'
-              : null;
+        : error.code === 'PHONE_TOO_SHORT' ||
+            error.code === 'PHONE_TOO_LONG' ||
+            error.code === 'PHONE_INVALID'
+          ? error.code
+          : error.code === 'IS_EMAIL' || error.code === 'EMAIL_INVALID'
+            ? 'EMAIL_INVALID'
+            : error.code === 'IS_NOT_EMPTY' || error.code === 'NAME_MISSING'
+              ? field === 'city'
+                ? 'CITY_MISSING'
+                : field === 'state'
+                  ? 'STATE_MISSING'
+                  : field === 'slug'
+                    ? 'SLUG_MISSING'
+                    : 'NAME_MISSING'
+              : field === 'slug'
+                ? 'SLUG_FORMAT'
+                : null;
     if (code) result[field] = { code, params: error.params };
   }
   return result;
