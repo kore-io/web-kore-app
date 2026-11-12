@@ -238,6 +238,31 @@
         "couple": "Vocês já têm 30 perguntas, o limite do site. Removam uma para adicionar outra.",
         "planner": "Este site já tem 30 perguntas, o limite. Remova uma para adicionar outra."
       }
+    },
+    "ceremony": {
+      "notice": "Só quem entra pelo link do convite vê os locais, os horários e os botões de rota. Quem abre o site sem o link vê um aviso.",
+      "item": "Local {{n}}",
+      "title": "Título",
+      "placeName": "Nome do lugar",
+      "date": "Data",
+      "time": "Hora",
+      "address": "Endereço",
+      "addressHelp": {
+        "couple": "Escrevam o endereço como ele aparece no Google Maps. Os botões Abrir no Google Maps e Abrir no Waze usam este texto.",
+        "planner": "Escreva o endereço como ele aparece no Google Maps. Os botões Abrir no Google Maps e Abrir no Waze usam este texto."
+      },
+      "up": "Subir {{title}}",
+      "down": "Descer {{title}}",
+      "remove": "Remover {{title}}",
+      "add": "Adicionar local",
+      "limit": {
+        "couple": "Vocês já têm 4 locais, o limite do site. Removam um para adicionar outro.",
+        "planner": "Este site já tem 4 locais, o limite. Remova um para adicionar outro."
+      },
+      "defaultTitle": {
+        "first": "Cerimônia",
+        "second": "Recepção"
+      }
     }
   }
 }

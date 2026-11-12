@@ -420,6 +420,119 @@ describe('Site › Seções de conteúdo (S3)', () => {
     );
   });
 
+  it('Cerimônia: o aviso fixo; o 1º local vem como Cerimônia e o 2º como Recepção, com a data do casamento (RN07)', async () => {
+    const user = userEvent.setup();
+    const calls = mockSite();
+    renderRoute({ url: '/app/site/cerimonia-e-recepcao' });
+    expect(
+      await screen.findByText(
+        'Só quem entra pelo link do convite vê os locais, os horários e os botões de rota. Quem abre o site sem o link vê um aviso.',
+      ),
+    ).toBeInTheDocument();
+    // Ligada e sem local: vazia (RN03).
+    expect(screen.getByText(/ainda não tem conteúdo/)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Adicionar local' }));
+    await user.click(screen.getByRole('button', { name: 'Adicionar local' }));
+    const titles = screen.getAllByRole('textbox', { name: 'Título' });
+    expect(titles.map((field) => (field as HTMLInputElement).value)).toEqual([
+      'Cerimônia',
+      'Recepção',
+    ]);
+    expect(
+      screen.getAllByLabelText('Data').map((field) => (field as HTMLInputElement).value),
+    ).toEqual(['2026-11-14', '2026-11-14']);
+    const address = screen.getAllByRole('textbox', { name: 'Endereço' });
+    expect(address[0]).toHaveAccessibleDescription(
+      'Escrevam o endereço como ele aparece no Google Maps. Os botões Abrir no Google Maps e Abrir no Waze usam este texto.',
+    );
+    const places = screen.getAllByRole('textbox', { name: 'Nome do lugar' });
+    await user.type(places[0] as HTMLElement, 'Capela Nossa Senhora das Graças');
+    await user.type(address[0] as HTMLElement, 'Rua Barão de Jaguara, 1200, Centro, Campinas, SP');
+    await user.type(screen.getAllByLabelText('Hora')[0] as HTMLElement, '16:30');
+    await user.type(places[1] as HTMLElement, 'Espaço Villa Toscana');
+    await user.type(address[1] as HTMLElement, 'Rua A & B, 10 #2');
+    // O rótulo das ações diz o local (RN07).
+    await user.click(screen.getByRole('button', { name: 'Subir Recepção' }));
+    expect(screen.getByRole('button', { name: 'Subir Recepção' })).toBeDisabled();
+    await user.click(save());
+    await waitFor(() => expect(calls).toHaveLength(1));
+    expect(calls[0]?.body).toEqual({
+      enabled: true,
+      title: 'Cerimônia & Recepção',
+      content: {
+        venues: [
+          {
+            title: 'Recepção',
+            placeName: 'Espaço Villa Toscana',
+            date: '2026-11-14',
+            time: null,
+            address: 'Rua A & B, 10 #2',
+          },
+          {
+            title: 'Cerimônia',
+            placeName: 'Capela Nossa Senhora das Graças',
+            date: '2026-11-14',
+            time: '16:30',
+            address: 'Rua Barão de Jaguara, 1200, Centro, Campinas, SP',
+          },
+        ],
+      },
+    });
+  });
+
+  it('Cerimônia: campos obrigatórios vazios no local mostram "Preencham este campo." e nada é gravado (RN12)', async () => {
+    const user = userEvent.setup();
+    const calls = mockSite();
+    renderRoute({ url: '/app/site/cerimonia-e-recepcao' });
+    await user.click(await screen.findByRole('button', { name: 'Adicionar local' }));
+    await user.clear(screen.getByRole('textbox', { name: 'Título' }));
+    expect(screen.getByRole('button', { name: 'Remover Local 1' })).toBeInTheDocument();
+    await user.click(save());
+    for (const name of ['Título', 'Nome do lugar', 'Endereço']) {
+      expect(screen.getByRole('textbox', { name })).toHaveAccessibleDescription(
+        'Preencham este campo.',
+      );
+    }
+    expect(calls).toHaveLength(0);
+  });
+
+  it('Cerimônia com 4 locais: Adicionar desabilitado com o limite de cada perfil (RN07)', async () => {
+    const venue = (title: string) => ({
+      title,
+      placeName: 'Lugar',
+      date: '2026-11-14',
+      time: '18:30',
+      address: 'Rua 1',
+    });
+    const ceremony = withSection({
+      type: 'ceremony',
+      title: 'Cerimônia & Recepção',
+      content: { venues: ['Cerimônia', 'Recepção', 'Brunch', 'Ensaio'].map(venue) },
+      enabled: true,
+      empty: false,
+    });
+    mockSite({ site: siteWith({ sections: ceremony }) });
+    const { unmount } = renderRoute({ url: '/app/site/cerimonia-e-recepcao' });
+    const add = await screen.findByRole('button', { name: 'Adicionar local' });
+    expect(add).toBeDisabled();
+    expect(add).toHaveAccessibleDescription(
+      'Vocês já têm 4 locais, o limite do site. Removam um para adicionar outro.',
+    );
+    expect(screen.getAllByLabelText('Hora')[0]).toHaveValue('18:30');
+    unmount();
+    profileUnderTest.current = 'planner';
+    mockSite({ site: siteWith({ sections: ceremony }) });
+    renderAreaScreen({ url: '/app/site/cerimonia-e-recepcao' });
+    expect(
+      await screen.findByRole('button', { name: 'Adicionar local' }),
+    ).toHaveAccessibleDescription(
+      'Este site já tem 4 locais, o limite. Remova um para adicionar outro.',
+    );
+    expect(screen.getAllByRole('textbox', { name: 'Endereço' })[0]).toHaveAccessibleDescription(
+      'Escreva o endereço como ele aparece no Google Maps. Os botões Abrir no Google Maps e Abrir no Waze usam este texto.',
+    );
+  });
+
   it('é acessível', async () => {
     mockSite({
       site: siteWith({
@@ -434,6 +547,14 @@ describe('Site › Seções de conteúdo (S3)', () => {
     });
     const { container } = renderRoute({ url: '/app/site/faq' });
     await screen.findByRole('button', { name: 'Adicionar pergunta' });
+    await expectNoA11yViolations({ container });
+  });
+
+  it('a Cerimônia é acessível', async () => {
+    const user = userEvent.setup();
+    mockSite();
+    const { container } = renderRoute({ url: '/app/site/cerimonia-e-recepcao' });
+    await user.click(await screen.findByRole('button', { name: 'Adicionar local' }));
     await expectNoA11yViolations({ container });
   });
 });

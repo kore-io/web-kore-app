@@ -10,6 +10,7 @@ import { useActiveWedding, type Audience } from '../../guests/hooks/use-active-w
 import { AppearanceSection } from '../components/appearance-section';
 import { BasicsSection } from '../components/basics-section';
 import {
+  CeremonySection,
   CountdownSection,
   DressCodeSection,
   FaqSection,
@@ -201,6 +202,7 @@ function SiteEditor({
                   if (!section) return null;
                   const props = { weddingId, site: data, section, audience };
                   if (section.type === 'countdown') return <CountdownSection {...props} />;
+                  if (section.type === 'ceremony') return <CeremonySection {...props} />;
                   if (section.type === 'lodging') return <LodgingSection {...props} />;
                   if (section.type === 'dress_code') return <DressCodeSection {...props} />;
                   if (section.type === 'faq') return <FaqSection {...props} />;
