@@ -2,11 +2,12 @@ import { Button, Dialog, PageHeader, Select, Spinner, Tab, Tabs } from '@kore-io
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate, useBlocker, useNavigate, useParams } from 'react-router';
-import { siteSectionPath } from '../../../app/paths';
+import { paths, siteSectionPath } from '../../../app/paths';
 import type { SiteEditorAppearanceResponse } from '../../../shared/api/generated/model';
 import { useSiteControllerGetV1 } from '../../../shared/api/generated/site/site';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { useActiveWedding, type Audience } from '../../guests/hooks/use-active-wedding';
+import { canOpenPublish } from '../../publication/publication';
 import { AppearanceSection } from '../components/appearance-section';
 import { BasicsSection } from '../components/basics-section';
 import {
@@ -155,6 +156,13 @@ function SiteEditor({
             >
               {t('previewSite.open')}
             </Button>
+            {/* Publicar por Cortesia (Publicação RN07; decisão 228(5)): secundário, só antes de
+                publicar; com mudança não salva, o Dialog de descartar vem antes. */}
+            {canOpenPublish(data.status) && (
+              <Button variant="secondary" onClick={() => void navigate(paths.publish)}>
+                {t('publication.publish')}
+              </Button>
+            )}
             <Button
               disabled={!dirty || form?.canSave === false || saving}
               onClick={() => void save()}

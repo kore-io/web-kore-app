@@ -47,7 +47,10 @@ test.describe('Publicação por Cortesia (RN01 a RN07)', () => {
     const { email, weddingId, slug } = await draftWedding();
     await signIn({ page, email });
 
-    await page.goto('/app/cobranca/publicar');
+    // Pelo Publicar do cabeçalho do Editor (RN07; 228(5)).
+    await page.goto('/app/site/dados-basicos');
+    await page.getByRole('button', { name: 'Publicar' }).click();
+    await expect(page).toHaveURL(/\/app\/cobranca\/publicar$/);
     await expect(page.getByRole('heading', { name: 'Publicar o site', level: 1 })).toBeVisible();
     const endDate = page.getByLabel('Data de saída do ar');
     await expect(endDate).toHaveValue('');
@@ -87,7 +90,11 @@ test.describe('Publicação por Cortesia (RN01 a RN07)', () => {
     await page.goto('/app/cobranca/publicar');
     await expect(page).toHaveURL(/\/app$/);
     await page.goto('/app/site/dados-basicos');
+    await expect(page.getByRole('heading', { name: 'Dados básicos', level: 2 })).toBeVisible({
+      timeout: 15_000,
+    });
     await expect(page.getByRole('textbox', { name: 'Endereço do site' })).toBeDisabled();
+    await expect(page.getByRole('button', { name: 'Publicar' })).toHaveCount(0);
 
     // O site responde como publicado (RN06; Site público RN04).
     await page.goto(`${SITE_ORIGIN}/${slug}`);
