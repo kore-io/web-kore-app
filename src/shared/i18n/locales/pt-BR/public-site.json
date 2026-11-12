@@ -35,6 +35,10 @@
     "linkInvalid": {
       "title": "Este link não funciona mais.",
       "description": "Peça um novo link ao casal."
+    },
+    "previewInvalid": {
+      "title": "Esta prévia não vale mais.",
+      "description": "Cada prévia vale uma vez só, por poucos minutos. O botão Pré-visualizar do Editor do site abre uma nova."
     }
   },
   "sections": {
@@ -62,5 +66,19 @@
   },
   "party": {
     "banner": "Convite para {{name}}"
+  },
+  "preview": {
+    "draft": "Prévia. O site ainda não foi publicado.",
+    "draftParty": "Prévia como {{name}}. O site ainda não foi publicado.",
+    "published": "Prévia do site.",
+    "publishedParty": "Prévia como {{name}}.",
+    "viewAs": "Ver como",
+    "visitor": "Visitante",
+    "party": "Grupo",
+    "search": "Buscar um grupo",
+    "more": {
+      "couple": "Mostrando 100 de {{total}} grupos. Busquem pelo nome para achar os outros.",
+      "planner": "Mostrando 100 de {{total}} grupos. Busque pelo nome para achar os outros."
+    }
   }
 }

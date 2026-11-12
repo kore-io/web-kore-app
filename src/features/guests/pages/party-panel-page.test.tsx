@@ -47,6 +47,7 @@ function moreira(overrides: Partial<PartyResponse> = {}): PartyResponse {
     deliveryStatus: 'not_sent',
     plusOneSlots: 1,
     history: [],
+    version: 1,
     link: { url: URL_ANTIGA, regeneratedAt: null },
     guests: [
       {
@@ -106,6 +107,9 @@ function moreira(overrides: Partial<PartyResponse> = {}): PartyResponse {
   };
 }
 
+/** Os corpos do POST …/site-previews (Ver como este grupo). */
+const previews: unknown[] = [];
+
 /** Responde o /me, o GET do grupo e o regenerate; devolve as chamadas ao regenerate. */
 function mockPanel({
   party = moreira(),
@@ -113,12 +117,20 @@ function mockPanel({
 }: { party?: PartyResponse | null; regenerate?: () => Response } = {}) {
   const calls: string[] = [];
   let current = party;
-  mockApi(({ method, path }) => {
+  previews.length = 0;
+  mockApi(({ method, path, body }) => {
     if (path === '/v1/me') return Response.json(meFor(me));
     if (method === 'GET' && path === '/v1/weddings/w1/parties/p1') {
       return current
         ? Response.json(current)
         : apiError({ status: 404, body: { error: 'PARTY_NOT_FOUND' } });
+    }
+    if (method === 'POST' && path === '/v1/weddings/w1/site-previews') {
+      previews.push(body);
+      return Response.json(
+        { url: 'http://localhost:5174/ana-e-marcos?previa=tok', expiresAt: '2026-11-11T12:05:00Z' },
+        { status: 201 },
+      );
     }
     if (method === 'POST' && path === '/v1/weddings/w1/parties/p1/regenerate-link') {
       calls.push(path);
@@ -255,19 +267,51 @@ describe('Painel do grupo (RN14)', () => {
     );
   });
 
-  it('as ações da F1, sem "Alterar resposta" nem "Ver como este grupo" (RN14; 201)', async () => {
+  it('as ações, sem "Alterar resposta" (RN14; 201); o "Ver como este grupo" chega com a prévia da F2', async () => {
     const user = userEvent.setup();
     mockPanel();
     renderRoute({ url: '/app/convidados/grupos/p1' });
     await screen.findByRole('heading', { name: 'Família Moreira', level: 1 });
     expect(screen.queryByText(/Alterar resposta/)).toBeNull();
-    expect(screen.queryByText(/Ver como/)).toBeNull();
+    expect(screen.getByRole('button', { name: 'Ver como este grupo' })).toBeEnabled();
     await user.click(screen.getByRole('button', { name: 'Ações de Célia Moreira' }));
     expect(
       within(screen.getByRole('menu'))
         .getAllByRole('menuitem')
         .map((item) => item.textContent),
     ).toEqual(['Mover de grupo', 'Mover para a lixeira']);
+  });
+
+  it('Ver como este grupo abre a aba no clique e a aponta para a prévia como o grupo (Pré-visualização RN01)', async () => {
+    const user = userEvent.setup();
+    const tab = { opener: {}, closed: false, location: { href: '' }, close: vi.fn() };
+    const open = vi.fn(() => tab);
+    vi.stubGlobal('open', open);
+    mockPanel();
+    renderRoute({ url: '/app/convidados/grupos/p1' });
+    await user.click(await screen.findByRole('button', { name: 'Ver como este grupo' }));
+    expect(open).toHaveBeenCalledWith('', '_blank');
+    await waitFor(() =>
+      expect(tab.location.href).toBe('http://localhost:5174/ana-e-marcos?previa=tok'),
+    );
+    expect(tab.opener).toBeNull();
+    expect(previews).toEqual([{ mode: 'party', partyId: 'p1' }]);
+  });
+
+  it('com a aba bloqueada, o Toast com Abrir a prévia, que abre num novo clique', async () => {
+    const user = userEvent.setup();
+    const open = vi.fn(() => null);
+    vi.stubGlobal('open', open);
+    mockPanel();
+    renderRoute({ url: '/app/convidados/grupos/p1' });
+    await user.click(await screen.findByRole('button', { name: 'Ver como este grupo' }));
+    expect(await screen.findByText('O navegador bloqueou a nova aba.')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Abrir a prévia' }));
+    expect(open).toHaveBeenLastCalledWith(
+      'http://localhost:5174/ana-e-marcos?previa=tok',
+      '_blank',
+      'noopener',
+    );
   });
 
   it('Cancelar não regenera (RN12)', async () => {

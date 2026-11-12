@@ -20,6 +20,7 @@ import type {
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { MoveGuestDialog } from '../components/move-guest-dialog';
 import { TrashDialog } from '../components/trash-dialog';
+import { useOpenPreview } from '../../site/preview/use-open-preview';
 import { useActiveWedding, type Audience } from '../hooks/use-active-wedding';
 import { useMoveGuest } from '../hooks/use-move-guest';
 import { useTrash } from '../hooks/use-trash';
@@ -53,6 +54,7 @@ function PartyPanel({
   const panel = usePartyPanel({ weddingId, partyId });
   const mover = useMoveGuest({ weddingId, audience });
   const trash = useTrash({ weddingId, audience });
+  const openPreview = useOpenPreview({ weddingId });
   const navigate = useNavigate();
   const [trashingParty, setTrashingParty] = useState(false);
   const [trashingGuest, setTrashingGuest] = useState<{ id: string; name: string } | null>(null);
@@ -106,6 +108,7 @@ function PartyPanel({
         />
         <LinkCard
           party={party}
+          onPreview={() => openPreview({ mode: 'party', partyId: party.id })}
           onCopy={(url) => void panel.copyLink({ url })}
           onTrash={() => setTrashingParty(true)}
         />
@@ -362,10 +365,13 @@ function GuestItem({
 
 function LinkCard({
   party,
+  onPreview,
   onCopy,
   onTrash,
 }: {
   party: PartyResponse;
+  /** Ver como este grupo (Pré-visualização RN01): a prévia como o grupo, em nova aba. */
+  onPreview: () => void;
   onCopy: (url: string) => void;
   onTrash: () => void;
 }) {
@@ -383,6 +389,10 @@ function LinkCard({
           onClick={() => url && onCopy(url)}
         >
           {t('panel.link.copy')}
+        </Button>
+        {/* Sem endereço do site, não há link nem prévia (RN01; o servidor daria 409). */}
+        <Button variant="secondary" size="sm" disabled={url === null} onClick={onPreview}>
+          {t('panel.link.preview')}
         </Button>
         <Button variant="destructive" size="sm" onClick={onTrash}>
           {t('trash.action')}

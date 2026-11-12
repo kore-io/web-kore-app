@@ -6,6 +6,7 @@
  */
 import type { PartyContactResponse } from './partyContactResponse';
 import type { PartyCountsResponse } from './partyCountsResponse';
+import type { PartyLastResponseResponse } from './partyLastResponseResponse';
 import type { PartyListItemResponseDeliveryStatus } from './partyListItemResponseDeliveryStatus';
 import type { TagSummaryResponse } from './tagSummaryResponse';
 
@@ -21,7 +22,14 @@ export interface PartyListItemResponse {
   /** @nullable */
   respondedAt: string | null;
   /**
-   * Fase 4.
+   * A coluna Respondido em (Prazo RN07): "· por Célia" (grupo, quem assinou) ou
+   * "· alterada por Ana" (casal, quem alterou). Nula enquanto o grupo não está respondido.
+   * @nullable
+   */
+  lastResponse: PartyLastResponseResponse | null;
+  /**
+   * Obsoleto: o nome de `lastResponse` (quem assinou ou quem alterou).
+   * @deprecated
    * @nullable
    */
   respondedBy: string | null;

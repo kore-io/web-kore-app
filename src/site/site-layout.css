@@ -129,3 +129,33 @@
 .kore-site__contact {
   @apply whitespace-nowrap text-site-foreground underline;
 }
+
+/*
+ * A barra da prévia (Pré-visualização RN06; Penpot "Barra da prévia"): fixa no topo, nas
+ * cores do Kore (ink e branco), e não nas da Aparência. No celular, o texto em cima e os
+ * controles embaixo.
+ */
+.kore-site-preview {
+  @apply sticky top-0 z-50 flex flex-col gap-2 bg-ink px-4 py-2 font-body text-white md:flex-row md:flex-wrap md:items-center md:justify-between md:gap-4;
+}
+
+.kore-site-preview__text {
+  @apply m-0 type-label;
+}
+
+.kore-site-preview__controls {
+  @apply flex items-center gap-2;
+}
+
+.kore-site-preview__party {
+  @apply flex min-w-0 flex-1 flex-wrap items-center gap-2 md:flex-none;
+}
+
+.kore-site-preview__select,
+.kore-site-preview__search {
+  @apply w-full min-w-0 text-ink md:w-56;
+}
+
+.kore-site-preview__more {
+  @apply m-0 w-full type-caption text-gray-300;
+}

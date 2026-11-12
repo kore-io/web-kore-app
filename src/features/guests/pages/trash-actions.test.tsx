@@ -59,6 +59,7 @@ const moreira: PartyResponse = {
   deliveryStatus: 'not_sent',
   plusOneSlots: 0,
   history: [],
+  version: 1,
   link: { url: null, regeneratedAt: null },
   guests: [guest('g1', 'Luiz Moreira'), guest('g2', 'Célia Moreira'), guest('g3', 'Pedro Moreira')],
 };
@@ -74,6 +75,7 @@ function item(id: string, name: string, people = 1): PartyListItemResponse {
     deliveryStatus: 'not_sent',
     respondedAt: null,
     respondedBy: null,
+    lastResponse: null,
     tags: [],
   };
 }

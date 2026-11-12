@@ -3,6 +3,7 @@ import { CloudOff, Clock, Globe, Link } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { PublicSiteResponse } from '../shared/api/generated/model';
+import { PreviewBar } from './components/preview-bar';
 import { SiteHero } from './components/site-hero';
 import { SiteLayout } from './components/site-layout';
 import { SiteSections } from './components/site-sections';
@@ -11,16 +12,26 @@ import { loadSiteFonts } from './fonts';
 import { parseSiteRoute } from './route';
 import { applySiteTheme } from './theme';
 import { usePartySession } from './use-party-session';
+import { usePreviewSession } from './use-preview-session';
 import { usePublicSite } from './use-public-site';
 
 /** O site do casal (Site público): o endereço, os estados e o Início. */
-export function SiteApp({ pathname = window.location.pathname }: { pathname?: string }) {
+export function SiteApp({
+  pathname = window.location.pathname,
+  search = window.location.search,
+}: {
+  pathname?: string;
+  search?: string;
+}) {
   const [queryClient] = useState(() => new QueryClient());
   const route = parseSiteRoute(pathname);
+  const previewToken = new URLSearchParams(search).get('previa');
   return (
     <QueryClientProvider client={queryClient}>
       {route.kind === 'none' ? (
         <NotFoundPage />
+      ) : route.kind === 'site' && previewToken ? (
+        <PreviewEntry slug={route.slug} token={previewToken} />
       ) : route.kind === 'party' ? (
         <PartyEntry slug={route.slug} token={route.token} />
       ) : (
@@ -88,6 +99,24 @@ function PartyEntry({ slug, token }: { slug: string; token: string }) {
   return <SitePage slug={entry.slug} />;
 }
 
+/** A prévia (Pré-visualização RN03 e RN04): troca o token pelo cookie e abre o site. */
+function PreviewEntry({ slug, token }: { slug: string; token: string }) {
+  const { t } = useTranslation('publicSite');
+  const entry = usePreviewSession({ slug, token });
+  if (entry.state === 'loading') return <SiteSkeleton />;
+  if (entry.state === 'invalid') {
+    return (
+      <SystemPage
+        icon={<Link />}
+        title={t('states.previewInvalid.title')}
+        description={t('states.previewInvalid.description')}
+      />
+    );
+  }
+  if (entry.state === 'error') return <LoadErrorPage retry={entry.retry} />;
+  return <SitePage slug={entry.slug} />;
+}
+
 function SitePage({ slug }: { slug: string }) {
   const { state, site, retry } = usePublicSite({ slug });
   if (state === 'loading') return <SiteSkeleton />;
@@ -108,14 +137,16 @@ function SiteHome({ site }: { site: PublicSiteResponse }) {
   return (
     <SiteLayout
       site={site}
-      {...(site.viewer.kind === 'party' &&
-        site.viewer.party && {
-          banner: (
+      banner={
+        <>
+          {site.viewer.kind === 'preview' && <PreviewBar site={site} />}
+          {site.viewer.party && (
             <p className="kore-site__party">
               {t('party.banner', { name: site.viewer.party.name })}
             </p>
-          ),
-        })}
+          )}
+        </>
+      }
     >
       <SiteHero site={site} now={new Date()} />
       <SiteSections sections={site.sections} />

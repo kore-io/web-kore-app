@@ -380,3 +380,12 @@
 .kore-site-story__sending {
   @apply m-0 type-caption text-gray-700;
 }
+
+/* Pré-visualizar e Salvar no cabeçalho (Pré-visualização RN01) */
+.kore-site-editor__actions {
+  @apply flex flex-wrap items-center justify-end gap-2;
+}
+
+.kore-site-editor__preview-help {
+  @apply m-0 w-full text-end type-caption text-gray-700;
+}

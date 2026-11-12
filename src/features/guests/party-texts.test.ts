@@ -16,6 +16,7 @@ function party(overrides: Partial<PartyListItemResponse> = {}): PartyListItemRes
     deliveryStatus: 'not_sent',
     respondedAt: null,
     respondedBy: null,
+    lastResponse: null,
     tags: [],
     ...overrides,
   };
