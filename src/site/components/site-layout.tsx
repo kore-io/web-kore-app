@@ -5,7 +5,7 @@ import type { PublicSiteResponse } from '../../shared/api/generated/model';
 import { formatPhone } from '../../features/guests/party-form';
 import { LONG_DATE } from '../../features/site/site-texts';
 import { EDITOR_SECTIONS } from '../../features/site/sections';
-import { companyLine, KORE_URL, PRIVACY_URL, TERMS_URL } from '../links';
+import { companyLine, madeWithKoreHref, PRIVACY_URL, TERMS_URL } from '../links';
 
 /** A âncora de cada seção no Início, pelo caminho do Editor (ex.: `#nossa-historia`). */
 export function sectionAnchor(type: string): string {
@@ -103,7 +103,7 @@ export function SiteLayout({
         {dateLine && <p className="kore-site__footer-line">{dateLine}</p>}
         <Contact contact={site.contact} />
         <p className="kore-site__footer-links">
-          <a className="kore-site__made-with" href={KORE_URL}>
+          <a className="kore-site__made-with" href={madeWithKoreHref()}>
             {t('footer.madeWith')}
           </a>
           <a href={TERMS_URL}>{t('footer.terms')}</a>

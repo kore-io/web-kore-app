@@ -1,0 +1,245 @@
+/*
+ * O Simule (Penpot, Institucional, página 03): no desktop, a prévia à esquerda e o passo
+ * numa coluna de 520 px à direita, com o botão no pé; no celular, a prévia fixa no topo e
+ * o passo embaixo. Nas cores do Kore; só o cartão da prévia usa as da Aparência.
+ */
+.kore-simule {
+  @apply flex min-h-dvh flex-col bg-paper font-body text-ink lg:flex-row;
+}
+
+.kore-simule-preview {
+  @apply sticky top-0 z-10 order-2 flex items-center justify-center bg-muted px-4 py-4 lg:static lg:order-none lg:flex-1 lg:px-16;
+}
+
+/* No celular, a coluna some e os filhos entram na ordem do Penpot: o topo, a prévia, o passo. */
+.kore-simule__column {
+  @apply contents lg:flex lg:w-130 lg:flex-none lg:flex-col lg:border-l lg:border-gray-300 lg:bg-white;
+}
+
+.kore-simule__head {
+  @apply order-1 bg-white px-5 pt-4 pb-3 lg:order-none lg:px-10;
+}
+
+.kore-simule-preview__card {
+  @apply flex w-full max-w-xl flex-col items-center gap-2 overflow-hidden rounded-lg border border-site-border bg-site-background px-6 py-8 text-center font-site-body text-site-foreground lg:py-16;
+}
+
+.kore-simule-preview__photo {
+  @apply -mt-4 mb-2 aspect-video w-full rounded-md object-cover lg:-mt-12;
+}
+
+.kore-simule-preview__overline {
+  @apply m-0 type-overline text-site-muted-foreground;
+}
+
+.kore-simule-preview__names {
+  @apply m-0 font-site-display type-display-md text-site-foreground;
+}
+
+.kore-simule-preview__line {
+  @apply m-0 type-caption text-site-foreground;
+}
+
+.kore-simule-preview__blank {
+  @apply block rounded-sm bg-site-border;
+}
+
+.kore-simule-preview__blank--names {
+  @apply h-12 w-64 max-w-full;
+}
+
+.kore-simule-preview__blank--line {
+  @apply h-2 w-48 max-w-full rounded-full;
+}
+
+.kore-simule-preview__button {
+  @apply mt-2 inline-flex min-h-9 items-center rounded-full bg-site-primary px-4 type-label text-site-primary-foreground;
+}
+
+.kore-simule__panel {
+  @apply order-3 flex flex-1 flex-col bg-white px-5 lg:order-none lg:px-10;
+}
+
+.kore-simule__top {
+  @apply flex items-center justify-between;
+}
+
+.kore-simule__back {
+  @apply -ml-2 inline-flex min-h-11 cursor-pointer items-center gap-1 px-2 type-label text-primary-dark;
+  @apply focus-visible:rounded-sm focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}
+
+.kore-simule__back > svg {
+  @apply size-4;
+}
+
+.kore-simule__step {
+  @apply type-caption text-gray-700;
+}
+
+.kore-simule__progress {
+  @apply mt-1;
+}
+
+.kore-simule__body {
+  @apply flex flex-1 flex-col gap-4 py-6 lg:py-8;
+}
+
+.kore-simule__title {
+  @apply m-0 font-display type-display-sm text-ink;
+}
+
+.kore-simule__help {
+  @apply -mt-2 m-0 type-body-md text-gray-700;
+}
+
+.kore-simule__field {
+  @apply flex flex-col gap-1.5;
+}
+
+.kore-simule__group {
+  @apply m-0 flex flex-col gap-2 border-0 p-0;
+}
+
+.kore-simule__legend {
+  @apply mb-2 p-0 type-label text-ink;
+}
+
+.kore-simule__swatches {
+  @apply flex flex-wrap gap-1 lg:gap-0;
+}
+
+.kore-simule__swatch {
+  @apply relative flex size-11 cursor-pointer items-center justify-center;
+}
+
+.kore-simule__swatch-input {
+  @apply sr-only;
+}
+
+.kore-simule__swatch-dot {
+  @apply block size-8 rounded-full;
+}
+
+.kore-simule__swatch-input:checked + .kore-simule__swatch-dot {
+  @apply ring-2 ring-ink ring-offset-2;
+}
+
+.kore-simule__swatch-input:focus-visible + .kore-simule__swatch-dot {
+  @apply shadow-focus-ring;
+}
+
+.kore-simule__swatch-other {
+  @apply m-1.5 size-8 cursor-pointer rounded-full bg-conic from-danger-base via-success-base to-info-base;
+  @apply aria-pressed:ring-2 aria-pressed:ring-ink aria-pressed:ring-offset-2;
+  @apply focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}
+
+.kore-simule__caption {
+  @apply m-0 type-caption text-gray-700;
+}
+
+.kore-simule__fonts {
+  @apply flex flex-wrap gap-2;
+}
+
+.kore-simule__font {
+  @apply relative cursor-pointer;
+}
+
+.kore-simule__font-input {
+  @apply sr-only;
+}
+
+.kore-simule__font-label {
+  @apply flex min-h-11 items-center rounded-full border border-gray-300 px-4 type-body-lg text-ink;
+}
+
+.kore-simule__font-input:checked + .kore-simule__font-label {
+  @apply border-primary-dark bg-primary-tint;
+}
+
+.kore-simule__font-input:focus-visible + .kore-simule__font-label {
+  @apply shadow-focus-ring;
+}
+
+.kore-simule__error {
+  @apply m-0 type-caption text-danger-text;
+}
+
+.kore-simule__list {
+  @apply m-0 flex list-none flex-col gap-3 p-0;
+}
+
+.kore-simule__item {
+  @apply flex items-center gap-3 type-body-md text-ink;
+}
+
+.kore-simule__item > svg {
+  @apply size-4 shrink-0;
+}
+
+.kore-simule__ready-actions {
+  @apply mt-auto flex flex-col gap-2 border-t border-gray-300 pt-4 text-center;
+}
+
+.kore-simule__footer {
+  @apply sticky bottom-0 -mx-5 flex flex-col items-stretch gap-2 border-t border-gray-300 bg-white px-5 py-4 text-center lg:-mx-10 lg:px-10;
+}
+
+.kore-simule__primary {
+  @apply w-full;
+}
+
+.kore-simule__link {
+  @apply inline-flex min-h-11 cursor-pointer items-center justify-center self-center bg-transparent type-label text-primary-dark hover:underline;
+}
+
+/* A folha "Escolham a cor": de baixo no celular; no desktop, sobre a coluna do passo. */
+.kore-simule-sheet {
+  @apply fixed inset-x-0 top-auto bottom-0 m-0 flex w-full max-w-none flex-col gap-4 rounded-t-xl border-0 bg-white p-5 shadow-lg backdrop:bg-overlay lg:inset-x-auto lg:right-5 lg:bottom-5 lg:w-120 lg:rounded-xl;
+}
+
+.kore-simule-sheet:not([open]) {
+  @apply hidden;
+}
+
+.kore-simule-sheet__header {
+  @apply flex items-center justify-between;
+}
+
+.kore-simule-sheet__title {
+  @apply m-0 font-display type-heading text-ink;
+}
+
+.kore-simule-sheet__close {
+  @apply inline-flex min-h-11 cursor-pointer items-center type-label text-primary-dark;
+}
+
+.kore-simule-sheet__row {
+  @apply flex items-center gap-3;
+}
+
+.kore-simule-sheet__label {
+  @apply sr-only;
+}
+
+.kore-simule-sheet__picker {
+  @apply size-11 shrink-0 cursor-pointer rounded-md border border-gray-300 bg-transparent p-0.5;
+}
+
+.kore-simule-sheet__hex {
+  @apply flex-1;
+}
+
+.kore-simule-sheet__message {
+  @apply m-0 flex items-start gap-2 rounded-md bg-success-tint p-3 type-body-md text-success-text;
+}
+
+.kore-simule-sheet__message > svg {
+  @apply mt-0.5 size-4 shrink-0;
+}
+
+.kore-simule-sheet__message--danger {
+  @apply bg-danger-tint text-danger-text;
+}

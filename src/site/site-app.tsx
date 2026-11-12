@@ -12,6 +12,7 @@ import { loadSiteFonts } from './fonts';
 import { parseSiteRoute } from './route';
 import { applySiteTheme } from './theme';
 import { usePartySession } from './use-party-session';
+import { SimulatorPage } from './simulator/simulator-page';
 import { usePreviewSession } from './use-preview-session';
 import { usePublicSite } from './use-public-site';
 
@@ -28,7 +29,9 @@ export function SiteApp({
   const previewToken = new URLSearchParams(search).get('previa');
   return (
     <QueryClientProvider client={queryClient}>
-      {route.kind === 'none' ? (
+      {route.kind === 'simulator' ? (
+        <SimulatorPage search={search} />
+      ) : route.kind === 'none' ? (
         <NotFoundPage />
       ) : route.kind === 'site' && previewToken ? (
         <PreviewEntry slug={route.slug} token={previewToken} />
