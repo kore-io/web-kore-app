@@ -33,8 +33,8 @@ importers:
         specifier: ^5.3.1
         version: 5.3.1
       '@kore-io/design':
-        specifier: 0.2.0-homolog.32
-        version: 0.2.0-homolog.32(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(eslint@10.14.0(jiti@2.7.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(stylelint@18.0.0)(tailwindcss@4.3.4)
+        specifier: 0.2.0-homolog.35
+        version: 0.2.0-homolog.35(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(eslint@10.14.0(jiti@2.7.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(stylelint@18.0.0)(tailwindcss@4.3.4)
       '@tanstack/react-query':
         specifier: ^5.106.1
         version: 5.106.1(@types/react@19.3.0)(react@19.3.1)
@@ -1107,8 +1107,8 @@ packages:
   '@keyv/serialize@1.1.1':
     resolution: {integrity: sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==}
 
-  '@kore-io/design@0.2.0-homolog.32':
-    resolution: {integrity: sha512-OSEkxElu4BshEvMIB3mA1+GO+nhV2T8L0EHpFGbi4Pn0f/kb8L+WQ5nAX3RLsHfbojV445GhobUpThXr+J54kg==, tarball: https://npm.pkg.github.com/download/@kore-io/design/0.2.0-homolog.32/1858799b09487116f372a0835584605786f2c174}
+  '@kore-io/design@0.2.0-homolog.35':
+    resolution: {integrity: sha512-hV1+SBYLFnIKWwnlnq2PLUrls83Tw0WY5y984sUdV0DZytbx8Mo2+b9uvdBDDU7fmDdfgg4ohYyyvtJ1XfUzAg==, tarball: https://npm.pkg.github.com/download/@kore-io/design/0.2.0-homolog.35/134aa1f6e1ef82d26a143bb1944f993aeeee2f76}
     engines: {node: '>=24'}
     peerDependencies:
       eslint: ^10.0.0
@@ -1116,13 +1116,6 @@ packages:
       react-dom: ^19.0.0
       stylelint: ^18.0.0
       tailwindcss: ^4.1.0
-    peerDependenciesMeta:
-      eslint:
-        optional: true
-      stylelint:
-        optional: true
-      tailwindcss:
-        optional: true
 
   '@orval/angular@8.46.0':
     resolution: {integrity: sha512-t8fPU4Zkh7TLvjJdRY8JK4SDPFfhEzPeH56zhjSvr+Vmk10VrkkjiohLu69P+x53C/9D6xirz0cuEH4YN+XxNw==}
@@ -5495,17 +5488,16 @@ snapshots:
 
   '@keyv/serialize@1.1.1': {}
 
-  '@kore-io/design@0.2.0-homolog.32(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(eslint@10.14.0(jiti@2.7.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(stylelint@18.0.0)(tailwindcss@4.3.4)':
+  '@kore-io/design@0.2.0-homolog.35(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(eslint@10.14.0(jiti@2.7.0))(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(stylelint@18.0.0)(tailwindcss@4.3.4)':
     dependencies:
       '@radix-ui/react-dialog': 1.3.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@radix-ui/react-dropdown-menu': 2.2.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@radix-ui/react-slot': 1.5.0(@types/react@19.3.0)(react@19.3.1)
       '@radix-ui/react-toast': 1.3.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      eslint: 10.14.0(jiti@2.7.0)
       lucide-react: 1.69.0(@types/react@19.3.0)(react@19.3.1)
       react: 19.3.1
       react-dom: 19.3.1(react@19.3.1)
-    optionalDependencies:
-      eslint: 10.14.0(jiti@2.7.0)
       stylelint: 18.0.0
       tailwindcss: 4.3.4
     transitivePeerDependencies:
