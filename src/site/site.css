@@ -10,3 +10,4 @@
 @import './site-layout.css' layer(components);
 @import './site-sections.css' layer(components);
 @import './site-system.css' layer(components);
+@import './simulator/simulator.css' layer(components);

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { KORE_URL } from '../links';
+import { madeWithKoreHref } from '../links';
 
 /**
  * Página de sistema do site (Penpot, Área do Convidado, página 03): na voz e nas cores do
@@ -30,7 +30,7 @@ export function SystemPage({
         {action}
       </main>
       <footer className="kore-site-system__footer">
-        <a className="kore-site-system__made-with" href={KORE_URL}>
+        <a className="kore-site-system__made-with" href={madeWithKoreHref()}>
           {t('footer.madeWith')}
         </a>
       </footer>

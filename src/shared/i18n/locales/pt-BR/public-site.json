@@ -80,5 +80,87 @@
       "couple": "Mostrando 100 de {{total}} grupos. Busquem pelo nome para achar os outros.",
       "planner": "Mostrando 100 de {{total}} grupos. Busque pelo nome para achar os outros."
     }
+  },
+  "simulator": {
+    "back": "Voltar",
+    "step": "Passo {{n}} de 4",
+    "done": "Pronto",
+    "saved": "Rascunho guardado",
+    "continue": "Continuar",
+    "preview": {
+      "overline": "Nosso casamento",
+      "button": "Abrir no Google Maps",
+      "cover": "Foto de capa"
+    },
+    "names": {
+      "title": "Como vocês se chamam?",
+      "help": "Do jeito que vai aparecer no site.",
+      "mine": "Seu nome",
+      "mineExample": "Ex.: Ana",
+      "partner": "Nome do seu amor",
+      "partnerExample": "Ex.: Marcos"
+    },
+    "when": {
+      "title": "Quando e onde vai ser?",
+      "help": "Se ainda não sabem a data, tudo bem. Dá para mudar depois.",
+      "date": "Data do casamento",
+      "noDate": "Ainda não sabemos a data",
+      "city": "Cidade"
+    },
+    "style": {
+      "title": "Qual é o estilo de vocês?",
+      "help": "A prévia muda na hora. Testem à vontade.",
+      "colors": "Cores",
+      "otherHelp": "Tem a cor do casamento de vocês? Toquem no círculo colorido.",
+      "other": "Outra cor",
+      "fonts": "Fontes"
+    },
+    "picker": {
+      "title": "Escolham a cor",
+      "close": "Fechar",
+      "color": "Cor",
+      "pick": "Escolher a cor",
+      "use": "Usar esta cor",
+      "good": {
+        "white": "Boa leitura: o texto dos botões fica branco.",
+        "dark": "Boa leitura: o texto dos botões fica preto."
+      },
+      "blocked": {
+        "primary_foreground": "Essa cor deixa o texto dos botões difícil de ler. Escolham um tom mais escuro ou mais claro.",
+        "primary_background": "Essa cor fica pouco visível neste fundo. Escolham um tom mais escuro ou mais claro."
+      }
+    },
+    "photo": {
+      "title": "Querem colocar uma foto?",
+      "help": "Ela aparece no topo do site. Se preferirem, escolham depois.",
+      "drop": "Escolher uma foto",
+      "dropHint": "JPG ou PNG.",
+      "notice": "A foto aparece só nesta prévia e não fica guardada. Quando criarem a conta, escolham a foto de novo no Editor do site.",
+      "skip": "Pular este passo",
+      "change": "Trocar foto",
+      "remove": "Remover foto",
+      "errors": {
+        "type": "Não foi possível usar esta foto. Escolham uma foto JPG ou PNG.",
+        "tooBig": "Esta foto passa de 25 MB. Escolham uma foto menor."
+      }
+    },
+    "ready": {
+      "title": "O site de vocês já tem cara de casamento",
+      "help": "Criem a conta para guardar tudo. Montar é grátis; vocês só pagam quando publicarem.",
+      "google": "Continuar com Google",
+      "email": "Criar com e-mail",
+      "photoNotice": "A foto não vai para a conta. Vocês a escolhem de novo no Editor do site.",
+      "draftNotice": "O que vocês montarem fica guardado só neste navegador, por 7 dias, até criarem a conta.",
+      "signIn": "Já têm conta? Entrar",
+      "guests": "Montem a lista de convidados",
+      "invites": "Enviem os convites pelo WhatsApp de vocês",
+      "gifts": "Recebam os presentes por Pix, sem taxa"
+    },
+    "resume": {
+      "title": "Continuar de onde pararam?",
+      "help": "Encontramos o site que vocês começaram neste aparelho. Ele ainda não foi salvo numa conta.",
+      "continue": "Continuar de onde pararam",
+      "restart": "Começar de novo"
+    }
   }
 }

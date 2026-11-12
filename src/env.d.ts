@@ -8,6 +8,10 @@ interface ImportMetaEnv {
   readonly VITE_COMPANY_NAME?: string;
   readonly VITE_COMPANY_CNPJ?: string;
   readonly VITE_COMPANY_ADDRESS?: string;
+  /** O Simule em kore.com.br/simule (Simule RN01): "true" só no local, até o PO liberar. */
+  readonly VITE_SIMULATOR_ENABLED?: string;
+  /** O endereço do app, para os botões do Pronto do Simule (RN08; ex.: http://localhost:5173). */
+  readonly VITE_APP_URL?: string;
 }
 
 interface ImportMeta {
