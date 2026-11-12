@@ -7,7 +7,8 @@
  * - A prévia vem do `GET /v1/public/sites/{slug}/preview`: publicado, os nomes e a og.jpg
  *   da capa; rascunho ou endereço que não existe, a prévia genérica do Kore, sem nome.
  * - Sempre `noindex`, `private, no-store` e `no-referrer` (RN02 e RN03).
- * - Se a API falhar, sai o HTML com a prévia genérica: o site carrega e mostra o erro dele.
+ * - Se a API falhar ou passar de 2,5 s, sai o HTML com a prévia genérica: o site carrega e
+ *   mostra o dele.
  */
 
 export interface SitePageEnv {
@@ -47,6 +48,9 @@ export const SITE_HEADERS = {
   'X-Content-Type-Options': 'nosniff',
 } as const;
 
+/** A página do convidado não espera uma API lenta (sugestão do Crivo no B6). */
+export const PREVIEW_TIMEOUT_MS = 2500;
+
 const SLUG_PATTERN = /^[a-z0-9](?:[a-z0-9-]{0,38}[a-z0-9])?$/;
 
 function escapeHtml(value: string): string {
@@ -75,16 +79,18 @@ async function linkPreview({
   slug,
   env,
   fetchImpl,
+  timeoutMs,
 }: {
   slug: string | null;
   env: SitePageEnv;
   fetchImpl: typeof fetch;
+  timeoutMs: number;
 }): Promise<LinkPreview | null> {
   if (!slug) return null;
   try {
     const response = await fetchImpl(
       `${env.API_URL}/v1/public/sites/${encodeURIComponent(slug)}/preview`,
-      { headers: { Accept: 'application/json' } },
+      { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(timeoutMs) },
     );
     if (!response.ok) return null;
     return (await response.json()) as LinkPreview;
@@ -138,15 +144,18 @@ export async function handleSitePage({
   request,
   env,
   fetchImpl = fetch,
+  timeoutMs = PREVIEW_TIMEOUT_MS,
 }: {
   request: Request;
   env: SitePageEnv;
   fetchImpl?: typeof fetch;
+  /** O limite da chamada à API (configurável para o teste). */
+  timeoutMs?: number;
 }): Promise<Response> {
   const url = new URL(request.url);
   const slug = slugFromPath(url.pathname);
   const [preview, page] = await Promise.all([
-    linkPreview({ slug, env, fetchImpl }),
+    linkPreview({ slug, env, fetchImpl, timeoutMs }),
     env.ASSETS.fetch(new Request(new URL('/', url), { method: 'GET' })),
   ]);
   const html = await page.text();

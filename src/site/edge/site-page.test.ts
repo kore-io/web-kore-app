@@ -38,6 +38,7 @@ describe('Pages Function do site do casal (Site público RN01 a RN03, RN09)', ()
       'https://api.test/v1/public/sites/ana-e-marcos/preview',
       {
         headers: { Accept: 'application/json' },
+        signal: expect.any(AbortSignal),
       },
     );
     expect(response.status).toBe(200);
@@ -119,6 +120,24 @@ describe('Pages Function do site do casal (Site público RN01 a RN03, RN09)', ()
       }),
     });
     expect(response.status).toBe(200);
+    expect(await response.text()).toContain('<title>Kore</title>');
+  });
+
+  it('a API lenta: passado o limite, a genérica, sem esperar', async () => {
+    const slow = vi.fn(
+      (_url: RequestInfo | URL, init?: RequestInit) =>
+        new Promise<Response>((_resolve, reject) => {
+          init?.signal?.addEventListener('abort', () => reject(init.signal?.reason));
+        }),
+    );
+    const started = Date.now();
+    const response = await handleSitePage({
+      request: new Request('https://kore.com.br/ana-e-marcos'),
+      env: env(),
+      fetchImpl: slow as unknown as typeof fetch,
+      timeoutMs: 50,
+    });
+    expect(Date.now() - started).toBeLessThan(2000);
     expect(await response.text()).toContain('<title>Kore</title>');
   });
 
