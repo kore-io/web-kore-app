@@ -1,5 +1,5 @@
 import { NavItem } from '@kore-io/design';
-import { Globe, LayoutDashboard, Users } from 'lucide-react';
+import { Globe, LayoutDashboard, Send, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, Outlet, useMatch } from 'react-router';
 import { useCoupleSession } from '../../features/access/hooks/use-couple-session';
@@ -21,6 +21,7 @@ export function CoupleAreaLayout() {
   const signOut = useSignOut();
   const onGuests = useMatch({ path: paths.guests, end: false }) !== null;
   const onSite = useMatch({ path: paths.site, end: false }) !== null;
+  const onDeliveries = useMatch({ path: paths.deliveries, end: false }) !== null;
   // O Dashboard só em /app: telas sem item na Sidebar (ex.: Publicar o site) não marcam nada.
   const onDashboard = useMatch({ path: paths.coupleArea, end: true }) !== null;
 
@@ -45,6 +46,9 @@ export function CoupleAreaLayout() {
           </NavItem>
           <NavItem asChild icon={<Users />} current={onGuests}>
             <Link to={paths.guests}>{t('nav.guests')}</Link>
+          </NavItem>
+          <NavItem asChild icon={<Send />} current={onDeliveries}>
+            <Link to={paths.deliveries}>{t('nav.deliveries')}</Link>
           </NavItem>
           <NavItem asChild icon={<Globe />} current={onSite}>
             <Link to={paths.site}>{t('nav.site')}</Link>

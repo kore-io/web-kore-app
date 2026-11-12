@@ -7,6 +7,8 @@ import { SignInGooglePage } from '../features/access/pages/sign-in-google-page';
 import { SignInPage } from '../features/access/pages/sign-in-page';
 import { SignUpPage } from '../features/access/pages/sign-up-page';
 import { DashboardPage } from '../features/dashboard/pages/dashboard-page';
+import { DeadlinePage } from '../features/deliveries/pages/deadline-page';
+import { DeliveriesLayout } from '../features/deliveries/pages/deliveries-layout';
 import { GuestsLayout } from '../features/guests/pages/guests-layout';
 import { GuestsPage } from '../features/guests/pages/guests-page';
 import { ExportPage } from '../features/guests/pages/export-page';
@@ -60,6 +62,15 @@ export const routes: RouteObject[] = [
           },
           { id: 'site-editor', path: 'site/:section', element: <SiteEditorPage /> },
           { id: 'publish', path: 'cobranca/publicar', element: <PublishPage /> },
+          {
+            path: 'envios',
+            element: <DeliveriesLayout />,
+            children: [
+              // No C3 da F4, Envios abre no Prazo de resposta (a única aba até o C4).
+              { index: true, element: <Navigate to={paths.deliveryDeadline} replace /> },
+              { id: 'delivery-deadline', path: 'prazo', element: <DeadlinePage /> },
+            ],
+          },
           {
             id: 'guest-party-edit',
             path: 'convidados/grupos/:partyId/editar',

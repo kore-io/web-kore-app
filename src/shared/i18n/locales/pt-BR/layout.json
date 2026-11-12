@@ -9,6 +9,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "guests": "Convidados",
+    "deliveries": "Envios",
     "site": "Site"
   },
   "activeProfileCouple": "Perfil ativo: Casal",

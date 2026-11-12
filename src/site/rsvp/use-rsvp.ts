@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { PutRsvpBody, RsvpResponse } from '../../shared/api/generated/model';
 import { rsvpControllerGetV1, rsvpControllerPutV1 } from '../../shared/api/generated/sites/sites';
 import { ApiError, apiErrorCode } from '../../shared/api/http-client';
+import { shortDayMonth } from '../../shared/date-texts';
 
 export const rsvpQueryKey = (slug: string) => ['rsvp', slug] as const;
 
@@ -60,16 +61,7 @@ function failure(error: unknown): SendResult {
   return { kind: 'failed' };
 }
 
-const SHORT = new Intl.DateTimeFormat('pt-BR', { day: 'numeric', month: 'short', timeZone: 'UTC' });
-const SHORT_YEAR = new Intl.DateTimeFormat('pt-BR', {
-  day: 'numeric',
-  month: 'short',
-  year: 'numeric',
-  timeZone: 'UTC',
-});
-
 /** O prazo por extenso curto, sem o ano corrente: "15 de out." (R2, RN03). */
 export function deadlineText({ day, now }: { day: string; now: Date }): string {
-  const date = new Date(`${day}T12:00:00Z`);
-  return (date.getUTCFullYear() === now.getFullYear() ? SHORT : SHORT_YEAR).format(date);
+  return shortDayMonth({ day, now });
 }

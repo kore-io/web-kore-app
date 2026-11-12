@@ -33,6 +33,10 @@ export const paths = {
   /** Novo grupo e Editar grupo (decisão 213(9)). */
   guestNew: '/app/convidados/novo',
   guestPartyEdit: '/app/convidados/grupos/:partyId/editar',
+  /** Envios (IA da Área do Casal); no C3 da F4, só a aba Prazo de resposta. */
+  deliveries: '/app/envios',
+  /** Envios › Prazo de resposta (Prazo e respostas RN02; decisão 217(13)). */
+  deliveryDeadline: '/app/envios/prazo',
   /** Site › Editor (decisão 214): /app/site abre os Dados básicos. */
   site: '/app/site',
   siteSection: '/app/site/:section',
