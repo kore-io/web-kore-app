@@ -48,7 +48,8 @@
     "caption": "Visão de visitante",
     "countdown_one": "Falta {{count}} dia",
     "countdown_other": "Faltam {{count}} dias",
-    "today": "É hoje"
+    "today": "É hoje",
+    "button": "Abrir no Google Maps"
   },
   "loading": "Carregando o site",
   "basics": {
@@ -139,5 +140,58 @@
         "planner": "Muitas fotos ao mesmo tempo. Espere um minuto e tente de novo."
       }
     }
+  },
+  "appearance": {
+    "typography": "Tipografia",
+    "inUse": "Em uso",
+    "fonts": {
+      "romantico": "Romântico",
+      "classico": "Clássico",
+      "leve": "Leve",
+      "moderno": "Moderno"
+    },
+    "colors": "Cores",
+    "colorsHelp": {
+      "couple": "Comecem por uma paleta e, se quiserem, troquem a cor principal e o destaque.",
+      "planner": "Comece por uma paleta e, se quiser, troque a cor principal e o destaque."
+    },
+    "palettesLabel": "Paleta de partida",
+    "palettes": {
+      "terracota": "Terracota",
+      "salvia": "Sálvia",
+      "rose": "Rosé",
+      "marfim": "Marfim",
+      "marinho": "Marinho",
+      "areia": "Areia",
+      "por-do-sol": "Pôr do sol",
+      "grafite": "Grafite",
+      "noite": "Noite"
+    },
+    "primary": "Cor principal (botões)",
+    "accent": "Destaque (detalhes e ícones)",
+    "colorPicker": "Escolher a cor: {{label}}",
+    "primaryLegend": {
+      "white": "Texto dos botões em branco · contraste {{text}} · sobre o fundo {{background}}",
+      "dark": "Texto dos botões em preto · contraste {{text}} · sobre o fundo {{background}}"
+    },
+    "accentLegend": "Sobre o fundo: {{ratio}}",
+    "accentLow": "O destaque fica pouco visível neste fundo.",
+    "blocked": {
+      "primary_foreground": {
+        "couple": "Essa cor deixa o texto dos botões difícil de ler. Escolham um tom mais escuro ou mais claro.",
+        "planner": "Essa cor deixa o texto dos botões difícil de ler. Escolha um tom mais escuro ou mais claro."
+      },
+      "primary_background": {
+        "couple": "Essa cor fica pouco visível neste fundo. Escolham um tom mais escuro ou mais claro, ou outro fundo.",
+        "planner": "Essa cor fica pouco visível neste fundo. Escolha um tom mais escuro ou mais claro, ou outro fundo."
+      }
+    },
+    "background": "Fundo",
+    "backgrounds": {
+      "light": "Claro",
+      "cream": "Creme",
+      "dark": "Escuro"
+    },
+    "help": "Trocar a aparência não apaga textos nem fotos."
   }
 }

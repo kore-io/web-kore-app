@@ -91,6 +91,14 @@
   @apply type-display-md;
 }
 
+.kore-editor-preview__rule {
+  @apply my-1 block h-0.5 w-12 rounded-full;
+}
+
+.kore-editor-preview__button {
+  @apply mt-3 inline-flex min-h-10 items-center rounded-full px-5 type-label;
+}
+
 .kore-editor-preview__date {
   @apply type-body-md;
 }
@@ -171,4 +179,121 @@
 
 .kore-site-cover__help {
   @apply type-caption text-gray-700;
+}
+
+/*
+ * Aparência (Penpot "Editor — Aparência"): os títulos dos grupos em type.overline
+ * gray.700; os 4 pares em cartões de 2 colunas (1 no celular), borda gray.300, raio md,
+ * com a amostra "Ana & Marcos" na fonte de títulos do par (type.display-sm) e as famílias
+ * em type.caption; o escolhido em primary.tint com a borda primary.dark e o selo "Em uso".
+ * As paletas em pílulas com as duas cores (16 px); a cor principal e o destaque com o
+ * círculo de 40 px ao lado do campo; a legenda em type.caption, success, warning ou
+ * danger. Os fundos em 3 cartões lado a lado (empilhados no celular).
+ */
+.kore-site-appearance {
+  @apply flex flex-col gap-6;
+}
+
+.kore-site-appearance__group {
+  @apply m-0 flex min-w-0 flex-col gap-4 border-0 p-0;
+}
+
+.kore-site-appearance__title {
+  @apply type-overline mb-4 p-0 text-gray-700;
+}
+
+.kore-site-appearance__help {
+  @apply type-body-md text-gray-700;
+}
+
+.kore-site-appearance__radio {
+  @apply sr-only;
+}
+
+.kore-site-appearance__fonts {
+  @apply grid gap-3 md:grid-cols-2;
+}
+
+.kore-site-appearance__card {
+  @apply flex cursor-pointer flex-col gap-1 rounded-md border border-gray-300 bg-white p-3 type-body-md text-ink;
+  @apply has-focus-visible:shadow-focus-ring;
+}
+
+.kore-site-appearance__card[data-selected='true'],
+.kore-site-appearance__palette[data-selected='true'] {
+  @apply border-1.5 border-primary-dark bg-primary-tint;
+}
+
+.kore-site-appearance__card--row {
+  @apply min-h-12 flex-row items-center gap-3;
+}
+
+.kore-site-appearance__card-head {
+  @apply flex items-center justify-between gap-2;
+}
+
+.kore-site-appearance__sample {
+  @apply type-display-sm;
+}
+
+.kore-site-appearance__families {
+  @apply type-caption text-gray-700;
+}
+
+.kore-site-appearance__palettes {
+  @apply flex flex-wrap gap-2;
+}
+
+.kore-site-appearance__palette {
+  @apply flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border border-gray-300 bg-white px-3 type-body-md text-ink;
+  @apply has-focus-visible:shadow-focus-ring;
+}
+
+.kore-site-appearance__dot {
+  @apply size-4 rounded-full;
+}
+
+.kore-site-appearance__color {
+  @apply flex flex-col gap-1.5;
+}
+
+.kore-site-appearance__color-label {
+  @apply type-label text-ink;
+}
+
+.kore-site-appearance__color-row {
+  @apply flex items-center gap-3;
+}
+
+.kore-site-appearance__picker {
+  @apply size-10 shrink-0 cursor-pointer rounded-full border border-gray-300 bg-transparent p-0;
+  @apply focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}
+
+.kore-site-appearance__hex {
+  @apply flex-1;
+}
+
+.kore-site-appearance__legend {
+  @apply type-caption;
+}
+
+.kore-site-appearance__legend--success {
+  @apply text-success-text;
+}
+
+.kore-site-appearance__legend--warning {
+  @apply text-warning-text;
+}
+
+.kore-site-appearance__legend--danger {
+  @apply text-danger-text;
+}
+
+.kore-site-appearance__backgrounds {
+  @apply grid gap-3 md:grid-cols-3;
+}
+
+.kore-site-appearance__swatch {
+  @apply size-6 shrink-0 rounded-full border border-gray-300;
 }

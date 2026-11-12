@@ -8,6 +8,9 @@ import {
 } from './support/backoffice';
 import { signIn, toast } from './support/app';
 
+const API_URL = process.env.E2E_API_URL ?? 'http://localhost:3000';
+const APP_ORIGIN = 'http://localhost:5173';
+
 let db: Db;
 
 test.beforeAll(async () => {
@@ -207,5 +210,65 @@ test.describe('Site › Editor (decisão 214)', () => {
     await expect(toast({ page, text: 'Alterações salvas.' })).toBeVisible();
     await page.reload();
     await expect(page.getByLabel(/Arrastem uma foto/)).toBeAttached();
+  });
+  test('Aparência: paleta, fontes e fundo salvos; a cor bloqueada no app e no servidor (S2 RN03 a RN07)', async ({
+    page,
+  }) => {
+    const email = `e2e-site-${unique()}@exemplo.kore.local`;
+    const userId = await createUser({ db, email, name: 'Ana Beatriz Moreira' });
+    const weddingId = await createWedding({
+      db,
+      partners: ['Ana Beatriz Moreira', 'Marcos Vinícius Rocha'],
+      eventDate: '2027-05-15',
+      city: 'Campinas',
+      status: 'draft',
+      createdByUserId: userId,
+      owners: [userId, null],
+    });
+    await signIn({ page, email });
+    await page.goto('/app/site/aparencia');
+
+    // O padrão do cadastro: Romântico, Terracota e Creme (RN02).
+    await expect(page.getByRole('radio', { name: 'Terracota' })).toBeChecked();
+    await expect(page.getByRole('radio', { name: 'Creme' })).toBeChecked();
+
+    await page.getByRole('radio', { name: 'Noite' }).locator('..').click();
+    await expect(page.getByRole('radio', { name: 'Escuro' })).toBeChecked();
+    await page
+      .getByRole('radio', { name: /Moderno/ })
+      .locator('..')
+      .click();
+    await page.getByRole('button', { name: 'Salvar' }).click();
+    await expect(toast({ page, text: 'Alterações salvas.' })).toBeVisible();
+
+    await page.reload();
+    await expect(page.getByRole('radio', { name: 'Noite' })).toBeChecked();
+    await expect(page.getByRole('radio', { name: /Moderno/ })).toBeChecked();
+    await expect(
+      page.getByRole('textbox', { name: 'Cor principal (botões)', exact: true }),
+    ).toHaveValue('#E7D3B0');
+
+    // A cor que some no fundo escuro trava o Salvar no app.
+    const primary = page.getByRole('textbox', { name: 'Cor principal (botões)', exact: true });
+    await primary.fill('#15171C');
+    await expect(page.getByRole('alert')).toContainText('Essa cor fica pouco visível neste fundo.');
+    await expect(page.getByRole('button', { name: 'Salvar' })).toBeDisabled();
+
+    // E o servidor recusa a mesma combinação pela mesma conta (RN05).
+    const refused = await page.request.put(`${API_URL}/v1/weddings/${weddingId}/site/appearance`, {
+      headers: { origin: APP_ORIGIN },
+      data: {
+        fontPairKey: 'moderno',
+        starterPaletteKey: null,
+        primaryColor: '#15171C',
+        accentColor: '#9A8C7A',
+        backgroundMode: 'dark',
+      },
+    });
+    expect(refused.status()).toBe(422);
+    expect((await refused.json()) as { error: string; check: string }).toMatchObject({
+      error: 'CONTRAST_TOO_LOW',
+      check: 'primary_background',
+    });
   });
 });
