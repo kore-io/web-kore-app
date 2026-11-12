@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import type { PublicSiteResponse } from '../shared/api/generated/model';
 import { SiteHero } from './components/site-hero';
 import { SiteLayout } from './components/site-layout';
+import { SiteSections } from './components/site-sections';
 import { SystemPage } from './components/system-page';
 import { loadSiteFonts } from './fonts';
 import { parseSiteRoute } from './route';
@@ -74,6 +75,7 @@ function SiteHome({ site }: { site: PublicSiteResponse }) {
   return (
     <SiteLayout site={site}>
       <SiteHero site={site} now={new Date()} />
+      <SiteSections sections={site.sections} />
     </SiteLayout>
   );
 }
