@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { SITE_ORIGIN } from '../playwright.config';
+import { signIn } from './support/app';
 import {
   connectBackoffice,
   createUser,
@@ -21,11 +22,8 @@ test.afterAll(async () => {
 });
 
 async function newWedding() {
-  const userId = await createUser({
-    db,
-    email: `e2e-site-${unique()}@exemplo.kore.local`,
-    name: 'Ana Beatriz Moreira',
-  });
+  const email = `e2e-site-${unique()}@exemplo.kore.local`;
+  const userId = await createUser({ db, email, name: 'Ana Beatriz Moreira' });
   const weddingId = await createWedding({
     db,
     partners: ['Ana Beatriz Moreira', 'Marcos Vinícius Rocha'],
@@ -38,7 +36,7 @@ async function newWedding() {
   const {
     rows: [row],
   } = await db.query<{ slug: string }>('select slug from weddings where id = $1', [weddingId]);
-  return { weddingId, slug: row?.slug ?? '' };
+  return { weddingId, slug: row?.slug ?? '', email };
 }
 
 /** A publicação chega na F4; o E2E grava o status e o publishedAt direto (Site público RN13). */
@@ -103,5 +101,127 @@ test.describe('Site do casal › o bundle público na 5174 (B1; Site público RN
       headers: { origin: SITE_ORIGIN },
     });
     expect(response.headers()['access-control-allow-origin']).toBeUndefined();
+  });
+  test('o visitante: as seções do Início, o texto como foi escrito, a FAQ em sanfona e nada do grupo na resposta (B2; S3 RN04 a RN10; Site público RN05, RN13)', async ({
+    page,
+  }) => {
+    const { weddingId, slug, email } = await newWedding();
+    // O casal preenche as seções pelo Editor (a API), com o contato e dois locais.
+    await signIn({ page, email });
+    const app = { origin: 'http://localhost:5173' };
+    const put = (type: string, data: object) =>
+      page.request.put(`${API_URL}/v1/weddings/${weddingId}/site/sections/${type}`, {
+        headers: app,
+        data,
+      });
+    expect(
+      (
+        await put('story', {
+          title: 'Como tudo começou',
+          enabled: true,
+          content: {
+            text: 'A gente se conheceu em 2019.\n\nCinco anos depois, o pedido.',
+            imageIds: [],
+          },
+        })
+      ).status(),
+    ).toBe(200);
+    expect(
+      (
+        await put('lodging', {
+          title: 'Hospedagem e transporte',
+          enabled: true,
+          content: { text: '<b>oi</b> veja www.exemplo.com' },
+        })
+      ).status(),
+    ).toBe(200);
+    expect(
+      (
+        await put('dress_code', {
+          title: 'Dress code',
+          enabled: true,
+          content: { text: 'Passeio completo.', imageId: null },
+        })
+      ).status(),
+    ).toBe(200);
+    expect(
+      (
+        await put('ceremony', {
+          title: 'Cerimônia & Recepção',
+          enabled: true,
+          content: {
+            venues: [
+              {
+                title: 'Cerimônia',
+                placeName: 'Capela Nossa Senhora das Graças',
+                date: '2027-05-15',
+                time: '16:30',
+                address: 'Rua Barão de Jaguara, 1200, Campinas, SP',
+              },
+            ],
+          },
+        })
+      ).status(),
+    ).toBe(200);
+    expect(
+      (
+        await put('faq', {
+          title: 'Perguntas frequentes',
+          enabled: true,
+          content: {
+            items: [
+              { question: 'E se chover?', answer: 'Há área coberta.' },
+              { question: 'Qual é o traje?', answer: 'Passeio completo, sem gravata.' },
+            ],
+          },
+        })
+      ).status(),
+    ).toBe(200);
+    expect(
+      (
+        await page.request.patch(`${API_URL}/v1/weddings/${weddingId}/site`, {
+          headers: app,
+          data: { contactWhatsapp: '+5519987654521' },
+        })
+      ).status(),
+    ).toBe(200);
+    await publish({ weddingId });
+
+    // O visitante, num navegador sem sessão.
+    const visitor = await page.context().browser()?.newContext();
+    if (!visitor) throw new Error('sem navegador');
+    const site = await visitor.newPage();
+    const response = site.waitForResponse(`${API_URL}/v1/sites/${slug}`);
+    await site.goto(`${SITE_ORIGIN}/${slug}`);
+    const body = JSON.stringify(await (await response).json());
+    // Nada do grupo vai ao visitante: o lugar, o endereço, o horário e o contato.
+    for (const secret of ['Capela', 'Barão de Jaguara', '16:30', '987654521']) {
+      expect(body).not.toContain(secret);
+    }
+
+    await expect(site.getByRole('heading', { level: 2, name: 'Como tudo começou' })).toBeVisible();
+    await expect(site.getByText('Cinco anos depois, o pedido.')).toBeVisible();
+    await expect(site.getByText('<b>oi</b> veja www.exemplo.com')).toBeVisible();
+    await expect(site.locator('#hospedagem-e-transporte').getByRole('link')).toHaveCount(0);
+    await expect(
+      site.getByText('Entre pelo link do seu convite para ver o local e o horário.'),
+    ).toBeVisible();
+    await expect(site.getByText('Capela Nossa Senhora das Graças')).toHaveCount(0);
+    await expect(site.getByRole('contentinfo').getByText(/Dúvidas\?/)).toHaveCount(0);
+
+    // A FAQ começa fechada; cada pergunta abre e fecha sozinha.
+    await expect(site.getByText('Passeio completo, sem gravata.')).toBeHidden();
+    await site.getByRole('button', { name: 'Qual é o traje?' }).click();
+    await expect(site.getByText('Passeio completo, sem gravata.')).toBeVisible();
+    await expect(site.getByText('Há área coberta.')).toBeHidden();
+
+    // O menu leva à seção pelo título.
+    await site.getByRole('button', { name: 'Abrir menu' }).click();
+    await site
+      .getByRole('navigation', { name: 'Menu principal' })
+      .getByRole('link', { name: 'Perguntas frequentes' })
+      .click();
+    await expect(site).toHaveURL(new RegExp(`/${slug}#faq$`));
+    await visitor.close();
   });
 });

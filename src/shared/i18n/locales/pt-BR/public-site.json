@@ -30,5 +30,23 @@
       "description": "Confira sua conexão e tente de novo.",
       "retry": "Tentar de novo"
     }
+  },
+  "sections": {
+    "overline": {
+      "story": "Nossa história",
+      "ceremony": "O grande dia",
+      "dress_code": "Para a festa",
+      "faq": "Dúvidas"
+    },
+    "storyAlt": "Foto {{n}} de {{total}} de {{title}}",
+    "dressCodeAlt": "Foto de referência do dress code",
+    "ceremonyLocked": "Entre pelo link do seu convite para ver o local e o horário.",
+    "ceremonyLockedHint": "O link chegou junto com o convite do casal."
+  },
+  "viewer": {
+    "close": "Fechar",
+    "previous": "Foto anterior",
+    "next": "Próxima foto",
+    "counter": "{{n}} de {{total}}"
   }
 }

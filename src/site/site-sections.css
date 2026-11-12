@@ -1,0 +1,165 @@
+/*
+ * As seções do Início (Penpot, Área do Convidado, Início): alternam o fundo do site e a
+ * superfície; o sobretítulo em caixa alta, o título na fonte de títulos e o texto na de
+ * corpo, nas cores da Aparência (site.*).
+ */
+.kore-site-section {
+  @apply px-4 py-16 md:px-8 lg:py-24;
+}
+
+.kore-site-section--base {
+  @apply bg-site-background;
+}
+
+.kore-site-section--alt {
+  @apply bg-site-surface;
+}
+
+.kore-site-section__inner {
+  @apply mx-auto flex max-w-2xl flex-col items-center gap-6 text-center;
+}
+
+.kore-site-section__inner--wide {
+  @apply max-w-5xl items-stretch text-start;
+}
+
+.kore-site-section__header {
+  @apply flex flex-col gap-2;
+}
+
+.kore-site-section__header--center {
+  @apply items-center text-center;
+}
+
+.kore-site-section__header--start {
+  @apply items-start text-start;
+}
+
+.kore-site-section__overline {
+  @apply m-0 type-overline text-site-muted-foreground;
+}
+
+.kore-site-section__title {
+  @apply m-0 font-site-display type-display-md text-site-foreground;
+}
+
+.kore-site-section__text {
+  @apply flex flex-col gap-4 type-body-lg text-site-foreground;
+}
+
+.kore-site-text {
+  @apply m-0 whitespace-pre-line;
+}
+
+/* Nossa história: no desktop, as fotos à esquerda e o texto à direita. */
+.kore-site-story {
+  @apply grid gap-8 lg:grid-cols-2 lg:items-center;
+}
+
+.kore-site-story--text {
+  @apply lg:grid-cols-1;
+}
+
+.kore-site-story__body {
+  @apply flex flex-col gap-4;
+}
+
+.kore-site-story__photos {
+  @apply m-0 grid list-none grid-cols-2 gap-3 p-0;
+}
+
+.kore-site-story__photos--one {
+  @apply grid-cols-1;
+}
+
+.kore-site-story__photo {
+  @apply block w-full cursor-zoom-in overflow-hidden rounded-lg border border-site-border bg-site-surface p-0;
+  @apply focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}
+
+.kore-site-story__image {
+  @apply block aspect-square w-full object-cover;
+}
+
+/* Visualizador */
+.kore-site-viewer {
+  @apply m-0 h-dvh max-h-none w-screen max-w-none bg-ink p-0 backdrop:bg-ink;
+}
+
+.kore-site-viewer__frame {
+  @apply relative flex h-dvh w-screen flex-col items-center justify-center gap-3 p-4 pt-16;
+}
+
+.kore-site-viewer__image {
+  @apply block min-h-0 max-w-full flex-1 rounded-md object-contain;
+}
+
+.kore-site-viewer__bar {
+  @apply flex items-center gap-4 text-white;
+}
+
+.kore-site-viewer__counter {
+  @apply type-label;
+}
+
+.kore-site-viewer__button,
+.kore-site-viewer__close {
+  @apply flex size-11 cursor-pointer items-center justify-center rounded-full border border-gray-500 bg-ink text-white;
+  @apply focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}
+
+.kore-site-viewer__close {
+  @apply absolute top-2 right-2;
+}
+
+/* Cerimônia & Recepção: o cartão fechado do visitante. */
+.kore-site-card {
+  @apply flex w-full flex-col items-center gap-2 rounded-lg bg-site-surface p-8 text-center;
+}
+
+.kore-site-section--alt .kore-site-card {
+  @apply bg-site-background;
+}
+
+.kore-site-card__icon {
+  @apply size-5 text-site-muted-foreground;
+}
+
+.kore-site-card__text {
+  @apply m-0 type-body-md text-site-foreground;
+}
+
+.kore-site-card__hint {
+  @apply m-0 type-caption text-site-muted-foreground;
+}
+
+/* Dress code */
+.kore-site-dress__image {
+  @apply block w-full max-w-sm rounded-lg border border-site-border object-cover;
+}
+
+/* FAQ em sanfona */
+.kore-site-faq {
+  @apply m-0 flex w-full list-none flex-col p-0 text-start;
+}
+
+.kore-site-faq__item {
+  @apply border-b border-site-border;
+}
+
+.kore-site-faq__question {
+  @apply m-0;
+}
+
+.kore-site-faq__button {
+  @apply flex min-h-14 w-full cursor-pointer items-center justify-between gap-4 bg-transparent py-3 text-start type-label-lg text-site-foreground;
+  @apply focus-visible:rounded-sm focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}
+
+.kore-site-faq__icon {
+  @apply size-5 shrink-0;
+}
+
+.kore-site-faq__answer {
+  @apply pb-4 type-body-md text-site-foreground;
+}
