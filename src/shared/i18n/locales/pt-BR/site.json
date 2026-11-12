@@ -104,6 +104,40 @@
         "couple": "Usem só letras minúsculas, números e hífen.",
         "planner": "Use só letras minúsculas, números e hífen."
       }
+    },
+    "cover": "Foto de capa",
+    "coverHelp": "A foto de capa aparece no topo do site e junto do link quando ele é compartilhado no WhatsApp e nas redes. Quem tiver o endereço vê esta foto."
+  },
+  "images": {
+    "drop": {
+      "couple": "Arrastem uma foto ou cliquem para escolher",
+      "planner": "Arraste uma foto ou clique para escolher"
+    },
+    "dropHint": "JPG ou PNG.",
+    "change": "Trocar foto",
+    "remove": "Remover foto",
+    "sending": "Enviando {{current}} de {{total}}",
+    "errors": {
+      "type": {
+        "couple": "Não foi possível usar esta foto. Escolham uma foto JPG ou PNG.",
+        "planner": "Não foi possível usar esta foto. Escolha uma foto JPG ou PNG."
+      },
+      "tooBig": {
+        "couple": "Esta foto passa de 25 MB. Escolham uma foto menor.",
+        "planner": "Esta foto passa de 25 MB. Escolha uma foto menor."
+      },
+      "network": {
+        "couple": "Não foi possível enviar a foto. Confiram a conexão e tentem de novo.",
+        "planner": "Não foi possível enviar a foto. Confira a conexão e tente de novo."
+      },
+      "limit": {
+        "couple": "Muitas fotos foram trocadas neste site hoje. Tentem de novo amanhã.",
+        "planner": "Muitas fotos foram trocadas neste site hoje. Tente de novo amanhã."
+      },
+      "rate": {
+        "couple": "Muitas fotos ao mesmo tempo. Esperem um minuto e tentem de novo.",
+        "planner": "Muitas fotos ao mesmo tempo. Espere um minuto e tente de novo."
+      }
     }
   }
 }

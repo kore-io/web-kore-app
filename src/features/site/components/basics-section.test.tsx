@@ -5,6 +5,14 @@ import { expectNoA11yViolations } from '../../../../tests/a11y';
 import { meFor, profileUnderTest } from '../../../../tests/profile';
 import { apiError, mockApi, renderAreaScreen, renderRoute } from '../../../../tests/render-route';
 import type { SiteEditorResponse } from '../../../shared/api/generated/model';
+import { compressImage } from '../images/compress-image';
+import { putFile } from '../images/put-file';
+
+vi.mock('../images/compress-image', async (original) => ({
+  ...(await original<typeof import('../images/compress-image')>()),
+  compressImage: vi.fn(async () => new Blob(['x'], { type: 'image/jpeg' })),
+}));
+vi.mock('../images/put-file', () => ({ putFile: vi.fn(async () => undefined) }));
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -66,6 +74,7 @@ function site(overrides: Partial<SiteEditorResponse> = {}): SiteEditorResponse {
 }
 
 type Call = { method: string; path: string; body: unknown };
+const gets = { count: 0 };
 
 function mockBasics({
   data = site(),
@@ -81,7 +90,32 @@ function mockBasics({
   const calls: Call[] = [];
   mockApi(({ method, path, body }) => {
     if (path === '/v1/me') return Response.json(meFor(me));
-    if (path === '/v1/weddings/w1/site' && method === 'GET') return Response.json(data);
+    if (path === '/v1/weddings/w1/site' && method === 'GET') {
+      gets.count += 1;
+      return Response.json(data);
+    }
+    if (path.endsWith('/upload-authorizations')) {
+      return Response.json(
+        {
+          imageId: 'img1',
+          uploadUrl: 'http://s3/put',
+          method: 'PUT',
+          headers: { 'Content-Type': 'image/jpeg', 'Content-Length': '1' },
+          expiresAt: '2026-11-11T12:05:00Z',
+        },
+        { status: 201 },
+      );
+    }
+    if (path === '/v1/weddings/w1/site-images') {
+      return Response.json({
+        id: 'img1',
+        status: 'ready',
+        url: 'https://cdn/img1/display.jpg',
+        thumbUrl: 'https://cdn/img1/thumb.jpg',
+        width: 2560,
+        height: 1707,
+      });
+    }
     if (path.startsWith('/v1/weddings/slug-availability')) {
       const query = new URLSearchParams(path.split('?')[1]);
       calls.push({ method, path, body: Object.fromEntries(query) });
@@ -301,6 +335,71 @@ describe('Site › Dados básicos (RN02 a RN08, RN10)', () => {
     await user.clear(field('Cidade'));
     await user.click(screen.getByRole('button', { name: 'Salvar' }));
     expect(field('Cidade')).toHaveAccessibleDescription('Informe a cidade.');
+    expect(screen.getByLabelText(/Arraste uma foto ou clique para escolher/)).toBeInTheDocument();
+  });
+
+  it('a foto de capa: envia, mostra a miniatura e vai no Salvar; Remover foto tira (RN09)', async () => {
+    const user = userEvent.setup();
+    const calls = mockBasics();
+    renderRoute({ url: '/app/site/dados-basicos' });
+    const drop = await screen.findByLabelText(/Arrastem uma foto ou cliquem para escolher/);
+    expect(
+      screen.getByText(
+        'A foto de capa aparece no topo do site e junto do link quando ele é compartilhado no WhatsApp e nas redes. Quem tiver o endereço vê esta foto.',
+      ),
+    ).toBeInTheDocument();
+    await user.upload(drop, new File(['x'], 'capa.jpg', { type: 'image/jpeg' }));
+    const thumb = await screen.findByRole('img', { name: 'Ana & Marcos' });
+    expect(thumb).toHaveAttribute('src', 'https://cdn/img1/thumb.jpg');
+    expect(compressImage).toHaveBeenCalled();
+    expect(putFile).toHaveBeenCalledWith(expect.objectContaining({ url: 'http://s3/put' }));
+    await user.click(screen.getByRole('button', { name: 'Salvar' }));
+    await waitFor(() =>
+      expect(calls.at(-1)).toEqual({
+        method: 'PATCH',
+        path: '/v1/weddings/w1/site',
+        body: { coverImageId: 'img1' },
+      }),
+    );
+  });
+
+  it('com capa, Remover foto volta à área de envio e manda o coverImageId nulo', async () => {
+    const user = userEvent.setup();
+    const calls = mockBasics({
+      data: site({
+        cover: {
+          id: 'c1',
+          url: 'https://cdn/c1/display.jpg',
+          thumbUrl: 'https://cdn/c1/thumb.jpg',
+          width: 1,
+          height: 1,
+        },
+      }),
+    });
+    renderRoute({ url: '/app/site/dados-basicos' });
+    expect(await screen.findByRole('img', { name: 'Ana & Marcos' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Trocar foto' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Remover foto' }));
+    expect(screen.getByLabelText(/Arrastem uma foto/)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Salvar' }));
+    await waitFor(() => expect(calls.at(-1)?.body).toEqual({ coverImageId: null }));
+  });
+
+  it('na corrida (403 FIELD_NOT_ALLOWED), o Editor recarrega o site (sugestão do Crivo)', async () => {
+    const user = userEvent.setup();
+    gets.count = 0;
+    mockBasics({
+      patch: () =>
+        apiError({ status: 403, body: { error: 'FIELD_NOT_ALLOWED', fields: ['state'] } }),
+    });
+    renderRoute({ url: '/app/site/dados-basicos' });
+    await user.selectOptions(await screen.findByRole('combobox', { name: 'UF' }), 'RJ');
+    const before = gets.count;
+    await user.click(screen.getByRole('button', { name: 'Salvar' }));
+    expect(
+      await screen.findByText('Não foi possível continuar. Confira sua conexão e tente de novo.'),
+    ).toBeInTheDocument();
+    await waitFor(() => expect(gets.count).toBeGreaterThan(before));
   });
 
   it('é acessível', async () => {

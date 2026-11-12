@@ -136,3 +136,39 @@
   @apply cursor-pointer text-primary-dark underline;
   @apply focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
 }
+
+/*
+ * Foto de capa (Penpot 1.2): a miniatura de 160 x 96 px, raio md, com Trocar foto ·
+ * Remover foto ao lado (embaixo no celular); o aviso fixo em type.caption gray.700.
+ */
+.kore-site-cover {
+  @apply flex flex-col gap-1.5;
+}
+
+.kore-site-cover__label {
+  @apply type-label text-ink;
+}
+
+.kore-site-cover__current {
+  @apply flex flex-col items-start gap-3 md:flex-row md:items-center;
+}
+
+.kore-site-cover__thumb {
+  @apply h-24 w-40 rounded-md bg-gray-100 object-cover;
+}
+
+.kore-site-cover__actions {
+  @apply flex gap-3;
+}
+
+.kore-site-cover__picker {
+  @apply hidden;
+}
+
+.kore-site-cover__sending {
+  @apply rounded-md bg-gray-100 p-4;
+}
+
+.kore-site-cover__help {
+  @apply type-caption text-gray-700;
+}

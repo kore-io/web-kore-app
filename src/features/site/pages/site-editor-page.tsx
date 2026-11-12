@@ -169,7 +169,13 @@ function SiteEditor({
                 {t(`sections.names.${sectionKey}`)}
               </h2>
               {sectionKey === 'basics' && (
-                <BasicsSection weddingId={weddingId} site={data} audience={audience} />
+                <BasicsSection
+                  // O que cada um pode mudar e a publicação mudam os campos: a seção remonta.
+                  key={`${data.publishedAt ?? ''}:${JSON.stringify(data.editable)}`}
+                  weddingId={weddingId}
+                  site={data}
+                  audience={audience}
+                />
               )}
             </section>
           </SectionFormProvider>

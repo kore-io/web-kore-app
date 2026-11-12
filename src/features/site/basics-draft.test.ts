@@ -17,6 +17,7 @@ const original: BasicsDraft = {
   slug: 'ana-e-marcos',
   whatsapp: '(19) 99876-4521',
   email: 'ana.moreira@gmail.com',
+  cover: null,
 };
 
 describe('rascunho dos Dados básicos (RN02 a RN08)', () => {
@@ -38,6 +39,22 @@ describe('rascunho dos Dados básicos (RN02 a RN08)', () => {
     expect(
       toPatchBody({ draft: { ...original, eventDate: '' }, original, partnerIds: [] }),
     ).toEqual({ eventDate: null });
+  });
+
+  it('a capa nova, trocada ou removida vai pelo id (RN09)', () => {
+    const cover = { id: 'img1', url: 'u', thumbUrl: 't' };
+    expect(toPatchBody({ draft: { ...original, cover }, original, partnerIds: [] })).toEqual({
+      coverImageId: 'img1',
+    });
+    expect(
+      toPatchBody({ draft: original, original: { ...original, cover }, partnerIds: [] }),
+    ).toEqual({ coverImageId: null });
+    expect(
+      isDirty({
+        draft: { ...original, cover: { ...cover, url: 'outra' } },
+        original: { ...original, cover },
+      }),
+    ).toBe(false);
   });
 
   it('espaços nas pontas não contam como mudança', () => {
@@ -88,6 +105,7 @@ describe('rascunho dos Dados básicos (RN02 a RN08)', () => {
         slug: null,
         contactWhatsapp: null,
         contactEmail: null,
+        cover: null,
       } as never),
     ).toEqual({
       names: ['Ana'],
@@ -97,6 +115,7 @@ describe('rascunho dos Dados básicos (RN02 a RN08)', () => {
       slug: '',
       whatsapp: '',
       email: '',
+      cover: null,
     });
   });
 });
