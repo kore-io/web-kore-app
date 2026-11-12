@@ -98,12 +98,35 @@ describe('textos da lista de grupos', () => {
   it('respondido em: sem resposta é null; com resposta, data curta e quem respondeu', () => {
     expect(respondedAtText({ t, party: party() })).toBeNull();
     const at = new Date(2026, 8, 12, 20, 14).toISOString();
-    expect(respondedAtText({ t, party: party({ respondedAt: at, respondedBy: 'Célia' }) })).toEqual(
-      {
-        primary: '12/09 às 20h14',
-        secondary: 'por Célia',
-      },
-    );
+    expect(
+      respondedAtText({
+        t,
+        party: party({
+          respondedAt: at,
+          lastResponse: { actor: 'party', signedByName: 'Célia', actorName: null },
+        }),
+      }),
+    ).toEqual({ primary: '12/09 às 20h14', secondary: 'por Célia' });
+    // A alteração do casal (ou da cerimonialista), com o nome de quem alterou (Prazo RN07).
+    expect(
+      respondedAtText({
+        t,
+        party: party({
+          respondedAt: at,
+          lastResponse: { actor: 'couple', signedByName: null, actorName: 'Ana' },
+        }),
+      })?.secondary,
+    ).toBe('alterada por Ana');
+    // Sem assinante (convidado expurgado), só a data.
+    expect(
+      respondedAtText({
+        t,
+        party: party({
+          respondedAt: at,
+          lastResponse: { actor: 'party', signedByName: null, actorName: null },
+        }),
+      })?.secondary,
+    ).toBeUndefined();
     const fullHour = new Date(2026, 5, 21, 9, 0).toISOString();
     expect(respondedAtText({ t, party: party({ respondedAt: fullHour }) })?.primary).toBe(
       '21/06 às 9h',

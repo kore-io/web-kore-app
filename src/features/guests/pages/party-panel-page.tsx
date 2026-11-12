@@ -18,11 +18,14 @@ import type {
   PartyResponse,
 } from '../../../shared/api/generated/model';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
+import { ChangeResponseDialog } from '../components/change-response-dialog';
 import { MoveGuestDialog } from '../components/move-guest-dialog';
+import { historyAt, historyLine } from '../party-history';
 import { TrashDialog } from '../components/trash-dialog';
 import { useOpenPreview } from '../../site/preview/use-open-preview';
 import { useActiveWedding, type Audience } from '../hooks/use-active-wedding';
 import { useMoveGuest } from '../hooks/use-move-guest';
+import { useResponseLock } from '../hooks/use-response-lock';
 import { useTrash } from '../hooks/use-trash';
 import { usePartyPanel } from '../hooks/use-party-panel';
 
@@ -36,21 +39,24 @@ const rsvpBadges: Record<PartyGuestResponseRsvpStatus, { tone: BadgeTone; icon: 
 /** Painel do grupo (RN14 de Grupos e convidados), em /app/convidados/grupos/:partyId. */
 export function PartyPanelPage() {
   const { partyId = '' } = useParams();
-  const { weddingId, audience } = useActiveWedding();
+  const { weddingId, audience, role } = useActiveWedding();
   if (!weddingId) return null;
-  return <PartyPanel weddingId={weddingId} partyId={partyId} audience={audience} />;
+  return <PartyPanel weddingId={weddingId} partyId={partyId} audience={audience} role={role} />;
 }
 
 function PartyPanel({
   weddingId,
   partyId,
   audience,
+  role,
 }: {
   weddingId: string;
   partyId: string;
   audience: Audience;
+  role: string | undefined;
 }) {
   const { t } = useTranslation('guests');
+  const lock = useResponseLock({ weddingId, role });
   const panel = usePartyPanel({ weddingId, partyId });
   const mover = useMoveGuest({ weddingId, audience });
   const trash = useTrash({ weddingId, audience });
@@ -60,6 +66,7 @@ function PartyPanel({
   const [trashingGuest, setTrashingGuest] = useState<{ id: string; name: string } | null>(null);
   const [confirming, setConfirming] = useState(false);
   const [moving, setMoving] = useState<{ id: string; name: string } | null>(null);
+  const [answering, setAnswering] = useState<PartyGuestResponse | null>(null);
   // O ⋮ do convidado que abriu o Mover de grupo: o foco volta a ele (o item do menu some).
   const menuButton = useRef<HTMLElement | null>(null);
 
@@ -91,6 +98,12 @@ function PartyPanel({
         <GroupCard party={party} />
         <GuestsCard
           guests={party.guests}
+          collaborator={lock.collaborator}
+          afterDeadline={lock.afterDeadline}
+          onChangeResponse={({ guest, trigger }) => {
+            menuButton.current = trigger;
+            setAnswering(guest);
+          }}
           onTrash={({ guest, trigger }) => {
             menuButton.current = trigger;
             // O último convidado com nome não sai (Grupos RN08; Lixeira RN04).
@@ -106,14 +119,29 @@ function PartyPanel({
             else setMoving(guest);
           }}
         />
+        {/* Grupo e Convidados em cima, Histórico e Link do grupo embaixo (Penpot A8). */}
+        <HistoryCard party={party} />
         <LinkCard
           party={party}
           audience={audience}
+          // A colaboradora não exclui o grupo que já respondeu (Prazo RN08; Lixeira RN07).
+          trashLocked={
+            lock.collaborator && party.guests.some((guest) => guest.rsvpStatus !== 'pending')
+          }
           onPreview={() => openPreview({ mode: 'party', partyId: party.id })}
           onCopy={(url) => void panel.copyLink({ url })}
           onTrash={() => setTrashingParty(true)}
         />
       </div>
+      <ChangeResponseDialog
+        weddingId={weddingId}
+        partyId={party.id}
+        version={party.version}
+        audience={audience}
+        guest={answering}
+        returnFocusRef={menuButton}
+        onClose={() => setAnswering(null)}
+      />
       <MoveGuestDialog
         weddingId={weddingId}
         audience={audience}
@@ -272,12 +300,20 @@ type GuestAction = (args: {
   trigger: HTMLElement | null;
 }) => void;
 
+type ResponseAction = (args: { guest: PartyGuestResponse; trigger: HTMLElement | null }) => void;
+
 function GuestsCard({
   guests,
+  collaborator,
+  afterDeadline,
+  onChangeResponse,
   onMove,
   onTrash,
 }: {
   guests: PartyGuestResponse[];
+  collaborator: boolean;
+  afterDeadline: boolean;
+  onChangeResponse: ResponseAction;
   onMove: GuestAction;
   onTrash: GuestAction;
 }) {
@@ -286,7 +322,15 @@ function GuestsCard({
     <Card title={t('panel.guests.title')}>
       <ul className="kore-party-panel__guests">
         {guests.map((guest) => (
-          <GuestItem key={guest.id} guest={guest} onMove={onMove} onTrash={onTrash} />
+          <GuestItem
+            key={guest.id}
+            guest={guest}
+            collaborator={collaborator}
+            afterDeadline={afterDeadline}
+            onChangeResponse={onChangeResponse}
+            onMove={onMove}
+            onTrash={onTrash}
+          />
         ))}
       </ul>
     </Card>
@@ -300,14 +344,29 @@ function GuestsCard({
  */
 function GuestItem({
   guest,
+  collaborator,
+  afterDeadline,
+  onChangeResponse,
   onMove,
   onTrash,
 }: {
   guest: PartyGuestResponse;
+  collaborator: boolean;
+  afterDeadline: boolean;
+  onChangeResponse: ResponseAction;
   onMove: GuestAction;
   onTrash: GuestAction;
 }) {
   const { t } = useTranslation('guests');
+  // A colaboradora: sem alterar depois do prazo (RN04) e sem excluir quem respondeu (RN08).
+  const responseLock = {
+    disabled: afterDeadline,
+    disabledReason: t('panel.response.afterDeadline'),
+  };
+  const trashLock = {
+    disabled: collaborator && guest.rsvpStatus !== 'pending',
+    disabledReason: t('trash.alreadyResponded.guest'),
+  };
   const actions = useRef<HTMLSpanElement>(null);
   const badge = rsvpBadges[guest.rsvpStatus];
   const { name } = guest;
@@ -327,52 +386,101 @@ function GuestItem({
         <Badge tone={badge.tone} icon={badge.icon}>
           {t(`panel.guests.rsvp.${guest.rsvpStatus}`)}
         </Badge>
-        {name !== null && (
-          <span ref={actions} className="kore-party-panel__guest-actions">
-            <ActionMenu
-              label={t('panel.guests.actions', { name })}
-              groups={[
-                [
-                  {
-                    id: 'move',
-                    label: t('panel.move.action'),
-                    onSelect: () =>
-                      onMove({
-                        guest: { id: guest.id, name },
-                        trigger: actions.current?.querySelector('button') ?? null,
-                      }),
-                  },
-                ],
-                [
-                  {
-                    id: 'trash',
-                    label: t('trash.action'),
-                    destructive: true,
-                    onSelect: () =>
-                      onTrash({
-                        guest: { id: guest.id, name },
-                        trigger: actions.current?.querySelector('button') ?? null,
-                      }),
-                  },
-                ],
-              ]}
-            />
-          </span>
-        )}
+        <span ref={actions} className="kore-party-panel__guest-actions">
+          <ActionMenu
+            label={t('panel.guests.actions', { name: name ?? t('panel.guests.plusOne') })}
+            // Alterar resposta (Prazo RN04), Mover de grupo e Mover para a lixeira; a vaga
+            // de acompanhante só tem o Alterar resposta. O ⋮ lido só no clique.
+            groups={
+              guest.isPlusOne || name === null
+                ? [
+                    [
+                      {
+                        id: 'response',
+                        label: t('panel.response.action'),
+                        ...responseLock,
+                        onSelect: () =>
+                          onChangeResponse({
+                            guest,
+                            trigger: actions.current?.querySelector('button') ?? null,
+                          }),
+                      },
+                    ],
+                  ]
+                : [
+                    [
+                      {
+                        id: 'response',
+                        label: t('panel.response.action'),
+                        ...responseLock,
+                        onSelect: () =>
+                          onChangeResponse({
+                            guest,
+                            trigger: actions.current?.querySelector('button') ?? null,
+                          }),
+                      },
+                      {
+                        id: 'move',
+                        label: t('panel.move.action'),
+                        onSelect: () =>
+                          onMove({
+                            guest: { id: guest.id, name },
+                            trigger: actions.current?.querySelector('button') ?? null,
+                          }),
+                      },
+                    ],
+                    [
+                      {
+                        id: 'trash',
+                        label: t('trash.action'),
+                        destructive: true,
+                        ...trashLock,
+                        onSelect: () =>
+                          onTrash({
+                            guest: { id: guest.id, name },
+                            trigger: actions.current?.querySelector('button') ?? null,
+                          }),
+                      },
+                    ],
+                  ]
+            }
+          />
+        </span>
       </span>
     </li>
+  );
+}
+
+/** O Histórico do grupo (Prazo e respostas RN05): oculto enquanto vazio. */
+function HistoryCard({ party }: { party: PartyResponse }) {
+  const { t } = useTranslation('guests');
+  if (party.history.length === 0) return null;
+  return (
+    <Card title={t('panel.history.title')}>
+      <ul className="kore-party-panel__history">
+        {party.history.map((entry, index) => (
+          <li key={`${entry.at}-${index}`} className="kore-party-panel__history-item">
+            <span>{historyLine({ t, entry, plusOneLabel: t('panel.guests.plusOne') })}</span>
+            <span className="kore-party-panel__history-at">{historyAt({ t, at: entry.at })}</span>
+          </li>
+        ))}
+      </ul>
+    </Card>
   );
 }
 
 function LinkCard({
   party,
   audience,
+  trashLocked,
   onPreview,
   onCopy,
   onTrash,
 }: {
   party: PartyResponse;
   audience: Audience;
+  /** A colaboradora não exclui o grupo que já respondeu (Prazo RN08). */
+  trashLocked: boolean;
   /** Ver como este grupo (Pré-visualização RN01): a prévia como o grupo, em nova aba. */
   onPreview: () => void;
   onCopy: (url: string) => void;
@@ -382,6 +490,7 @@ function LinkCard({
   const { t: tSite } = useTranslation('site');
   const { url } = party.link;
   const helpId = useId();
+  const trashHelpId = useId();
   return (
     <Card title={t('panel.link.title')}>
       <p className="kore-party-panel__link">{url ?? '—'}</p>
@@ -406,10 +515,21 @@ function LinkCard({
         >
           {t('panel.link.preview')}
         </Button>
-        <Button variant="destructive" size="sm" onClick={onTrash}>
+        <Button
+          variant="destructive"
+          size="sm"
+          disabled={trashLocked}
+          {...(trashLocked && { 'aria-describedby': trashHelpId })}
+          onClick={onTrash}
+        >
           {t('trash.action')}
         </Button>
       </div>
+      {trashLocked && (
+        <p id={trashHelpId} className="kore-party-panel__note">
+          {t('trash.alreadyResponded.party')}
+        </p>
+      )}
       {url === null && (
         <p id={helpId} className="kore-party-panel__note">
           {tSite(`previewSite.noSlug.${audience}`)}

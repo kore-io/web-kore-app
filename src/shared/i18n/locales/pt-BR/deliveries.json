@@ -1,0 +1,46 @@
+{
+  "title": "Envios",
+  "tabs": {
+    "label": "Envios",
+    "deadline": "Prazo de resposta",
+    "deadlineShort": "Prazo"
+  },
+  "deadline": {
+    "label": "Prazo de resposta",
+    "daysLeft_one": "Falta {{count}} dia. No site, o grupo vê \"Vocês podem responder até {{date}}.\"",
+    "daysLeft_other": "Faltam {{count}} dias. No site, o grupo vê \"Vocês podem responder até {{date}}.\"",
+    "today": "O prazo termina hoje, às 23h59. No site, o grupo vê \"Vocês podem responder até {{date}}.\"",
+    "none": "Sem prazo, os convidados respondem até o dia do casamento.",
+    "notice": {
+      "couple": "Depois do prazo, só vocês podem alterar as respostas.",
+      "planner": "Depois do prazo, só o casal pode alterar as respostas."
+    },
+    "noticeText": "Os convidados veem a resposta dada, sem poder mudar.",
+    "ended": "O prazo terminou em {{date}}.",
+    "endedText": "Os convidados só veem a resposta dada.",
+    "reopen": {
+      "couple": "Escolham uma nova data para reabrir as respostas.",
+      "planner": "Escolha uma nova data para reabrir as respostas."
+    },
+    "pendingLabel": "Ainda sem resposta",
+    "pendingGuests_zero": "convidados",
+    "pendingGuests_one": "convidado",
+    "pendingGuests_other": "convidados",
+    "pendingParties_zero": "{{count}} grupos",
+    "pendingParties_one": "{{count}} grupo",
+    "pendingParties_other": "{{count}} grupos",
+    "pendingDetail": "{{guests}} em {{parties}} · Lembrar pendentes",
+    "save": "Salvar prazo",
+    "remove": "Tirar o prazo",
+    "saved": "Prazo salvo.",
+    "removed": "Prazo retirado.",
+    "inPast": {
+      "couple": "Essa data já passou. Escolham uma data a partir de hoje.",
+      "planner": "Essa data já passou. Escolha uma data a partir de hoje."
+    },
+    "afterEvent": {
+      "couple": "O prazo precisa ser até o dia do casamento, {{date}}. Escolham outra data.",
+      "planner": "O prazo precisa ser até o dia do casamento, {{date}}. Escolha outra data."
+    }
+  }
+}

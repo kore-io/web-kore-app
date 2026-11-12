@@ -1,5 +1,6 @@
 import access from './locales/pt-BR/access.json';
 import common from './locales/pt-BR/common.json';
+import deliveries from './locales/pt-BR/deliveries.json';
 import guests from './locales/pt-BR/guests.json';
 import layout from './locales/pt-BR/layout.json';
 import publicSite from './locales/pt-BR/public-site.json';
@@ -10,7 +11,7 @@ import site from './locales/pt-BR/site.json';
  * vem da Voz & Microcopy e do Penpot; nada de texto de tela fora daqui.
  */
 export const resources = {
-  'pt-BR': { access, common, guests, layout, publicSite, site },
+  'pt-BR': { access, common, deliveries, guests, layout, publicSite, site },
 } as const;
 
 export const defaultNamespace = 'common';

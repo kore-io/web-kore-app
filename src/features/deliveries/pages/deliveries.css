@@ -1,0 +1,29 @@
+/*
+ * Envios (Penpot, Área do Casal, página 07): as abas, com o rótulo curto no celular, e o
+ * Prazo de resposta (A7) num painel branco de até 560 px: o Alert do prazo vencido no topo,
+ * o Date Field com a linha de apoio, o Alert de Informação, o Stat Card dos pendentes e,
+ * à direita, Tirar o prazo · Salvar prazo (no celular, em largura cheia, o principal em cima).
+ */
+.kore-deliveries {
+  @apply flex flex-col gap-6;
+}
+
+.kore-deliveries__tab-short {
+  @apply md:hidden;
+}
+
+.kore-deliveries__tab-long {
+  @apply hidden md:inline;
+}
+
+.kore-deadline {
+  @apply flex max-w-140 flex-col gap-4 rounded-lg border border-gray-300 bg-white p-5;
+}
+
+.kore-deadline__loading {
+  @apply flex justify-center py-12;
+}
+
+.kore-deadline__actions {
+  @apply flex flex-col-reverse gap-3 md:flex-row md:justify-end;
+}

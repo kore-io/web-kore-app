@@ -95,3 +95,32 @@
 .kore-move-guest__empty {
   @apply type-caption text-gray-700;
 }
+
+/* O Histórico (Prazo e respostas RN05): a linha em ink e a hora em caption gray.700. */
+.kore-party-panel__history {
+  @apply m-0 flex list-none flex-col gap-3 p-0;
+}
+
+.kore-party-panel__history-item {
+  @apply flex flex-col gap-0.5 type-body-md text-ink;
+}
+
+.kore-party-panel__history-at {
+  @apply type-caption text-gray-700;
+}
+
+/*
+ * O Dialog do Alterar resposta (Prazo e respostas RN04; Penpot A8): Vai · Não vai lado a
+ * lado, o aviso do Não vai em caption gray.700, o nome da vaga e a restrição.
+ */
+.kore-change-response {
+  @apply flex flex-col gap-4;
+}
+
+.kore-change-response__choice {
+  @apply flex flex-wrap gap-x-6 gap-y-2;
+}
+
+.kore-change-response__note {
+  @apply m-0 type-caption text-gray-700;
+}

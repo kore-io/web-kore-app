@@ -26,6 +26,8 @@ describe('rotas do app (decisões 139, 146, 147 e 198)', () => {
       guestNew: '/app/convidados/novo',
       guestPartyEdit: '/app/convidados/grupos/:partyId/editar',
       site: '/app/site',
+      deliveries: '/app/envios',
+      deliveryDeadline: '/app/envios/prazo',
       siteSection: '/app/site/:section',
       publish: '/app/cobranca/publicar',
       guestTags: '/app/convidados/tags',

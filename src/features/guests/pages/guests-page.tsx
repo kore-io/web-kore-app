@@ -19,12 +19,20 @@ import { useRowActions } from '../hooks/use-row-actions';
 
 /** Aba Grupos e convidados (RN13 de Grupos e convidados), dentro do GuestsLayout. */
 export function GuestsPage() {
-  const { weddingId, audience } = useActiveWedding();
+  const { weddingId, audience, role } = useActiveWedding();
   if (!weddingId) return null;
-  return <PartiesView weddingId={weddingId} audience={audience} />;
+  return <PartiesView weddingId={weddingId} audience={audience} role={role} />;
 }
 
-function PartiesView({ weddingId, audience }: { weddingId: string; audience: Audience }) {
+function PartiesView({
+  weddingId,
+  audience,
+  role,
+}: {
+  weddingId: string;
+  audience: Audience;
+  role: string | undefined;
+}) {
   const { t } = useTranslation('guests');
   const { filters: urlFilters, setFilters } = usePartyFilters();
   const tags = useTagsControllerListV1(weddingId);
@@ -71,7 +79,14 @@ function PartiesView({ weddingId, audience }: { weddingId: string; audience: Aud
           isLoadingMore={list.isLoadingMore}
           loadMoreFailed={list.loadMoreFailed}
           onLoadMore={list.loadMore}
-          actionsFor={(party) => <PartyRowMenu party={party} onAction={rowActions.onAction} />}
+          actionsFor={(party) => (
+            <PartyRowMenu
+              party={party}
+              // A colaboradora não exclui quem já respondeu (Prazo RN08).
+              trashLocked={role !== 'owner' && party.counts.confirmed + party.counts.declined > 0}
+              onAction={rowActions.onAction}
+            />
+          )}
         />
         <p className="kore-guests__showing">
           {t('showing', { shown: list.parties.length, count: list.total ?? 0 })}
