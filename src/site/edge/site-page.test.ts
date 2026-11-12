@@ -10,6 +10,7 @@ const HTML = `<!doctype html><html lang="pt-BR"><head>
 function env(overrides: Partial<SitePageEnv> = {}): SitePageEnv {
   return {
     API_URL: 'https://api.test',
+    IMAGES_ORIGIN: 'https://cdn.test',
     ASSETS: { fetch: vi.fn(async () => new Response(HTML)) },
     ...overrides,
   };
@@ -46,8 +47,16 @@ describe('Pages Function do site do casal (Site público RN01 a RN03, RN09)', ()
       'cache-control': 'private, no-store',
       'x-robots-tag': 'noindex, nofollow',
       'referrer-policy': 'no-referrer',
+      'x-content-type-options': 'nosniff',
       'content-type': 'text/html; charset=utf-8',
     });
+    // A CSP (RN01): a API e o CDN das imagens liberados, nada inline e fora de iframe.
+    const csp = response.headers.get('content-security-policy') ?? '';
+    expect(csp).toContain("connect-src 'self' https://api.test");
+    expect(csp).toContain("img-src 'self' https://cdn.test blob:");
+    expect(csp).toContain("script-src 'self';");
+    expect(csp).toContain("frame-ancestors 'none'");
+    expect(csp).not.toContain('unsafe-inline');
     const html = await response.text();
     expect(html).toContain('<title>Ana &amp; Marcos</title>');
     expect(html).toContain('<meta property="og:title" content="Ana &amp; Marcos" />');
