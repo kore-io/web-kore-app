@@ -181,6 +181,24 @@ describe('Envios › as abas e os grupos (Envios RN01, RN03, RN04, RN10; decisã
     );
   });
 
+  it('vindo do cartão Envios do Dashboard, abre com o status tocado (Dashboard RN02)', async () => {
+    const calls = mockSend();
+    renderRoute({ url: '/app/envios/convites?envio=visualizado' });
+    await screen.findByText('Família Moreira');
+    expect(calls.map((call) => call.path)).toContainEqual(
+      expect.stringMatching(/^\/v1\/weddings\/w1\/parties\?.*sent=viewed/),
+    );
+  });
+
+  it('um ?envio= que não é status (ex.: toString) cai no "não enviado"', async () => {
+    const calls = mockSend();
+    renderRoute({ url: '/app/envios/convites?envio=toString' });
+    await screen.findByText('Família Moreira');
+    expect(calls.map((call) => call.path)).toContainEqual(
+      expect.stringMatching(/^\/v1\/weddings\/w1\/parties\?.*sent=not_sent/),
+    );
+  });
+
   it('marca grupos, "2 grupos marcados" e Continuar leva ao canal', async () => {
     const user = userEvent.setup();
     mockSend();

@@ -9,6 +9,7 @@ import { useTagsControllerListV1 } from '../../../shared/api/generated/tags/tags
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { PartyList } from '../../guests/components/party-list';
 import type { Audience } from '../../guests/hooks/use-active-wedding';
+import { sentFilters } from '../../guests/hooks/use-party-filters';
 import type { DeliveryKind } from '../delivery-texts';
 import { DELIVERY_LIMIT, useDeliverySelection } from '../hooks/use-delivery-selection';
 import { ClosedNotice, type Closed } from './send-page';
@@ -35,8 +36,15 @@ export function GroupsStep({
 }) {
   const { t } = useTranslation('deliveries');
   const { t: tGuests } = useTranslation('guests');
-  const [, setSearch] = useSearchParams();
-  const [sent, setSent] = useState<SentFilter>('not_sent');
+  const [search, setSearch] = useSearchParams();
+  // O cartão Envios do Dashboard abre o convite com o status tocado (?envio=visualizado,
+  // Dashboard RN02); sem ele, "não enviado" (Envios RN04).
+  const [sent, setSent] = useState<SentFilter>(() => {
+    const fromUrl = search.get('envio');
+    return fromUrl && Object.hasOwn(sentFilters, fromUrl)
+      ? sentFilters[fromUrl as keyof typeof sentFilters]
+      : 'not_sent';
+  });
   const [saveTheDate, setSaveTheDate] = useState<SaveTheDateFilter>('');
   const [tag, setTag] = useState('');
   const tags = useTagsControllerListV1(weddingId, { query: { enabled: kind !== 'save_the_date' } });

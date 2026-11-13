@@ -51,7 +51,7 @@
     "@fontsource/nunito-sans": "^5.3.0",
     "@fontsource/playfair-display": "^5.3.0",
     "@fontsource/source-sans-3": "^5.3.1",
-    "@kore-io/design": "0.2.0-homolog.40",
+    "@kore-io/design": "0.2.0-homolog.42",
     "@tanstack/react-query": "^5.106.1",
     "i18next": "^26.7.2",
     "lucide-react": "^1.69.0",
