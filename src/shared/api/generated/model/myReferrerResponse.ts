@@ -13,4 +13,16 @@ export interface MyReferrerResponse {
    * @nullable
    */
   discountPercent: number | null;
+  /**
+   * "***.982.247-**"; nulo antes do primeiro recebimento (Repasse RN02).
+   * @nullable
+   */
+  taxIdMasked: string | null;
+  /**
+   * A chave ativa mascarada; nula sem chave confirmada (Repasse RN03).
+   * @nullable
+   */
+  pixKeyMasked: string | null;
+  /** CPF ou CNPJ e chave ativa: pode receber ("Cadastre seu CPF ou CNPJ e sua chave Pix…"). */
+  payoutDataComplete: boolean;
 }
