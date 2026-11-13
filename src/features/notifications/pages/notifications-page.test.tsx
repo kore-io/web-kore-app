@@ -140,6 +140,8 @@ describe('Notificações (Central RN04 a RN06)', () => {
     await router.navigate('/app/notificacoes');
     await user.click(await screen.findByRole('button', { name: /2 grupos responderam/ }));
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/convidados'));
+    // Na ordem de Respondido em (Central RN05; decisão 246).
+    expect(router.state.location.search).toBe('?ordem=respondido');
   });
 
   it('o aviso de cobrança (billing) não aparece: o front da F3 o desenha (Central RN01)', async () => {

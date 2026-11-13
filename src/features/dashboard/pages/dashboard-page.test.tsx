@@ -304,6 +304,35 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     ).not.toContain('/app/convidados/grupos/undefined');
   });
 
+  it('a Atividade agrupada leva à lista na ordem de Respondido em (RN04; decisão 246)', async () => {
+    const group = (partyId: string, name: string) => ({
+      at: today(20, 14),
+      partyId,
+      name,
+      confirmed: 1,
+      declined: 0,
+    });
+    mockDashboard({
+      data: dashboard({
+        recentActivity: [
+          {
+            id: 'n2',
+            source: 'notification',
+            count: 2,
+            readAt: null,
+            at: today(20, 14),
+            groups: [group('p1', 'Família Moreira'), group('p2', 'Família Duarte')],
+          },
+        ],
+      }),
+    });
+    renderRoute({ url: '/app' });
+    await screen.findByText('142');
+    expect(
+      within(card('Atividade recente')).getByRole('link', { name: /2 grupos responderam/ }),
+    ).toHaveAttribute('href', '/app/convidados?ordem=respondido');
+  });
+
   it('a Atividade recente vazia', async () => {
     mockDashboard({ data: dashboard({ recentActivity: [] }) });
     renderRoute({ url: '/app' });

@@ -45,6 +45,7 @@ export function usePartyList({
       // Depois de uma falha, só o Tentar de novo pede de novo (o marcador não dispara sozinho).
       if (query.hasNextPage && !query.isFetchingNextPage) void query.fetchNextPage();
     },
-    isFiltered: Object.keys(params).length > 0,
+    // A ordem não é filtro: só ela não troca o vazio (tipo 3) pelo sem resultado (tipo 1).
+    isFiltered: Object.keys(params).some((key) => key !== 'order'),
   };
 }
