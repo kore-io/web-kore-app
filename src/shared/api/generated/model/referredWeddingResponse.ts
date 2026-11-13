@@ -4,6 +4,7 @@
  * Kore API
  * OpenAPI spec version: 1
  */
+import type { ReferredWeddingCommissionResponse } from './referredWeddingCommissionResponse';
 import type { ReferredWeddingResponseStatus } from './referredWeddingResponseStatus';
 
 export interface ReferredWeddingResponse {
@@ -11,4 +12,6 @@ export interface ReferredWeddingResponse {
   weddingId: string | null;
   partnerNames: string[];
   status: ReferredWeddingResponseStatus;
+  /** @nullable */
+  commission: ReferredWeddingCommissionResponse | null;
 }

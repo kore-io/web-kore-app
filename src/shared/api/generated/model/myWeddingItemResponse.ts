@@ -20,4 +20,6 @@ export interface MyWeddingItemResponse {
   state: string;
   guestsTotal: number;
   createdByMe: boolean;
+  /** "Aguardando pagamento" (filtro e status derivado; Comissões RN08): só o booleano. */
+  awaitingPayment: boolean;
 }

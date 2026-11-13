@@ -25,7 +25,10 @@ import type {
   BillingQuoteControllerGetQuoteV1Params,
   BillingQuoteResponse,
   BillingResponse,
+  ChangeEndDateBody,
   CreatePaymentBody,
+  EndDateBeyondPaidErrorBody,
+  EndDateChangedResponse,
   EndDateOutOfRangeErrorBody,
   EventDateMissingErrorBody,
   GatewayUnavailableErrorBody,
@@ -58,6 +61,7 @@ import type {
   ValidationErrorBody,
   WebhookReceivedResponse,
   WeddingBlockedErrorBody,
+  WeddingDeletionScheduledErrorBody,
   WeddingNotFoundErrorBody,
 } from '../model';
 
@@ -537,6 +541,157 @@ export function useBillingQuoteControllerGetQuoteV1<
   return withQueryKey(query, queryOptions.queryKey);
 }
 
+export const getPaymentsControllerEndDateV1Url = (weddingId: string) => {
+  return `/v1/weddings/${weddingId}/end-date`;
+};
+
+/**
+ * @summary Antecipar ou voltar a data de saída do ar (Data de saída do ar RN05):
+sem cobrança nem reembolso, até o paidThrough; depois dele, a extensão.
+ */
+export const paymentsControllerEndDateV1 = async (
+  weddingId: string,
+  changeEndDateBody: ChangeEndDateBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<EndDateChangedResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<EndDateChangedResponse>(getPaymentsControllerEndDateV1Url(weddingId), {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(changeEndDateBody),
+  });
+};
+
+export const getPaymentsControllerEndDateV1MutationKey = () =>
+  ['paymentsControllerEndDateV1'] as const;
+
+export const getPaymentsControllerEndDateV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
+    | WeddingNotFoundErrorBody
+    | NotPublishedErrorBody
+    | WeddingDeletionScheduledErrorBody
+    | EndDateOutOfRangeErrorBody
+    | EndDateBeyondPaidErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof paymentsControllerEndDateV1>>,
+    TError,
+    PaymentsControllerEndDateV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof paymentsControllerEndDateV1>>,
+  TError,
+  PaymentsControllerEndDateV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getPaymentsControllerEndDateV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof paymentsControllerEndDateV1>>,
+    PaymentsControllerEndDateV1MutationVariables
+  > = (props) => {
+    const { weddingId, data } = props ?? {};
+
+    return paymentsControllerEndDateV1(weddingId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PaymentsControllerEndDateV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof paymentsControllerEndDateV1>>
+>;
+export type PaymentsControllerEndDateV1MutationBody = ChangeEndDateBody;
+export type PaymentsControllerEndDateV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
+  | WeddingNotFoundErrorBody
+  | NotPublishedErrorBody
+  | WeddingDeletionScheduledErrorBody
+  | EndDateOutOfRangeErrorBody
+  | EndDateBeyondPaidErrorBody
+  | RateLimitedErrorBody
+>;
+export type PaymentsControllerEndDateV1MutationVariables = {
+  weddingId: string;
+  data: ChangeEndDateBody;
+};
+
+/**
+ * @summary Antecipar ou voltar a data de saída do ar (Data de saída do ar RN05):
+sem cobrança nem reembolso, até o paidThrough; depois dele, a extensão.
+ */
+export const usePaymentsControllerEndDateV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
+    | WeddingNotFoundErrorBody
+    | NotPublishedErrorBody
+    | WeddingDeletionScheduledErrorBody
+    | EndDateOutOfRangeErrorBody
+    | EndDateBeyondPaidErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof paymentsControllerEndDateV1>>,
+      TError,
+      PaymentsControllerEndDateV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof paymentsControllerEndDateV1>>,
+  TError,
+  PaymentsControllerEndDateV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getPaymentsControllerEndDateV1MutationOptions(options), queryClient);
+};
 export const getPaymentsControllerRefundV1Url = (weddingId: string, paymentId: string) => {
   return `/v1/weddings/${weddingId}/payments/${paymentId}/refund-request`;
 };
@@ -598,6 +753,7 @@ export const getPaymentsControllerRefundV1MutationOptions = <
     | RefundNotLastExtensionErrorBody
     | PaymentDisputedErrorBody
     | PaymentNotPaidErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -651,6 +807,7 @@ export type PaymentsControllerRefundV1MutationError = ErrorType<
   | RefundNotLastExtensionErrorBody
   | PaymentDisputedErrorBody
   | PaymentNotPaidErrorBody
+  | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
 export type PaymentsControllerRefundV1MutationVariables = {
@@ -677,6 +834,7 @@ export const usePaymentsControllerRefundV1 = <
     | RefundNotLastExtensionErrorBody
     | PaymentDisputedErrorBody
     | PaymentNotPaidErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -750,6 +908,7 @@ export const getPaymentsControllerPayV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | NotDraftErrorBody
     | SiteSlugMissingErrorBody
@@ -758,6 +917,8 @@ export const getPaymentsControllerPayV1MutationOptions = <
     | PaymentAlreadyPaidErrorBody
     | RefundInProgressErrorBody
     | PriceChangedErrorBody
+    | NotPublishedErrorBody
+    | WeddingDeletionScheduledErrorBody
     | EndDateOutOfRangeErrorBody
     | IdempotencyKeyReusedErrorBody
     | RateLimitedErrorBody
@@ -808,6 +969,7 @@ export type PaymentsControllerPayV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | NotDraftErrorBody
   | SiteSlugMissingErrorBody
@@ -816,6 +978,8 @@ export type PaymentsControllerPayV1MutationError = ErrorType<
   | PaymentAlreadyPaidErrorBody
   | RefundInProgressErrorBody
   | PriceChangedErrorBody
+  | NotPublishedErrorBody
+  | WeddingDeletionScheduledErrorBody
   | EndDateOutOfRangeErrorBody
   | IdempotencyKeyReusedErrorBody
   | RateLimitedErrorBody
@@ -839,6 +1003,7 @@ export const usePaymentsControllerPayV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | NotDraftErrorBody
     | SiteSlugMissingErrorBody
@@ -847,6 +1012,8 @@ export const usePaymentsControllerPayV1 = <
     | PaymentAlreadyPaidErrorBody
     | RefundInProgressErrorBody
     | PriceChangedErrorBody
+    | NotPublishedErrorBody
+    | WeddingDeletionScheduledErrorBody
     | EndDateOutOfRangeErrorBody
     | IdempotencyKeyReusedErrorBody
     | RateLimitedErrorBody

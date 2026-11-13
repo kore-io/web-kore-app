@@ -36,6 +36,8 @@ import type {
   TrashedTagResponse,
   UpdateTagBody,
   ValidationErrorBody,
+  WeddingBlockedErrorBody,
+  WeddingDeletionScheduledErrorBody,
   WeddingNotFoundErrorBody,
 } from '../model';
 
@@ -84,8 +86,10 @@ export const getTagsControllerTrashV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | TagNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -130,8 +134,10 @@ export type TagsControllerTrashV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | TagNotFoundErrorBody
+  | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
 export type TagsControllerTrashV1MutationVariables = { weddingId: string; tagId: string };
@@ -144,8 +150,10 @@ export const useTagsControllerTrashV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | TagNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -216,9 +224,11 @@ export const getTagsControllerUpdateV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | TagNotFoundErrorBody
     | TagNameTakenErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -264,9 +274,11 @@ export type TagsControllerUpdateV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | TagNotFoundErrorBody
   | TagNameTakenErrorBody
+  | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
 export type TagsControllerUpdateV1MutationVariables = {
@@ -284,9 +296,11 @@ export const useTagsControllerUpdateV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | TagNotFoundErrorBody
     | TagNameTakenErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -494,9 +508,11 @@ export const getTagsControllerCreateV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | TagLimitReachedErrorBody
     | TagNameTakenErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -542,9 +558,11 @@ export type TagsControllerCreateV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | TagLimitReachedErrorBody
   | TagNameTakenErrorBody
+  | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
 export type TagsControllerCreateV1MutationVariables = { weddingId: string; data: CreateTagBody };
@@ -558,9 +576,11 @@ export const useTagsControllerCreateV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | TagLimitReachedErrorBody
     | TagNameTakenErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -631,8 +651,10 @@ export const getTagsControllerApplyV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | TagNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -678,8 +700,10 @@ export type TagsControllerApplyV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | TagNotFoundErrorBody
+  | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
 export type TagsControllerApplyV1MutationVariables = {
@@ -697,8 +721,10 @@ export const useTagsControllerApplyV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | TagNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,

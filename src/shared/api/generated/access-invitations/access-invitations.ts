@@ -45,6 +45,8 @@ import type {
   SendAccessInvitationsResponse,
   SessionExpiredErrorBody,
   ValidationErrorBody,
+  WeddingBlockedErrorBody,
+  WeddingDeletionScheduledErrorBody,
   WeddingNotFoundErrorBody,
 } from '../model';
 
@@ -119,10 +121,12 @@ export const getAccessInvitationsControllerSendV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | OwnersFullErrorBody
     | PlannerAlreadyErrorBody
     | CoupleInvitationsFullErrorBody
+    | WeddingDeletionScheduledErrorBody
     | SelfInvitationErrorBody
     | RateLimitedErrorBody
   >,
@@ -169,10 +173,12 @@ export type AccessInvitationsControllerSendV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | OwnersFullErrorBody
   | PlannerAlreadyErrorBody
   | CoupleInvitationsFullErrorBody
+  | WeddingDeletionScheduledErrorBody
   | SelfInvitationErrorBody
   | RateLimitedErrorBody
 >;
@@ -190,10 +196,12 @@ export const useAccessInvitationsControllerSendV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | OwnersFullErrorBody
     | PlannerAlreadyErrorBody
     | CoupleInvitationsFullErrorBody
+    | WeddingDeletionScheduledErrorBody
     | SelfInvitationErrorBody
     | RateLimitedErrorBody
   >,
@@ -243,9 +251,11 @@ export const getAccessInvitationsControllerCancelV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | InvitationNotFoundErrorBody
     | NotPendingErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -290,9 +300,11 @@ export type AccessInvitationsControllerCancelV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | InvitationNotFoundErrorBody
   | NotPendingErrorBody
+  | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
 export type AccessInvitationsControllerCancelV1MutationVariables = {
@@ -308,9 +320,11 @@ export const useAccessInvitationsControllerCancelV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | InvitationNotFoundErrorBody
     | NotPendingErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,

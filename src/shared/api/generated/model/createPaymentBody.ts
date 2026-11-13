@@ -9,7 +9,7 @@ import type { CreatePaymentBodyMethod } from './createPaymentBodyMethod';
 import type { PayerBody } from './payerBody';
 
 export interface CreatePaymentBody {
-  /** Por ora só a publicação; a extensão entra no PR da data de saída do ar. */
+  /** A publicação ou a extensão (Data de saída do ar RN04: adiar e renovar). */
   kind: CreatePaymentBodyKind;
   endDate: string;
   method: CreatePaymentBodyMethod;

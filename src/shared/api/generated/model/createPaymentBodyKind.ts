@@ -6,11 +6,12 @@
  */
 
 /**
- * Por ora só a publicação; a extensão entra no PR da data de saída do ar.
+ * A publicação ou a extensão (Data de saída do ar RN04: adiar e renovar).
  */
 export type CreatePaymentBodyKind =
   (typeof CreatePaymentBodyKind)[keyof typeof CreatePaymentBodyKind];
 
 export const CreatePaymentBodyKind = {
   publication: 'publication',
+  extension: 'extension',
 } as const;

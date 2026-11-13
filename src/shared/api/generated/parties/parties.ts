@@ -42,6 +42,8 @@ import type {
   TrashedPartyResponse,
   UpdatePartyBody,
   ValidationErrorBody,
+  WeddingBlockedErrorBody,
+  WeddingDeletionScheduledErrorBody,
   WeddingNotFoundErrorBody,
 } from '../model';
 
@@ -113,7 +115,9 @@ export const getPartiesControllerTrashManyV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -159,7 +163,9 @@ export type PartiesControllerTrashManyV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
+  | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
 export type PartiesControllerTrashManyV1MutationVariables = {
@@ -176,7 +182,9 @@ export const usePartiesControllerTrashManyV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -225,8 +233,10 @@ export const getPartiesControllerTrashV1MutationOptions = <
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
     | AlreadyRespondedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | PartyNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -272,8 +282,10 @@ export type PartiesControllerTrashV1MutationError = ErrorType<
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
   | AlreadyRespondedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | PartyNotFoundErrorBody
+  | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
 export type PartiesControllerTrashV1MutationVariables = { weddingId: string; partyId: string };
@@ -287,8 +299,10 @@ export const usePartiesControllerTrashV1 = <
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
     | AlreadyRespondedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | PartyNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -529,9 +543,11 @@ export const getPartiesControllerUpdateV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | PartyNotFoundErrorBody
     | PlusOnesInUseErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -577,9 +593,11 @@ export type PartiesControllerUpdateV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | PartyNotFoundErrorBody
   | PlusOnesInUseErrorBody
+  | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
 export type PartiesControllerUpdateV1MutationVariables = {
@@ -597,9 +615,11 @@ export const usePartiesControllerUpdateV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | PartyNotFoundErrorBody
     | PlusOnesInUseErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -1042,7 +1062,9 @@ export const getPartiesControllerCreateV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -1088,7 +1110,9 @@ export type PartiesControllerCreateV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
+  | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
 export type PartiesControllerCreateV1MutationVariables = {
@@ -1105,7 +1129,9 @@ export const usePartiesControllerCreateV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -1157,8 +1183,10 @@ export const getPartiesControllerRegenerateV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | PartyNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -1203,8 +1231,10 @@ export type PartiesControllerRegenerateV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | PartyNotFoundErrorBody
+  | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
 export type PartiesControllerRegenerateV1MutationVariables = { weddingId: string; partyId: string };
@@ -1217,8 +1247,10 @@ export const usePartiesControllerRegenerateV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | PartyNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,

@@ -28,6 +28,8 @@ import type {
   OriginNotAllowedErrorBody,
   RateLimitedErrorBody,
   SessionExpiredErrorBody,
+  WeddingBlockedErrorBody,
+  WeddingDeletionScheduledErrorBody,
   WeddingHasNoOwnerErrorBody,
   WeddingMembersResponse,
   WeddingNotFoundErrorBody,
@@ -220,11 +222,13 @@ export const getWeddingMembersControllerRemoveV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | MembershipNotFoundErrorBody
     | CannotRemoveOwnerErrorBody
     | LastOwnerErrorBody
     | WeddingHasNoOwnerErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -269,11 +273,13 @@ export type WeddingMembersControllerRemoveV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | MembershipNotFoundErrorBody
   | CannotRemoveOwnerErrorBody
   | LastOwnerErrorBody
   | WeddingHasNoOwnerErrorBody
+  | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
 export type WeddingMembersControllerRemoveV1MutationVariables = { weddingId: string; id: string };
@@ -286,11 +292,13 @@ export const useWeddingMembersControllerRemoveV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | MembershipNotFoundErrorBody
     | CannotRemoveOwnerErrorBody
     | LastOwnerErrorBody
     | WeddingHasNoOwnerErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,

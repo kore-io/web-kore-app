@@ -35,6 +35,8 @@ import type {
   SessionExpiredErrorBody,
   TrashedGuestResponse,
   ValidationErrorBody,
+  WeddingBlockedErrorBody,
+  WeddingDeletionScheduledErrorBody,
   WeddingNotFoundErrorBody,
 } from '../model';
 
@@ -84,10 +86,12 @@ export const getGuestsControllerTrashV1MutationOptions = <
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
     | AlreadyRespondedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | GuestNotFoundErrorBody
     | LastGuestErrorBody
     | EmptyPlusOneErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -133,10 +137,12 @@ export type GuestsControllerTrashV1MutationError = ErrorType<
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
   | AlreadyRespondedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | GuestNotFoundErrorBody
   | LastGuestErrorBody
   | EmptyPlusOneErrorBody
+  | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
 export type GuestsControllerTrashV1MutationVariables = { weddingId: string; guestId: string };
@@ -150,10 +156,12 @@ export const useGuestsControllerTrashV1 = <
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
     | AlreadyRespondedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | GuestNotFoundErrorBody
     | LastGuestErrorBody
     | EmptyPlusOneErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -224,10 +232,12 @@ export const getGuestsControllerMoveV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | GuestNotFoundErrorBody
     | LastGuestErrorBody
     | EmptyPlusOneErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -273,10 +283,12 @@ export type GuestsControllerMoveV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | GuestNotFoundErrorBody
   | LastGuestErrorBody
   | EmptyPlusOneErrorBody
+  | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
 export type GuestsControllerMoveV1MutationVariables = {
@@ -294,10 +306,12 @@ export const useGuestsControllerMoveV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | GuestNotFoundErrorBody
     | LastGuestErrorBody
     | EmptyPlusOneErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,

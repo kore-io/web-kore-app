@@ -45,6 +45,8 @@ import type {
   UpdateSiteSectionBody,
   UpdateSongQuestionBody,
   ValidationErrorBody,
+  WeddingBlockedErrorBody,
+  WeddingDeletionScheduledErrorBody,
   WeddingNotFoundErrorBody,
 } from '../model';
 
@@ -116,7 +118,9 @@ export const getSiteControllerSongQuestionV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -162,7 +166,9 @@ export type SiteControllerSongQuestionV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
+  | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
 export type SiteControllerSongQuestionV1MutationVariables = {
@@ -179,7 +185,9 @@ export const useSiteControllerSongQuestionV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -253,8 +261,10 @@ export const getSiteControllerSectionV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | SiteImageNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -300,8 +310,10 @@ export type SiteControllerSectionV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | SiteImageNotFoundErrorBody
+  | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
 export type SiteControllerSectionV1MutationVariables = {
@@ -319,8 +331,10 @@ export const useSiteControllerSectionV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | SiteImageNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -391,7 +405,9 @@ export const getSiteControllerAppearanceV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | ContrastTooLowErrorBody
     | RateLimitedErrorBody
   >,
@@ -438,7 +454,9 @@ export type SiteControllerAppearanceV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
+  | WeddingDeletionScheduledErrorBody
   | ContrastTooLowErrorBody
   | RateLimitedErrorBody
 >;
@@ -456,7 +474,9 @@ export const useSiteControllerAppearanceV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | ContrastTooLowErrorBody
     | RateLimitedErrorBody
   >,
@@ -694,11 +714,13 @@ export const getSiteControllerPatchV1MutationOptions = <
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
     | SiteFieldNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | SiteImageNotFoundErrorBody
     | SiteSlugLockedErrorBody
     | SitePaymentPendingErrorBody
     | SiteSlugUnavailableErrorBody
+    | WeddingDeletionScheduledErrorBody
     | EndDateOutOfRangeErrorBody
     | RateLimitedErrorBody
   >,
@@ -746,11 +768,13 @@ export type SiteControllerPatchV1MutationError = ErrorType<
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
   | SiteFieldNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | SiteImageNotFoundErrorBody
   | SiteSlugLockedErrorBody
   | SitePaymentPendingErrorBody
   | SiteSlugUnavailableErrorBody
+  | WeddingDeletionScheduledErrorBody
   | EndDateOutOfRangeErrorBody
   | RateLimitedErrorBody
 >;
@@ -766,11 +790,13 @@ export const useSiteControllerPatchV1 = <
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
     | SiteFieldNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | SiteImageNotFoundErrorBody
     | SiteSlugLockedErrorBody
     | SitePaymentPendingErrorBody
     | SiteSlugUnavailableErrorBody
+    | WeddingDeletionScheduledErrorBody
     | EndDateOutOfRangeErrorBody
     | RateLimitedErrorBody
   >,
