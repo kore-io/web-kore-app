@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fileNameFromDisposition } from './export-download';
+import { fileNameFromDisposition } from './download-file';
 
 describe('nome do arquivo da exportação (RN09)', () => {
   it.each([
