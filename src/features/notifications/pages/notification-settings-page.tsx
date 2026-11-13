@@ -1,6 +1,6 @@
-import { PageHeader, Select, Spinner, Tab, Tabs, useToast } from '@kore-io/design';
+import { PageHeader, Select, Spinner, Switch, Tab, Tabs, useToast } from '@kore-io/design';
 import { useQueryClient } from '@tanstack/react-query';
-import { useId } from 'react';
+import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { paths } from '../../../app/paths';
@@ -16,6 +16,7 @@ import {
 } from '../../../shared/api/generated/notifications/notifications';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { useActiveWedding } from '../../guests/hooks/use-active-wedding';
+import { disablePush, enablePush, pushAvailability, type PushAvailability } from '../push';
 
 const EMAIL_OPTIONS: SavePreferenceBodyEmail[] = ['immediate', 'daily', 'off'];
 
@@ -23,8 +24,9 @@ const EMAIL_OPTIONS: SavePreferenceBodyEmail[] = ['immediate', 'daily', 'off'];
  * Configurações › Notificações (/app/configuracoes/notificacoes; Central RN07; decisão 221;
  * Penpot 27): por pessoa e por casamento, a linha Respostas do convite com o E-mail (Na
  * hora · Resumo diário às 20h · Desligado, padrão o resumo). Cada mudança grava na hora,
- * sem botão Salvar, com o Toast "Preferências salvas.". A central sempre recebe tudo; o
- * push por aparelho entra no C9. Na F5, das abas de Configurações só existe Notificações.
+ * sem botão Salvar, com o Toast "Preferências salvas.". A central sempre recebe tudo. O
+ * Push vale para este aparelho (Notificações e push RN07): ligar pede a permissão e assina;
+ * desligar apaga a assinatura deste aparelho. Na F5, das abas só existe Notificações.
  */
 export function NotificationSettingsPage() {
   const { weddingId } = useActiveWedding();
@@ -43,6 +45,35 @@ function NotificationSettings({ weddingId }: { weddingId: string }) {
   const preferences = useNotificationsControllerGetPreferencesV1(params);
   const rsvp = preferences.data?.items.find((item) => item.type === 'rsvp');
   const queryKey = getNotificationsControllerGetPreferencesV1QueryKey(params);
+  const [availability, setAvailability] = useState<PushAvailability>(() => pushAvailability());
+  const [pushBusy, setPushBusy] = useState(false);
+  const failed = () =>
+    showToast({
+      tone: 'danger',
+      message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
+    });
+
+  async function togglePush({ on, vapidPublicKey }: { on: boolean; vapidPublicKey: string }) {
+    setPushBusy(true);
+    try {
+      if (on) {
+        const result = await enablePush({ vapidPublicKey });
+        // Não aceitou: o switch fica desligado, com o aviso do navegador.
+        if (result === 'denied') {
+          setAvailability('denied');
+          return;
+        }
+      } else {
+        await disablePush();
+      }
+      await queryClient.invalidateQueries({ queryKey });
+      showToast({ tone: 'success', message: t('settings.saved') });
+    } catch {
+      failed();
+    } finally {
+      setPushBusy(false);
+    }
+  }
 
   async function saveEmail(email: SavePreferenceBodyEmail) {
     const before = queryClient.getQueryData<PreferencesResponse>(queryKey);
@@ -60,10 +91,7 @@ function NotificationSettings({ weddingId }: { weddingId: string }) {
       showToast({ tone: 'success', message: t('settings.saved') });
     } catch {
       queryClient.setQueryData(queryKey, before);
-      showToast({
-        tone: 'danger',
-        message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
-      });
+      failed();
     }
   }
 
@@ -108,8 +136,60 @@ function NotificationSettings({ weddingId }: { weddingId: string }) {
               </Select>
             </div>
           </div>
+          <PushRow
+            push={preferences.data?.push}
+            availability={availability}
+            busy={pushBusy}
+            onToggle={(on, vapidPublicKey) => void togglePush({ on, vapidPublicKey })}
+          />
           <p className="kore-settings__note">{t('settings.note')}</p>
         </section>
+      )}
+    </div>
+  );
+}
+
+/**
+ * A linha do Push (Penpot 27): o switch vale para este aparelho. Sem o app instalado (ou
+ * sem push no navegador), desabilitado com "Para receber push, instale o Kore no seu
+ * celular."; bloqueado no navegador, com o aviso de liberar; sem a chave VAPID no ambiente,
+ * só desabilitado.
+ */
+function PushRow({
+  push,
+  availability,
+  busy,
+  onToggle,
+}: {
+  push: PreferencesResponse['push'] | undefined;
+  availability: PushAvailability;
+  busy: boolean;
+  onToggle: (on: boolean, vapidPublicKey: string) => void;
+}) {
+  const { t } = useTranslation('notifications');
+  const vapidPublicKey = push?.vapidPublicKey ?? null;
+  const reason =
+    availability === 'install'
+      ? t('settings.pushInstall')
+      : availability === 'denied'
+        ? t('settings.pushDenied')
+        : null;
+  return (
+    <div className="kore-settings__push">
+      <Switch
+        checked={availability === 'ready' && push?.subscribed === true}
+        disabled={busy || availability !== 'ready' || vapidPublicKey === null}
+        {...(reason && { 'aria-describedby': 'kore-settings-push-reason' })}
+        onChange={(event) => {
+          if (vapidPublicKey) onToggle(event.target.checked, vapidPublicKey);
+        }}
+      >
+        {t('settings.push')}
+      </Switch>
+      {reason && (
+        <p id="kore-settings-push-reason" className="kore-settings__push-reason">
+          {reason}
+        </p>
       )}
     </div>
   );

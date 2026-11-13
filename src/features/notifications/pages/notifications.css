@@ -87,3 +87,11 @@
 .kore-settings__label {
   @apply type-label text-ink;
 }
+
+.kore-settings__push {
+  @apply flex flex-col gap-1.5 border-b border-gray-300 pb-4;
+}
+
+.kore-settings__push-reason {
+  @apply m-0 type-caption text-gray-700;
+}
