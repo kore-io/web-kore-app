@@ -59,6 +59,8 @@ test.describe('Site › Editor (decisão 214)', () => {
       'Hospedagem e transportedesligada',
       'Dress codedesligada',
       'FAQdesligada',
+      // A Pergunta de música entrou na lista na F4 (Música RN01).
+      'Pergunta de músicadesligada',
     ]);
 
     await page
