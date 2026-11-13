@@ -27,6 +27,7 @@ import {
   longDate,
   rateDetail,
 } from '../dashboard-texts';
+import { guestsByRespondedAt } from '../../guests/hooks/use-party-filters';
 
 /** O caminho de cada item do Checklist (RN03). */
 const CHECKLIST_PATHS: Record<ChecklistItemResponse['key'], string> = {
@@ -369,7 +370,9 @@ function ActivityCard({
             const texts = activityTexts({ t, item });
             const [first] = item.groups;
             const to =
-              item.count <= 1 && first ? guestPartyPath({ partyId: first.partyId }) : paths.guests;
+              item.count <= 1 && first
+                ? guestPartyPath({ partyId: first.partyId })
+                : guestsByRespondedAt(paths.guests);
             return (
               <li key={item.id}>
                 <Link

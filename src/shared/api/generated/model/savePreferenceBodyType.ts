@@ -12,4 +12,5 @@ export const SavePreferenceBodyType = {
   rsvp: 'rsvp',
   wedding_published: 'wedding_published',
   membership_removed: 'membership_removed',
+  commission: 'commission',
 } as const;

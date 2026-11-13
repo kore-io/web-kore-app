@@ -192,6 +192,25 @@ describe('Convidados › Grupos e convidados (RN13)', () => {
     expect(screen.getAllByRole('combobox', { name: 'Resposta' })[0]).toHaveValue('');
   });
 
+  it('com ?ordem=respondido, a lista pede a ordem de Respondido em (Central RN05; decisão 246)', async () => {
+    const listPaths = mockList(() =>
+      Response.json(page([party('p1', 'Família Moreira')], { total: 1 })),
+    );
+    renderRoute({ url: '/app/convidados?ordem=respondido' });
+    await screen.findByRole('table');
+    expect(listPaths[0]).toBe('/v1/weddings/w1/parties?order=respondedAt');
+  });
+
+  it('a ordem não é filtro: sem grupos, o vazio de quem não cadastrou (tipo 3)', async () => {
+    mockList(() =>
+      Response.json(
+        page([], { total: 0, summary: { ...summary, guests: 0, parties: 0, namedGuests: 0 } }),
+      ),
+    );
+    renderRoute({ url: '/app/convidados?ordem=respondido' });
+    expect(await screen.findByText('Vocês ainda não cadastraram convidados.')).toBeInTheDocument();
+  });
+
   it('o filtro de Tag vai para a URL pelo id e para a API (Tags RN09)', async () => {
     const user = userEvent.setup();
     const listPaths = mockList(() =>

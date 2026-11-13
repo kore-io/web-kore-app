@@ -22,6 +22,7 @@ import { activityDate, activityTexts } from '../../dashboard/dashboard-texts';
 import { useActiveWedding } from '../../guests/hooks/use-active-wedding';
 import { useMarkNotificationRead } from '../hooks/use-mark-notification-read';
 import { isResponseItem, responseGroups } from '../notification-shape';
+import { guestsByRespondedAt } from '../../guests/hooks/use-party-filters';
 
 type Filter = '' | NotificationsControllerListV1Type;
 
@@ -183,7 +184,9 @@ function NotificationItem({ weddingId, item }: { weddingId: string; item: Notifi
         data-unread={unread || undefined}
         onClick={() => {
           if (unread) markRead({ id: item.id });
-          void navigate(single ? guestPartyPath({ partyId: first.partyId }) : paths.guests);
+          void navigate(
+            single ? guestPartyPath({ partyId: first.partyId }) : guestsByRespondedAt(paths.guests),
+          );
         }}
       >
         {unread && <span className="kore-notifications__dot" aria-hidden="true" />}

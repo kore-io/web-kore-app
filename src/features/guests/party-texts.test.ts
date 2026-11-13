@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import type { PartyListItemResponse } from '../../shared/api/generated/model';
 import { contactText, respondedAtText, responsesText, summaryText } from './party-texts';
 
+const SP = 'America/Sao_Paulo';
+
 const t = i18next.getFixedT('pt-BR', 'guests');
 
 function party(overrides: Partial<PartyListItemResponse> = {}): PartyListItemResponse {
@@ -96,8 +98,8 @@ describe('textos da lista de grupos', () => {
   });
 
   it('respondido em: sem resposta é null; com resposta, data curta e quem respondeu', () => {
-    expect(respondedAtText({ t, party: party() })).toBeNull();
-    const at = new Date(2026, 8, 12, 20, 14).toISOString();
+    expect(respondedAtText({ t, party: party(), timezone: SP })).toBeNull();
+    const at = '2026-09-12T23:14:00Z';
     expect(
       respondedAtText({
         t,
@@ -105,6 +107,7 @@ describe('textos da lista de grupos', () => {
           respondedAt: at,
           lastResponse: { actor: 'party', signedByName: 'Célia', actorName: null },
         }),
+        timezone: SP,
       }),
     ).toEqual({ primary: '12/09 às 20h14', secondary: 'por Célia' });
     // A alteração do casal (ou da cerimonialista), com o nome de quem alterou (Prazo RN07).
@@ -115,6 +118,7 @@ describe('textos da lista de grupos', () => {
           respondedAt: at,
           lastResponse: { actor: 'couple', signedByName: null, actorName: 'Ana' },
         }),
+        timezone: SP,
       })?.secondary,
     ).toBe('alterada por Ana');
     // Sem assinante (convidado expurgado), só a data.
@@ -125,11 +129,17 @@ describe('textos da lista de grupos', () => {
           respondedAt: at,
           lastResponse: { actor: 'party', signedByName: null, actorName: null },
         }),
+        timezone: SP,
       })?.secondary,
     ).toBeUndefined();
-    const fullHour = new Date(2026, 5, 21, 9, 0).toISOString();
-    expect(respondedAtText({ t, party: party({ respondedAt: fullHour }) })?.primary).toBe(
-      '21/06 às 9h',
-    );
+    const fullHour = '2026-06-21T12:00:00Z';
+    expect(
+      respondedAtText({ t, party: party({ respondedAt: fullHour }), timezone: SP })?.primary,
+    ).toBe('21/06 às 9h');
+    // No fuso do casamento (decisão 246): a mesma resposta em Manaus é uma hora antes.
+    expect(
+      respondedAtText({ t, party: party({ respondedAt: at }), timezone: 'America/Manaus' })
+        ?.primary,
+    ).toBe('12/09 às 19h14');
   });
 });

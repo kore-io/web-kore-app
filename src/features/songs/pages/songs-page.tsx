@@ -39,10 +39,10 @@ export function SongsPage() {
       </div>
     );
   }
-  return <Songs weddingId={weddingId} />;
+  return <Songs weddingId={weddingId} timezone={site.data.timezone} />;
 }
 
-function Songs({ weddingId }: { weddingId: string }) {
+function Songs({ weddingId, timezone }: { weddingId: string; timezone: string | null }) {
   const { t } = useTranslation('songs');
   const { t: tCommon } = useTranslation('common');
   const { t: tAccess } = useTranslation('access');
@@ -134,7 +134,7 @@ function Songs({ weddingId }: { weddingId: string }) {
                   </td>
                   <td>
                     <CardLabel>{t('columns.suggestedAt')}</CardLabel>
-                    {suggestedAtText({ at: item.suggestedAt })}
+                    {suggestedAtText({ at: item.suggestedAt, timezone })}
                   </td>
                 </tr>
               ))}

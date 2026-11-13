@@ -14,4 +14,7 @@ export type BillingEntryResponseKind =
 export const BillingEntryResponseKind = {
   payment_confirmed: 'payment_confirmed',
   refund_completed: 'refund_completed',
+  end_date_soon: 'end_date_soon',
+  grace: 'grace',
+  expired: 'expired',
 } as const;

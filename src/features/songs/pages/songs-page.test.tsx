@@ -11,7 +11,8 @@ const suggestion = (guestId: string, song: string, overrides: object = {}) => ({
   song,
   guestName: 'Célia Moreira',
   partyName: 'Família Moreira',
-  suggestedAt: new Date(2026, 8, 12, 20, 14).toISOString(),
+  // 20h14 em São Paulo, o fuso do casamento da fixture (decisão 246), em qualquer máquina.
+  suggestedAt: '2026-09-12T23:14:00Z',
   ...overrides,
 });
 

@@ -22,4 +22,6 @@ export interface MeLifecycleResponse {
   expiredAt: string | null;
   /** @nullable */
   deletionScheduledFor: string | null;
+  /** Bloqueado pelo suporte (Casamento bloqueado RN07): a faixa substitui as outras. */
+  blocked: boolean;
 }

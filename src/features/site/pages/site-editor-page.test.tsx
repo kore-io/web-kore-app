@@ -75,7 +75,7 @@ function site(overrides: Partial<SiteEditorResponse> = {}): SiteEditorResponse {
     ],
     editable: { names: true, eventDate: true, state: true, slug: false },
     status: 'published',
-    publication: { courtesyEnabled: true, endDateMin: '2027-01-01', endDateMax: '2027-12-31' },
+    publication: { endDateMin: '2027-01-01', endDateMax: '2027-12-31' },
     ...overrides,
   } as SiteEditorResponse;
 }

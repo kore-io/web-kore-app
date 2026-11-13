@@ -4,6 +4,7 @@
  * Kore API
  * OpenAPI spec version: 1
  */
+import type { PartiesControllerListV1Order } from './partiesControllerListV1Order';
 import type { PartiesControllerListV1Remind } from './partiesControllerListV1Remind';
 import type { PartiesControllerListV1Rsvp } from './partiesControllerListV1Rsvp';
 import type { PartiesControllerListV1SaveTheDate } from './partiesControllerListV1SaveTheDate';
@@ -16,6 +17,12 @@ export type PartiesControllerListV1Params = {
   remind?: PartiesControllerListV1Remind;
   /** O filtro do save the date: enviado ou não (Envios RN03). */
   saveTheDate?: PartiesControllerListV1SaveTheDate;
+  /**
+   * A ordem: alfabética (o padrão) ou "Respondido em", mais recentes primeiro
+   * e os sem resposta no fim (Central RN05; Dashboard RN04; decisão 246). O
+   * cursor vale só na ordem que o deu.
+   */
+  order?: PartiesControllerListV1Order;
   /**
    * @minimum 1
    * @maximum 100

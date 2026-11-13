@@ -33,6 +33,8 @@ import type {
   SlugUnavailableErrorBody,
   TermsVersionOutdatedErrorBody,
   ValidationErrorBody,
+  WeddingBlockedErrorBody,
+  WeddingDeletionScheduledErrorBody,
   WeddingHasOwnerErrorBody,
   WeddingNotFoundErrorBody,
   WeddingsControllerSlugAvailabilityV1Params,
@@ -85,8 +87,10 @@ export const getWeddingsControllerRemoveV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | WeddingHasOwnerErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -131,8 +135,10 @@ export type WeddingsControllerRemoveV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | WeddingHasOwnerErrorBody
+  | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
 export type WeddingsControllerRemoveV1MutationVariables = { weddingId: string };
@@ -147,8 +153,10 @@ export const useWeddingsControllerRemoveV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | WeddingHasOwnerErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,

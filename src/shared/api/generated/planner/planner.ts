@@ -31,6 +31,7 @@ import type {
   ProfileNotOwnedErrorBody,
   RateLimitedErrorBody,
   ReferredWeddingResponse,
+  ReferrerCommissionsResponse,
   SessionExpiredErrorBody,
   TemplateNotFoundErrorBody,
   TemplatesLimitErrorBody,
@@ -986,3 +987,146 @@ export const usePlannerTemplatesControllerRemoveV1 = <
 > => {
   return useMutation(getPlannerTemplatesControllerRemoveV1MutationOptions(options), queryClient);
 };
+export const getReferrerCommissionsControllerListV1Url = () => {
+  return `/v1/me/referrer/commissions`;
+};
+
+/**
+ * @summary A tela Comissões (Comissões do indicador RN02, RN07 e RN10).
+ */
+export const referrerCommissionsControllerListV1 = async (
+  options?: Parameters<typeof httpClient>[1],
+): Promise<ReferrerCommissionsResponse> => {
+  return httpClient<ReferrerCommissionsResponse>(getReferrerCommissionsControllerListV1Url(), {
+    ...options,
+    method: 'GET',
+  });
+};
+
+export const getReferrerCommissionsControllerListV1QueryKey = () => {
+  return [`/v1/me/referrer/commissions`] as const;
+};
+
+export const getReferrerCommissionsControllerListV1QueryOptions = <
+  TData = Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>,
+  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getReferrerCommissionsControllerListV1QueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>> = ({
+    signal,
+  }) => referrerCommissionsControllerListV1({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ReferrerCommissionsControllerListV1QueryResult = NonNullable<
+  Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>
+>;
+export type ReferrerCommissionsControllerListV1QueryError = ErrorType<
+  SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody
+>;
+
+export function useReferrerCommissionsControllerListV1<
+  TData = Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>,
+  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>,
+          TError,
+          Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useReferrerCommissionsControllerListV1<
+  TData = Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>,
+  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>,
+          TError,
+          Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useReferrerCommissionsControllerListV1<
+  TData = Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>,
+  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary A tela Comissões (Comissões do indicador RN02, RN07 e RN10).
+ */
+
+export function useReferrerCommissionsControllerListV1<
+  TData = Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>,
+  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getReferrerCommissionsControllerListV1QueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}

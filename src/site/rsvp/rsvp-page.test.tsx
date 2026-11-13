@@ -136,6 +136,58 @@ describe('Confirmar presença (Confirmar presença RN01 a RN14)', () => {
     expect(song).toHaveAttribute('maxlength', '120');
   });
 
+  it('o campo da música só para quem marcou Vou, e só com a pergunta ligada (Música RN04)', async () => {
+    const user = userEvent.setup();
+    mockRsvp();
+    const view = renderRsvp();
+    await user.click(
+      within(await screen.findByRole('group', { name: 'Carla Nunes' })).getByLabelText('Vou'),
+    );
+    await user.click(within(choice('Rafael Nunes')).getByLabelText('Não vou'));
+    // Um campo só: o de Carla, que vai; Rafael, que não vai, fica sem.
+    expect(
+      screen.getAllByRole('textbox', { name: 'Que música não pode faltar na festa? (opcional)' }),
+    ).toHaveLength(1);
+    expect(within(choice('Rafael Nunes')).queryByRole('textbox')).toBeNull();
+    view.unmount();
+    // A pergunta desligada: com Vou, a restrição aparece e a música não.
+    mockRsvp({
+      data: rsvp({
+        songQuestion: { enabled: false, text: 'Que música não pode faltar na festa?' },
+      }),
+    });
+    renderRsvp();
+    await user.click(
+      within(await screen.findByRole('group', { name: 'Carla Nunes' })).getByLabelText('Vou'),
+    );
+    expect(
+      screen.getByRole('textbox', { name: 'Restrição alimentar (opcional)' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('textbox', { name: /música/ })).toBeNull();
+  });
+
+  it('o Enviar fica desabilitado depois do 1º clique: um PUT só, com o aria-busy (RN07)', async () => {
+    const user = userEvent.setup();
+    const answered = rsvp({
+      guests: rsvp().guests.map((guest) =>
+        guest.isPlusOne ? guest : { ...guest, rsvpStatus: 'confirmed' as const },
+      ),
+    });
+    // O PUT não responde: o envio fica em andamento.
+    const calls = mockRsvp({
+      data: answered,
+      put: () => new Promise<Response>(() => undefined) as unknown as Response,
+    });
+    renderRsvp();
+    await user.click(await screen.findByRole('button', { name: 'Alterar respostas' }));
+    await user.click(within(choice('Quem está respondendo?')).getByLabelText('Carla'));
+    await user.click(send());
+    await waitFor(() => expect(send()).toBeDisabled());
+    expect(send()).toHaveAttribute('aria-busy', 'true');
+    await user.click(send());
+    expect(calls).toHaveLength(1);
+  });
+
   it('sem resposta e sem quem assina: os erros, sem enviar (RN04, RN06)', async () => {
     const user = userEvent.setup();
     const calls = mockRsvp();

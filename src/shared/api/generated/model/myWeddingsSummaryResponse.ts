@@ -6,7 +6,11 @@
  */
 
 export interface MyWeddingsSummaryResponse {
+  /** Comissão disponível, em centavos (Comissões do indicador RN08; decisão 36). */
+  commissionAvailableCents: number;
   /** Todos menos pós-evento e expirado (RN03). */
   active: number;
   awaitingCouple: number;
+  /** Aguardando pagamento: rascunho com o Pix pendente (Comissões do indicador RN08). */
+  awaitingPayment: number;
 }
