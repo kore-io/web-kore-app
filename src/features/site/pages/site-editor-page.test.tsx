@@ -39,6 +39,7 @@ function site(overrides: Partial<SiteEditorResponse> = {}): SiteEditorResponse {
   return {
     publishedAt: '2026-10-01T12:00:00Z',
     siteUpdatedAt: '2026-11-11T13:31:00Z',
+    songQuestion: { enabled: false, text: 'Que música não pode faltar na festa?' },
     partners: [
       { id: 'pa', title: 'bride', name: 'Ana Beatriz Moreira' },
       { id: 'pm', title: 'groom', name: 'Marcos Vinícius Rocha' },
@@ -92,7 +93,7 @@ describe('Site › Editor (Dados básicos RN01, RN10, RN11; decisão 214)', () =
     mockSite();
     const { router } = renderRoute({ url: '/app/site' });
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/site/dados-basicos'));
-    await router.navigate('/app/site/pergunta-de-musica');
+    await router.navigate('/app/site/nao-existe');
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/site/dados-basicos'));
   });
 
@@ -119,6 +120,7 @@ describe('Site › Editor (Dados básicos RN01, RN10, RN11; decisão 214)', () =
       'Hospedagem e transportedesligada',
       'Dress codeligada',
       'FAQligada',
+      'Pergunta de músicadesligada',
     ]);
     expect(within(list).getByRole('link', { name: /Dados básicos/ })).toHaveAttribute(
       'aria-current',

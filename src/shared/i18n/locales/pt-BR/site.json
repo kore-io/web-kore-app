@@ -23,7 +23,8 @@
       "ceremony": "Cerimônia & Recepção",
       "lodging": "Hospedagem e transporte",
       "dress_code": "Dress code",
-      "faq": "FAQ"
+      "faq": "FAQ",
+      "song_question": "Pergunta de música"
     },
     "state": {
       "on": "ligada",
@@ -284,6 +285,12 @@
       },
       "remove": "Remover foto {{n}}",
       "alt": "Foto {{n}} de {{total}} de {{title}}"
+    },
+    "songQuestion": {
+      "switch": "Fazer a pergunta no RSVP",
+      "text": "Texto da pergunta",
+      "help": "Aparece no RSVP, depois da resposta de presença.",
+      "off": "A pergunta não aparece no RSVP. As sugestões que já chegaram continuam guardadas."
     }
   },
   "previewSite": {
