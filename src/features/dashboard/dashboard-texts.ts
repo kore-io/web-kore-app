@@ -42,10 +42,15 @@ export function countdownLine({
 }): string | null {
   if (daysUntilEvent === null || eventDate === null || daysUntilEvent < 0) return null;
   if (daysUntilEvent === 0) return t('header.today');
-  const date = new Date(`${eventDate}T12:00:00Z`);
+  return t('header.countdown', { count: daysUntilEvent, date: longDate({ day: eventDate, now }) });
+}
+
+/** "sáb., 14 de nov." e, fora do ano corrente, "sáb., 14 de fev. de 2027" (Penpot 03). */
+export function longDate({ day, now }: { day: string; now: Date }): string {
+  const date = new Date(`${day}T12:00:00Z`);
   const format =
     date.getUTCFullYear() === now.getFullYear() ? WEEKDAY_DAY_MONTH : WEEKDAY_DAY_MONTH_YEAR;
-  return t('header.countdown', { count: daysUntilEvent, date: format.format(date) });
+  return format.format(date);
 }
 
 /** Convidados (RN02): "em 58 grupos · 96 confirmados, 18 recusados e 28 pendentes". */
@@ -67,7 +72,7 @@ export function guestsDetail({
 
 /**
  * Buffet (RN02): "82 adultos, 11 crianças e 3 bebês confirmados"; a faixa com zero sai, e
- * quem não tem faixa entra só no total. Sem nenhuma faixa, nula.
+ * quem não tem faixa entra só no total. Sem nenhuma faixa, só o total.
  */
 export function buffetDetail({
   t,
@@ -75,13 +80,14 @@ export function buffetDetail({
 }: {
   t: DashboardT;
   stats: DashboardStatsResponse;
-}): string | null {
+}): string {
   const parts = [
     stats.adultsConfirmed > 0 && t('buffet.adults', { count: stats.adultsConfirmed }),
     stats.childrenConfirmed > 0 && t('buffet.children', { count: stats.childrenConfirmed }),
     stats.babiesConfirmed > 0 && t('buffet.babies', { count: stats.babiesConfirmed }),
   ].filter((part): part is string => Boolean(part));
-  if (parts.length === 0) return null;
+  // Sem faixa etária: só o total, "0 confirmados" (Penpot 03, antes de publicar).
+  if (parts.length === 0) return t('guests.confirmed', { count: stats.confirmed });
   // Uma pessoa só concorda com ela ("1 criança confirmada"); senão, "confirmados".
   const total = stats.adultsConfirmed + stats.childrenConfirmed + stats.babiesConfirmed;
   const key =

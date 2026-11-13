@@ -88,19 +88,19 @@ test.describe('Dashboard do casal (RN01 a RN06)', () => {
     await expect(page.getByRole('button', { name: 'Enviar convites' })).toBeEnabled();
     const delivery = page.getByRole('heading', { name: 'Envios', level: 2 }).locator('..');
     await expect(delivery.getByRole('link')).toHaveText([
-      'Não enviado1',
-      'Enviado1',
-      'Visualizado0',
-      'Respondido0',
+      'Não enviado1 grupo',
+      'Enviado1 grupo',
+      'Visualizado0 grupos',
+      'Respondido0 grupos',
     ]);
     await expect(checklist).toContainText('Enviar os convites (1 de 2 grupos)');
     await expect(checklist).toContainText('Lembrar os pendentes (1 grupo)');
     const site = page.getByRole('heading', { name: 'Status do site' }).locator('..');
     await expect(site).toContainText('Publicado');
-    await expect(site).toContainText('No ar até 15 de ago. de 2027.');
+    await expect(site).toContainText('No ar até dom., 15 de ago. de 2027.');
 
     // O status tocado abre Enviar convites com o filtro (RN02).
-    await delivery.getByRole('link', { name: /^Enviado 1$/ }).click();
+    await delivery.getByRole('link', { name: /^Enviado 1 grupo$/ }).click();
     await expect(page).toHaveURL(/\/app\/envios\/convites\?envio=enviado$/);
     await expect(page.getByRole('checkbox', { name: /Família Moreira/ })).toBeVisible();
     await expect(page.getByRole('checkbox', { name: /Tio Jorge/ })).toHaveCount(0);

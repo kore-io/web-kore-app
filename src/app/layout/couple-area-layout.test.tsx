@@ -126,7 +126,12 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
     await user.click(await screen.findByRole('button', { name: 'Menu do usuário' }));
     await user.click(await screen.findByRole('menuitem', { name: 'Sair' }));
     await waitFor(() => expect(router.state.location.pathname).toBe('/entrar'));
-    expect(screen.queryByText(/Não foi possível continuar/)).toBeNull();
+    // Sem o Toast de erro do Sair (o aviso do Dashboard, que lê 404 aqui, não conta).
+    expect(
+      within(screen.getByRole('region', { name: /^Avisos/ })).queryByText(
+        /Não foi possível continuar/,
+      ),
+    ).toBeNull();
   });
 
   it.each([

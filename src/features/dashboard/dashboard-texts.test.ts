@@ -51,7 +51,7 @@ describe('textos do Dashboard (RN01, RN02, RN04)', () => {
     );
   });
 
-  it('Buffet: as faixas com zero saem; uma pessoa concorda com ela; sem faixa, nada', () => {
+  it('Buffet: as faixas com zero saem; uma pessoa concorda com ela; sem faixa, só o total', () => {
     expect(buffetDetail({ t, stats: stats() })).toBe(
       '82 adultos, 11 crianças e 3 bebês confirmados',
     );
@@ -72,7 +72,18 @@ describe('textos do Dashboard (RN01, RN02, RN04)', () => {
         t,
         stats: stats({ adultsConfirmed: 0, childrenConfirmed: 0, babiesConfirmed: 0 }),
       }),
-    ).toBeNull();
+    ).toBe('96 confirmados');
+    expect(
+      buffetDetail({
+        t,
+        stats: stats({
+          confirmed: 0,
+          adultsConfirmed: 0,
+          childrenConfirmed: 0,
+          babiesConfirmed: 0,
+        }),
+      }),
+    ).toBe('0 confirmados');
   });
 
   it('Taxa de resposta: com e sem prazo', () => {

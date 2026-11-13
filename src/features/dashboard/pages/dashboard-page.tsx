@@ -1,5 +1,5 @@
 import { Alert, Badge, Button, EmptyState, PageHeader, StatCard } from '@kore-io/design';
-import { Check, Circle, Users } from 'lucide-react';
+import { Check, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router';
 import { guestPartyPath, paths, siteSectionPath } from '../../../app/paths';
@@ -11,8 +11,9 @@ import type {
 } from '../../../shared/api/generated/model';
 import { notificationsControllerReadV1 } from '../../../shared/api/generated/notifications/notifications';
 import { useDashboardControllerGetV1 } from '../../../shared/api/generated/rsvp/rsvp';
-import { oneDot, shortDayMonth } from '../../../shared/date-texts';
+import { oneDot } from '../../../shared/date-texts';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
+import { deliveryBadges } from '../../guests/components/delivery-badges';
 import { useActiveWedding, type Audience } from '../../guests/hooks/use-active-wedding';
 import type { sentFilters } from '../../guests/hooks/use-party-filters';
 import { canOpenPublish } from '../../publication/publication';
@@ -23,6 +24,7 @@ import {
   buffetDetail,
   countdownLine,
   guestsDetail,
+  longDate,
   rateDetail,
 } from '../dashboard-texts';
 
@@ -88,15 +90,15 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
       }
       actions={
         <div className="kore-dashboard__actions">
+          <Button variant="secondary" onClick={() => void navigate(paths.site)}>
+            {t('actions.editSite')}
+          </Button>
           <Button
             disabled={!data || closed}
             {...(data && closed && { 'aria-describedby': 'kore-dashboard-closed' })}
             onClick={() => void navigate(paths.deliveryInvites)}
           >
             {t('actions.sendInvites')}
-          </Button>
-          <Button variant="secondary" onClick={() => void navigate(paths.site)}>
-            {t('actions.editSite')}
           </Button>
           {data && closed && (
             <p id="kore-dashboard-closed" className="kore-dashboard__help">
@@ -147,21 +149,27 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
           />
         ) : (
           <>
-            <Link to={paths.guests} className="kore-dashboard__card-link">
+            <Link to={paths.guests} className="kore-dashboard__card-link kore-dashboard__stat">
               <StatCard
                 label={t('guests.title')}
                 value={data.stats.guestsTotal}
                 detail={guestsDetail({ t, stats: data.stats })}
               />
             </Link>
-            <Link to={`${paths.guests}?resposta=confirmados`} className="kore-dashboard__card-link">
+            <Link
+              to={`${paths.guests}?resposta=confirmados`}
+              className="kore-dashboard__card-link kore-dashboard__stat"
+            >
               <StatCard
                 label={t('buffet.title')}
                 value={data.stats.confirmed}
-                detail={buffetDetail({ t, stats: data.stats }) ?? undefined}
+                detail={buffetDetail({ t, stats: data.stats })}
               />
             </Link>
-            <Link to={paths.deliveryDeadline} className="kore-dashboard__card-link">
+            <Link
+              to={paths.deliveryDeadline}
+              className="kore-dashboard__card-link kore-dashboard__stat"
+            >
               <StatCard
                 label={t('rate.title')}
                 value={t('rate.value', { percent: data.stats.rsvpPercent })}
@@ -185,27 +193,44 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
 function DeliveryCard({ data, closed }: { data: DashboardResponse; closed: boolean }) {
   const { t } = useTranslation('dashboard');
   return (
-    <section className="kore-dashboard__card" aria-labelledby="kore-dashboard-delivery">
+    <section
+      className="kore-dashboard__card kore-dashboard__card--half"
+      aria-labelledby="kore-dashboard-delivery"
+    >
       <h2 id="kore-dashboard-delivery" className="kore-dashboard__card-title">
         {t('delivery.title')}
       </h2>
-      {closed ? (
-        <p className="kore-dashboard__card-text">{t('delivery.closed')}</p>
-      ) : (
-        <ul className="kore-dashboard__delivery">
-          {DELIVERY_ROWS.map((row) => (
+      <ul className="kore-dashboard__delivery">
+        {DELIVERY_ROWS.map((row) => {
+          const badge = deliveryBadges[row.label];
+          const content = (
+            <>
+              <Badge tone={badge.tone} icon={badge.icon}>
+                {t(`delivery.${row.label}`)}
+              </Badge>
+              <span className="kore-dashboard__delivery-value">
+                {t('delivery.parties', { count: data.delivery[row.key] })}
+              </span>
+            </>
+          );
+          return (
             <li key={row.key}>
-              <Link
-                to={`${paths.deliveryInvites}?envio=${row.slug}`}
-                className="kore-dashboard__delivery-row"
-              >
-                <span>{t(`delivery.${row.label}`)}</span>
-                <span className="kore-dashboard__delivery-value">{data.delivery[row.key]}</span>
-              </Link>
+              {/* Antes de publicar, os números ficam, sem levar aos envios (RN01). */}
+              {closed ? (
+                <span className="kore-dashboard__delivery-row">{content}</span>
+              ) : (
+                <Link
+                  to={`${paths.deliveryInvites}?envio=${row.slug}`}
+                  className="kore-dashboard__delivery-row"
+                >
+                  {content}
+                </Link>
+              )}
             </li>
-          ))}
-        </ul>
-      )}
+          );
+        })}
+      </ul>
+      {closed && <p className="kore-dashboard__card-caption">{t('delivery.closed')}</p>}
     </section>
   );
 }
@@ -218,21 +243,28 @@ function SiteCard({ data, now }: { data: DashboardResponse; now: Date }) {
   const status = siteStatus(data.site.status);
   const live = status === 'published' || status === 'post_event';
   return (
-    <section className="kore-dashboard__card" aria-labelledby="kore-dashboard-site">
+    <section
+      className="kore-dashboard__card kore-dashboard__card--half kore-dashboard__site"
+      aria-labelledby="kore-dashboard-site"
+    >
       <h2 id="kore-dashboard-site" className="kore-dashboard__card-title">
         {t('site.title')}
       </h2>
       {status && (
-        <Badge tone={live ? 'success' : 'neutral'} className="kore-dashboard__badge">
+        <Badge
+          tone={live ? 'success' : 'neutral'}
+          {...(live && { icon: <Check strokeWidth={2.4} /> })}
+          className="kore-dashboard__badge"
+        >
           {tSite(`status.${status}`)}
         </Badge>
       )}
-      {live && data.site.slug && (
-        <p className="kore-dashboard__card-text">{tSite('address', { slug: data.site.slug })}</p>
+      {data.site.slug && (
+        <p className="kore-dashboard__site-address">{tSite('address', { slug: data.site.slug })}</p>
       )}
       {live && data.site.endDate && (
-        <p className="kore-dashboard__card-text">
-          {oneDot(t('site.endDate', { date: shortDayMonth({ day: data.site.endDate, now }) }))}
+        <p className="kore-dashboard__card-caption">
+          {oneDot(t('site.endDate', { date: longDate({ day: data.site.endDate, now }) }))}
         </p>
       )}
       {status === 'awaiting_couple' && (
@@ -240,7 +272,7 @@ function SiteCard({ data, now }: { data: DashboardResponse; now: Date }) {
       )}
       <div className="kore-dashboard__card-actions">
         {canOpenPublish(data.site.status) ? (
-          <Button size="sm" onClick={() => void navigate(paths.publish)}>
+          <Button size="sm" variant="secondary" onClick={() => void navigate(paths.publish)}>
             {t('site.publish')}
           </Button>
         ) : (
@@ -272,7 +304,10 @@ function ChecklistCard({ items }: { items: ChecklistItemResponse[] }) {
     return t(`checklist.${item.key}`);
   };
   return (
-    <section className="kore-dashboard__card" aria-labelledby="kore-dashboard-checklist">
+    <section
+      className="kore-dashboard__card kore-dashboard__card--half"
+      aria-labelledby="kore-dashboard-checklist"
+    >
       <h2 id="kore-dashboard-checklist" className="kore-dashboard__card-title">
         {t('checklist.title')}
       </h2>
@@ -283,13 +318,18 @@ function ChecklistCard({ items }: { items: ChecklistItemResponse[] }) {
             className="kore-dashboard__check"
             data-state={item.done ? 'done' : item.key === next ? 'next' : 'todo'}
           >
-            {item.done ? (
-              <Check className="kore-dashboard__check-icon" aria-hidden="true" strokeWidth={2.4} />
-            ) : (
-              <Circle className="kore-dashboard__check-icon" aria-hidden="true" />
-            )}
+            <span className="kore-dashboard__check-box" aria-hidden="true">
+              {item.done && <Check strokeWidth={2.4} />}
+            </span>
             <Link to={CHECKLIST_PATHS[item.key]} className="kore-dashboard__check-link">
-              {item.done ? <s>{label(item)}</s> : label(item)}
+              {label(item)}
+              {/* O estado para o leitor de tela; na tela, a caixa marcada (decisão 239(B2)). */}
+              {item.done && (
+                <>
+                  {' '}
+                  <span className="kore-dashboard__sr">{t('checklist.done')}</span>
+                </>
+              )}
             </Link>
           </li>
         ))}
@@ -306,7 +346,7 @@ function ActivityCard({ items, now }: { items: ActivityResponse[]; now: Date }) 
   const { t } = useTranslation('dashboard');
   return (
     <section
-      className="kore-dashboard__card kore-dashboard__card--wide"
+      className="kore-dashboard__card kore-dashboard__card--half"
       aria-labelledby="kore-dashboard-activity"
     >
       <h2 id="kore-dashboard-activity" className="kore-dashboard__card-title">
@@ -336,9 +376,6 @@ function ActivityCard({ items, now }: { items: ActivityResponse[]; now: Date }) 
                   }}
                 >
                   <span className="kore-dashboard__activity-title">{texts.title}</span>
-                  {texts.detail && (
-                    <span className="kore-dashboard__activity-detail">{texts.detail}</span>
-                  )}
                   <span className="kore-dashboard__activity-date">
                     {activityDate({ t, at: item.at, now })}
                   </span>

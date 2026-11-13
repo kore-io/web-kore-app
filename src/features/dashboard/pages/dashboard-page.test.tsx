@@ -164,8 +164,13 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     const rows = within(card('Envios'))
       .getAllByRole('link')
       .map((link) => link.textContent);
-    expect(rows).toEqual(['Não enviado6', 'Enviado5', 'Visualizado4', 'Respondido43']);
-    await user.click(within(card('Envios')).getByRole('link', { name: 'Visualizado4' }));
+    expect(rows).toEqual([
+      'Não enviado6 grupos',
+      'Enviado5 grupos',
+      'Visualizado4 grupos',
+      'Respondido43 grupos',
+    ]);
+    await user.click(within(card('Envios')).getByRole('link', { name: /^Visualizado/ }));
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/envios/convites'));
     expect(router.state.location.search).toBe('?envio=visualizado');
   });
@@ -177,7 +182,7 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     const site = card('Status do site');
     expect(within(site).getByText('Publicado')).toBeInTheDocument();
     expect(within(site).getByText('kore.com.br/ana-e-marcos')).toBeInTheDocument();
-    expect(within(site).getByText('No ar até 14 de fev. de 2028.')).toBeInTheDocument();
+    expect(within(site).getByText('No ar até seg., 14 de fev. de 2028.')).toBeInTheDocument();
     expect(within(site).getByRole('button', { name: 'Editar site' })).toBeInTheDocument();
   });
 
@@ -187,13 +192,20 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     await screen.findByText('142');
     const items = within(card('Checklist')).getAllByRole('listitem');
     expect(items.map((item) => item.textContent)).toEqual([
-      'Cadastrar os convidados',
-      'Escolher a aparência',
-      'Publicar o site',
+      'Cadastrar os convidados feito',
+      'Escolher a aparência feito',
+      'Publicar o site feito',
       'Enviar os convites (52 de 58 grupos)',
       'Lembrar os pendentes (15 grupos)',
     ]);
-    expect(items[0]?.querySelector('s')).not.toBeNull();
+    expect(items[0]).toHaveAttribute('data-state', 'done');
+    // O "feito" é só para o leitor de tela (decisão 239(B2)).
+    expect(within(items[0] as HTMLElement).getByRole('link')).toHaveAccessibleName(
+      'Cadastrar os convidados feito',
+    );
+    expect(within(items[3] as HTMLElement).getByRole('link')).toHaveAccessibleName(
+      'Enviar os convites (52 de 58 grupos)',
+    );
     expect(items[3]).toHaveAttribute('data-state', 'next');
     expect(within(items[4] as HTMLElement).getByRole('link')).toHaveAttribute(
       'href',
@@ -224,6 +236,9 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     expect(
       within(card('Envios')).getByText('Os envios começam depois de publicar o site.'),
     ).toBeInTheDocument();
+    // Antes de publicar, os números ficam, sem levar aos envios.
+    expect(within(card('Envios')).queryAllByRole('link')).toHaveLength(0);
+    expect(within(card('Envios')).getByText('6 grupos')).toBeInTheDocument();
     expect(within(card('Status do site')).getByText('Rascunho')).toBeInTheDocument();
     expect(within(card('Status do site')).getByRole('button', { name: 'Publicar' })).toBeEnabled();
     expect(within(card('Checklist')).queryByText(/Lembrar os pendentes/)).toBeNull();
@@ -242,7 +257,6 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     const item = within(activity).getByRole('link', {
       name: /Família Moreira respondeu o convite/,
     });
-    expect(item).toHaveTextContent('3 confirmados, 1 recusado');
     expect(item).toHaveTextContent('hoje às 20h14');
     expect(item).toHaveAttribute('href', '/app/convidados/grupos/p1');
     await user.click(item);

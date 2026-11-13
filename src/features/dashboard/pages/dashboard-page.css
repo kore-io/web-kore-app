@@ -1,27 +1,40 @@
-/* Dashboard (Dashboard RN02, RN07): os cartões em 1 coluna no celular, 2 no tablet e 3 no
-   computador, na ordem da RN02; o skeleton enquanto carrega. */
+/* Dashboard (Dashboard RN02, RN07; Penpot 03): no computador, os 3 números numa linha e os
+   outros cartões dois a dois; no tablet, 2 colunas; no celular, 1, com o Status do site
+   primeiro (o selo sai da Topbar, RN07). O skeleton enquanto carrega. */
 .kore-dashboard {
   @apply flex flex-col gap-6;
 }
 
 .kore-dashboard__actions {
-  @apply flex flex-col items-stretch gap-2 md:flex-row md:flex-wrap md:items-center lg:justify-end;
+  @apply grid grid-cols-2 gap-2 md:flex md:flex-wrap md:items-center lg:justify-end;
 }
 
 .kore-dashboard__help {
-  @apply m-0 type-caption text-gray-700 md:basis-full lg:text-right;
+  @apply col-span-2 m-0 type-caption text-gray-700 md:basis-full lg:text-right;
 }
 
 .kore-dashboard__grid {
-  @apply grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3;
+  @apply grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-6;
 }
 
 .kore-dashboard__skeleton {
   @apply h-36 animate-pulse rounded-lg bg-gray-100 motion-reduce:animate-none;
 }
 
+.kore-dashboard__skeleton:nth-child(-n + 3) {
+  @apply lg:col-span-2;
+}
+
+.kore-dashboard__skeleton:nth-child(n + 4) {
+  @apply lg:col-span-3;
+}
+
 .kore-dashboard__empty {
-  @apply md:col-span-2 lg:col-span-3;
+  @apply md:col-span-2 lg:col-span-6;
+}
+
+.kore-dashboard__stat {
+  @apply lg:col-span-2;
 }
 
 .kore-dashboard__card-link {
@@ -36,8 +49,12 @@
   @apply flex flex-col gap-3 rounded-lg border border-gray-300 bg-white p-5;
 }
 
-.kore-dashboard__card--wide {
-  @apply md:col-span-2 lg:col-span-3;
+.kore-dashboard__card--half {
+  @apply lg:col-span-3;
+}
+
+.kore-dashboard__site {
+  @apply order-first md:order-none;
 }
 
 .kore-dashboard__card-title {
@@ -46,6 +63,14 @@
 
 .kore-dashboard__card-text {
   @apply m-0 type-body-md text-gray-700;
+}
+
+.kore-dashboard__card-caption {
+  @apply m-0 type-caption text-gray-700;
+}
+
+.kore-dashboard__site-address {
+  @apply m-0 type-body-md text-ink;
 }
 
 .kore-dashboard__card-actions {
@@ -61,15 +86,15 @@
 }
 
 .kore-dashboard__delivery-row {
-  @apply flex min-h-11 items-center justify-between gap-3 rounded-sm border-b border-gray-300 type-body-md text-ink no-underline hover:text-primary-dark focus-visible:shadow-focus-ring focus-visible:outline-none;
+  @apply flex min-h-11 items-center justify-between gap-3 rounded-sm text-ink no-underline focus-visible:shadow-focus-ring focus-visible:outline-none;
 }
 
-.kore-dashboard__delivery li:last-child .kore-dashboard__delivery-row {
-  @apply border-b-0;
+a.kore-dashboard__delivery-row:hover .kore-dashboard__delivery-value {
+  @apply text-primary-dark underline;
 }
 
 .kore-dashboard__delivery-value {
-  @apply type-label;
+  @apply type-body-md;
 }
 
 .kore-dashboard__checklist {
@@ -80,20 +105,25 @@
   @apply flex min-h-11 items-center gap-3;
 }
 
-.kore-dashboard__check-icon {
-  @apply size-5 shrink-0 text-gray-500;
+/* A caixa do Checklist (Penpot 03): marcada em primary com o ✓ branco; a vazia com a borda. */
+.kore-dashboard__check-box {
+  @apply flex size-5 shrink-0 items-center justify-center rounded-sm border-2 border-gray-500 text-white;
 }
 
-.kore-dashboard__check[data-state='done'] .kore-dashboard__check-icon {
-  @apply text-success-text;
+.kore-dashboard__check-box > svg {
+  @apply size-3.5;
+}
+
+.kore-dashboard__check[data-state='done'] .kore-dashboard__check-box {
+  @apply border-primary bg-primary;
+}
+
+.kore-dashboard__sr {
+  @apply sr-only;
 }
 
 .kore-dashboard__check-link {
   @apply rounded-sm type-body-md text-ink no-underline hover:underline focus-visible:shadow-focus-ring focus-visible:outline-none;
-}
-
-.kore-dashboard__check[data-state='done'] .kore-dashboard__check-link {
-  @apply text-gray-700;
 }
 
 /* O próximo passo em destaque (o Gherkin "Publicar o site é o próximo"). */
@@ -106,18 +136,13 @@
 }
 
 .kore-dashboard__activity-item {
-  @apply flex min-h-11 flex-col gap-0.5 rounded-sm border-b border-gray-300 py-3 text-inherit no-underline hover:bg-gray-100 focus-visible:shadow-focus-ring focus-visible:outline-none;
-}
-
-.kore-dashboard__activity li:last-child .kore-dashboard__activity-item {
-  @apply border-b-0;
+  @apply flex min-h-11 flex-col gap-0.5 rounded-sm py-2 text-inherit no-underline hover:underline focus-visible:shadow-focus-ring focus-visible:outline-none;
 }
 
 .kore-dashboard__activity-title {
-  @apply type-label text-ink;
+  @apply type-body-md text-ink;
 }
 
-.kore-dashboard__activity-detail,
 .kore-dashboard__activity-date {
   @apply type-caption text-gray-700;
 }

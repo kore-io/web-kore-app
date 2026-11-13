@@ -7,31 +7,16 @@ import {
   GroupTableHeader,
   Spinner,
   Tag,
-  type BadgeTone,
 } from '@kore-io/design';
-import { Check, Clock, Send } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { guestPartyPath } from '../../../app/paths';
-import type {
-  PartyListItemResponse,
-  PartyListItemResponseDeliveryStatus,
-} from '../../../shared/api/generated/model';
+import type { PartyListItemResponse } from '../../../shared/api/generated/model';
+import { deliveryBadges } from './delivery-badges';
 import { contactText, respondedAtText, responsesText } from '../party-texts';
 import { useLoadMoreOnScroll } from '../hooks/use-load-more-on-scroll';
 import type { usePartySelection } from '../hooks/use-party-selection';
-
-/** Selo do envio, como no Badge do DS (o ícone de 14 px, traço 2,4 no Check). */
-const deliveryBadges: Record<
-  PartyListItemResponseDeliveryStatus,
-  { tone: BadgeTone; icon?: ReactNode }
-> = {
-  not_sent: { tone: 'neutral' },
-  sent: { tone: 'info', icon: <Send /> },
-  viewed: { tone: 'warning', icon: <Clock /> },
-  responded: { tone: 'success', icon: <Check strokeWidth={2.4} /> },
-};
 
 interface PartyListProps {
   parties: PartyListItemResponse[];

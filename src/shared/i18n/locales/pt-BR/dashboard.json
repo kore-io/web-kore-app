@@ -17,8 +17,10 @@
   },
   "guests": {
     "title": "Convidados",
+    "parties_zero": "em {{count}} grupos",
     "parties_one": "em {{count}} grupo",
     "parties_other": "em {{count}} grupos",
+    "confirmed_zero": "{{count}} confirmados",
     "confirmed_one": "{{count}} confirmado",
     "confirmed_other": "{{count}} confirmados",
     "declined_one": "{{count}} recusado",
@@ -56,7 +58,10 @@
     "not_sent": "Não enviado",
     "sent": "Enviado",
     "viewed": "Visualizado",
-    "responded": "Respondido"
+    "responded": "Respondido",
+    "parties_zero": "{{count}} grupos",
+    "parties_one": "{{count}} grupo",
+    "parties_other": "{{count}} grupos"
   },
   "site": {
     "title": "Status do site",
@@ -74,7 +79,8 @@
     "invitesProgress": "Enviar os convites ({{done}} de {{total}} grupos)",
     "reminders": "Lembrar os pendentes",
     "remindersProgress_one": "Lembrar os pendentes ({{count}} grupo)",
-    "remindersProgress_other": "Lembrar os pendentes ({{count}} grupos)"
+    "remindersProgress_other": "Lembrar os pendentes ({{count}} grupos)",
+    "done": "feito"
   },
   "activity": {
     "title": "Atividade recente",
