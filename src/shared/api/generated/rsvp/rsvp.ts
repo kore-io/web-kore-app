@@ -47,6 +47,7 @@ import type {
   RsvpDeadlineResponse,
   SaveMessageTemplateBody,
   SessionExpiredErrorBody,
+  SiteExpiredConflictErrorBody,
   SongQuestionDisabledErrorBody,
   SongSuggestionsControllerPageV1Params,
   SongSuggestionsResponse,
@@ -724,6 +725,7 @@ export const getDeliveriesControllerGetQueueV1QueryOptions = <
     | ActionNotAllowedErrorBody
     | WeddingNotFoundErrorBody
     | DeliveriesClosedErrorBody
+    | SiteExpiredConflictErrorBody
     | RateLimitedErrorBody
   >,
 >(
@@ -766,6 +768,7 @@ export type DeliveriesControllerGetQueueV1QueryError = ErrorType<
   | ActionNotAllowedErrorBody
   | WeddingNotFoundErrorBody
   | DeliveriesClosedErrorBody
+  | SiteExpiredConflictErrorBody
   | RateLimitedErrorBody
 >;
 
@@ -777,6 +780,7 @@ export function useDeliveriesControllerGetQueueV1<
     | ActionNotAllowedErrorBody
     | WeddingNotFoundErrorBody
     | DeliveriesClosedErrorBody
+    | SiteExpiredConflictErrorBody
     | RateLimitedErrorBody
   >,
 >(
@@ -806,6 +810,7 @@ export function useDeliveriesControllerGetQueueV1<
     | ActionNotAllowedErrorBody
     | WeddingNotFoundErrorBody
     | DeliveriesClosedErrorBody
+    | SiteExpiredConflictErrorBody
     | RateLimitedErrorBody
   >,
 >(
@@ -835,6 +840,7 @@ export function useDeliveriesControllerGetQueueV1<
     | ActionNotAllowedErrorBody
     | WeddingNotFoundErrorBody
     | DeliveriesClosedErrorBody
+    | SiteExpiredConflictErrorBody
     | RateLimitedErrorBody
   >,
 >(
@@ -860,6 +866,7 @@ export function useDeliveriesControllerGetQueueV1<
     | ActionNotAllowedErrorBody
     | WeddingNotFoundErrorBody
     | DeliveriesClosedErrorBody
+    | SiteExpiredConflictErrorBody
     | RateLimitedErrorBody
   >,
 >(
@@ -933,6 +940,7 @@ export const getDeliveriesControllerMarkV1MutationOptions = <
     | WeddingNotFoundErrorBody
     | DeliveryPartyNotFoundErrorBody
     | DeliveriesClosedErrorBody
+    | SiteExpiredConflictErrorBody
     | DeliveryNotAllowedErrorBody
     | RateLimitedErrorBody
   >,
@@ -982,6 +990,7 @@ export type DeliveriesControllerMarkV1MutationError = ErrorType<
   | WeddingNotFoundErrorBody
   | DeliveryPartyNotFoundErrorBody
   | DeliveriesClosedErrorBody
+  | SiteExpiredConflictErrorBody
   | DeliveryNotAllowedErrorBody
   | RateLimitedErrorBody
 >;
@@ -1002,6 +1011,7 @@ export const useDeliveriesControllerMarkV1 = <
     | WeddingNotFoundErrorBody
     | DeliveryPartyNotFoundErrorBody
     | DeliveriesClosedErrorBody
+    | SiteExpiredConflictErrorBody
     | DeliveryNotAllowedErrorBody
     | RateLimitedErrorBody
   >,
@@ -1076,6 +1086,7 @@ export const getQrCodesControllerCreateV1MutationOptions = <
     | WeddingNotFoundErrorBody
     | DeliveryPartyNotFoundErrorBody
     | DeliveriesClosedErrorBody
+    | SiteExpiredConflictErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -1124,6 +1135,7 @@ export type QrCodesControllerCreateV1MutationError = ErrorType<
   | WeddingNotFoundErrorBody
   | DeliveryPartyNotFoundErrorBody
   | DeliveriesClosedErrorBody
+  | SiteExpiredConflictErrorBody
   | RateLimitedErrorBody
 >;
 export type QrCodesControllerCreateV1MutationVariables = { weddingId: string; data: QrCodesBody };
@@ -1141,6 +1153,7 @@ export const useQrCodesControllerCreateV1 = <
     | WeddingNotFoundErrorBody
     | DeliveryPartyNotFoundErrorBody
     | DeliveriesClosedErrorBody
+    | SiteExpiredConflictErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,

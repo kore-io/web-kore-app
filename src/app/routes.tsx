@@ -13,7 +13,6 @@ import { SendPage } from '../features/deliveries/pages/send-page';
 import { GuestsLayout } from '../features/guests/pages/guests-layout';
 import { GuestsPage } from '../features/guests/pages/guests-page';
 import { ExportPage } from '../features/guests/pages/export-page';
-import { PublishPage } from '../features/publication/pages/publish-page';
 import { SiteEditorPage } from '../features/site/pages/site-editor-page';
 import { SongsPage } from '../features/songs/pages/songs-page';
 import { NotificationSettingsPage } from '../features/notifications/pages/notification-settings-page';
@@ -65,7 +64,6 @@ export const routes: RouteObject[] = [
             element: <Navigate to={siteSectionPath({ section: FIRST_SECTION_SLUG })} replace />,
           },
           { id: 'site-editor', path: 'site/:section', element: <SiteEditorPage /> },
-          { id: 'publish', path: 'cobranca/publicar', element: <PublishPage /> },
           { id: 'songs', path: 'musicas', element: <SongsPage /> },
           { id: 'notifications', path: 'notificacoes', element: <NotificationsPage /> },
           {

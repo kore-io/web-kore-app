@@ -12,4 +12,5 @@ export const NotificationsControllerListV1Type = {
   rsvp: 'rsvp',
   wedding_published: 'wedding_published',
   membership_removed: 'membership_removed',
+  billing: 'billing',
 } as const;

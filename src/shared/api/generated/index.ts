@@ -1,5 +1,6 @@
 export * from './access-invitations/access-invitations';
 export * from './auth/auth';
+export * from './billing/billing';
 export * from './guest-imports/guest-imports';
 export * from './guests/guests';
 export * from './health/health';

@@ -90,6 +90,8 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
       );
       const { router } = renderRoute({ url: '/app' });
       const bell = await screen.findByRole('button', { name });
+      // O contador visual: o número até 9, "9+" acima (lib 0.2.0-homolog.44; decisão 241(1)).
+      if (count > 0) expect(bell).toHaveTextContent(count > 9 ? '9+' : String(count));
       await user.click(bell);
       await waitFor(() => expect(router.state.location.pathname).toBe('/app/notificacoes'));
     },

@@ -10,7 +10,7 @@ import type { NotificationsControllerListV1Type } from './notificationsControlle
 export type NotificationsControllerListV1Params = {
   weddingId?: string;
   scope?: NotificationsControllerListV1Scope;
-  /** Filtro por tipo (casal: Respostas; cerimonialista: os 3). */
+  /** Filtro por tipo (casal: Respostas e Cobrança; cerimonialista: os 3 dela). */
   type?: NotificationsControllerListV1Type;
   /**
    * O `nextCursor` da página anterior.

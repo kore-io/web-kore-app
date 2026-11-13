@@ -59,8 +59,7 @@
     "notPublished": {
       "couple": "Publiquem o site para começar os envios.",
       "planner": "Os envios começam depois que o casal publicar o site."
-    },
-    "publish": "Publicar o site"
+    }
   },
   "groups": {
     "marked_zero": "{{count}} grupos marcados",

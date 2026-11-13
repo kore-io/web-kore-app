@@ -16,6 +16,4 @@ export interface SitePublicationResponse {
    * @nullable
    */
   endDateMax: string | null;
-  /** A chave do servidor; o app só esconde o botão, quem decide é o servidor. */
-  courtesyEnabled: boolean;
 }

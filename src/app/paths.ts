@@ -56,11 +56,6 @@ export const paths = {
   /** Site › Editor (decisão 214): /app/site abre os Dados básicos. */
   site: '/app/site',
   siteSection: '/app/site/:section',
-  /**
-   * Cobrança e publicação › Publicar o site (Publicação por Cortesia RN07; decisão 217(13)).
-   * Sem item na Sidebar na F4 (decisão 228(2)): abre pelo Publicar do Editor e do Dashboard.
-   */
-  publish: '/app/cobranca/publicar',
 } as const;
 
 /** Caminho do Painel de um grupo. */

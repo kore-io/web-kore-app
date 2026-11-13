@@ -1,7 +1,6 @@
 import { Spinner } from '@kore-io/design';
 import { useTranslation } from 'react-i18next';
-import { Link, useSearchParams } from 'react-router';
-import { paths } from '../../../app/paths';
+import { useSearchParams } from 'react-router';
 import { useDashboardControllerGetV1 } from '../../../shared/api/generated/rsvp/rsvp';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { useActiveWedding, type Audience } from '../../guests/hooks/use-active-wedding';
@@ -101,8 +100,8 @@ export function ClosedNotice({ audience, closed }: { audience: Audience; closed:
   if (closed !== 'not_published') return null;
   return (
     <p className="kore-send__closed" id="kore-send-closed">
-      {t(`closed.notPublished.${audience}`)}{' '}
-      {audience === 'couple' && <Link to={paths.publish}>{t('closed.publish')}</Link>}
+      {/* O link Publicar o site volta com a tela paga do front da F3 (decisão 243). */}
+      {t(`closed.notPublished.${audience}`)}
     </p>
   );
 }

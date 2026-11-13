@@ -9,9 +9,12 @@ import type { PreferenceResponseType } from './preferenceResponseType';
 
 export interface PreferenceResponse {
   type: PreferenceResponseType;
+  /** `always`: Cobrança e pagamentos, sempre por e-mail e sem seletor (decisão 236). */
   email: PreferenceResponseEmail;
   /** Sempre ligada no casal. */
   inApp: boolean;
+  /** O app mostra o seletor de e-mail só quando é editável (decisão 236). */
+  emailEditable: boolean;
   /** Vai a false só quando sai a última assinatura da pessoa (RN07; 217(8)). */
   push: boolean;
 }

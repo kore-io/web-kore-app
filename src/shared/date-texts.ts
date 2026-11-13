@@ -16,3 +16,8 @@ export function shortDayMonth({ day, now }: { day: string; now: Date }): string 
 export function oneDot(text: string): string {
   return text.replace(/\.\./g, '.');
 }
+
+/** "14 de nov. de 2027", sempre com o ano (a ajuda dos limites da data de saída do ar). */
+export function shortDate(day: string): string {
+  return SHORT_YEAR.format(new Date(`${day}T12:00:00Z`));
+}

@@ -213,7 +213,7 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     );
   });
 
-  it('antes de publicar: Enviar convites desabilitado com o motivo, Envios com a frase e Publicar (RN03, RN05)', async () => {
+  it('antes de publicar: Enviar convites desabilitado com o motivo, Envios com a frase e o Editor no lugar do Publicar (RN03, RN05; 243)', async () => {
     mockDashboard({
       data: dashboard({
         site: { slug: 'ana-e-marcos', publishedAt: null, endDate: null, status: 'draft' },
@@ -240,7 +240,14 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     expect(within(card('Envios')).queryAllByRole('link')).toHaveLength(0);
     expect(within(card('Envios')).getByText('6 grupos')).toBeInTheDocument();
     expect(within(card('Status do site')).getByText('Rascunho')).toBeInTheDocument();
-    expect(within(card('Status do site')).getByRole('button', { name: 'Publicar' })).toBeEnabled();
+    // O Publicar volta com a tela paga do front da F3 (decisão 243): o Editor por enquanto.
+    expect(within(card('Status do site')).queryByRole('button', { name: 'Publicar' })).toBeNull();
+    expect(
+      within(card('Status do site')).getByRole('button', { name: 'Editar site' }),
+    ).toBeEnabled();
+    expect(
+      within(card('Checklist')).getByRole('link', { name: 'Publicar o site' }),
+    ).toHaveAttribute('href', '/app/site');
     expect(within(card('Checklist')).queryByText(/Lembrar os pendentes/)).toBeNull();
     expect(within(card('Checklist')).getByText('Publicar o site').closest('li')).toHaveAttribute(
       'data-state',

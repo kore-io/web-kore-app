@@ -27,7 +27,7 @@ import {
   type BasicsErrors,
   type BasicsField,
 } from '../basics-draft';
-import { shortDate } from '../../publication/publication';
+import { shortDate } from '../../../shared/date-texts';
 import { useSectionForm } from '../section-form';
 import { ImageField } from './image-field';
 import { timezoneLabelKey } from '../timezones';
