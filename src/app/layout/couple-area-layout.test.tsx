@@ -42,7 +42,7 @@ function meOnly(path: string, body: object = me()) {
 }
 
 describe('área do casal com o /v1/me (decisão 163)', () => {
-  it('a Topbar e o menu com os nomes do casal, a pessoa e só o Sair (163(2))', async () => {
+  it('a Topbar e o menu com os nomes do casal, a pessoa, Configurações e o Sair (163(2); Penpot 03)', async () => {
     const user = userEvent.setup();
     mockApi(({ path }) => meOnly(path));
     renderRoute({ url: '/app' });
@@ -60,7 +60,63 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
       within(menu)
         .getAllByRole('menuitem')
         .map((item) => item.textContent),
-    ).toEqual(['Sair']);
+    ).toEqual(['Configurações', 'Sair']);
+  });
+
+  it('Configurações, no menu, abre as preferências de notificação (decisão 221)', async () => {
+    const user = userEvent.setup();
+    mockApi(({ path }) => meOnly(path));
+    const { router } = renderRoute({ url: '/app' });
+    await user.click(await screen.findByRole('button', { name: 'Menu do usuário' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Configurações' }));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/app/configuracoes/notificacoes'),
+    );
+  });
+
+  it.each([
+    [0, 'Notificações'],
+    [1, 'Notificações, 1 não lida'],
+    [3, 'Notificações, 3 não lidas'],
+    [12, 'Notificações, mais de 9 não lidas'],
+  ])(
+    'o sino com %i não lidas: "%s"; tocar leva às Notificações (Central RN06)',
+    async (count, name) => {
+      const user = userEvent.setup();
+      mockApi(({ path }) =>
+        path.startsWith('/v1/me/notifications/unread-count')
+          ? Response.json({ unreadCount: count })
+          : meOnly(path),
+      );
+      const { router } = renderRoute({ url: '/app' });
+      const bell = await screen.findByRole('button', { name });
+      await user.click(bell);
+      await waitFor(() => expect(router.state.location.pathname).toBe('/app/notificacoes'));
+    },
+  );
+
+  it.each([
+    ['published', 'Publicado'],
+    ['draft', 'Rascunho'],
+    ['post_event', 'Pós-evento'],
+  ])(
+    'o selo de status do site na Topbar: %s (Dashboard RN07; decisão 239(B3))',
+    async (status, label) => {
+      mockApi(({ path }) =>
+        path === '/v1/weddings/w1/site' ? Response.json({ status }) : meOnly(path),
+      );
+      renderRoute({ url: '/app' });
+      const banner = await screen.findByRole('banner');
+      expect(await within(banner).findByText(label)).toBeInTheDocument();
+    },
+  );
+
+  it('sem a leitura do site, a Topbar fica sem selo', async () => {
+    mockApi(({ path }) => meOnly(path));
+    renderRoute({ url: '/app' });
+    const banner = await screen.findByRole('banner');
+    await screen.findByRole('button', { name: 'Menu do usuário' });
+    expect(within(banner).queryByText(/Publicado|Rascunho/)).toBeNull();
   });
 
   it('conta sem nome: o e-mail no lugar do nome', async () => {

@@ -9,7 +9,6 @@ import type {
   ChecklistItemResponse,
   DashboardResponse,
 } from '../../../shared/api/generated/model';
-import { notificationsControllerReadV1 } from '../../../shared/api/generated/notifications/notifications';
 import { useDashboardControllerGetV1 } from '../../../shared/api/generated/rsvp/rsvp';
 import { oneDot } from '../../../shared/date-texts';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
@@ -17,6 +16,8 @@ import { deliveryBadges } from '../../guests/components/delivery-badges';
 import { useActiveWedding, type Audience } from '../../guests/hooks/use-active-wedding';
 import type { sentFilters } from '../../guests/hooks/use-party-filters';
 import { canOpenPublish } from '../../publication/publication';
+import { useMarkNotificationRead } from '../../notifications/hooks/use-mark-notification-read';
+import { isResponseItem } from '../../notifications/notification-shape';
 import { siteStatus } from '../../site/site-texts';
 import {
   activityDate,
@@ -183,7 +184,7 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
         )}
         <SiteCard data={data} now={now} />
         <ChecklistCard items={data.checklist} />
-        {!empty && <ActivityCard items={data.recentActivity} now={now} />}
+        {!empty && <ActivityCard weddingId={weddingId} items={data.recentActivity} now={now} />}
       </div>
     </div>
   );
@@ -290,7 +291,8 @@ function ChecklistCard({ items }: { items: ChecklistItemResponse[] }) {
   const { t } = useTranslation('dashboard');
   const next = items.find((item) => !item.done)?.key;
   const label = (item: ChecklistItemResponse) => {
-    if (!item.done && item.progress && item.key === 'invites') {
+    // Sem grupos, sem a contagem "(0 de 0 grupos)": só "Enviar os convites".
+    if (!item.done && item.progress && item.progress.total > 0 && item.key === 'invites') {
       return t('checklist.invitesProgress', {
         done: item.progress.done,
         total: item.progress.total,
@@ -342,8 +344,20 @@ function ChecklistCard({ items }: { items: ChecklistItemResponse[] }) {
  * Atividade recente (RN04): as 5 últimas, com o texto da central e a data; abrir leva ao
  * Painel do grupo (1 grupo) ou à lista (vários) e marca a notificação como lida.
  */
-function ActivityCard({ items, now }: { items: ActivityResponse[]; now: Date }) {
+function ActivityCard({
+  weddingId,
+  items: all,
+  now,
+}: {
+  weddingId: string;
+  items: ActivityResponse[];
+  now: Date;
+}) {
   const { t } = useTranslation('dashboard');
+  // Só as respostas: a API monta os grupos do payload da notificação, e a central do casal
+  // já recebe os avisos de cobrança (outro formato), que o app desenha no front da F3.
+  const items = all.filter((item) => isResponseItem(item.groups));
+  const markRead = useMarkNotificationRead({ weddingId });
   return (
     <section
       className="kore-dashboard__card kore-dashboard__card--half"
@@ -367,11 +381,9 @@ function ActivityCard({ items, now }: { items: ActivityResponse[]; now: Date }) 
                   to={to}
                   className="kore-dashboard__activity-item"
                   onClick={() => {
-                    // Abrir marca como lida (Central RN05), sem esperar a resposta.
+                    // Abrir marca como lida (Central RN05); a da colaboradora não tem o que marcar.
                     if (item.source === 'notification' && item.readAt === null) {
-                      void notificationsControllerReadV1(item.id, { keepalive: true }).catch(
-                        () => undefined,
-                      );
+                      markRead({ id: item.id });
                     }
                   }}
                 >

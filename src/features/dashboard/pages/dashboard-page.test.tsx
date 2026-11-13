@@ -265,6 +265,38 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     );
   });
 
+  it('a Atividade recente sem os avisos de cobrança (o payload deles vira o groups), que entram na F3', async () => {
+    mockDashboard({
+      data: dashboard({
+        recentActivity: [
+          {
+            id: 'nb',
+            source: 'notification',
+            count: 1,
+            readAt: null,
+            at: today(21, 0),
+            // Como a API manda: o payload do billing no lugar dos grupos.
+            groups: [
+              { kind: 'payment_confirmed', at: today(21, 0) },
+            ] as unknown as DashboardResponse['recentActivity'][number]['groups'],
+          },
+          ...dashboard().recentActivity,
+        ],
+      }),
+    });
+    renderRoute({ url: '/app' });
+    await screen.findByText('142');
+    const links = within(card('Atividade recente')).getAllByRole('link');
+    expect(links).toHaveLength(1);
+    expect(links[0]).toHaveTextContent('Família Moreira respondeu o convite');
+    expect(screen.queryByText(/^ respondeu o convite/)).toBeNull();
+    expect(
+      within(card('Atividade recente'))
+        .getAllByRole('link')
+        .map((link) => link.getAttribute('href')),
+    ).not.toContain('/app/convidados/grupos/undefined');
+  });
+
   it('a Atividade recente vazia', async () => {
     mockDashboard({ data: dashboard({ recentActivity: [] }) });
     renderRoute({ url: '/app' });
@@ -307,6 +339,25 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     expect(card('Checklist')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Adicionar convidados' }));
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/convidados/novo'));
+  });
+
+  it('sem grupos, "Enviar os convites" sem a contagem "(0 de 0 grupos)"', async () => {
+    mockDashboard({
+      data: dashboard({
+        stats: { ...dashboard().stats, guestsTotal: 0, partiesTotal: 0 },
+        checklist: [
+          { key: 'guests', done: false, progress: null },
+          { key: 'invites', done: false, progress: { done: 0, total: 0 } },
+        ],
+      }),
+    });
+    renderRoute({ url: '/app' });
+    await screen.findByRole('heading', { name: 'Vocês ainda não cadastraram convidados.' });
+    expect(
+      within(card('Checklist'))
+        .getAllByRole('listitem')
+        .map((item) => item.textContent),
+    ).toEqual(['Cadastrar os convidados', 'Enviar os convites']);
   });
 
   it('se o Dashboard não carrega, o aviso com o Tentar de novo', async () => {

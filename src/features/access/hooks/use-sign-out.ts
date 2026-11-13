@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { paths } from '../../../app/paths';
 import { useAuthControllerLogoutV1 } from '../../../shared/api/generated/auth/auth';
 import { ApiError } from '../../../shared/api/http-client';
+import { forgetPushOnSignOut } from '../../notifications/push';
 import type { SignInLocationState } from '../sign-in-location-state';
 
 /**
@@ -22,6 +23,8 @@ export function useSignOut({ signInState }: { signInState?: SignInLocationState 
 
   const signedOut = () => {
     queryClient.clear();
+    // A API apaga o push da sessão (Notificações e push RN08); o navegador esquece o dele.
+    void forgetPushOnSignOut();
     // O Entrar com outra conta do convite volta ao convite depois (origem invite, RN06).
     void navigate(paths.signIn, { replace: true, state: signInState });
   };
