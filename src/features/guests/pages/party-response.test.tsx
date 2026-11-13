@@ -195,6 +195,27 @@ describe('Alterar resposta pelo casal (Prazo e respostas RN04; Penpot A8)', () =
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 
+  it('a cerimonialista: o 409 RSVP_CHANGED no singular (decisão 232(7))', async () => {
+    profileUnderTest.current = 'planner';
+    const user = userEvent.setup();
+    mockPanel({
+      response: () =>
+        apiError({
+          status: 409,
+          body: { error: 'RSVP_CHANGED', current: { partyId: 'p1', version: 9 } },
+        }),
+    });
+    renderAreaScreen({ url: '/app/convidados/grupos/p1' });
+    const dialog = await openChange(user, 'Pedro Moreira');
+    await user.click(within(dialog).getByRole('radio', { name: 'Não vai' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Salvar resposta' }));
+    expect(
+      await screen.findByText(
+        'As respostas deste grupo mudaram. O painel agora mostra as respostas atuais: confira e tente de novo.',
+      ),
+    ).toBeInTheDocument();
+  });
+
   it('numa falha de rede, o Dialog fica aberto com o que foi marcado', async () => {
     const user = userEvent.setup();
     mockPanel({ response: () => apiError({ status: 500, body: {} }) });

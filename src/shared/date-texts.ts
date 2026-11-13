@@ -21,3 +21,29 @@ export function oneDot(text: string): string {
 export function shortDate(day: string): string {
   return SHORT_YEAR.format(new Date(`${day}T12:00:00Z`));
 }
+
+/** O fuso de quando o casamento não tem um (o padrão das telas e do .xlsx). */
+export const DEFAULT_TIMEZONE = 'America/Sao_Paulo';
+
+/**
+ * A data curta e a hora de um instante no fuso do casamento, como no .xlsx (decisão 246):
+ * "12/09" e "20h14"; na hora cheia, "20h" (Voz).
+ */
+export function dayAndTimeIn({ at, timezone }: { at: string; timezone: string | null }) {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: timezone ?? DEFAULT_TIMEZONE,
+    day: '2-digit',
+    month: '2-digit',
+    hour: 'numeric',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(new Date(at));
+  const part = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((item) => item.type === type)?.value ?? '';
+  const hour = Number(part('hour'));
+  const minute = part('minute');
+  return {
+    date: `${part('day')}/${part('month')}`,
+    time: minute === '00' ? `${hour}h` : `${hour}h${minute}`,
+  };
+}
