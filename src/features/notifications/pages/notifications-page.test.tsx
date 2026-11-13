@@ -63,7 +63,8 @@ function mockNotifications({
     ],
   ],
   readAll = 'ok',
-}: { pages?: object[][]; readAll?: 'ok' | 'fail' } = {}) {
+  filtered = false,
+}: { pages?: object[][]; readAll?: 'ok' | 'fail'; filtered?: boolean } = {}) {
   const calls: Call[] = [];
   mockApi(({ method, path }) => {
     if (path === '/v1/me') return Response.json(meFor(me));
@@ -76,6 +77,10 @@ function mockNotifications({
     }
     if (/^\/v1\/me\/notifications\/[^/?]+\/read$/.test(path) && method === 'POST') {
       return new Response(null, { status: 204 });
+    }
+    if (path.startsWith('/v1/me/notifications') && method === 'GET' && filtered) {
+      // O filtro pedido não tem nenhuma (o "Nenhuma notificação deste tipo.").
+      if (path.includes('type=')) return Response.json({ items: [], nextCursor: null });
     }
     if (path.startsWith('/v1/me/notifications') && method === 'GET') {
       const cursor = new URLSearchParams(path.split('?')[1]).get('cursor');
@@ -198,6 +203,16 @@ describe('Notificações (Central RN04 a RN06)', () => {
         '/v1/me/notifications?weddingId=w1&type=rsvp',
       ),
     );
+  });
+
+  it('o filtro sem resultado: "Nenhuma notificação deste tipo." (RN06)', async () => {
+    const user = userEvent.setup();
+    mockNotifications({ filtered: true });
+    renderRoute({ url: '/app/notificacoes' });
+    await screen.findAllByRole('listitem');
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Tipo' }), 'Respostas');
+    expect(await screen.findByText('Nenhuma notificação deste tipo.')).toBeInTheDocument();
+    expect(screen.queryByText('Ainda não há notificações')).toBeNull();
   });
 
   it('vazia: o Empty State; sem não lidas, o Marcar todas desabilitado', async () => {

@@ -367,6 +367,22 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     ).toEqual(['Cadastrar os convidados', 'Enviar os convites']);
   });
 
+  it('sem convidados, a colaboradora lê o vazio dela (RN06)', async () => {
+    profileUnderTest.current = 'planner';
+    mockDashboard({
+      data: dashboard({
+        role: 'collaborator',
+        stats: { ...dashboard().stats, guestsTotal: 0, partiesTotal: 0 },
+        delivery: { notSent: 0, sent: 0, viewed: 0, responded: 0 },
+      }),
+    });
+    renderAreaScreen({ url: '/app' });
+    expect(
+      await screen.findByRole('heading', { name: 'Este casamento ainda não tem convidados.' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Adicionar convidados' })).toBeInTheDocument();
+  });
+
   it('se o Dashboard não carrega, o aviso com o Tentar de novo', async () => {
     mockDashboard({ data: null });
     renderRoute({ url: '/app' });

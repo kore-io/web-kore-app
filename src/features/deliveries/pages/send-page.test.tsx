@@ -96,7 +96,12 @@ function mockSend({
         reminderQueue: { parties: 0, guests: 0, notReminded: 0 },
       });
     }
-    if (path.startsWith('/v1/weddings/w1/tags')) return Response.json({ data: [], limit: 10 });
+    if (path.startsWith('/v1/weddings/w1/tags')) {
+      return Response.json({
+        data: [{ id: 't1', name: 'Padrinhos', color: 'wine', guests: 4 }],
+        limit: 10,
+      });
+    }
     if (path.startsWith('/v1/weddings/w1/parties') && method === 'GET') {
       calls.push({ method, path, body });
       return Response.json({
@@ -562,5 +567,181 @@ describe('Envios › QR code (Envios RN09; Penpot A6)', () => {
     const { container } = renderRoute({ url: '/app/envios/convites?etapa=fila' });
     await screen.findByText('Família Moreira');
     await expectNoA11yViolations({ container });
+  });
+});
+
+describe('Envios › as versões e os textos que faltavam (DoD das F4 e F5; RN03, RN06, RN07, RN10)', () => {
+  it('o filtro Tag do convite vai no GET (RN03, RN04)', async () => {
+    const user = userEvent.setup();
+    const calls = mockSend();
+    renderRoute({ url: '/app/envios/convites' });
+    await screen.findByText('Família Moreira');
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Tag' }), 'Tag: Padrinhos');
+    await waitFor(() =>
+      expect(calls.map((call) => call.path)).toContainEqual(
+        expect.stringMatching(/\/parties\?.*tag=t1/),
+      ),
+    );
+  });
+
+  it('o save the date: o filtro "Todos · Não enviado · Enviado", sem o de envio do convite (RN03)', async () => {
+    const user = userEvent.setup();
+    const calls = mockSend();
+    renderRoute({ url: '/app/envios/save-the-date' });
+    const filter = await screen.findByRole('combobox', { name: 'Save the date' });
+    expect(
+      Array.from((filter as HTMLSelectElement).options).map((option) => option.textContent),
+    ).toEqual(['Todos', 'Não enviado', 'Enviado']);
+    expect(screen.queryByRole('combobox', { name: 'Envio' })).toBeNull();
+    await user.selectOptions(filter, 'Enviado');
+    await waitFor(() =>
+      expect(calls.map((call) => call.path)).toContainEqual(
+        expect.stringMatching(/\/parties\?.*saveTheDate=sent/),
+      ),
+    );
+  });
+
+  it.each([
+    [
+      'save_the_date',
+      'save-the-date',
+      'Usem {nome_do_grupo}, {data} e {site}. O save the date não leva o link do grupo: as respostas chegam com o convite.',
+    ],
+    [
+      'reminder',
+      'lembrete',
+      'Usem {nome_do_grupo}, {data}, {prazo} e {link}. Sem prazo, o {prazo} fica em branco.',
+    ],
+  ])('a ajuda da mensagem do %s, do casal (RN06)', async (kind, slug, help) => {
+    mockSend();
+    preset(['p1'], 'whatsapp', kind);
+    renderRoute({ url: `/app/envios/${slug}?etapa=canal` });
+    expect(await screen.findByRole('textbox', { name: 'Mensagem' })).toHaveAccessibleDescription(
+      help,
+    );
+  });
+
+  it('a prévia do save the date diz só "É assim que o grupo recebe." (RN06)', async () => {
+    mockSend();
+    preset(['p1'], 'whatsapp', 'save_the_date');
+    renderRoute({ url: '/app/envios/save-the-date?etapa=canal' });
+    expect(await screen.findByText('É assim que o grupo recebe.')).toBeInTheDocument();
+    expect(screen.queryByText(/O link é só deste grupo/)).toBeNull();
+  });
+
+  it('um nome de grupo com marcação aparece como texto na prévia, sem virar HTML (RN06)', async () => {
+    mockSend({
+      queue: [
+        queueItem('p1', 'Tio <b>Zé</b> & Cia', {
+          copyText: 'Oi, Tio <b>Zé</b> & Cia! A confirmação é por este link: https://kore.com.br/x',
+        }),
+      ],
+    });
+    preset(['p1']);
+    const { container } = renderRoute({ url: '/app/envios/convites?etapa=canal' });
+    expect(await screen.findByText('Prévia · Tio <b>Zé</b> & Cia')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Oi, Tio <b>Zé</b> & Cia! A confirmação é por este link: https://kore.com.br/x',
+      ),
+    ).toBeInTheDocument();
+    expect(container.querySelector('.kore-send__preview b')).toBeNull();
+  });
+
+  /** O texto sem o caractere de não quebrar do "e-mail" (withNonBreakingEmail). */
+  const plain = (text: string) => (content: string, element: Element | null) =>
+    element?.tagName === 'P' && content.replace(/\u2060/g, '') === text;
+
+  it('o sem e-mail na fila do e-mail, nas duas vozes (RN07)', async () => {
+    mockSend({ queue: [queueItem('p1', 'Família Moreira', { mailtoUrl: null })] });
+    preset(['p1'], 'email');
+    const view = renderRoute({ url: '/app/envios/convites?etapa=fila' });
+    expect(
+      await screen.findByText(
+        plain('O contato deste grupo não tem e-mail. Adicionem um para enviar por e-mail.'),
+      ),
+    ).toBeInTheDocument();
+    view.unmount();
+    profileUnderTest.current = 'planner';
+    mockSend({ queue: [queueItem('p1', 'Família Moreira', { mailtoUrl: null })] });
+    preset(['p1'], 'email');
+    renderAreaScreen({ url: '/app/envios/convites?etapa=fila' });
+    expect(
+      await screen.findByText(
+        plain('O contato deste grupo não tem e-mail. Adicione um para enviar por e-mail.'),
+      ),
+    ).toBeInTheDocument();
+  });
+
+  describe('a cerimonialista, no singular (198(2))', () => {
+    it.each([
+      [
+        'invite',
+        'convites',
+        'Use {nome_do_grupo}, {data} e {link}. O Kore troca cada um pelos dados do grupo.',
+      ],
+      [
+        'save_the_date',
+        'save-the-date',
+        'Use {nome_do_grupo}, {data} e {site}. O save the date não leva o link do grupo: as respostas chegam com o convite.',
+      ],
+      [
+        'reminder',
+        'lembrete',
+        'Use {nome_do_grupo}, {data}, {prazo} e {link}. Sem prazo, o {prazo} fica em branco.',
+      ],
+    ])('a ajuda da mensagem do %s', async (kind, slug, help) => {
+      profileUnderTest.current = 'planner';
+      mockSend();
+      preset(['p1'], 'whatsapp', kind);
+      renderAreaScreen({ url: `/app/envios/${slug}?etapa=canal` });
+      expect(await screen.findByRole('textbox', { name: 'Mensagem' })).toHaveAccessibleDescription(
+        help,
+      );
+    });
+
+    it('o {link} que falta', async () => {
+      const user = userEvent.setup();
+      profileUnderTest.current = 'planner';
+      mockSend();
+      preset(['p1']);
+      renderAreaScreen({ url: '/app/envios/convites?etapa=canal' });
+      const message = await screen.findByRole('textbox', { name: 'Mensagem' });
+      await user.clear(message);
+      await user.type(message, 'Oi!');
+      expect(message).toHaveAccessibleDescription(
+        'A mensagem precisa ter o {link}, senão o grupo não consegue responder. Coloque o {link} de volta.',
+      );
+    });
+
+    it('o limite de 200', async () => {
+      profileUnderTest.current = 'planner';
+      mockSend();
+      preset(Array.from({ length: 201 }, (_, index) => `x${index}`));
+      renderAreaScreen({ url: '/app/envios/convites' });
+      expect(
+        await screen.findByText('Você marcou 201 grupos. Marque até 200 por envio.'),
+      ).toBeInTheDocument();
+    });
+
+    it('o sem telefone na fila do WhatsApp', async () => {
+      profileUnderTest.current = 'planner';
+      mockSend();
+      preset(['p1', 'p2']);
+      renderAreaScreen({ url: '/app/envios/convites?etapa=fila' });
+      expect(
+        await screen.findByText(
+          'O contato deste grupo não tem telefone. Adicione um para enviar pelo WhatsApp.',
+        ),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it('no pós-evento, só a etapa Grupos, com o Continuar desabilitado (RN01)', async () => {
+    mockSend({ status: 'post_event' });
+    preset(['p1']);
+    renderRoute({ url: '/app/envios/convites?etapa=fila' });
+    expect(await screen.findByRole('button', { name: 'Continuar' })).toBeDisabled();
+    expect(screen.queryByRole('textbox', { name: 'Mensagem' })).toBeNull();
   });
 });

@@ -223,6 +223,32 @@ describe('Envios › Prazo de resposta (Prazo e respostas RN01 a RN03; Penpot A7
     );
   });
 
+  it('a cerimonialista: o depois do casamento e a ajuda de reabrir no singular (RN01, RN03)', async () => {
+    profileUnderTest.current = 'planner';
+    const user = userEvent.setup();
+    mockDeadline({ put: () => apiError({ status: 422, body: { error: 'DEADLINE_AFTER_EVENT' } }) });
+    const view = renderAreaScreen({ url: '/app/envios/prazo' });
+    await user.clear(await screen.findByLabelText('Prazo de resposta'));
+    await user.type(field(), dayFromToday(5));
+    await user.click(screen.getByRole('button', { name: 'Salvar prazo' }));
+    await waitFor(() =>
+      expect(field()).toHaveAccessibleDescription(
+        oneDot(
+          `O prazo precisa ser até o dia do casamento, ${short('2027-11-14')}. Escolha outra data.`,
+        ),
+      ),
+    );
+    view.unmount();
+    // Prazo vencido: a ajuda para reabrir, no singular.
+    mockDeadline({ deadline: dayFromToday(-1) });
+    renderAreaScreen({ url: '/app/envios/prazo' });
+    await waitFor(() =>
+      expect(field()).toHaveAccessibleDescription(
+        'Escolha uma nova data para reabrir as respostas.',
+      ),
+    );
+  });
+
   it('se o site não carrega, o aviso com o Tentar de novo, e não o Spinner', async () => {
     mockApi(({ path }) => {
       if (path === '/v1/me') return Response.json(meFor(me));
