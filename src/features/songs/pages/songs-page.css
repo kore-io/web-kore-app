@@ -28,8 +28,9 @@
   @apply w-full border-separate border-spacing-0 overflow-hidden rounded-lg border border-gray-300 bg-white;
 }
 
+/* No cartão, o cabeçalho sai da tela, mas fica para o leitor de tela. */
 .kore-songs__table thead {
-  @apply hidden lg:table-header-group;
+  @apply max-lg:sr-only;
 }
 
 .kore-songs__table th {
