@@ -174,7 +174,9 @@ function DeadlineForm({
               parties: t('deadline.pendingParties', { count: pending.parties }),
             })}
             {' · '}
-            <Link to={paths.deliveryReminder}>{t('deadline.remind')}</Link>
+            <Link className="kore-deadline__remind" to={paths.deliveryReminder}>
+              {t('deadline.remind')}
+            </Link>
           </>
         }
       />
