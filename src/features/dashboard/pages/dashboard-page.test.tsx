@@ -265,6 +265,29 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     );
   });
 
+  it('a Atividade recente sem os avisos de cobrança (sem grupo), que entram na F3', async () => {
+    mockDashboard({
+      data: dashboard({
+        recentActivity: [
+          {
+            id: 'nb',
+            source: 'notification',
+            count: 1,
+            readAt: null,
+            at: today(21, 0),
+            groups: [],
+          },
+          ...dashboard().recentActivity,
+        ],
+      }),
+    });
+    renderRoute({ url: '/app' });
+    await screen.findByText('142');
+    const links = within(card('Atividade recente')).getAllByRole('link');
+    expect(links).toHaveLength(1);
+    expect(links[0]).toHaveTextContent('Família Moreira respondeu o convite');
+  });
+
   it('a Atividade recente vazia', async () => {
     mockDashboard({ data: dashboard({ recentActivity: [] }) });
     renderRoute({ url: '/app' });

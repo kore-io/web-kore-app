@@ -345,7 +345,7 @@ function ChecklistCard({ items }: { items: ChecklistItemResponse[] }) {
  */
 function ActivityCard({
   weddingId,
-  items,
+  items: all,
   now,
 }: {
   weddingId: string;
@@ -353,6 +353,9 @@ function ActivityCard({
   now: Date;
 }) {
   const { t } = useTranslation('dashboard');
+  // Só as respostas, com grupo: a central do casal já recebe os avisos de cobrança, que o
+  // app desenha no front da F3.
+  const items = all.filter((item) => item.groups.length > 0);
   const markRead = useMarkNotificationRead({ weddingId });
   return (
     <section

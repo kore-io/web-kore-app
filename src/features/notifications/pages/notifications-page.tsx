@@ -23,6 +23,11 @@ import { useMarkNotificationRead } from '../hooks/use-mark-notification-read';
 
 type Filter = '' | NotificationsControllerListV1Type;
 
+/** O tipo que a central desenha na F5: a resposta do convite, com ao menos um grupo. */
+function isDrawn(item: NotificationResponse): boolean {
+  return (item.type as string) === 'rsvp' && item.payload.length > 0;
+}
+
 /**
  * Notificações (/app/notificacoes; Central RN04 a RN06; Penpot 25): as do casamento ativo,
  * mais novas primeiro, com o filtro por tipo (Todas · Respostas na F5), Marcar todas como
@@ -82,7 +87,9 @@ function Notifications({ weddingId }: { weddingId: string }) {
         message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
       }),
   });
-  const items = list.data?.pages.flatMap((page) => page.items) ?? [];
+  // Só os tipos que o app desenha (as respostas, Central RN01): a API já grava os de
+  // cobrança (Publicar e pagar RN13), que entram com o front da F3.
+  const items = (list.data?.pages.flatMap((page) => page.items) ?? []).filter(isDrawn);
   const hasUnread = items.some((item) => item.readAt === null);
 
   return (

@@ -137,6 +137,30 @@ describe('Notificações (Central RN04 a RN06)', () => {
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/convidados'));
   });
 
+  it('o aviso de cobrança (billing) não aparece: o front da F3 o desenha (Central RN01)', async () => {
+    mockNotifications({
+      pages: [
+        [
+          notification('nb', { type: 'billing', payload: [{ kind: 'payment_confirmed' }] }),
+          notification('n1'),
+        ],
+      ],
+    });
+    renderRoute({ url: '/app/notificacoes' });
+    const items = await screen.findAllByRole('listitem');
+    expect(items).toHaveLength(1);
+    expect(items[0]).toHaveTextContent('Família Moreira respondeu o convite');
+    expect(screen.queryByText(/^ respondeu o convite/)).toBeNull();
+  });
+
+  it('só avisos de cobrança: o vazio', async () => {
+    mockNotifications({
+      pages: [[notification('nb', { type: 'billing', payload: [{ kind: 'payment_confirmed' }] })]],
+    });
+    renderRoute({ url: '/app/notificacoes' });
+    expect(await screen.findByText('Ainda não há notificações')).toBeInTheDocument();
+  });
+
   it('Marcar todas como lidas: o Toast e a lista lida de novo (RN06)', async () => {
     const user = userEvent.setup();
     const calls = mockNotifications();
