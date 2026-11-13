@@ -72,6 +72,13 @@ function mockDeadline({
 }
 
 const field = () => screen.getByLabelText('Prazo de resposta');
+/** O link do Lembrar pendentes do Stat Card (a aba do lembrete tem o mesmo nome e destino). */
+const remindLink = () =>
+  screen
+    .getAllByRole('link', { name: 'Lembrar pendentes' })
+    .find((link) => link.closest('.kore-deadline'));
+/** A linha de apoio do Stat Card dos pendentes, com o link. */
+const pendingDetail = () => remindLink()?.parentElement?.textContent;
 const short = (day: string) => shortDayMonth({ day, now: new Date() });
 
 describe('Envios › Prazo de resposta (Prazo e respostas RN01 a RN03; Penpot A7)', () => {
@@ -92,7 +99,9 @@ describe('Envios › Prazo de resposta (Prazo e respostas RN01 a RN03; Penpot A7
     ).toBeInTheDocument();
     expect(screen.getByText('Ainda sem resposta')).toBeInTheDocument();
     expect(screen.getByText('28')).toBeInTheDocument();
-    expect(screen.getByText('convidados em 15 grupos · Lembrar pendentes')).toBeInTheDocument();
+    expect(pendingDetail()).toBe('convidados em 15 grupos · Lembrar pendentes');
+    // O Lembrar pendentes leva à aba do lembrete (o C4 mesclou).
+    expect(remindLink()).toHaveAttribute('href', '/app/envios/lembrete');
     expect(screen.getByRole('button', { name: 'Tirar o prazo' })).toBeEnabled();
     expect(screen.getByRole('button', { name: 'Salvar prazo' })).toBeDisabled();
     expect(screen.getByRole('link', { name: 'Envios' })).toHaveAttribute('aria-current', 'page');
@@ -109,14 +118,12 @@ describe('Envios › Prazo de resposta (Prazo e respostas RN01 a RN03; Penpot A7
     expect(await screen.findByLabelText('Prazo de resposta')).toHaveAccessibleDescription(
       oneDot(`Falta 1 dia. No site, o grupo vê "Vocês podem responder até ${short(tomorrow)}."`),
     );
-    expect(screen.getByText('convidado em 1 grupo · Lembrar pendentes')).toBeInTheDocument();
+    await waitFor(() => expect(pendingDetail()).toBe('convidado em 1 grupo · Lembrar pendentes'));
     view.unmount();
     // Zero fica no plural: "0 convidados em 0 grupos".
     mockDeadline({ deadline: tomorrow, queue: { parties: 0, guests: 0, notReminded: 0 } });
     const zero = renderRoute({ url: '/app/envios/prazo' });
-    expect(
-      await screen.findByText('convidados em 0 grupos · Lembrar pendentes'),
-    ).toBeInTheDocument();
+    await waitFor(() => expect(pendingDetail()).toBe('convidados em 0 grupos · Lembrar pendentes'));
     zero.unmount();
     const today = dayFromToday(0);
     mockDeadline({ deadline: today });

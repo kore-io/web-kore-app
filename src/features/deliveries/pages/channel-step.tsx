@@ -25,8 +25,10 @@ import type { Closed } from './send-page';
 
 const BODY_MAX = 1000;
 const SUBJECT_MAX = 120;
-/** O QR entra no C5, só no convite (RN09). */
-const CHANNELS: DeliveryChannel[] = ['whatsapp', 'email', 'link'];
+/** Os canais do tipo (RN05): o QR code só existe no convite (RN09). */
+export function channelsOf(kind: DeliveryKind): DeliveryChannel[] {
+  return kind === 'invite' ? ['whatsapp', 'email', 'link', 'qr'] : ['whatsapp', 'email', 'link'];
+}
 
 /**
  * A etapa Canal e mensagem (Envios RN05 e RN06; Penpot A5): o canal da fila inteira, a
@@ -77,13 +79,17 @@ function ChannelForm({
   const [body, setBody] = useState(template.body);
   const [subject, setSubject] = useState(template.subject);
   const [saving, setSaving] = useState(false);
-  const linkMissing = needsLink(kind) && !hasLinkPlaceholder(body);
+  const channels = channelsOf(kind);
+  const channel = channels.includes(selection.channel) ? selection.channel : 'whatsapp';
+  // O QR leva só o link do grupo, sem a mensagem (RN09): a etapa fica só com o canal.
+  const qr = channel === 'qr';
+  const linkMissing = !qr && needsLink(kind) && !hasLinkPlaceholder(body);
   const dirty = body !== template.body || subject !== template.subject;
   const first = selection.ids[0];
   const preview = useDeliveriesControllerGetQueueV1(
     weddingId,
     { kind, partyIds: first ?? '' },
-    { query: { enabled: Boolean(first) } },
+    { query: { enabled: Boolean(first) && !qr } },
   );
   const previewItem = preview.data?.items[0];
 
@@ -122,7 +128,7 @@ function ChannelForm({
     setSaving(true);
     try {
       // A edição fica para os próximos envios (RN06); a fila lê a mensagem guardada.
-      if (dirty) {
+      if (dirty && !qr) {
         await messageTemplatesControllerPutV1(weddingId, kind, {
           body,
           subject: subject.replace(/[\r\n]+/g, ' ').trim() || null,
@@ -143,18 +149,18 @@ function ChannelForm({
       <div className="kore-send__panel">
         <fieldset className="kore-send__channels">
           <legend className="kore-send__overline">{t('channel.label')}</legend>
-          {CHANNELS.map((channel) => (
+          {channels.map((item) => (
             <Radio
-              key={channel}
+              key={item}
               name={radioName}
-              checked={selection.channel === channel}
-              onChange={() => selection.setChannel(channel)}
+              checked={channel === item}
+              onChange={() => selection.setChannel(item)}
             >
-              {t(`channel.${channel}`)}
+              {t(`channel.${item}`)}
             </Radio>
           ))}
         </fieldset>
-        {selection.channel === 'email' && (
+        {channel === 'email' && (
           <FormField label={t('message.subject')}>
             {({ id, describedBy }) => (
               <Input
@@ -167,28 +173,30 @@ function ChannelForm({
             )}
           </FormField>
         )}
-        <FormField
-          label={t('message.body')}
-          hint={
-            linkMissing
-              ? t(`message.linkMissing.${audience}`)
-              : t(`message.help.${kind}.${audience}`)
-          }
-          hintTone={linkMissing ? 'danger' : 'neutral'}
-        >
-          {({ id, describedBy, invalid }) => (
-            <Textarea
-              id={id}
-              aria-describedby={describedBy}
-              invalid={invalid}
-              rows={7}
-              maxLength={BODY_MAX}
-              value={body}
-              onChange={(event) => setBody(event.target.value)}
-            />
-          )}
-        </FormField>
-        {(dirty || !template.isDefault) && (
+        {!qr && (
+          <FormField
+            label={t('message.body')}
+            hint={
+              linkMissing
+                ? t(`message.linkMissing.${audience}`)
+                : t(`message.help.${kind}.${audience}`)
+            }
+            hintTone={linkMissing ? 'danger' : 'neutral'}
+          >
+            {({ id, describedBy, invalid }) => (
+              <Textarea
+                id={id}
+                aria-describedby={describedBy}
+                invalid={invalid}
+                rows={7}
+                maxLength={BODY_MAX}
+                value={body}
+                onChange={(event) => setBody(event.target.value)}
+              />
+            )}
+          </FormField>
+        )}
+        {!qr && (dirty || !template.isDefault) && (
           <button
             type="button"
             className="kore-send__restore"
@@ -205,7 +213,7 @@ function ChannelForm({
           </button>
         )}
       </div>
-      {previewItem && (
+      {previewItem && !qr && (
         <aside
           className="kore-send__preview"
           aria-label={t('message.previewTitle', { name: previewItem.name })}

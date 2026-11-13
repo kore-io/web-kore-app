@@ -25,6 +25,11 @@
   @apply flex justify-center py-12;
 }
 
+/* O Lembrar pendentes do Stat Card: o link no texto de apoio, em primary sublinhado. */
+.kore-deadline__remind {
+  @apply rounded-sm font-semibold text-primary-dark underline focus-visible:shadow-focus-ring focus-visible:outline-none;
+}
+
 .kore-deadline__actions {
   @apply flex flex-col-reverse gap-3 md:flex-row md:justify-end;
 }
@@ -171,4 +176,13 @@
 
 .kore-send__restore {
   @apply self-start cursor-pointer border-0 bg-transparent p-0 type-caption text-primary-dark hover:underline disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+/* A lista do QR code (Penpot A6): um cartão só, os grupos separados por linha, sem botão. */
+.kore-send__qr-list {
+  @apply m-0 flex list-none flex-col rounded-lg border border-gray-300 bg-white px-5 py-2;
+}
+
+.kore-send__qr-item {
+  @apply flex flex-col gap-0.5 border-b border-gray-300 py-3 last:border-b-0;
 }
