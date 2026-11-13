@@ -3,10 +3,10 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { guestPartyEditPath, guestPartyPath } from '../../../app/paths';
 import { getPartiesControllerGetV1QueryOptions } from '../../../shared/api/generated/parties/parties';
 import type { PartyListItemResponse } from '../../../shared/api/generated/model';
 import type { RowAction } from '../components/party-row-menu';
+import { useAreaPaths } from '../../../app/area';
 
 /**
  * As ações do ⋮ da lista. Copiar link e Mover para a lixeira precisam do grupo inteiro
@@ -14,6 +14,7 @@ import type { RowAction } from '../components/party-row-menu';
  * pelo mesmo GET do Painel, e reaproveita o cache dele.
  */
 export function useRowActions({ weddingId }: { weddingId: string }) {
+  const area = useAreaPaths();
   const { t } = useTranslation('guests');
   const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
@@ -49,8 +50,8 @@ export function useRowActions({ weddingId }: { weddingId: string }) {
       trigger: HTMLElement | null;
     }) => {
       trigger.current = button;
-      if (action === 'open') void navigate(guestPartyPath({ partyId: row.id }));
-      if (action === 'edit') void navigate(guestPartyEditPath({ partyId: row.id }));
+      if (action === 'open') void navigate(area.guestParty({ partyId: row.id }));
+      if (action === 'edit') void navigate(area.guestPartyEdit({ partyId: row.id }));
       if (action === 'copy') {
         const url = party(row.id).then((detail) => {
           if (!detail.link.url) throw new Error('sem link');

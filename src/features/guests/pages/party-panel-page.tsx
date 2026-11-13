@@ -11,7 +11,6 @@ import { Check, Clock, X } from 'lucide-react';
 import { useId, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate, useNavigate, useParams } from 'react-router';
-import { guestPartyEditPath, paths } from '../../../app/paths';
 import type {
   PartyGuestResponse,
   PartyGuestResponseRsvpStatus,
@@ -28,6 +27,7 @@ import { useMoveGuest } from '../hooks/use-move-guest';
 import { useResponseLock } from '../hooks/use-response-lock';
 import { useTrash } from '../hooks/use-trash';
 import { usePartyPanel } from '../hooks/use-party-panel';
+import { useAreaPaths } from '../../../app/area';
 
 /** Selo da resposta do convidado, como os Badges do DS. */
 const rsvpBadges: Record<PartyGuestResponseRsvpStatus, { tone: BadgeTone; icon: ReactNode }> = {
@@ -55,6 +55,7 @@ function PartyPanel({
   audience: Audience;
   role: string | undefined;
 }) {
+  const area = useAreaPaths();
   const { t } = useTranslation('guests');
   const lock = useResponseLock({ weddingId, role });
   const panel = usePartyPanel({ weddingId, partyId });
@@ -70,14 +71,14 @@ function PartyPanel({
   // O ⋮ do convidado que abriu o Mover de grupo: o foco volta a ele (o item do menu some).
   const menuButton = useRef<HTMLElement | null>(null);
 
-  if (panel.notFound) return <Navigate to={paths.guests} replace />;
+  if (panel.notFound) return <Navigate to={area.guests} replace />;
   if (panel.isError) return <LoadErrorNotice onRetry={panel.retry} />;
   const { party } = panel;
   if (!party) return null;
 
   return (
     <div className="kore-party-panel">
-      <Link to={paths.guests} className="kore-party-panel__back">
+      <Link to={area.guests} className="kore-party-panel__back">
         {t('panel.back')}
       </Link>
       <PageHeader
@@ -88,7 +89,7 @@ function PartyPanel({
             <Button variant="secondary" onClick={() => setConfirming(true)}>
               {t('panel.regenerate')}
             </Button>
-            <Button onClick={() => void navigate(guestPartyEditPath({ partyId: party.id }))}>
+            <Button onClick={() => void navigate(area.guestPartyEdit({ partyId: party.id }))}>
               {t('partyForm.editButton')}
             </Button>
           </>
@@ -176,7 +177,7 @@ function PartyPanel({
             onDone: (ok) => {
               setTrashingParty(false);
               // O grupo saiu da lista: o Painel volta para ela.
-              if (ok) void navigate(paths.guests);
+              if (ok) void navigate(area.guests);
             },
           })
         }

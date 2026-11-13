@@ -9,7 +9,7 @@ import { menuUser } from '../../features/access/session-user';
 import { useNotificationsControllerUnreadV1 } from '../../shared/api/generated/notifications/notifications';
 import { useSiteControllerGetV1 } from '../../shared/api/generated/site/site';
 import { LoadError } from '../../shared/components/load-error';
-import { paths } from '../paths';
+import { areaPaths, COUPLE_AREA } from '../area';
 import { AppShell } from './app-shell';
 import { SiteStatusBadge } from './site-status-badge';
 
@@ -19,14 +19,17 @@ import { SiteStatusBadge } from './site-status-badge';
  * ativo: Casal · Ana & Marcos" e só o Sair na F0. Enquanto o /me carrega (ou redireciona),
  * nada aparece; se ele falhar por rede ou 5xx, o aviso com o Tentar de novo (decisão 164).
  */
+/** Os caminhos da área do casal, em `/app`. */
+const AREA = areaPaths(COUPLE_AREA.base);
+
 export function CoupleAreaLayout() {
   const { t } = useTranslation('layout');
   const { me, failed, retry } = useCoupleSession();
   const signOut = useSignOut();
-  const onGuests = useMatch({ path: paths.guests, end: false }) !== null;
-  const onSite = useMatch({ path: paths.site, end: false }) !== null;
-  const onDeliveries = useMatch({ path: paths.deliveries, end: false }) !== null;
-  const onSongs = useMatch({ path: paths.songs, end: false }) !== null;
+  const onGuests = useMatch({ path: AREA.guests, end: false }) !== null;
+  const onSite = useMatch({ path: AREA.site, end: false }) !== null;
+  const onDeliveries = useMatch({ path: AREA.deliveries, end: false }) !== null;
+  const onSongs = useMatch({ path: AREA.songs, end: false }) !== null;
   // Músicas só com a pergunta de música ligada (Música RN03), pelo mesmo GET do Editor.
   const { weddingId, role } = useActiveWedding();
   const navigate = useNavigate();
@@ -51,7 +54,7 @@ export function CoupleAreaLayout() {
   // O selo de status do site na Topbar (Dashboard RN07; decisão 239(B3)).
   const siteStatusValue = (site.data as { status?: unknown } | undefined)?.status;
   // O Dashboard só em /app: telas sem item na Sidebar (ex.: Publicar o site) não marcam nada.
-  const onDashboard = useMatch({ path: paths.coupleArea, end: true }) !== null;
+  const onDashboard = useMatch({ path: AREA.dashboard, end: true }) !== null;
 
   // Sem os dados da pessoa, sem o AppShell: o aviso no meio da tela (decisão 164).
   if (failed) return <LoadError onRetry={retry} />;
@@ -74,32 +77,32 @@ export function CoupleAreaLayout() {
           {
             id: 'settings',
             label: t('settings'),
-            onSelect: () => void navigate(paths.settingsNotifications),
+            onSelect: () => void navigate(AREA.settingsNotifications),
           },
         ],
         [{ id: 'sign-out', label: t('signOut'), onSelect: signOut }],
       ]}
       notifications={{
         unread: owner ? (unread.data?.unreadCount ?? 0) : 0,
-        onOpen: () => void navigate(paths.notifications),
+        onOpen: () => void navigate(AREA.notifications),
       }}
       navigation={
         <>
           <NavItem asChild icon={<LayoutDashboard />} current={onDashboard}>
-            <Link to={paths.coupleArea}>{t('nav.dashboard')}</Link>
+            <Link to={AREA.dashboard}>{t('nav.dashboard')}</Link>
           </NavItem>
           <NavItem asChild icon={<Users />} current={onGuests}>
-            <Link to={paths.guests}>{t('nav.guests')}</Link>
+            <Link to={AREA.guests}>{t('nav.guests')}</Link>
           </NavItem>
           <NavItem asChild icon={<Send />} current={onDeliveries}>
-            <Link to={paths.deliveries}>{t('nav.deliveries')}</Link>
+            <Link to={AREA.deliveries}>{t('nav.deliveries')}</Link>
           </NavItem>
           <NavItem asChild icon={<Globe />} current={onSite}>
-            <Link to={paths.site}>{t('nav.site')}</Link>
+            <Link to={AREA.site}>{t('nav.site')}</Link>
           </NavItem>
           {songsEnabled && (
             <NavItem asChild icon={<Music />} current={onSongs}>
-              <Link to={paths.songs}>{t('nav.songs')}</Link>
+              <Link to={AREA.songs}>{t('nav.songs')}</Link>
             </NavItem>
           )}
         </>

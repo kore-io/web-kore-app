@@ -2,7 +2,6 @@ import { Button, Dialog, PageHeader, Select, Spinner, Tab, Tabs } from '@kore-io
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate, useBlocker, useNavigate, useParams } from 'react-router';
-import { siteSectionPath } from '../../../app/paths';
 import type { SiteEditorAppearanceResponse } from '../../../shared/api/generated/model';
 import { useSiteControllerGetV1 } from '../../../shared/api/generated/site/site';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
@@ -30,15 +29,17 @@ import {
   type SectionKey,
 } from '../sections';
 import { savedAtText, siteStatus } from '../site-texts';
+import { useAreaPaths } from '../../../app/area';
 
 type MobileTab = 'sections' | 'edit' | 'preview';
 
 /** Site › Editor (Dados básicos RN01, RN10, RN11; decisão 214). */
 export function SiteEditorPage() {
+  const area = useAreaPaths();
   const { weddingId, audience } = useActiveWedding();
   const { section: slug } = useParams();
   const section = sectionBySlug(slug);
-  if (!section) return <Navigate to={siteSectionPath({ section: FIRST_SECTION_SLUG })} replace />;
+  if (!section) return <Navigate to={area.siteSection({ section: FIRST_SECTION_SLUG })} replace />;
   if (!weddingId) return null;
   return <SiteEditor weddingId={weddingId} sectionKey={section.key} audience={audience} />;
 }
@@ -52,6 +53,7 @@ function SiteEditor({
   sectionKey: SectionKey;
   audience: Audience;
 }) {
+  const area = useAreaPaths();
   const { t } = useTranslation('site');
   const navigate = useNavigate();
   const site = useSiteControllerGetV1(weddingId);
@@ -122,7 +124,7 @@ function SiteEditor({
         {EDITOR_SECTIONS.map(({ key, slug }) => (
           <li key={key}>
             <Link
-              to={siteSectionPath({ section: slug })}
+              to={area.siteSection({ section: slug })}
               className="kore-site-editor__item"
               aria-current={key === sectionKey ? 'page' : undefined}
               onClick={() => setTab('edit')}
@@ -198,7 +200,7 @@ function SiteEditor({
               value={sectionKey}
               onChange={(event) => {
                 const next = EDITOR_SECTIONS.find((item) => item.key === event.target.value);
-                if (next) void navigate(siteSectionPath({ section: next.slug }));
+                if (next) void navigate(area.siteSection({ section: next.slug }));
               }}
             >
               {EDITOR_SECTIONS.map(({ key }) => (

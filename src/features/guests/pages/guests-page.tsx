@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router';
-import { paths } from '../../../app/paths';
 import { presetDeliverySelection } from '../../deliveries/hooks/use-delivery-selection';
 import { EmptyState, Spinner } from '@kore-io/design';
 import { SearchX, Users } from 'lucide-react';
@@ -19,6 +18,7 @@ import { usePartyFilters } from '../hooks/use-party-filters';
 import { usePartyList } from '../hooks/use-party-list';
 import { usePartySelection } from '../hooks/use-party-selection';
 import { useRowActions } from '../hooks/use-row-actions';
+import { useAreaPaths } from '../../../app/area';
 
 /** Aba Grupos e convidados (RN13 de Grupos e convidados), dentro do GuestsLayout. */
 export function GuestsPage() {
@@ -36,6 +36,7 @@ function PartiesView({
   audience: Audience;
   role: string | undefined;
 }) {
+  const area = useAreaPaths();
   const { t } = useTranslation('guests');
   const navigate = useNavigate();
   const { filters: urlFilters, setFilters } = usePartyFilters();
@@ -119,7 +120,7 @@ function PartiesView({
               kind: 'reminder',
               ids: marked.map((party) => party.id),
             });
-            void navigate(paths.deliveryReminder);
+            void navigate(area.deliveryReminder);
           }}
           tags={tags.data?.data ?? []}
           isApplying={applyTag.isApplying}

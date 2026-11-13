@@ -4,7 +4,6 @@ import { Bell } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { guestPartyPath, paths } from '../../../app/paths';
 import type {
   NotificationEntryResponse,
   NotificationResponse,
@@ -23,6 +22,7 @@ import { useActiveWedding } from '../../guests/hooks/use-active-wedding';
 import { useMarkNotificationRead } from '../hooks/use-mark-notification-read';
 import { isResponseItem, responseGroups } from '../notification-shape';
 import { guestsByRespondedAt } from '../../guests/hooks/use-party-filters';
+import { useAreaPaths } from '../../../app/area';
 
 type Filter = '' | NotificationsControllerListV1Type;
 
@@ -165,6 +165,7 @@ function Notifications({ weddingId }: { weddingId: string }) {
  * e o peso maior, e "não lida" para o leitor de tela.
  */
 function NotificationItem({ weddingId, item }: { weddingId: string; item: NotificationResponse }) {
+  const area = useAreaPaths();
   const { t } = useTranslation('notifications');
   const { t: tDashboard } = useTranslation('dashboard');
   const navigate = useNavigate();
@@ -185,7 +186,7 @@ function NotificationItem({ weddingId, item }: { weddingId: string; item: Notifi
         onClick={() => {
           if (unread) markRead({ id: item.id });
           void navigate(
-            single ? guestPartyPath({ partyId: first.partyId }) : guestsByRespondedAt(paths.guests),
+            single ? area.guestParty({ partyId: first.partyId }) : guestsByRespondedAt(area.guests),
           );
         }}
       >

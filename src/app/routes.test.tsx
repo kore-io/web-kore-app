@@ -1,6 +1,7 @@
 import { render } from '@testing-library/react';
 import { createMemoryRouter, matchRoutes, RouterProvider } from 'react-router';
 import { describe, expect, it } from 'vitest';
+import { areaPaths, plannerWeddingBase } from './area';
 import { paths } from './paths';
 import { routes } from './routes';
 
@@ -20,25 +21,49 @@ describe('rotas do app (decisões 139, 146, 147 e 198)', () => {
       signUp: '/cadastro',
       sessionExpired: '/sessao-expirada',
       coupleArea: '/app',
+      plannerWedding: '/cerimonialista/casamentos/:weddingId',
+    });
+  });
+
+  it('os caminhos das telas do casamento, a partir do caminho-base (Colaboradora RN09)', () => {
+    const { guestParty, guestPartyEdit, siteSection, ...couple } = areaPaths('/app');
+    expect(couple).toEqual({
+      dashboard: '/app',
       guests: '/app/convidados',
       guestImport: '/app/convidados/importar',
       guestExport: '/app/convidados/exportar',
+      guestTags: '/app/convidados/tags',
+      guestTrash: '/app/convidados/lixeira',
       guestNew: '/app/convidados/novo',
-      guestPartyEdit: '/app/convidados/grupos/:partyId/editar',
-      site: '/app/site',
-      songs: '/app/musicas',
-      notifications: '/app/notificacoes',
-      settingsNotifications: '/app/configuracoes/notificacoes',
       deliveries: '/app/envios',
       deliveryInvites: '/app/envios/convites',
       deliverySaveTheDate: '/app/envios/save-the-date',
       deliveryReminder: '/app/envios/lembrete',
       deliveryDeadline: '/app/envios/prazo',
-      siteSection: '/app/site/:section',
-      guestTags: '/app/convidados/tags',
-      guestTrash: '/app/convidados/lixeira',
-      guestParty: '/app/convidados/grupos/:partyId',
+      songs: '/app/musicas',
+      notifications: '/app/notificacoes',
+      settingsNotifications: '/app/configuracoes/notificacoes',
+      site: '/app/site',
     });
+    expect(guestParty({ partyId: 'p1' })).toBe('/app/convidados/grupos/p1');
+    expect(guestPartyEdit({ partyId: 'p1' })).toBe('/app/convidados/grupos/p1/editar');
+    expect(siteSection({ section: 'faq' })).toBe('/app/site/faq');
+    const planner = areaPaths(plannerWeddingBase({ weddingId: 'w9' }));
+    expect(planner.guests).toBe('/cerimonialista/casamentos/w9/convidados');
+    expect(planner.guestParty({ partyId: 'p1' })).toBe(
+      '/cerimonialista/casamentos/w9/convidados/grupos/p1',
+    );
+  });
+
+  it.each([
+    ['/cerimonialista/casamentos/w9', 'planner-dashboard'],
+    ['/cerimonialista/casamentos/w9/convidados', 'planner-guests'],
+    ['/cerimonialista/casamentos/w9/convidados/grupos/p1', 'planner-guest-party'],
+    ['/cerimonialista/casamentos/w9/envios/convites', 'planner-delivery-invites'],
+    ['/cerimonialista/casamentos/w9/site/dados-basicos', 'planner-site-editor'],
+    ['/cerimonialista/casamentos/w9/musicas', 'planner-songs'],
+  ])('%s abre a mesma tela na área da colaboradora (%s)', (url, id) => {
+    expect(routeIdAt({ url })).toBe(id);
   });
 
   it.each([
