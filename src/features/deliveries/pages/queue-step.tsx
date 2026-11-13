@@ -13,6 +13,7 @@ import {
 import { getPartiesControllerListV1InfiniteQueryKey } from '../../../shared/api/generated/parties/parties';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import type { Audience } from '../../guests/hooks/use-active-wedding';
+import { useWeddingTimezone } from '../../../shared/use-wedding-timezone';
 import { deliveryStatusText, sentAtOf, type DeliveryKind } from '../delivery-texts';
 import { DELIVERY_LIMIT, useDeliverySelection } from '../hooks/use-delivery-selection';
 import { QrStep } from './qr-step';
@@ -61,6 +62,8 @@ function ChannelQueue({
   const [, setSearch] = useSearchParams();
   const navigate = useNavigate();
   const selection = useDeliverySelection({ weddingId, kind, visibleIds: [] });
+  // A hora do envio no fuso do casamento (decisão 248).
+  const timezone = useWeddingTimezone({ weddingId });
   const channel = selection.channel === 'qr' ? 'whatsapp' : selection.channel;
   const ids = selection.ids.slice(0, DELIVERY_LIMIT);
   const queue = useDeliveriesControllerGetQueueV1(
@@ -149,6 +152,7 @@ function ChannelQueue({
             at: local?.at ?? sentAtOf({ kind, item }),
             channel: local?.channel ?? item.lastChannel,
             now: new Date(),
+            timezone,
           });
           const done = Boolean(local ?? sentAtOf({ kind, item }));
           const missing =

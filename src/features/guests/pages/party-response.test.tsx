@@ -244,7 +244,8 @@ describe('Alterar resposta pelo casal (Prazo e respostas RN04; Penpot A8)', () =
 describe('o Histórico do grupo no Painel (Prazo e respostas RN05)', () => {
   it('as linhas da mais nova para a mais antiga, com a hora; vazio, oculto', async () => {
     const at = (day: number, hour: number, minute: number) =>
-      new Date(2026, 8, day, hour, minute).toISOString();
+      // A hora em São Paulo (UTC-3), o fuso do casamento (decisão 248), em qualquer máquina.
+      new Date(Date.UTC(2026, 8, day, hour + 3, minute)).toISOString();
     mockPanel({
       party: moreira({
         history: [

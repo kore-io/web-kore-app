@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { historyAt, historyLine } from './party-history';
 
 const t = i18next.getFixedT('pt-BR', 'guests');
-const at = new Date(2026, 8, 12, 20, 14).toISOString();
+const SP = 'America/Sao_Paulo';
+// 20h14 de 12/09 em São Paulo.
+const at = '2026-09-12T23:14:00Z';
 const line = (entry: object) =>
   historyLine({ t, entry: { at, ...entry } as never, plusOneLabel: 'Acompanhante' });
 
@@ -47,7 +49,15 @@ describe('o Histórico do grupo (Prazo e respostas RN05)', () => {
   });
 
   it('a hora: "12/09 às 20h14" e a cheia sem minutos', () => {
-    expect(historyAt({ t, at })).toBe('12/09 às 20h14');
-    expect(historyAt({ t, at: new Date(2026, 5, 21, 9, 0).toISOString() })).toBe('21/06 às 9h');
+    expect(historyAt({ t, at, timezone: SP })).toBe('12/09 às 20h14');
+    expect(historyAt({ t, at: '2026-06-21T12:00:00Z', timezone: SP })).toBe('21/06 às 9h');
+  });
+
+  it('a hora no fuso do casamento, não no do aparelho (decisão 248)', () => {
+    // 01h30 UTC de 13/09 é 22h30 de 12/09 em São Paulo e 21h30 em Manaus.
+    expect(historyAt({ t, at: '2026-09-13T01:30:00Z', timezone: SP })).toBe('12/09 às 22h30');
+    expect(historyAt({ t, at: '2026-09-13T01:30:00Z', timezone: 'America/Manaus' })).toBe(
+      '12/09 às 21h30',
+    );
   });
 });

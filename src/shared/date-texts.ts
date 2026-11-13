@@ -27,11 +27,12 @@ export const DEFAULT_TIMEZONE = 'America/Sao_Paulo';
 
 /**
  * A data curta e a hora de um instante no fuso do casamento, como no .xlsx (decisão 246):
- * "12/09" e "20h14"; na hora cheia, "20h" (Voz).
+ * "12/09" e "20h14"; na hora cheia, "20h" (Voz). O `day` serve para saber se é hoje no fuso.
  */
 export function dayAndTimeIn({ at, timezone }: { at: string; timezone: string | null }) {
   const parts = new Intl.DateTimeFormat('en-GB', {
     timeZone: timezone ?? DEFAULT_TIMEZONE,
+    year: 'numeric',
     day: '2-digit',
     month: '2-digit',
     hour: 'numeric',
@@ -45,5 +46,7 @@ export function dayAndTimeIn({ at, timezone }: { at: string; timezone: string | 
   return {
     date: `${part('day')}/${part('month')}`,
     time: minute === '00' ? `${hour}h` : `${hour}h${minute}`,
+    /** O dia no fuso, para comparar ("é hoje?"): "2026-09-12". */
+    day: `${part('year')}-${part('month')}-${part('day')}`,
   };
 }
