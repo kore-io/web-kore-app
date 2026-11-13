@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
 import { signIn, toast } from './support/app';
 import {
@@ -130,5 +131,92 @@ test.describe('Envios (RN01 a RN08; decisão 235)', () => {
         return rows[0]?.save_the_date_sent_at !== null && rows[0]?.delivery_status === 'not_sent';
       })
       .toBe(true);
+  });
+
+  test('o QR code do convite: o PDF com vários grupos e a imagem com um, que marcam o envio (RN09)', async ({
+    page,
+  }) => {
+    test.setTimeout(120_000);
+    const email = `e2e-qr-${unique()}@exemplo.kore.local`;
+    const userId = await createUser({ db, email, name: 'Ana Beatriz Moreira' });
+    const weddingId = await createWedding({
+      db,
+      partners: ['Ana Beatriz Moreira', 'Marcos Vinícius Rocha'],
+      eventDate: '2027-05-15',
+      city: 'Campinas',
+      status: 'draft',
+      createdByUserId: userId,
+      owners: [userId, null],
+    });
+    await db.query(
+      `update weddings set status = 'published', published_at = now(), end_date = '2027-08-15',
+         publication_source = 'courtesy' where id = $1`,
+      [weddingId],
+    );
+    await signIn({ page, email });
+    const newParty = async (name: string) =>
+      (await (
+        await page.request.post(`${API_URL}/v1/weddings/${weddingId}/parties`, {
+          headers: APP,
+          data: { name, guests: [{ name: `${name} contato`, phone: '+5519998763310' }] },
+        })
+      ).json()) as { id: string };
+    const moreira = await newParty('Família Moreira');
+    const jorge = await newParty('Tio Jorge');
+    const helena = await newParty('Vó Helena');
+    const channels = async (ids: string[]) =>
+      (
+        await db.query<{ last_channel: string; delivery_status: string }>(
+          'select last_channel, delivery_status from parties where id = any($1) order by id',
+          [ids],
+        )
+      ).rows;
+
+    // Vários grupos: o PDF para impressão.
+    await page.goto('/app/envios/convites');
+    await page.getByRole('checkbox', { name: /Família Moreira/ }).check({ force: true });
+    await page.getByRole('checkbox', { name: /Tio Jorge/ }).check({ force: true });
+    await page.getByRole('button', { name: 'Continuar' }).click();
+    await page.getByRole('radio', { name: 'QR code' }).check({ force: true });
+    await expect(page.getByRole('textbox', { name: 'Mensagem' })).toHaveCount(0);
+    await page.getByRole('button', { name: 'Ir para a fila (2 grupos)' }).click();
+    await expect(page.getByText('Tio Jorge', { exact: true })).toBeVisible();
+    const [pdf] = await Promise.all([
+      page.waitForEvent('download'),
+      page.getByRole('button', { name: 'Baixar PDF para impressão' }).click(),
+    ]);
+    expect(pdf.suggestedFilename()).toMatch(/^qr-.+\.pdf$/);
+    const pdfBytes = await readFile((await pdf.path()) ?? '');
+    expect(pdfBytes.subarray(0, 4).toString()).toBe('%PDF');
+    await expect(
+      toast({ page, text: 'QR code baixado. 2 grupos marcados como enviados.' }),
+    ).toBeVisible();
+    expect(await channels([moreira.id, jorge.id])).toEqual([
+      { last_channel: 'qr', delivery_status: 'sent' },
+      { last_channel: 'qr', delivery_status: 'sent' },
+    ]);
+
+    // Um grupo: a imagem (PNG).
+    // A seleção do aparelho volta vazia, com o canal QR guardado (RN07).
+    await page.evaluate((id) => {
+      window.sessionStorage.setItem(
+        `kore.deliveries.${id}.invite`,
+        JSON.stringify({ ids: [], channel: 'qr' }),
+      );
+    }, weddingId);
+    await page.goto('/app/envios/convites');
+    await page.getByRole('checkbox', { name: /Vó Helena/ }).check({ force: true });
+    await page.getByRole('button', { name: 'Continuar' }).click();
+    await expect(page.getByRole('radio', { name: 'QR code' })).toBeChecked();
+    await page.getByRole('button', { name: 'Ir para a fila (1 grupo)' }).click();
+    const [png] = await Promise.all([
+      page.waitForEvent('download'),
+      page.getByRole('button', { name: 'Baixar imagem (PNG)' }).click(),
+    ]);
+    expect(png.suggestedFilename()).toMatch(/^qr-.+\.png$/);
+    await expect(
+      toast({ page, text: 'QR code baixado. O grupo foi marcado como enviado.' }),
+    ).toBeVisible();
+    expect(await channels([helena.id])).toEqual([{ last_channel: 'qr', delivery_status: 'sent' }]);
   });
 });
