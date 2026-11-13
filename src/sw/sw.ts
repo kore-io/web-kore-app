@@ -65,9 +65,14 @@ self.addEventListener('notificationclick', (event) => {
       const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
       const open = windows.find((client) => new URL(client.url).origin === target.origin);
       if (open) {
-        await open.focus();
-        await open.navigate(target.href);
-        return;
+        try {
+          await open.focus();
+          await open.navigate(target.href);
+          return;
+        } catch {
+          // A aba pode não estar sob este service worker (includeUncontrolled): o navigate()
+          // lança; abre uma janela nova (sugestão do Crivo no C9).
+        }
       }
       await self.clients.openWindow(target.href);
     })(),
