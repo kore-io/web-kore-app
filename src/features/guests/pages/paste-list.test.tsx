@@ -97,6 +97,9 @@ function mockPaste({
         nextCursor: null,
       });
     }
+    // A Sidebar lê o site (o item Músicas, Música RN03): não é chamada da tela.
+    if (path === '/v1/weddings/w1/site')
+      return apiError({ status: 404, body: { error: 'NOT_FOUND' } });
     calls.push({ method, path, body });
     if (path === '/v1/weddings/w1/guest-imports/paste/preview') return previewResponse();
     if (path === '/v1/weddings/w1/guest-imports/paste') return importResponse();

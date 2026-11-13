@@ -44,6 +44,11 @@ export const paths = {
   deliveryReminder: '/app/envios/lembrete',
   /** Envios › Prazo de resposta (Prazo e respostas RN02; decisão 217(13)). */
   deliveryDeadline: '/app/envios/prazo',
+  /**
+   * Músicas (Música RN05): só com a pergunta de música ligada; desligada, leva ao Editor ›
+   * Pergunta de música (RN03).
+   */
+  songs: '/app/musicas',
   /** Site › Editor (decisão 214): /app/site abre os Dados básicos. */
   site: '/app/site',
   siteSection: '/app/site/:section',

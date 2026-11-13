@@ -1,0 +1,59 @@
+/* Músicas (Música RN05): a tabela no computador; no celular e no tablet, um cartão por
+   sugestão, com o nome de cada coluna antes do valor. */
+.kore-songs {
+  @apply flex flex-col gap-6;
+}
+
+.kore-songs__actions {
+  @apply flex flex-col items-stretch gap-2 md:items-start lg:items-end;
+}
+
+.kore-songs__export-help {
+  @apply m-0 type-caption text-gray-700;
+}
+
+.kore-songs__loading {
+  @apply flex justify-center py-6;
+}
+
+.kore-songs__sentinel {
+  @apply h-px;
+}
+
+.kore-songs__caption {
+  @apply sr-only;
+}
+
+.kore-songs__table {
+  @apply w-full border-separate border-spacing-0 overflow-hidden rounded-lg border border-gray-300 bg-white;
+}
+
+/* No cartão, o cabeçalho sai da tela, mas fica para o leitor de tela. */
+.kore-songs__table thead {
+  @apply max-lg:sr-only;
+}
+
+.kore-songs__table th {
+  @apply bg-gray-100 px-4 py-3 text-left type-overline text-gray-700;
+}
+
+.kore-songs__table tbody tr {
+  @apply flex flex-col gap-1 border-b border-gray-300 px-4 py-3 last:border-b-0 lg:table-row lg:p-0;
+}
+
+.kore-songs__table td {
+  @apply type-body-md text-ink lg:border-b lg:border-gray-300 lg:px-4 lg:py-3;
+}
+
+.kore-songs__table tbody tr:last-child td {
+  @apply lg:border-b-0;
+}
+
+/* No cartão, o nome da coluna antes do valor; a música vai sozinha, em destaque. */
+.kore-songs__label {
+  @apply text-gray-700 lg:hidden;
+}
+
+.kore-songs__song {
+  @apply type-label;
+}

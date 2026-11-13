@@ -15,6 +15,7 @@ import { GuestsPage } from '../features/guests/pages/guests-page';
 import { ExportPage } from '../features/guests/pages/export-page';
 import { PublishPage } from '../features/publication/pages/publish-page';
 import { SiteEditorPage } from '../features/site/pages/site-editor-page';
+import { SongsPage } from '../features/songs/pages/songs-page';
 import { ImportPage } from '../features/guests/pages/import-page';
 import { EditPartyPage, NewPartyPage } from '../features/guests/pages/party-form-page';
 import { PartyPanelPage } from '../features/guests/pages/party-panel-page';
@@ -63,6 +64,7 @@ export const routes: RouteObject[] = [
           },
           { id: 'site-editor', path: 'site/:section', element: <SiteEditorPage /> },
           { id: 'publish', path: 'cobranca/publicar', element: <PublishPage /> },
+          { id: 'songs', path: 'musicas', element: <SongsPage /> },
           {
             path: 'envios',
             element: <DeliveriesLayout />,

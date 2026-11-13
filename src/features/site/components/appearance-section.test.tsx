@@ -40,6 +40,7 @@ const me = {
 const site = {
   publishedAt: null,
   siteUpdatedAt: '2026-11-11T13:31:00Z',
+  songQuestion: { enabled: false, text: 'Que música não pode faltar na festa?' },
   partners: [
     { id: 'pa', title: 'bride', name: 'Ana Beatriz Moreira' },
     { id: 'pm', title: 'groom', name: 'Marcos Vinícius Rocha' },

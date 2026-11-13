@@ -10,7 +10,8 @@
     "dashboard": "Dashboard",
     "guests": "Convidados",
     "deliveries": "Envios",
-    "site": "Site"
+    "site": "Site",
+    "songs": "Músicas"
   },
   "activeProfileCouple": "Perfil ativo: Casal",
   "activeProfileCoupleWedding": "Perfil ativo: Casal · {{couple}}",
