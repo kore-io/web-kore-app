@@ -37,7 +37,7 @@ export interface PartyFilters {
 export const SEARCH_MAX_LENGTH = 80;
 
 function pick<T extends string>({ value, options }: { value: string | null; options: object }) {
-  return value !== null && value in options ? (value as T) : '';
+  return value !== null && Object.hasOwn(options, value) ? (value as T) : '';
 }
 
 /** Filtros e busca da lista, guardados na URL (o voltar do navegador e o link funcionam). */

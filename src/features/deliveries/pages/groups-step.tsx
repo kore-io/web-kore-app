@@ -41,7 +41,7 @@ export function GroupsStep({
   // Dashboard RN02); sem ele, "não enviado" (Envios RN04).
   const [sent, setSent] = useState<SentFilter>(() => {
     const fromUrl = search.get('envio');
-    return fromUrl && fromUrl in sentFilters
+    return fromUrl && Object.hasOwn(sentFilters, fromUrl)
       ? sentFilters[fromUrl as keyof typeof sentFilters]
       : 'not_sent';
   });
