@@ -34,10 +34,17 @@ const me = (overrides: Record<string, unknown> = {}) => ({
   ...overrides,
 });
 
+/** Só o /me responde; as telas da área (o Dashboard) ficam com o 404 e o aviso delas. */
+function meOnly(path: string, body: object = me()) {
+  return path === '/v1/me'
+    ? Response.json(body)
+    : apiError({ status: 404, body: { error: 'NOT_FOUND' } });
+}
+
 describe('área do casal com o /v1/me (decisão 163)', () => {
   it('a Topbar e o menu com os nomes do casal, a pessoa e só o Sair (163(2))', async () => {
     const user = userEvent.setup();
-    mockApi(() => Response.json(me()));
+    mockApi(({ path }) => meOnly(path));
     renderRoute({ url: '/app' });
     const trigger = await screen.findByRole('button', { name: 'Menu do usuário' });
     expect(screen.getByRole('link', { name: 'Dashboard' })).toHaveAttribute('aria-current', 'page');
@@ -57,8 +64,9 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
   });
 
   it('conta sem nome: o e-mail no lugar do nome', async () => {
-    mockApi(() =>
-      Response.json(
+    mockApi(({ path }) =>
+      meOnly(
+        path,
         me({ user: { id: 'u1', name: null, email: 'ana@exemplo.com', platformRole: 'none' } }),
       ),
     );
@@ -76,8 +84,9 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
 
   it('com outro perfil ativo (ou nenhum): vai à Seleção de perfil (RN14)', async () => {
     // Dois perfis com o de cerimonialista ativo: a Seleção mostra a escolha.
-    mockApi(() =>
-      Response.json(
+    mockApi(({ path }) =>
+      meOnly(
+        path,
         me({
           activeProfile: 'planner',
           profiles: ['couple', 'planner'],
@@ -97,7 +106,7 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
     const requests: string[] = [];
     mockApi(({ method, path }) => {
       requests.push(`${method} ${path}`);
-      return path === '/v1/auth/logout' ? new Response(null, { status: 204 }) : Response.json(me());
+      return path === '/v1/auth/logout' ? new Response(null, { status: 204 }) : meOnly(path);
     });
     const { router } = renderRoute({ url: '/app' });
     await user.click(await screen.findByRole('button', { name: 'Menu do usuário' }));
@@ -111,7 +120,7 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
     mockApi(({ path }) =>
       path === '/v1/auth/logout'
         ? apiError({ status: 401, body: { error: 'SESSION_EXPIRED' } })
-        : Response.json(me()),
+        : meOnly(path),
     );
     const { router } = renderRoute({ url: '/app' });
     await user.click(await screen.findByRole('button', { name: 'Menu do usuário' }));
@@ -125,7 +134,7 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
     ['5xx', () => apiError({ status: 503, body: { error: 'Service Unavailable' } })],
   ])('se o Sair falhar (%s), avisa no Toast e fica na área (decisão 163(5))', async (_, fail) => {
     const user = userEvent.setup();
-    mockApi(({ path }) => (path === '/v1/auth/logout' ? fail() : Response.json(me())));
+    mockApi(({ path }) => (path === '/v1/auth/logout' ? fail() : meOnly(path)));
     const { router } = renderRoute({ url: '/app' });
     await user.click(await screen.findByRole('button', { name: 'Menu do usuário' }));
     await user.click(await screen.findByRole('menuitem', { name: 'Sair' }));
@@ -155,7 +164,8 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
       await expectNoA11yViolations({ container });
       await user.click(screen.getByRole('button', { name: 'Tentar de novo' }));
       expect(await screen.findByRole('button', { name: 'Menu do usuário' })).toBeInTheDocument();
-      expect(calls).toBe(2);
+      // O Tentar de novo refaz o /me; o Dashboard, ao montar, também o relê (useActiveWedding).
+      expect(calls).toBeGreaterThanOrEqual(2);
     },
   );
 });

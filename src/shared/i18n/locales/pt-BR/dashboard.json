@@ -1,0 +1,95 @@
+{
+  "title": "Dashboard",
+  "header": {
+    "greeting": "Olá, {{name}}",
+    "countdown_one": "Falta {{count}} dia para o casamento · {{date}}",
+    "countdown_other": "Faltam {{count}} dias para o casamento · {{date}}",
+    "today": "O casamento é hoje!",
+    "collaborator": "Você colabora neste casamento."
+  },
+  "actions": {
+    "sendInvites": "Enviar convites",
+    "editSite": "Editar site",
+    "closed": {
+      "couple": "Publiquem o site para começar os envios.",
+      "planner": "Os envios começam depois que o casal publicar o site."
+    }
+  },
+  "guests": {
+    "title": "Convidados",
+    "parties_one": "em {{count}} grupo",
+    "parties_other": "em {{count}} grupos",
+    "confirmed_one": "{{count}} confirmado",
+    "confirmed_other": "{{count}} confirmados",
+    "declined_one": "{{count}} recusado",
+    "declined_other": "{{count}} recusados",
+    "pending_one": "{{count}} pendente",
+    "pending_other": "{{count}} pendentes",
+    "empty": {
+      "couple": "Vocês ainda não cadastraram convidados.",
+      "planner": "Este casamento ainda não tem convidados."
+    },
+    "add": "Adicionar convidados"
+  },
+  "buffet": {
+    "title": "Buffet",
+    "adults_one": "{{count}} adulto",
+    "adults_other": "{{count}} adultos",
+    "children_one": "{{count}} criança",
+    "children_other": "{{count}} crianças",
+    "babies_one": "{{count}} bebê",
+    "babies_other": "{{count}} bebês",
+    "detail": "{{parts}} confirmados",
+    "detailOne": "{{parts}} confirmado",
+    "detailOneChild": "{{parts}} confirmada"
+  },
+  "rate": {
+    "title": "Taxa de resposta",
+    "value": "{{percent}}%",
+    "responded": "{{responded}} de {{total}} responderam",
+    "deadline": "prazo: {{date}}",
+    "noDeadline": "sem prazo"
+  },
+  "delivery": {
+    "title": "Envios",
+    "closed": "Os envios começam depois de publicar o site.",
+    "not_sent": "Não enviado",
+    "sent": "Enviado",
+    "viewed": "Visualizado",
+    "responded": "Respondido"
+  },
+  "site": {
+    "title": "Status do site",
+    "endDate": "No ar até {{date}}.",
+    "publish": "Publicar",
+    "edit": "Editar site",
+    "awaitingCouple": "O casal ainda não aceitou o convite."
+  },
+  "checklist": {
+    "title": "Checklist",
+    "guests": "Cadastrar os convidados",
+    "appearance": "Escolher a aparência",
+    "publish": "Publicar o site",
+    "invites": "Enviar os convites",
+    "invitesProgress": "Enviar os convites ({{done}} de {{total}} grupos)",
+    "reminders": "Lembrar os pendentes",
+    "remindersProgress_one": "Lembrar os pendentes ({{count}} grupo)",
+    "remindersProgress_other": "Lembrar os pendentes ({{count}} grupos)"
+  },
+  "activity": {
+    "title": "Atividade recente",
+    "one": "{{name}} respondeu o convite",
+    "many_one": "{{count}} grupo respondeu",
+    "many_other": "{{count}} grupos responderam",
+    "confirmed_one": "{{count}} confirmado",
+    "confirmed_other": "{{count}} confirmados",
+    "declined_one": "{{count}} recusado",
+    "declined_other": "{{count}} recusados",
+    "more_one": "+ {{count}} grupo",
+    "more_other": "+ {{count}} grupos",
+    "today": "hoje às {{time}}",
+    "yesterday": "ontem às {{time}}",
+    "on": "{{date}} às {{time}}",
+    "empty": "Ainda não há respostas. Elas aparecem aqui conforme os grupos respondem."
+  }
+}

@@ -27,3 +27,4 @@
 @import '../features/publication/pages/publish-page.css' layer(components);
 @import '../features/deliveries/pages/deliveries.css' layer(components);
 @import '../features/songs/pages/songs-page.css' layer(components);
+@import '../features/dashboard/pages/dashboard-page.css' layer(components);
