@@ -35,7 +35,7 @@
     "pendingParties_zero": "{{count}} grupos",
     "pendingParties_one": "{{count}} grupo",
     "pendingParties_other": "{{count}} grupos",
-    "pendingDetail": "{{guests}} em {{parties}} · Lembrar pendentes",
+    "pendingDetail": "{{guests}} em {{parties}}",
     "save": "Salvar prazo",
     "remove": "Tirar o prazo",
     "saved": "Prazo salvo.",
@@ -47,7 +47,8 @@
     "afterEvent": {
       "couple": "O prazo precisa ser até o dia do casamento, {{date}}. Escolham outra data.",
       "planner": "O prazo precisa ser até o dia do casamento, {{date}}. Escolha outra data."
-    }
+    },
+    "remind": "Lembrar pendentes"
   },
   "summary": {
     "sent_one": "{{sent}} de {{count}} grupo já recebeu o convite",

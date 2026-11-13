@@ -2,6 +2,8 @@ import { Alert, Button, DateField, Spinner, StatCard, useToast } from '@kore-io/
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router';
+import { paths } from '../../../app/paths';
 import type { DashboardResponse } from '../../../shared/api/generated/model';
 import {
   getDashboardControllerGetV1QueryKey,
@@ -165,10 +167,16 @@ function DeadlineForm({
       <StatCard
         label={t('deadline.pendingLabel')}
         value={pending.guests}
-        detail={t('deadline.pendingDetail', {
-          guests: t('deadline.pendingGuests', { count: pending.guests }),
-          parties: t('deadline.pendingParties', { count: pending.parties }),
-        })}
+        detail={
+          <>
+            {t('deadline.pendingDetail', {
+              guests: t('deadline.pendingGuests', { count: pending.guests }),
+              parties: t('deadline.pendingParties', { count: pending.parties }),
+            })}
+            {' · '}
+            <Link to={paths.deliveryReminder}>{t('deadline.remind')}</Link>
+          </>
+        }
       />
       <div className="kore-deadline__actions">
         {saved && (
