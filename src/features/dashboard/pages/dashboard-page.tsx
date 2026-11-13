@@ -17,6 +17,7 @@ import { useActiveWedding, type Audience } from '../../guests/hooks/use-active-w
 import type { sentFilters } from '../../guests/hooks/use-party-filters';
 import { canOpenPublish } from '../../publication/publication';
 import { useMarkNotificationRead } from '../../notifications/hooks/use-mark-notification-read';
+import { isResponseItem } from '../../notifications/notification-shape';
 import { siteStatus } from '../../site/site-texts';
 import {
   activityDate,
@@ -353,9 +354,9 @@ function ActivityCard({
   now: Date;
 }) {
   const { t } = useTranslation('dashboard');
-  // Só as respostas, com grupo: a central do casal já recebe os avisos de cobrança, que o
-  // app desenha no front da F3.
-  const items = all.filter((item) => item.groups.length > 0);
+  // Só as respostas: a API monta os grupos do payload da notificação, e a central do casal
+  // já recebe os avisos de cobrança (outro formato), que o app desenha no front da F3.
+  const items = all.filter((item) => isResponseItem(item.groups));
   const markRead = useMarkNotificationRead({ weddingId });
   return (
     <section

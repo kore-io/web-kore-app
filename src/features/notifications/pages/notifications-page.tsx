@@ -20,12 +20,13 @@ import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { activityDate, activityTexts } from '../../dashboard/dashboard-texts';
 import { useActiveWedding } from '../../guests/hooks/use-active-wedding';
 import { useMarkNotificationRead } from '../hooks/use-mark-notification-read';
+import { isResponseItem } from '../notification-shape';
 
 type Filter = '' | NotificationsControllerListV1Type;
 
 /** O tipo que a central desenha na F5: a resposta do convite, com ao menos um grupo. */
 function isDrawn(item: NotificationResponse): boolean {
-  return (item.type as string) === 'rsvp' && item.payload.length > 0;
+  return (item.type as string) === 'rsvp' && isResponseItem(item.payload);
 }
 
 /**

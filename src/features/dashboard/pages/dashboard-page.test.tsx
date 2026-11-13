@@ -265,7 +265,7 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     );
   });
 
-  it('a Atividade recente sem os avisos de cobrança (sem grupo), que entram na F3', async () => {
+  it('a Atividade recente sem os avisos de cobrança (o payload deles vira o groups), que entram na F3', async () => {
     mockDashboard({
       data: dashboard({
         recentActivity: [
@@ -275,7 +275,10 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
             count: 1,
             readAt: null,
             at: today(21, 0),
-            groups: [],
+            // Como a API manda: o payload do billing no lugar dos grupos.
+            groups: [
+              { kind: 'payment_confirmed', at: today(21, 0) },
+            ] as unknown as DashboardResponse['recentActivity'][number]['groups'],
           },
           ...dashboard().recentActivity,
         ],
@@ -286,6 +289,12 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     const links = within(card('Atividade recente')).getAllByRole('link');
     expect(links).toHaveLength(1);
     expect(links[0]).toHaveTextContent('Família Moreira respondeu o convite');
+    expect(screen.queryByText(/^ respondeu o convite/)).toBeNull();
+    expect(
+      within(card('Atividade recente'))
+        .getAllByRole('link')
+        .map((link) => link.getAttribute('href')),
+    ).not.toContain('/app/convidados/grupos/undefined');
   });
 
   it('a Atividade recente vazia', async () => {
