@@ -16,6 +16,7 @@ import { LoadErrorNotice } from '../../../shared/components/load-error';
 import type { Audience } from '../../guests/hooks/use-active-wedding';
 import { deliveryStatusText, sentAtOf, type DeliveryKind } from '../delivery-texts';
 import { DELIVERY_LIMIT, useDeliverySelection } from '../hooks/use-delivery-selection';
+import { QrStep } from './qr-step';
 import type { Closed } from './send-page';
 
 type Sent = Record<string, { at: string; channel: 'whatsapp' | 'email' | 'link' }>;
@@ -26,7 +27,23 @@ type Sent = Record<string, { at: string; channel: 'whatsapp' | 'email' | 'link' 
  * "Parar e continuar depois". O clique abre a URL pronta na hora (o bloqueio de popup do
  * iOS) e marca o envio em paralelo, com `keepalive`; o Kore não sabe se a mensagem saiu.
  */
-export function QueueStep({
+export function QueueStep(props: {
+  weddingId: string;
+  audience: Audience;
+  kind: DeliveryKind;
+  closed: Closed;
+}) {
+  const { channel } = useDeliverySelection({
+    weddingId: props.weddingId,
+    kind: props.kind,
+    visibleIds: [],
+  });
+  // O QR code tem a fila própria, sem cartões, e só no convite (RN09).
+  if (props.kind === 'invite' && channel === 'qr') return <QrStep weddingId={props.weddingId} />;
+  return <ChannelQueue {...props} />;
+}
+
+function ChannelQueue({
   weddingId,
   audience,
   kind,

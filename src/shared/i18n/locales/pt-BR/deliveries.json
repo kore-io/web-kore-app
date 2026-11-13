@@ -155,5 +155,11 @@
     "groups": "Grupos",
     "channel": "Canal e mensagem",
     "queue": "Fila de envio"
+  },
+  "qr": {
+    "pdf": "Baixar PDF para impressão",
+    "png": "Baixar imagem (PNG)",
+    "downloaded_one": "QR code baixado. O grupo foi marcado como enviado.",
+    "downloaded_other": "QR code baixado. {{count}} grupos marcados como enviados."
   }
 }

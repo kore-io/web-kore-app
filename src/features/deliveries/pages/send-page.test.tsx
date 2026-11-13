@@ -76,11 +76,13 @@ function mockSend({
     body: DEFAULT_INVITE,
     isDefault: true,
   },
+  qrError,
 }: {
   status?: string;
   parties?: object[];
   queue?: object[];
   template?: object;
+  qrError?: { status: number; body: Record<string, unknown> };
 } = {}) {
   const calls: Call[] = [];
   let current = template;
@@ -123,6 +125,17 @@ function mockSend({
         subject: 'Convite',
         skippedPartyIds: [],
         items: queue.filter((item) => ids.includes((item as { id: string }).id)),
+      });
+    }
+    if (path === '/v1/weddings/w1/parties/qr-codes' && method === 'POST') {
+      calls.push({ method, path, body });
+      if (qrError) return apiError(qrError);
+      const pdf = (body as { format: string }).format === 'pdf';
+      return new Response(new Blob(['qr']), {
+        headers: {
+          'Content-Type': pdf ? 'application/pdf' : 'image/png',
+          'Content-Disposition': `attachment; filename="qr-ana-e-marcos.${pdf ? 'pdf' : 'png'}"`,
+        },
       });
     }
     if (path === '/v1/weddings/w1/deliveries' && method === 'POST') {
@@ -421,6 +434,116 @@ describe('Envios › a fila (Envios RN07, RN08)', () => {
   it('é acessível', async () => {
     mockSend();
     preset(['p1', 'p2']);
+    const { container } = renderRoute({ url: '/app/envios/convites?etapa=fila' });
+    await screen.findByText('Família Moreira');
+    await expectNoA11yViolations({ container });
+  });
+});
+
+describe('Envios › QR code (Envios RN09; Penpot A6)', () => {
+  let clicked: { href: string; download: string }[] = [];
+  beforeEach(() => {
+    clicked = [];
+    vi.stubGlobal(
+      'URL',
+      Object.assign(URL, { createObjectURL: () => 'blob:kore/qr', revokeObjectURL: vi.fn() }),
+    );
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (
+      this: HTMLAnchorElement,
+    ) {
+      clicked.push({ href: this.getAttribute('href') ?? '', download: this.download });
+    });
+  });
+  afterEach(() => vi.restoreAllMocks());
+
+  it('o QR code só existe no convite; escolhido, a etapa fica sem a mensagem', async () => {
+    const user = userEvent.setup();
+    mockSend();
+    preset(['p1', 'p2']);
+    const view = renderRoute({ url: '/app/envios/convites?etapa=canal' });
+    await screen.findByRole('textbox', { name: 'Mensagem' });
+    const channels = screen.getByRole('group', { name: 'Canal' });
+    expect(
+      within(channels)
+        .getAllByRole('radio')
+        .map((radio) => radio.parentElement?.textContent?.replace(/\u2060/g, '')),
+    ).toEqual(['WhatsApp', 'E-mail', 'Copiar link', 'QR code']);
+    await user.click(within(channels).getByRole('radio', { name: 'QR code' }));
+    expect(screen.queryByRole('textbox', { name: 'Mensagem' })).toBeNull();
+    expect(screen.queryByText('Prévia · Família Moreira')).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Ir para a fila (2 grupos)' }));
+    expect(await screen.findByRole('button', { name: 'Baixar PDF para impressão' })).toBeEnabled();
+    view.unmount();
+    preset(['p1'], 'whatsapp', 'reminder');
+    renderRoute({ url: '/app/envios/lembrete?etapa=canal' });
+    await screen.findByRole('textbox', { name: 'Mensagem' });
+    expect(screen.queryByRole('radio', { name: 'QR code' })).toBeNull();
+  });
+
+  it('vários grupos: a lista sem cartões, o PDF e o Toast com o número (RN09)', async () => {
+    const user = userEvent.setup();
+    const calls = mockSend({
+      queue: [
+        queueItem('p1', 'Família Moreira'),
+        queueItem('p2', 'Tio Jorge', {
+          contact: { guestId: 'p2g', name: 'Jorge', phoneMasked: null, emailMasked: 'jo***@x.com' },
+        }),
+      ],
+    });
+    preset(['p1', 'p2'], 'qr');
+    renderRoute({ url: '/app/envios/convites?etapa=fila' });
+    const download = await screen.findByRole('button', { name: 'Baixar PDF para impressão' });
+    // Sem o aviso do WhatsApp, o contador e os botões por grupo.
+    expect(screen.queryByText(/O WhatsApp abre a seguir/)).toBeNull();
+    expect(screen.queryByText(/enviados$/)).toBeNull();
+    expect(screen.getAllByRole('button').map((button) => button.textContent)).not.toContain(
+      'Abrir WhatsApp',
+    );
+    expect(screen.getByText('Célia Moreira · (19) 9****-3310')).toBeInTheDocument();
+    expect(screen.getByText('Jorge · jo***@x.com')).toBeInTheDocument();
+    await user.click(download);
+    expect(
+      await screen.findByText('QR code baixado. 2 grupos marcados como enviados.'),
+    ).toBeInTheDocument();
+    expect(calls.find((call) => call.path.endsWith('/qr-codes'))?.body).toEqual({
+      partyIds: ['p1', 'p2'],
+      format: 'pdf',
+    });
+    expect(clicked).toEqual([{ href: 'blob:kore/qr', download: 'qr-ana-e-marcos.pdf' }]);
+  });
+
+  it('um grupo: Baixar imagem (PNG) e o Toast no singular', async () => {
+    const user = userEvent.setup();
+    const calls = mockSend();
+    preset(['p1'], 'qr');
+    renderRoute({ url: '/app/envios/convites?etapa=fila' });
+    await user.click(await screen.findByRole('button', { name: 'Baixar imagem (PNG)' }));
+    expect(
+      await screen.findByText('QR code baixado. O grupo foi marcado como enviado.'),
+    ).toBeInTheDocument();
+    expect(calls.find((call) => call.path.endsWith('/qr-codes'))?.body).toEqual({
+      partyIds: ['p1'],
+      format: 'png',
+    });
+    expect(clicked).toEqual([{ href: 'blob:kore/qr', download: 'qr-ana-e-marcos.png' }]);
+  });
+
+  it('a recusa do servidor: o Toast de erro, sem baixar e sem o Toast do QR', async () => {
+    const user = userEvent.setup();
+    mockSend({
+      qrError: { status: 409, body: { error: 'DELIVERIES_CLOSED', reason: 'not_published' } },
+    });
+    preset(['p1', 'p2'], 'qr');
+    renderRoute({ url: '/app/envios/convites?etapa=fila' });
+    await user.click(await screen.findByRole('button', { name: 'Baixar PDF para impressão' }));
+    expect(await screen.findByText(/^Não foi possível continuar/)).toBeInTheDocument();
+    expect(screen.queryByText(/^QR code baixado/)).toBeNull();
+    expect(clicked).toEqual([]);
+  });
+
+  it('é acessível', async () => {
+    mockSend();
+    preset(['p1', 'p2'], 'qr');
     const { container } = renderRoute({ url: '/app/envios/convites?etapa=fila' });
     await screen.findByText('Família Moreira');
     await expectNoA11yViolations({ container });
