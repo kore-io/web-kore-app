@@ -142,7 +142,13 @@ export function activityDate({ t, at, now }: { t: DashboardT; at: string; now: D
  * nomes separados por " · ", com "+ 2 grupos" depois de 3. Sem nome de convidado nem
  * restrição.
  */
-export function activityTexts({ t, item }: { t: DashboardT; item: ActivityResponse }) {
+export function activityTexts({
+  t,
+  item,
+}: {
+  t: DashboardT;
+  item: Pick<ActivityResponse, 'count' | 'groups'>;
+}) {
   const [first] = item.groups;
   if (item.count <= 1 && first) {
     const parts = [

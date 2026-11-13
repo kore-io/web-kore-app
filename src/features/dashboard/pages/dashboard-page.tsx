@@ -9,7 +9,6 @@ import type {
   ChecklistItemResponse,
   DashboardResponse,
 } from '../../../shared/api/generated/model';
-import { notificationsControllerReadV1 } from '../../../shared/api/generated/notifications/notifications';
 import { useDashboardControllerGetV1 } from '../../../shared/api/generated/rsvp/rsvp';
 import { oneDot } from '../../../shared/date-texts';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
@@ -17,6 +16,7 @@ import { deliveryBadges } from '../../guests/components/delivery-badges';
 import { useActiveWedding, type Audience } from '../../guests/hooks/use-active-wedding';
 import type { sentFilters } from '../../guests/hooks/use-party-filters';
 import { canOpenPublish } from '../../publication/publication';
+import { useMarkNotificationRead } from '../../notifications/hooks/use-mark-notification-read';
 import { siteStatus } from '../../site/site-texts';
 import {
   activityDate,
@@ -183,7 +183,7 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
         )}
         <SiteCard data={data} now={now} />
         <ChecklistCard items={data.checklist} />
-        {!empty && <ActivityCard items={data.recentActivity} now={now} />}
+        {!empty && <ActivityCard weddingId={weddingId} items={data.recentActivity} now={now} />}
       </div>
     </div>
   );
@@ -343,8 +343,17 @@ function ChecklistCard({ items }: { items: ChecklistItemResponse[] }) {
  * Atividade recente (RN04): as 5 últimas, com o texto da central e a data; abrir leva ao
  * Painel do grupo (1 grupo) ou à lista (vários) e marca a notificação como lida.
  */
-function ActivityCard({ items, now }: { items: ActivityResponse[]; now: Date }) {
+function ActivityCard({
+  weddingId,
+  items,
+  now,
+}: {
+  weddingId: string;
+  items: ActivityResponse[];
+  now: Date;
+}) {
   const { t } = useTranslation('dashboard');
+  const markRead = useMarkNotificationRead({ weddingId });
   return (
     <section
       className="kore-dashboard__card kore-dashboard__card--half"
@@ -368,11 +377,9 @@ function ActivityCard({ items, now }: { items: ActivityResponse[]; now: Date }) 
                   to={to}
                   className="kore-dashboard__activity-item"
                   onClick={() => {
-                    // Abrir marca como lida (Central RN05), sem esperar a resposta.
+                    // Abrir marca como lida (Central RN05); a da colaboradora não tem o que marcar.
                     if (item.source === 'notification' && item.readAt === null) {
-                      void notificationsControllerReadV1(item.id, { keepalive: true }).catch(
-                        () => undefined,
-                      );
+                      markRead({ id: item.id });
                     }
                   }}
                 >
