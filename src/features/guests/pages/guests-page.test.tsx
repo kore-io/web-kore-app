@@ -192,6 +192,25 @@ describe('Convidados › Grupos e convidados (RN13)', () => {
     expect(screen.getAllByRole('combobox', { name: 'Resposta' })[0]).toHaveValue('');
   });
 
+  it('com ?ordem=respondido, a lista pede a ordem de Respondido em (Central RN05; decisão 246)', async () => {
+    const listPaths = mockList(() =>
+      Response.json(page([party('p1', 'Família Moreira')], { total: 1 })),
+    );
+    renderRoute({ url: '/app/convidados?ordem=respondido' });
+    await screen.findByRole('table');
+    expect(listPaths[0]).toBe('/v1/weddings/w1/parties?order=respondedAt');
+  });
+
+  it('a ordem não é filtro: sem grupos, o vazio de quem não cadastrou (tipo 3)', async () => {
+    mockList(() =>
+      Response.json(
+        page([], { total: 0, summary: { ...summary, guests: 0, parties: 0, namedGuests: 0 } }),
+      ),
+    );
+    renderRoute({ url: '/app/convidados?ordem=respondido' });
+    expect(await screen.findByText('Vocês ainda não cadastraram convidados.')).toBeInTheDocument();
+  });
+
   it('o filtro de Tag vai para a URL pelo id e para a API (Tags RN09)', async () => {
     const user = userEvent.setup();
     const listPaths = mockList(() =>
@@ -269,6 +288,20 @@ describe('Convidados › Grupos e convidados (RN13)', () => {
     expect(selectAll).toBeChecked();
     await user.click(selectAll);
     expect(screen.queryByText(/selecionad/)).toBeNull();
+  });
+
+  it('Lembrar pendentes leva os marcados à aba do lembrete (Envios RN04; Penpot A9)', async () => {
+    const user = userEvent.setup();
+    window.sessionStorage.clear();
+    mockList(() => Response.json(page([party('p1', 'Família Moreira'), party('p2', 'Tio Jorge')])));
+    const { router } = renderRoute({ url: '/app/convidados' });
+    await screen.findByRole('table');
+    await user.click(screen.getByRole('checkbox', { name: 'Selecionar Tio Jorge' }));
+    await user.click(screen.getByRole('button', { name: 'Lembrar pendentes' }));
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app/envios/lembrete'));
+    expect(
+      JSON.parse(window.sessionStorage.getItem('kore.deliveries.w1.reminder') ?? '{}').ids,
+    ).toEqual(['p2']);
   });
 
   it('Adicionar tag a 1 grupo: o Toast no singular "Tag aplicada a 1 grupo." (Tags RN08)', async () => {

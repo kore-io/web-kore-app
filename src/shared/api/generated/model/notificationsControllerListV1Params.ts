@@ -4,16 +4,17 @@
  * Kore API
  * OpenAPI spec version: 1
  */
+import type { NotificationsControllerListV1Scope } from './notificationsControllerListV1Scope';
 import type { NotificationsControllerListV1Type } from './notificationsControllerListV1Type';
 
 export type NotificationsControllerListV1Params = {
-  /** Filtro por tipo (Todas · Respostas). */
+  weddingId?: string;
+  scope?: NotificationsControllerListV1Scope;
+  /** Filtro por tipo (casal: Respostas e Cobrança; cerimonialista: os 3 dela). */
   type?: NotificationsControllerListV1Type;
   /**
    * O `nextCursor` da página anterior.
    * @maxLength 200
    */
   cursor?: string;
-  /** O casamento ativo. */
-  weddingId: string;
 };

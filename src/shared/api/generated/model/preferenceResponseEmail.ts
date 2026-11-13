@@ -5,6 +5,9 @@
  * OpenAPI spec version: 1
  */
 
+/**
+ * `always`: Cobrança e pagamentos, sempre por e-mail e sem seletor (decisão 236).
+ */
 export type PreferenceResponseEmail =
   (typeof PreferenceResponseEmail)[keyof typeof PreferenceResponseEmail];
 
@@ -12,4 +15,5 @@ export const PreferenceResponseEmail = {
   off: 'off',
   immediate: 'immediate',
   daily: 'daily',
+  always: 'always',
 } as const;

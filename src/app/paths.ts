@@ -33,6 +33,26 @@ export const paths = {
   /** Novo grupo e Editar grupo (decisão 213(9)). */
   guestNew: '/app/convidados/novo',
   guestPartyEdit: '/app/convidados/grupos/:partyId/editar',
+  /** Envios (IA da Área do Casal; decisão 235): abre em Enviar convites. */
+  deliveries: '/app/envios',
+  /**
+   * Envios › Enviar convites, Save the date e Lembrar pendentes (decisão 235): as etapas
+   * (Grupos → Canal e mensagem → Fila) no mesmo caminho, com ?etapa=canal e ?etapa=fila.
+   */
+  deliveryInvites: '/app/envios/convites',
+  deliverySaveTheDate: '/app/envios/save-the-date',
+  deliveryReminder: '/app/envios/lembrete',
+  /** Envios › Prazo de resposta (Prazo e respostas RN02; decisão 217(13)). */
+  deliveryDeadline: '/app/envios/prazo',
+  /**
+   * Músicas (Música RN05): só com a pergunta de música ligada; desligada, leva ao Editor ›
+   * Pergunta de música (RN03).
+   */
+  songs: '/app/musicas',
+  /** Notificações (Central RN06; decisão 217(13)): o sino da Topbar leva aqui. */
+  notifications: '/app/notificacoes',
+  /** Configurações › Notificações (Central RN07; decisão 221). */
+  settingsNotifications: '/app/configuracoes/notificacoes',
   /** Site › Editor (decisão 214): /app/site abre os Dados básicos. */
   site: '/app/site',
   siteSection: '/app/site/:section',

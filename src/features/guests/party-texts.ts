@@ -1,4 +1,5 @@
 import type { TFunction } from 'i18next';
+import { dayAndTimeIn } from '../../shared/date-texts';
 import type {
   PartyCountsResponse,
   PartyListItemResponse,
@@ -57,19 +58,29 @@ export function responsesText({ t, counts }: { t: GuestsT; counts: PartyCountsRe
 }
 
 /**
- * Respondido em (Fase 4): "12/09 às 20h14" e "por Célia"; hora cheia sem minutos
- * ("21/06 às 9h", regra das datas curtas em listas da Voz).
+ * Respondido em (Prazo RN07): "12/09 às 20h14" e "por Célia" ou "alterada por Ana"; hora cheia sem minutos
+ * ("21/06 às 9h", regra das datas curtas em listas da Voz), no fuso do casamento.
  */
-export function respondedAtText({ t, party }: { t: GuestsT; party: PartyListItemResponse }) {
+export function respondedAtText({
+  t,
+  party,
+  timezone,
+}: {
+  t: GuestsT;
+  party: PartyListItemResponse;
+  /** O fuso do casamento, como o .xlsx (decisão 246). */
+  timezone: string | null;
+}) {
   if (party.respondedAt === null) return null;
-  const at = new Date(party.respondedAt);
-  const two = (value: number) => String(value).padStart(2, '0');
-  const date = `${two(at.getDate())}/${two(at.getMonth() + 1)}`;
-  const time =
-    at.getMinutes() === 0 ? `${at.getHours()}h` : `${at.getHours()}h${two(at.getMinutes())}`;
-  return {
-    primary: t('row.respondedAt', { date, time }),
-    secondary:
-      party.respondedBy === null ? undefined : t('row.respondedBy', { name: party.respondedBy }),
-  };
+  const { date, time } = dayAndTimeIn({ at: party.respondedAt, timezone });
+  // Quem respondeu (Prazo RN07): "por Célia" (o grupo, quem assinou) ou "alterada por Ana"
+  // (o casal ou a cerimonialista, quem alterou); sem nome, só a data.
+  const last = party.lastResponse;
+  const secondary =
+    last?.actor === 'couple' && last.actorName
+      ? t('row.changedBy', { name: last.actorName })
+      : last?.actor === 'party' && last.signedByName
+        ? t('row.respondedBy', { name: last.signedByName })
+        : undefined;
+  return { primary: t('row.respondedAt', { date, time }), secondary };
 }

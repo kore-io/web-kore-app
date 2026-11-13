@@ -16,6 +16,7 @@ import {
   FaqSection,
   LodgingSection,
 } from '../sections/section-forms';
+import { SongQuestionSection } from '../sections/song-question-section';
 import { StorySection } from '../sections/story-section';
 import { useOpenPreview } from '../preview/use-open-preview';
 import { SitePreview } from '../components/site-preview';
@@ -128,7 +129,13 @@ function SiteEditor({
             >
               <span>{t(`sections.names.${key}`)}</span>
               <span className="kore-site-editor__state">
-                {t(`sections.state.${sectionState({ key, sections: data.sections })}`)}
+                {t(
+                  `sections.state.${sectionState({
+                    key,
+                    sections: data.sections,
+                    songQuestionEnabled: data.songQuestion.enabled,
+                  })}`,
+                )}
               </span>
             </Link>
           </li>
@@ -222,6 +229,9 @@ function SiteEditor({
                 )}
                 {sectionKey === 'appearance' && (
                   <AppearanceSection weddingId={weddingId} site={data} audience={audience} />
+                )}
+                {sectionKey === 'song_question' && (
+                  <SongQuestionSection weddingId={weddingId} songQuestion={data.songQuestion} />
                 )}
                 {(() => {
                   const section = data.sections.find((item) => item.type === sectionKey);

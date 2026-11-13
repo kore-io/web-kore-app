@@ -32,6 +32,8 @@ import type {
   TrashItemNotFoundErrorBody,
   TrashListResponse,
   ValidationErrorBody,
+  WeddingBlockedErrorBody,
+  WeddingDeletionScheduledErrorBody,
   WeddingNotFoundErrorBody,
 } from '../model';
 
@@ -240,10 +242,12 @@ export const getTrashControllerRestoreV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | TrashItemNotFoundErrorBody
     | TagLimitReachedErrorBody
     | TagNameTakenErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -289,10 +293,12 @@ export type TrashControllerRestoreV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | TrashItemNotFoundErrorBody
   | TagLimitReachedErrorBody
   | TagNameTakenErrorBody
+  | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
 export type TrashControllerRestoreV1MutationVariables = {
@@ -309,10 +315,12 @@ export const useTrashControllerRestoreV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | TrashItemNotFoundErrorBody
     | TagLimitReachedErrorBody
     | TagNameTakenErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,

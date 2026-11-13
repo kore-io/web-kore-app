@@ -108,6 +108,10 @@
   @apply m-0 type-body-md;
 }
 
+.kore-site-hero__action {
+  @apply mt-2;
+}
+
 /* Carregando */
 .kore-site-skeleton {
   @apply min-h-dvh bg-paper;
@@ -121,9 +125,16 @@
   @apply h-96 animate-pulse bg-gray-100;
 }
 
-/* A faixa do grupo identificado (Penpot: "Convite para Família Moreira"), acima da Topbar. */
+/*
+ * A faixa do grupo identificado (Penpot: "Convite para Família Moreira" e o Confirmar
+ * presença), acima da Topbar: lado a lado no tablet e no desktop, empilhados no celular.
+ */
 .kore-site__party {
-  @apply m-0 border-b border-site-border bg-site-background px-4 py-2 text-center type-label text-site-foreground;
+  @apply flex flex-col items-center justify-center gap-2 border-b border-site-border bg-site-background px-4 py-2 md:flex-row md:gap-4;
+}
+
+.kore-site__party-text {
+  @apply m-0 text-center type-label text-site-foreground;
 }
 
 .kore-site__contact {

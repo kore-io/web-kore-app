@@ -12,9 +12,12 @@ export type RowAction = 'open' | 'edit' | 'copy' | 'trash';
  */
 export function PartyRowMenu({
   party,
+  trashLocked = false,
   onAction,
 }: {
   party: PartyListItemResponse;
+  /** A colaboradora não exclui um grupo que já respondeu (Prazo RN08; Lixeira RN07). */
+  trashLocked?: boolean;
   onAction: (input: {
     action: RowAction;
     party: PartyListItemResponse;
@@ -41,6 +44,8 @@ export function PartyRowMenu({
               id: 'trash',
               label: t('trash.action'),
               destructive: true,
+              disabled: trashLocked,
+              disabledReason: t('trash.alreadyResponded.party'),
               onSelect: () => select('trash'),
             },
           ],

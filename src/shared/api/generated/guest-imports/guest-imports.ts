@@ -30,6 +30,8 @@ import type {
   SpreadsheetUploadBody,
   TooManyGuestsErrorBody,
   ValidationErrorBody,
+  WeddingBlockedErrorBody,
+  WeddingDeletionScheduledErrorBody,
   WeddingNotFoundErrorBody,
 } from '../model';
 
@@ -72,7 +74,9 @@ export const getGuestImportsControllerSpreadsheetPreviewV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | FileTooLargeErrorBody
     | SpreadsheetRefusedErrorBody
     | RateLimitedErrorBody
@@ -120,7 +124,9 @@ export type GuestImportsControllerSpreadsheetPreviewV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
+  | WeddingDeletionScheduledErrorBody
   | FileTooLargeErrorBody
   | SpreadsheetRefusedErrorBody
   | RateLimitedErrorBody
@@ -139,7 +145,9 @@ export const useGuestImportsControllerSpreadsheetPreviewV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | FileTooLargeErrorBody
     | SpreadsheetRefusedErrorBody
     | RateLimitedErrorBody
@@ -201,8 +209,10 @@ export const getGuestImportsControllerSpreadsheetV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | NothingToImportErrorBody
+    | WeddingDeletionScheduledErrorBody
     | FileTooLargeErrorBody
     | SpreadsheetRefusedErrorBody
     | RateLimitedErrorBody
@@ -250,8 +260,10 @@ export type GuestImportsControllerSpreadsheetV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | NothingToImportErrorBody
+  | WeddingDeletionScheduledErrorBody
   | FileTooLargeErrorBody
   | SpreadsheetRefusedErrorBody
   | RateLimitedErrorBody
@@ -270,8 +282,10 @@ export const useGuestImportsControllerSpreadsheetV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | NothingToImportErrorBody
+    | WeddingDeletionScheduledErrorBody
     | FileTooLargeErrorBody
     | SpreadsheetRefusedErrorBody
     | RateLimitedErrorBody
@@ -344,7 +358,9 @@ export const getGuestImportsControllerPastePreviewV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | TooManyGuestsErrorBody
     | RateLimitedErrorBody
   >,
@@ -391,7 +407,9 @@ export type GuestImportsControllerPastePreviewV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
+  | WeddingDeletionScheduledErrorBody
   | TooManyGuestsErrorBody
   | RateLimitedErrorBody
 >;
@@ -409,7 +427,9 @@ export const useGuestImportsControllerPastePreviewV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | TooManyGuestsErrorBody
     | RateLimitedErrorBody
   >,
@@ -481,7 +501,9 @@ export const getGuestImportsControllerPasteV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | TooManyGuestsErrorBody
     | DuplicateErrorBody
     | RateLimitedErrorBody
@@ -529,7 +551,9 @@ export type GuestImportsControllerPasteV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
+  | WeddingDeletionScheduledErrorBody
   | TooManyGuestsErrorBody
   | DuplicateErrorBody
   | RateLimitedErrorBody
@@ -548,7 +572,9 @@ export const useGuestImportsControllerPasteV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | TooManyGuestsErrorBody
     | DuplicateErrorBody
     | RateLimitedErrorBody

@@ -30,6 +30,7 @@ import type {
   OriginNotAllowedErrorBody,
   PreferenceResponse,
   PreferencesResponse,
+  ProfileNotOwnedErrorBody,
   PushEndpointNotAllowedErrorBody,
   PushSubscriptionBody,
   PushUnsubscribeBody,
@@ -62,7 +63,7 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
 };
 
 export const getNotificationsControllerListV1Url = (
-  params: NotificationsControllerListV1Params,
+  params?: NotificationsControllerListV1Params,
 ) => {
   const normalizedParams = new URLSearchParams();
 
@@ -80,10 +81,11 @@ export const getNotificationsControllerListV1Url = (
 };
 
 /**
- * @summary A página Notificações do casamento ativo (Central RN06).
+ * @summary A página Notificações do casamento ativo (Central RN06), ou a da
+cerimonialista com `scope=planner` (Notificações da cerimonialista RN05).
  */
 export const notificationsControllerListV1 = async (
-  params: NotificationsControllerListV1Params,
+  params?: NotificationsControllerListV1Params,
   options?: Parameters<typeof httpClient>[1],
 ): Promise<NotificationsResponse> => {
   return httpClient<NotificationsResponse>(getNotificationsControllerListV1Url(params), {
@@ -101,10 +103,14 @@ export const getNotificationsControllerListV1QueryKey = (
 export const getNotificationsControllerListV1QueryOptions = <
   TData = Awaited<ReturnType<typeof notificationsControllerListV1>>,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | ProfileNotOwnedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
-  params: NotificationsControllerListV1Params,
+  params?: NotificationsControllerListV1Params,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerListV1>>, TError, TData>
@@ -131,16 +137,24 @@ export type NotificationsControllerListV1QueryResult = NonNullable<
   Awaited<ReturnType<typeof notificationsControllerListV1>>
 >;
 export type NotificationsControllerListV1QueryError = ErrorType<
-  ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | ProfileNotOwnedErrorBody
+  | WeddingNotFoundErrorBody
+  | RateLimitedErrorBody
 >;
 
 export function useNotificationsControllerListV1<
   TData = Awaited<ReturnType<typeof notificationsControllerListV1>>,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | ProfileNotOwnedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
-  params: NotificationsControllerListV1Params,
+  params: undefined | NotificationsControllerListV1Params,
   options: {
     query: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerListV1>>, TError, TData>
@@ -160,10 +174,14 @@ export function useNotificationsControllerListV1<
 export function useNotificationsControllerListV1<
   TData = Awaited<ReturnType<typeof notificationsControllerListV1>>,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | ProfileNotOwnedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
-  params: NotificationsControllerListV1Params,
+  params?: NotificationsControllerListV1Params,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerListV1>>, TError, TData>
@@ -183,10 +201,14 @@ export function useNotificationsControllerListV1<
 export function useNotificationsControllerListV1<
   TData = Awaited<ReturnType<typeof notificationsControllerListV1>>,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | ProfileNotOwnedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
-  params: NotificationsControllerListV1Params,
+  params?: NotificationsControllerListV1Params,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerListV1>>, TError, TData>
@@ -196,16 +218,21 @@ export function useNotificationsControllerListV1<
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
- * @summary A página Notificações do casamento ativo (Central RN06).
+ * @summary A página Notificações do casamento ativo (Central RN06), ou a da
+cerimonialista com `scope=planner` (Notificações da cerimonialista RN05).
  */
 
 export function useNotificationsControllerListV1<
   TData = Awaited<ReturnType<typeof notificationsControllerListV1>>,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | ProfileNotOwnedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
-  params: NotificationsControllerListV1Params,
+  params?: NotificationsControllerListV1Params,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerListV1>>, TError, TData>
@@ -224,7 +251,7 @@ export function useNotificationsControllerListV1<
 }
 
 export const getNotificationsControllerUnreadV1Url = (
-  params: NotificationsControllerUnreadV1Params,
+  params?: NotificationsControllerUnreadV1Params,
 ) => {
   const normalizedParams = new URLSearchParams();
 
@@ -245,7 +272,7 @@ export const getNotificationsControllerUnreadV1Url = (
  * @summary O contador do sino, a cada 60 s com a aba visível (Central RN06; R7-5).
  */
 export const notificationsControllerUnreadV1 = async (
-  params: NotificationsControllerUnreadV1Params,
+  params?: NotificationsControllerUnreadV1Params,
   options?: Parameters<typeof httpClient>[1],
 ): Promise<UnreadCountResponse> => {
   return httpClient<UnreadCountResponse>(getNotificationsControllerUnreadV1Url(params), {
@@ -263,10 +290,14 @@ export const getNotificationsControllerUnreadV1QueryKey = (
 export const getNotificationsControllerUnreadV1QueryOptions = <
   TData = Awaited<ReturnType<typeof notificationsControllerUnreadV1>>,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | ProfileNotOwnedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
-  params: NotificationsControllerUnreadV1Params,
+  params?: NotificationsControllerUnreadV1Params,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerUnreadV1>>, TError, TData>
@@ -293,16 +324,24 @@ export type NotificationsControllerUnreadV1QueryResult = NonNullable<
   Awaited<ReturnType<typeof notificationsControllerUnreadV1>>
 >;
 export type NotificationsControllerUnreadV1QueryError = ErrorType<
-  ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | ProfileNotOwnedErrorBody
+  | WeddingNotFoundErrorBody
+  | RateLimitedErrorBody
 >;
 
 export function useNotificationsControllerUnreadV1<
   TData = Awaited<ReturnType<typeof notificationsControllerUnreadV1>>,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | ProfileNotOwnedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
-  params: NotificationsControllerUnreadV1Params,
+  params: undefined | NotificationsControllerUnreadV1Params,
   options: {
     query: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerUnreadV1>>, TError, TData>
@@ -322,10 +361,14 @@ export function useNotificationsControllerUnreadV1<
 export function useNotificationsControllerUnreadV1<
   TData = Awaited<ReturnType<typeof notificationsControllerUnreadV1>>,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | ProfileNotOwnedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
-  params: NotificationsControllerUnreadV1Params,
+  params?: NotificationsControllerUnreadV1Params,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerUnreadV1>>, TError, TData>
@@ -345,10 +388,14 @@ export function useNotificationsControllerUnreadV1<
 export function useNotificationsControllerUnreadV1<
   TData = Awaited<ReturnType<typeof notificationsControllerUnreadV1>>,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | ProfileNotOwnedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
-  params: NotificationsControllerUnreadV1Params,
+  params?: NotificationsControllerUnreadV1Params,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerUnreadV1>>, TError, TData>
@@ -364,10 +411,14 @@ export function useNotificationsControllerUnreadV1<
 export function useNotificationsControllerUnreadV1<
   TData = Awaited<ReturnType<typeof notificationsControllerUnreadV1>>,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | ProfileNotOwnedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
-  params: NotificationsControllerUnreadV1Params,
+  params?: NotificationsControllerUnreadV1Params,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerUnreadV1>>, TError, TData>
@@ -386,7 +437,7 @@ export function useNotificationsControllerUnreadV1<
 }
 
 export const getNotificationsControllerReadAllV1Url = (
-  params: NotificationsControllerReadAllV1Params,
+  params?: NotificationsControllerReadAllV1Params,
 ) => {
   const normalizedParams = new URLSearchParams();
 
@@ -407,7 +458,7 @@ export const getNotificationsControllerReadAllV1Url = (
  * @summary Marcar todas como lidas (Central RN06).
  */
 export const notificationsControllerReadAllV1 = async (
-  params: NotificationsControllerReadAllV1Params,
+  params?: NotificationsControllerReadAllV1Params,
   options?: Parameters<typeof httpClient>[1],
 ): Promise<void> => {
   return httpClient<void>(getNotificationsControllerReadAllV1Url(params), {
@@ -424,6 +475,7 @@ export const getNotificationsControllerReadAllV1MutationOptions = <
     | ValidationErrorBody
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
+    | ProfileNotOwnedErrorBody
     | WeddingNotFoundErrorBody
     | RateLimitedErrorBody
   >,
@@ -469,11 +521,12 @@ export type NotificationsControllerReadAllV1MutationError = ErrorType<
   | ValidationErrorBody
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
+  | ProfileNotOwnedErrorBody
   | WeddingNotFoundErrorBody
   | RateLimitedErrorBody
 >;
 export type NotificationsControllerReadAllV1MutationVariables = {
-  params: NotificationsControllerReadAllV1Params;
+  params?: NotificationsControllerReadAllV1Params;
 };
 
 /**
@@ -484,6 +537,7 @@ export const useNotificationsControllerReadAllV1 = <
     | ValidationErrorBody
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
+    | ProfileNotOwnedErrorBody
     | WeddingNotFoundErrorBody
     | RateLimitedErrorBody
   >,
@@ -614,7 +668,7 @@ export const useNotificationsControllerReadV1 = <
   return useMutation(getNotificationsControllerReadV1MutationOptions(options), queryClient);
 };
 export const getNotificationsControllerGetPreferencesV1Url = (
-  params: NotificationsControllerGetPreferencesV1Params,
+  params?: NotificationsControllerGetPreferencesV1Params,
 ) => {
   const normalizedParams = new URLSearchParams();
 
@@ -632,10 +686,11 @@ export const getNotificationsControllerGetPreferencesV1Url = (
 };
 
 /**
- * @summary Configurações › Notificações (Central RN07).
+ * @summary Configurações › Notificações (Central RN07). Sem `weddingId`, a preferência
+geral da cerimonialista (Notificações da cerimonialista RN06).
  */
 export const notificationsControllerGetPreferencesV1 = async (
-  params: NotificationsControllerGetPreferencesV1Params,
+  params?: NotificationsControllerGetPreferencesV1Params,
   options?: Parameters<typeof httpClient>[1],
 ): Promise<PreferencesResponse> => {
   return httpClient<PreferencesResponse>(getNotificationsControllerGetPreferencesV1Url(params), {
@@ -653,10 +708,14 @@ export const getNotificationsControllerGetPreferencesV1QueryKey = (
 export const getNotificationsControllerGetPreferencesV1QueryOptions = <
   TData = Awaited<ReturnType<typeof notificationsControllerGetPreferencesV1>>,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | ProfileNotOwnedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
-  params: NotificationsControllerGetPreferencesV1Params,
+  params?: NotificationsControllerGetPreferencesV1Params,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -689,16 +748,24 @@ export type NotificationsControllerGetPreferencesV1QueryResult = NonNullable<
   Awaited<ReturnType<typeof notificationsControllerGetPreferencesV1>>
 >;
 export type NotificationsControllerGetPreferencesV1QueryError = ErrorType<
-  ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | ProfileNotOwnedErrorBody
+  | WeddingNotFoundErrorBody
+  | RateLimitedErrorBody
 >;
 
 export function useNotificationsControllerGetPreferencesV1<
   TData = Awaited<ReturnType<typeof notificationsControllerGetPreferencesV1>>,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | ProfileNotOwnedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
-  params: NotificationsControllerGetPreferencesV1Params,
+  params: undefined | NotificationsControllerGetPreferencesV1Params,
   options: {
     query: Partial<
       UseQueryOptions<
@@ -722,10 +789,14 @@ export function useNotificationsControllerGetPreferencesV1<
 export function useNotificationsControllerGetPreferencesV1<
   TData = Awaited<ReturnType<typeof notificationsControllerGetPreferencesV1>>,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | ProfileNotOwnedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
-  params: NotificationsControllerGetPreferencesV1Params,
+  params?: NotificationsControllerGetPreferencesV1Params,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -749,10 +820,14 @@ export function useNotificationsControllerGetPreferencesV1<
 export function useNotificationsControllerGetPreferencesV1<
   TData = Awaited<ReturnType<typeof notificationsControllerGetPreferencesV1>>,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | ProfileNotOwnedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
-  params: NotificationsControllerGetPreferencesV1Params,
+  params?: NotificationsControllerGetPreferencesV1Params,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -766,16 +841,21 @@ export function useNotificationsControllerGetPreferencesV1<
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
- * @summary Configurações › Notificações (Central RN07).
+ * @summary Configurações › Notificações (Central RN07). Sem `weddingId`, a preferência
+geral da cerimonialista (Notificações da cerimonialista RN06).
  */
 
 export function useNotificationsControllerGetPreferencesV1<
   TData = Awaited<ReturnType<typeof notificationsControllerGetPreferencesV1>>,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | ProfileNotOwnedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
-  params: NotificationsControllerGetPreferencesV1Params,
+  params?: NotificationsControllerGetPreferencesV1Params,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -843,6 +923,7 @@ export const getNotificationsControllerSavePreferenceV1MutationOptions = <
     | ValidationErrorBody
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
+    | ProfileNotOwnedErrorBody
     | WeddingNotFoundErrorBody
     | RateLimitedErrorBody
   >,
@@ -888,6 +969,7 @@ export type NotificationsControllerSavePreferenceV1MutationError = ErrorType<
   | ValidationErrorBody
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
+  | ProfileNotOwnedErrorBody
   | WeddingNotFoundErrorBody
   | RateLimitedErrorBody
 >;
@@ -901,6 +983,7 @@ export const useNotificationsControllerSavePreferenceV1 = <
     | ValidationErrorBody
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
+    | ProfileNotOwnedErrorBody
     | WeddingNotFoundErrorBody
     | RateLimitedErrorBody
   >,

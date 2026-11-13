@@ -1,0 +1,18 @@
+{
+  "title": "Músicas",
+  "loading": "Carregando as sugestões",
+  "loadingMore": "Carregando mais sugestões",
+  "export": "Exportar para o DJ",
+  "exportDisabled": "Ainda não há sugestões para exportar.",
+  "exported": "Lista exportada.",
+  "empty": {
+    "title": "Ainda não há sugestões",
+    "description": "Elas aparecem conforme os convidados confirmam."
+  },
+  "columns": {
+    "song": "Música",
+    "guest": "Quem sugeriu",
+    "party": "Grupo",
+    "suggestedAt": "Data da sugestão"
+  }
+}

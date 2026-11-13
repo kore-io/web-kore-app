@@ -21,6 +21,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  ActionNotAllowedErrorBody,
   AlreadyOwnerErrorBody,
   ContrastTooLowErrorBody,
   CreateWeddingBody,
@@ -32,6 +33,10 @@ import type {
   SlugUnavailableErrorBody,
   TermsVersionOutdatedErrorBody,
   ValidationErrorBody,
+  WeddingBlockedErrorBody,
+  WeddingDeletionScheduledErrorBody,
+  WeddingHasOwnerErrorBody,
+  WeddingNotFoundErrorBody,
   WeddingsControllerSlugAvailabilityV1Params,
 } from '../model';
 
@@ -55,6 +60,125 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   return result;
 };
 
+export const getWeddingsControllerRemoveV1Url = (weddingId: string) => {
+  return `/v1/weddings/${weddingId}`;
+};
+
+/**
+ * @summary Excluir este casamento (Meus casamentos RN11): só a cerimonialista que o
+criou, em rascunho ou aguardando o casal, sem dono ativo. Abre as próprias
+transações: a autorização sob a RLS e a exclusão pelo backoffice.
+ */
+export const weddingsControllerRemoveV1 = async (
+  weddingId: string,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<void> => {
+  return httpClient<void>(getWeddingsControllerRemoveV1Url(weddingId), {
+    ...options,
+    method: 'DELETE',
+  });
+};
+
+export const getWeddingsControllerRemoveV1MutationKey = () =>
+  ['weddingsControllerRemoveV1'] as const;
+
+export const getWeddingsControllerRemoveV1MutationOptions = <
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
+    | WeddingNotFoundErrorBody
+    | WeddingHasOwnerErrorBody
+    | WeddingDeletionScheduledErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof weddingsControllerRemoveV1>>,
+    TError,
+    WeddingsControllerRemoveV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof weddingsControllerRemoveV1>>,
+  TError,
+  WeddingsControllerRemoveV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getWeddingsControllerRemoveV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof weddingsControllerRemoveV1>>,
+    WeddingsControllerRemoveV1MutationVariables
+  > = (props) => {
+    const { weddingId } = props ?? {};
+
+    return weddingsControllerRemoveV1(weddingId, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type WeddingsControllerRemoveV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof weddingsControllerRemoveV1>>
+>;
+
+export type WeddingsControllerRemoveV1MutationError = ErrorType<
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
+  | WeddingNotFoundErrorBody
+  | WeddingHasOwnerErrorBody
+  | WeddingDeletionScheduledErrorBody
+  | RateLimitedErrorBody
+>;
+export type WeddingsControllerRemoveV1MutationVariables = { weddingId: string };
+
+/**
+ * @summary Excluir este casamento (Meus casamentos RN11): só a cerimonialista que o
+criou, em rascunho ou aguardando o casal, sem dono ativo. Abre as próprias
+transações: a autorização sob a RLS e a exclusão pelo backoffice.
+ */
+export const useWeddingsControllerRemoveV1 = <
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
+    | WeddingNotFoundErrorBody
+    | WeddingHasOwnerErrorBody
+    | WeddingDeletionScheduledErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof weddingsControllerRemoveV1>>,
+      TError,
+      WeddingsControllerRemoveV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof weddingsControllerRemoveV1>>,
+  TError,
+  WeddingsControllerRemoveV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getWeddingsControllerRemoveV1MutationOptions(options), queryClient);
+};
 export const getWeddingsControllerSlugAvailabilityV1Url = (
   params: WeddingsControllerSlugAvailabilityV1Params,
 ) => {

@@ -3,7 +3,14 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../../../tests/a11y';
 import { meFor, profileUnderTest } from '../../../../tests/profile';
-import { apiError, mockApi, renderAreaScreen, renderRoute } from '../../../../tests/render-route';
+import {
+  apiError,
+  mockApi,
+  renderAreaScreen,
+  renderRoute,
+  isLayoutRead,
+  layoutReadNotFound,
+} from '../../../../tests/render-route';
 import type { PastePreviewResponse } from '../../../shared/api/generated/model';
 
 afterEach(() => {
@@ -97,6 +104,8 @@ function mockPaste({
         nextCursor: null,
       });
     }
+    // O layout lê o site e o contador do sino: não são chamadas da tela.
+    if (isLayoutRead({ method, path })) return layoutReadNotFound();
     calls.push({ method, path, body });
     if (path === '/v1/weddings/w1/guest-imports/paste/preview') return previewResponse();
     if (path === '/v1/weddings/w1/guest-imports/paste') return importResponse();

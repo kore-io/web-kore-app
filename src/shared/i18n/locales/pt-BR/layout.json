@@ -9,9 +9,13 @@
   "nav": {
     "dashboard": "Dashboard",
     "guests": "Convidados",
-    "site": "Site"
+    "deliveries": "Envios",
+    "site": "Site",
+    "songs": "Músicas"
   },
   "activeProfileCouple": "Perfil ativo: Casal",
   "activeProfileCoupleWedding": "Perfil ativo: Casal · {{couple}}",
-  "signOut": "Sair"
+  "signOut": "Sair",
+  "notificationsUnreadMany": "Notificações, mais de 9 não lidas",
+  "settings": "Configurações"
 }

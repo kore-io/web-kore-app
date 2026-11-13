@@ -4,7 +4,14 @@ import i18next from 'i18next';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../../../tests/a11y';
 import { meFor, profileUnderTest } from '../../../../tests/profile';
-import { apiError, mockApi, renderAreaScreen, renderRoute } from '../../../../tests/render-route';
+import {
+  apiError,
+  mockApi,
+  renderAreaScreen,
+  renderRoute,
+  isLayoutRead,
+  layoutReadNotFound,
+} from '../../../../tests/render-route';
 import type { SiteEditorResponse } from '../../../shared/api/generated/model';
 import { compressImage } from '../images/compress-image';
 import { basicsErrorText } from './basics-section';
@@ -49,6 +56,7 @@ function site(overrides: Partial<SiteEditorResponse> = {}): SiteEditorResponse {
   return {
     publishedAt: null,
     siteUpdatedAt: '2026-11-11T13:31:00Z',
+    songQuestion: { enabled: false, text: 'Que música não pode faltar na festa?' },
     partners: [
       { id: 'pa', title: 'bride', name: 'Ana Beatriz Moreira' },
       { id: 'pm', title: 'groom', name: 'Marcos Vinícius Rocha' },
@@ -123,6 +131,18 @@ function mockBasics({
       calls.push({ method, path, body: Object.fromEntries(query) });
       return availability(query.get('slug') ?? '');
     }
+    if (path === '/v1/weddings/w1/dashboard') {
+      return Response.json({
+        site: {
+          slug: data.slug,
+          publishedAt: data.publishedAt,
+          endDate: '2027-02-14',
+          status: data.status,
+        },
+      });
+    }
+    // O layout lê o contador do sino: não é chamada da tela.
+    if (isLayoutRead({ method, path })) return layoutReadNotFound();
     calls.push({ method, path, body });
     if (path === '/v1/weddings/w1/site' && method === 'PATCH') return patch(body);
     return apiError({ status: 404, body: { error: 'NOT_FOUND' } });
@@ -456,6 +476,50 @@ describe('Site › Dados básicos (RN02 a RN08, RN10)', () => {
       await screen.findByText('Não foi possível continuar. Confira sua conexão e tente de novo.'),
     ).toBeInTheDocument();
     await waitFor(() => expect(gets.count).toBeGreaterThan(before));
+  });
+
+  it('publicado: a data do casamento não fica em branco, sem chamar a API (decisão 219)', async () => {
+    const user = userEvent.setup();
+    const calls = mockBasics({
+      data: site({ publishedAt: '2026-11-12T13:00:00Z', status: 'published' }),
+    });
+    renderRoute({ url: '/app/site/dados-basicos' });
+    const date = await screen.findByLabelText('Data do casamento');
+    await user.clear(date);
+    await user.click(screen.getByRole('button', { name: 'Salvar' }));
+    expect(date).toHaveAccessibleDescription(
+      'O site já foi publicado, então a data do casamento não pode ficar em branco.',
+    );
+    expect(date).toHaveAttribute('aria-invalid', 'true');
+    expect(calls.filter((call) => call.method === 'PATCH')).toHaveLength(0);
+  });
+
+  it('publicado: a data nova que tira a saída do ar da faixa diz até quando o site fica no ar (RN11; 228(1))', async () => {
+    const user = userEvent.setup();
+    mockBasics({
+      data: site({ publishedAt: '2026-11-12T13:00:00Z', status: 'published' }),
+      patch: () =>
+        apiError({
+          status: 422,
+          body: {
+            statusCode: 422,
+            error: 'END_DATE_OUT_OF_RANGE',
+            message: 'x',
+            endDateMin: '2028-03-02',
+            endDateMax: '2029-03-01',
+          },
+        }),
+    });
+    renderRoute({ url: '/app/site/dados-basicos' });
+    const date = await screen.findByLabelText('Data do casamento');
+    await user.clear(date);
+    await user.type(date, '2028-03-01');
+    await user.click(screen.getByRole('button', { name: 'Salvar' }));
+    await waitFor(() =>
+      expect(date).toHaveAccessibleDescription(
+        'A data do casamento precisa ser antes de 14 de fev. de 2027, quando o site sai do ar.',
+      ),
+    );
   });
 
   it('é acessível', async () => {

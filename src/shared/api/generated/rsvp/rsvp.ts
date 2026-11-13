@@ -47,10 +47,13 @@ import type {
   RsvpDeadlineResponse,
   SaveMessageTemplateBody,
   SessionExpiredErrorBody,
+  SiteExpiredConflictErrorBody,
   SongQuestionDisabledErrorBody,
   SongSuggestionsControllerPageV1Params,
   SongSuggestionsResponse,
   ValidationErrorBody,
+  WeddingBlockedErrorBody,
+  WeddingDeletionScheduledErrorBody,
   WeddingNotFoundErrorBody,
 } from '../model';
 
@@ -122,7 +125,9 @@ export const getCoupleResponsesControllerDeadlineV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | DeadlineAfterEventErrorBody
     | DeadlineInPastErrorBody
     | RateLimitedErrorBody
@@ -170,7 +175,9 @@ export type CoupleResponsesControllerDeadlineV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
+  | WeddingDeletionScheduledErrorBody
   | DeadlineAfterEventErrorBody
   | DeadlineInPastErrorBody
   | RateLimitedErrorBody
@@ -189,7 +196,9 @@ export const useCoupleResponsesControllerDeadlineV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | DeadlineAfterEventErrorBody
     | DeadlineInPastErrorBody
     | RateLimitedErrorBody
@@ -266,9 +275,11 @@ export const getCoupleResponsesControllerResponseV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | GuestNotFoundErrorBody
     | GuestResponseChangedErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -314,9 +325,11 @@ export type CoupleResponsesControllerResponseV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | GuestNotFoundErrorBody
   | GuestResponseChangedErrorBody
+  | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
 export type CoupleResponsesControllerResponseV1MutationVariables = {
@@ -334,9 +347,11 @@ export const useCoupleResponsesControllerResponseV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | GuestNotFoundErrorBody
     | GuestResponseChangedErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -583,7 +598,9 @@ export const getMessageTemplatesControllerPutV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | LinkPlaceholderMissingErrorBody
     | RateLimitedErrorBody
   >,
@@ -630,7 +647,9 @@ export type MessageTemplatesControllerPutV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
+  | WeddingDeletionScheduledErrorBody
   | LinkPlaceholderMissingErrorBody
   | RateLimitedErrorBody
 >;
@@ -649,7 +668,9 @@ export const useMessageTemplatesControllerPutV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | LinkPlaceholderMissingErrorBody
     | RateLimitedErrorBody
   >,
@@ -724,6 +745,7 @@ export const getDeliveriesControllerGetQueueV1QueryOptions = <
     | ActionNotAllowedErrorBody
     | WeddingNotFoundErrorBody
     | DeliveriesClosedErrorBody
+    | SiteExpiredConflictErrorBody
     | RateLimitedErrorBody
   >,
 >(
@@ -766,6 +788,7 @@ export type DeliveriesControllerGetQueueV1QueryError = ErrorType<
   | ActionNotAllowedErrorBody
   | WeddingNotFoundErrorBody
   | DeliveriesClosedErrorBody
+  | SiteExpiredConflictErrorBody
   | RateLimitedErrorBody
 >;
 
@@ -777,6 +800,7 @@ export function useDeliveriesControllerGetQueueV1<
     | ActionNotAllowedErrorBody
     | WeddingNotFoundErrorBody
     | DeliveriesClosedErrorBody
+    | SiteExpiredConflictErrorBody
     | RateLimitedErrorBody
   >,
 >(
@@ -806,6 +830,7 @@ export function useDeliveriesControllerGetQueueV1<
     | ActionNotAllowedErrorBody
     | WeddingNotFoundErrorBody
     | DeliveriesClosedErrorBody
+    | SiteExpiredConflictErrorBody
     | RateLimitedErrorBody
   >,
 >(
@@ -835,6 +860,7 @@ export function useDeliveriesControllerGetQueueV1<
     | ActionNotAllowedErrorBody
     | WeddingNotFoundErrorBody
     | DeliveriesClosedErrorBody
+    | SiteExpiredConflictErrorBody
     | RateLimitedErrorBody
   >,
 >(
@@ -860,6 +886,7 @@ export function useDeliveriesControllerGetQueueV1<
     | ActionNotAllowedErrorBody
     | WeddingNotFoundErrorBody
     | DeliveriesClosedErrorBody
+    | SiteExpiredConflictErrorBody
     | RateLimitedErrorBody
   >,
 >(
@@ -930,9 +957,12 @@ export const getDeliveriesControllerMarkV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | DeliveryPartyNotFoundErrorBody
     | DeliveriesClosedErrorBody
+    | SiteExpiredConflictErrorBody
+    | WeddingDeletionScheduledErrorBody
     | DeliveryNotAllowedErrorBody
     | RateLimitedErrorBody
   >,
@@ -979,9 +1009,12 @@ export type DeliveriesControllerMarkV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | DeliveryPartyNotFoundErrorBody
   | DeliveriesClosedErrorBody
+  | SiteExpiredConflictErrorBody
+  | WeddingDeletionScheduledErrorBody
   | DeliveryNotAllowedErrorBody
   | RateLimitedErrorBody
 >;
@@ -999,9 +1032,12 @@ export const useDeliveriesControllerMarkV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | DeliveryPartyNotFoundErrorBody
     | DeliveriesClosedErrorBody
+    | SiteExpiredConflictErrorBody
+    | WeddingDeletionScheduledErrorBody
     | DeliveryNotAllowedErrorBody
     | RateLimitedErrorBody
   >,
@@ -1073,9 +1109,12 @@ export const getQrCodesControllerCreateV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | DeliveryPartyNotFoundErrorBody
     | DeliveriesClosedErrorBody
+    | SiteExpiredConflictErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -1121,9 +1160,12 @@ export type QrCodesControllerCreateV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | DeliveryPartyNotFoundErrorBody
   | DeliveriesClosedErrorBody
+  | SiteExpiredConflictErrorBody
+  | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
 export type QrCodesControllerCreateV1MutationVariables = { weddingId: string; data: QrCodesBody };
@@ -1138,9 +1180,12 @@ export const useQrCodesControllerCreateV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | DeliveryPartyNotFoundErrorBody
     | DeliveriesClosedErrorBody
+    | SiteExpiredConflictErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,

@@ -27,6 +27,8 @@ import type {
   SiteImageUploadAuthorizationResponse,
   SiteImageUploadMissingErrorBody,
   ValidationErrorBody,
+  WeddingBlockedErrorBody,
+  WeddingDeletionScheduledErrorBody,
   WeddingNotFoundErrorBody,
 } from '../model';
 
@@ -85,10 +87,12 @@ export const getSiteImagesControllerConfirmV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | SiteImageNotFoundErrorBody
     | SiteImageProcessingErrorBody
     | SiteImageUploadMissingErrorBody
+    | WeddingDeletionScheduledErrorBody
     | SiteImageInvalidErrorBody
     | RateLimitedErrorBody
   >,
@@ -135,10 +139,12 @@ export type SiteImagesControllerConfirmV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | SiteImageNotFoundErrorBody
   | SiteImageProcessingErrorBody
   | SiteImageUploadMissingErrorBody
+  | WeddingDeletionScheduledErrorBody
   | SiteImageInvalidErrorBody
   | RateLimitedErrorBody
 >;
@@ -158,10 +164,12 @@ export const useSiteImagesControllerConfirmV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | SiteImageNotFoundErrorBody
     | SiteImageProcessingErrorBody
     | SiteImageUploadMissingErrorBody
+    | WeddingDeletionScheduledErrorBody
     | SiteImageInvalidErrorBody
     | RateLimitedErrorBody
   >,
@@ -236,8 +244,10 @@ export const getSiteImagesControllerAuthorizeV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | SiteImageLimitErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -283,8 +293,10 @@ export type SiteImagesControllerAuthorizeV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | SiteImageLimitErrorBody
+  | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
 export type SiteImagesControllerAuthorizeV1MutationVariables = {
@@ -301,8 +313,10 @@ export const useSiteImagesControllerAuthorizeV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | SiteImageLimitErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,

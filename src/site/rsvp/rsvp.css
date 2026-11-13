@@ -1,0 +1,188 @@
+/*
+ * Confirmar presença (Penpot, Área do Convidado, seção B; decisão 232): a página do grupo
+ * nas cores e fontes da Aparência. O nome do grupo em sobretítulo, o título em display e o
+ * prazo; os cartões de até 704 px em site.surface, com o nome, as pílulas Vou · Não vou
+ * (a marcada em site.primary), a restrição e a música; quem assina em pílulas com o
+ * primeiro nome; o Enviar respostas em largura cheia. Erros em danger.text, com a borda em
+ * danger.base. Alvo de toque de 44 px.
+ */
+.kore-site-rsvp {
+  @apply mx-auto flex w-full max-w-176 flex-col gap-10 px-4 pt-14 pb-20;
+}
+
+.kore-site-rsvp__header {
+  @apply flex flex-col items-center gap-3 text-center;
+}
+
+.kore-site-rsvp__overline {
+  @apply m-0 type-overline text-site-muted-foreground;
+}
+
+.kore-site-rsvp__title {
+  @apply m-0 font-display type-display-md text-site-foreground;
+}
+
+/* No formulário, 12 px abaixo do título e centralizado (Penpot): o espaço da página (40 px) menos 28. */
+.kore-site-rsvp__deadline {
+  @apply m-0 -mt-7 mb-5 text-center type-body-md text-site-foreground;
+}
+
+.kore-site-rsvp__form {
+  @apply flex flex-col gap-5;
+}
+
+.kore-site-rsvp__card {
+  @apply m-0 flex min-w-0 flex-col gap-3 rounded-xl border-0 bg-site-surface p-6;
+}
+
+.kore-site-rsvp__card-title,
+.kore-site-rsvp__name {
+  @apply m-0 mb-1 p-0 type-label-lg text-site-foreground;
+}
+
+.kore-site-rsvp__slot {
+  @apply flex flex-col gap-3;
+}
+
+.kore-site-rsvp__slot + .kore-site-rsvp__slot {
+  @apply mt-3 border-t border-site-border pt-4;
+}
+
+.kore-site-rsvp__hidden {
+  @apply sr-only;
+}
+
+.kore-site-rsvp__choice {
+  @apply m-0 grid min-w-0 grid-cols-2 gap-2 border-0 p-0;
+}
+
+.kore-site-rsvp__choice > legend {
+  @apply col-span-2;
+}
+
+.kore-site-rsvp__signer {
+  @apply m-0 flex min-w-0 flex-col gap-3 border-0 p-0;
+}
+
+/* As pílulas dividem a largura: duas por linha no celular, todas numa linha a partir do tablet. */
+.kore-site-rsvp__pills {
+  @apply grid grid-cols-2 gap-2 md:auto-cols-fr md:grid-flow-col md:grid-cols-none;
+}
+
+.kore-site-rsvp__option {
+  @apply flex min-h-11 cursor-pointer items-center justify-center rounded-full border border-site-border bg-white px-4 text-center type-label text-site-foreground;
+  @apply focus-within:shadow-focus-ring;
+}
+
+.kore-site-rsvp__option[data-checked='true'] {
+  @apply border-site-primary bg-site-primary text-site-primary-foreground;
+}
+
+.kore-site-rsvp__choice[aria-invalid='true'] .kore-site-rsvp__option,
+.kore-site-rsvp__signer[aria-invalid='true'] .kore-site-rsvp__option {
+  @apply border-danger-base;
+}
+
+.kore-site-rsvp__radio {
+  @apply sr-only;
+}
+
+.kore-site-rsvp__field {
+  @apply flex flex-col gap-2;
+}
+
+.kore-site-rsvp__label {
+  @apply type-label text-site-foreground;
+}
+
+.kore-site-rsvp__input {
+  @apply min-h-11 w-full rounded-md border border-site-border bg-white px-3 type-body-md text-site-foreground placeholder:text-site-muted-foreground;
+  @apply focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}
+
+.kore-site-rsvp__input[aria-invalid='true'] {
+  @apply border-danger-base;
+}
+
+.kore-site-rsvp__help {
+  @apply m-0 type-caption text-site-muted-foreground;
+}
+
+.kore-site-rsvp__error {
+  @apply m-0 type-caption text-danger-text;
+}
+
+.kore-site-rsvp__notice {
+  @apply m-0 rounded-lg border border-danger-base bg-white p-4 type-body-md text-site-foreground;
+}
+
+.kore-site-rsvp__submit,
+.kore-site-hero__action,
+.kore-site__party-action {
+  @apply inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-full bg-site-primary px-6 type-label text-site-primary-foreground no-underline;
+  @apply focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}
+
+.kore-site-rsvp__submit {
+  @apply w-full;
+}
+
+/* O site não tem o Desabilitado: a opacidade de 50% do DS (Penpot B4). */
+.kore-site-rsvp__submit:disabled {
+  @apply cursor-not-allowed opacity-50;
+}
+
+.kore-site-rsvp__spinner {
+  @apply size-4 animate-spin rounded-full border-2 border-site-primary-foreground border-t-transparent;
+}
+
+.kore-site-rsvp__secondary {
+  @apply inline-flex min-h-11 cursor-pointer items-center justify-center rounded-full border border-site-primary bg-transparent px-6 type-label text-site-foreground;
+  @apply focus-visible:shadow-focus-ring focus-visible:outline-2 focus-visible:outline-paper;
+}
+
+.kore-site-rsvp__done,
+.kore-site-rsvp__closed {
+  @apply flex flex-col items-center gap-5 text-center;
+}
+
+.kore-site-rsvp__done-icon {
+  @apply flex size-16 items-center justify-center rounded-full bg-site-surface text-site-accent;
+}
+
+.kore-site-rsvp__done-icon > svg {
+  @apply size-5;
+}
+
+.kore-site-rsvp__done-title {
+  @apply m-0 font-display type-display-sm text-site-foreground;
+}
+
+/* O aviso do prazo com o contato do casal, numa caixa só (Penpot, prazo encerrado). */
+.kore-site-rsvp__closed-box {
+  @apply flex w-full flex-col gap-1 rounded-lg border border-site-border bg-site-surface p-4 text-start;
+}
+
+.kore-site-rsvp__closed-text {
+  @apply m-0 type-label text-site-foreground;
+}
+
+.kore-site-rsvp__contact {
+  @apply m-0 type-body-md text-site-muted-foreground;
+}
+
+.kore-site-rsvp__summary {
+  @apply m-0 flex w-full list-none flex-col gap-3 rounded-xl bg-site-surface p-6;
+}
+
+.kore-site-rsvp__summary-item {
+  @apply flex items-center justify-between gap-4 type-body-md text-site-foreground;
+}
+
+.kore-site-rsvp__summary-answer {
+  @apply type-label;
+}
+
+.kore-site-rsvp__note {
+  @apply m-0 type-body-md text-site-muted-foreground;
+}

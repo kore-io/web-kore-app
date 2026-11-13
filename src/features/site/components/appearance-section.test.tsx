@@ -3,7 +3,14 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../../../tests/a11y';
 import { meFor, profileUnderTest } from '../../../../tests/profile';
-import { apiError, mockApi, renderAreaScreen, renderRoute } from '../../../../tests/render-route';
+import {
+  apiError,
+  mockApi,
+  renderAreaScreen,
+  renderRoute,
+  isLayoutRead,
+  layoutReadNotFound,
+} from '../../../../tests/render-route';
 import type { SiteEditorResponse } from '../../../shared/api/generated/model';
 
 vi.mock('../site-fonts', () => ({ loadEditorFonts: vi.fn(async () => undefined) }));
@@ -40,6 +47,7 @@ const me = {
 const site = {
   publishedAt: null,
   siteUpdatedAt: '2026-11-11T13:31:00Z',
+  songQuestion: { enabled: false, text: 'Que música não pode faltar na festa?' },
   partners: [
     { id: 'pa', title: 'bride', name: 'Ana Beatriz Moreira' },
     { id: 'pm', title: 'groom', name: 'Marcos Vinícius Rocha' },
@@ -71,6 +79,8 @@ function mockAppearance({ put }: { put?: (body: Record<string, unknown>) => Resp
   mockApi(({ method, path, body }) => {
     if (path === '/v1/me') return Response.json(meFor(me));
     if (path === '/v1/weddings/w1/site' && method === 'GET') return Response.json(site);
+    // O layout lê o contador do sino: não é chamada da tela.
+    if (isLayoutRead({ method, path })) return layoutReadNotFound();
     calls.push({ method, path, body });
     if (path === '/v1/weddings/w1/site/appearance') {
       const data = body as Record<string, unknown>;

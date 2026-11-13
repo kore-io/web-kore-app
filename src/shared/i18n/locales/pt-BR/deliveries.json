@@ -1,0 +1,165 @@
+{
+  "title": "Envios",
+  "tabs": {
+    "label": "Envios",
+    "deadline": "Prazo de resposta",
+    "deadlineShort": "Prazo",
+    "invites": "Enviar convites",
+    "invitesShort": "Convites",
+    "saveTheDate": "Save the date",
+    "saveTheDateShort": "Save the date",
+    "reminder": "Lembrar pendentes",
+    "reminderShort": "Lembrar"
+  },
+  "deadline": {
+    "label": "Prazo de resposta",
+    "daysLeft_one": "Falta {{count}} dia. No site, o grupo vê \"Vocês podem responder até {{date}}.\"",
+    "daysLeft_other": "Faltam {{count}} dias. No site, o grupo vê \"Vocês podem responder até {{date}}.\"",
+    "today": "O prazo termina hoje, às 23h59. No site, o grupo vê \"Vocês podem responder até {{date}}.\"",
+    "none": "Sem prazo, os convidados respondem até o dia do casamento.",
+    "notice": {
+      "couple": "Depois do prazo, só vocês podem alterar as respostas.",
+      "planner": "Depois do prazo, só o casal pode alterar as respostas."
+    },
+    "noticeText": "Os convidados veem a resposta dada, sem poder mudar.",
+    "ended": "O prazo terminou em {{date}}.",
+    "endedText": "Os convidados só veem a resposta dada.",
+    "reopen": {
+      "couple": "Escolham uma nova data para reabrir as respostas.",
+      "planner": "Escolha uma nova data para reabrir as respostas."
+    },
+    "pendingLabel": "Ainda sem resposta",
+    "pendingGuests_zero": "convidados",
+    "pendingGuests_one": "convidado",
+    "pendingGuests_other": "convidados",
+    "pendingParties_zero": "{{count}} grupos",
+    "pendingParties_one": "{{count}} grupo",
+    "pendingParties_other": "{{count}} grupos",
+    "pendingDetail": "{{guests}} em {{parties}}",
+    "save": "Salvar prazo",
+    "remove": "Tirar o prazo",
+    "saved": "Prazo salvo.",
+    "removed": "Prazo retirado.",
+    "inPast": {
+      "couple": "Essa data já passou. Escolham uma data a partir de hoje.",
+      "planner": "Essa data já passou. Escolha uma data a partir de hoje."
+    },
+    "afterEvent": {
+      "couple": "O prazo precisa ser até o dia do casamento, {{date}}. Escolham outra data.",
+      "planner": "O prazo precisa ser até o dia do casamento, {{date}}. Escolha outra data."
+    },
+    "remind": "Lembrar pendentes"
+  },
+  "summary": {
+    "sent_one": "{{sent}} de {{count}} grupo já recebeu o convite",
+    "sent_other": "{{sent}} de {{count}} grupos já receberam o convite",
+    "deadline": "prazo de resposta: {{date}}"
+  },
+  "closed": {
+    "notPublished": {
+      "couple": "Publiquem o site para começar os envios.",
+      "planner": "Os envios começam depois que o casal publicar o site."
+    }
+  },
+  "groups": {
+    "marked_zero": "{{count}} grupos marcados",
+    "marked_one": "{{count}} grupo marcado",
+    "marked_other": "{{count}} grupos marcados",
+    "continue": "Continuar",
+    "limit": {
+      "couple": "Vocês marcaram {{count}} grupos. Marquem até 200 por envio.",
+      "planner": "Você marcou {{count}} grupos. Marque até 200 por envio."
+    },
+    "saveTheDateFilter": {
+      "all": "Todos",
+      "not_sent": "Não enviado",
+      "sent": "Enviado"
+    }
+  },
+  "reminder": {
+    "header_one": "{{count}} grupo com convidados sem resposta",
+    "header_other": "{{count}} grupos com convidados sem resposta",
+    "emptyTitle": "Nenhum grupo para lembrar",
+    "emptyDescription": "Todos os que receberam o convite já responderam.",
+    "outside_one": "{{count}} grupo marcado não entra no lembrete: ainda não recebeu o convite ou já respondeu.",
+    "outside_other": "{{count}} grupos marcados não entram no lembrete: ainda não receberam o convite ou já responderam."
+  },
+  "channel": {
+    "whatsapp": "WhatsApp",
+    "email": "E-mail",
+    "link": "Copiar link",
+    "qr": "QR code",
+    "label": "Canal"
+  },
+  "message": {
+    "body": "Mensagem",
+    "subject": "Assunto",
+    "help": {
+      "invite": {
+        "couple": "Usem {nome_do_grupo}, {data} e {link}. O Kore troca cada um pelos dados do grupo.",
+        "planner": "Use {nome_do_grupo}, {data} e {link}. O Kore troca cada um pelos dados do grupo."
+      },
+      "save_the_date": {
+        "couple": "Usem {nome_do_grupo}, {data} e {site}. O save the date não leva o link do grupo: as respostas chegam com o convite.",
+        "planner": "Use {nome_do_grupo}, {data} e {site}. O save the date não leva o link do grupo: as respostas chegam com o convite."
+      },
+      "reminder": {
+        "couple": "Usem {nome_do_grupo}, {data}, {prazo} e {link}. Sem prazo, o {prazo} fica em branco.",
+        "planner": "Use {nome_do_grupo}, {data}, {prazo} e {link}. Sem prazo, o {prazo} fica em branco."
+      }
+    },
+    "linkMissing": {
+      "couple": "A mensagem precisa ter o {link}, senão o grupo não consegue responder. Coloquem o {link} de volta.",
+      "planner": "A mensagem precisa ter o {link}, senão o grupo não consegue responder. Coloque o {link} de volta."
+    },
+    "restore": "Restaurar a mensagem padrão",
+    "previewTitle": "Prévia · {{name}}",
+    "previewNote": "É assim que o grupo recebe. O link é só deste grupo.",
+    "previewNoteSaveTheDate": "É assim que o grupo recebe.",
+    "back": "Voltar",
+    "toQueue_one": "Ir para a fila ({{count}} grupo)",
+    "toQueue_other": "Ir para a fila ({{count}} grupos)"
+  },
+  "queue": {
+    "notice": "O WhatsApp abre a seguir, com a mensagem pronta. O ideal é enviar do número de uma das pessoas do casal.",
+    "counter": "{{sent}} de {{total}} enviados",
+    "stop": "Parar e continuar depois",
+    "open": {
+      "whatsapp": "Abrir WhatsApp",
+      "email": "Abrir e-mail",
+      "link": "Copiar mensagem"
+    },
+    "again": "Enviar de novo",
+    "copied": "Mensagem copiada.",
+    "noPhone": {
+      "couple": "O contato deste grupo não tem telefone. Adicionem um para enviar pelo WhatsApp.",
+      "planner": "O contato deste grupo não tem telefone. Adicione um para enviar pelo WhatsApp."
+    },
+    "noEmail": {
+      "couple": "O contato deste grupo não tem e-mail. Adicionem um para enviar por e-mail.",
+      "planner": "O contato deste grupo não tem e-mail. Adicione um para enviar por e-mail."
+    },
+    "editParty": "Editar grupo",
+    "status": {
+      "sentToday": "Enviado às {{time}} {{channel}}",
+      "sentOn": "Enviado em {{date}} às {{time}} {{channel}}",
+      "byWhatsapp": "pelo WhatsApp",
+      "byEmail": "por e-mail",
+      "copiedToday": "Mensagem copiada às {{time}}",
+      "copiedOn": "Mensagem copiada em {{date}} às {{time}}"
+    },
+    "sent": "Enviado"
+  },
+  "steps": {
+    "label": "Etapas",
+    "groups": "Grupos",
+    "channel": "Canal e mensagem",
+    "queue": "Fila de envio"
+  },
+  "qr": {
+    "pdf": "Baixar PDF para impressão",
+    "png": "Baixar imagem (PNG)",
+    "downloaded_one": "QR code baixado. O grupo foi marcado como enviado.",
+    "downloaded_other": "QR code baixado. {{count}} grupos marcados como enviados."
+  }
+}

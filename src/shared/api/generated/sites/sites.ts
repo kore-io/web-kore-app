@@ -42,10 +42,13 @@ import type {
   RsvpRateLimitedErrorBody,
   RsvpResponse,
   SiteDraftErrorBody,
+  SiteExpiredConflictErrorBody,
+  SiteExpiredErrorBody,
   SiteLinkInvalidErrorBody,
   SiteLinkPreviewResponse,
   SiteNotFoundErrorBody,
   SitePartyNotFoundErrorBody,
+  SiteUnavailableErrorBody,
   ValidationErrorBody,
 } from '../model';
 
@@ -703,6 +706,8 @@ export const getPublicSiteControllerPartySessionV1MutationOptions = <
     | SiteLinkInvalidErrorBody
     | SiteDraftErrorBody
     | SiteNotFoundErrorBody
+    | SiteExpiredErrorBody
+    | SiteUnavailableErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -749,6 +754,8 @@ export type PublicSiteControllerPartySessionV1MutationError = ErrorType<
   | SiteLinkInvalidErrorBody
   | SiteDraftErrorBody
   | SiteNotFoundErrorBody
+  | SiteExpiredErrorBody
+  | SiteUnavailableErrorBody
   | RateLimitedErrorBody
 >;
 export type PublicSiteControllerPartySessionV1MutationVariables = {
@@ -768,6 +775,8 @@ export const usePublicSiteControllerPartySessionV1 = <
     | SiteLinkInvalidErrorBody
     | SiteDraftErrorBody
     | SiteNotFoundErrorBody
+    | SiteExpiredErrorBody
+    | SiteUnavailableErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -955,7 +964,12 @@ export const getRsvpControllerGetV1QueryKey = (slug: string) => {
 export const getRsvpControllerGetV1QueryOptions = <
   TData = Awaited<ReturnType<typeof rsvpControllerGetV1>>,
   TError = ErrorType<
-    PartySessionInvalidErrorBody | SiteNotFoundErrorBody | SiteDraftErrorBody | RateLimitedErrorBody
+    | PartySessionInvalidErrorBody
+    | SiteNotFoundErrorBody
+    | SiteDraftErrorBody
+    | SiteExpiredErrorBody
+    | SiteUnavailableErrorBody
+    | RateLimitedErrorBody
   >,
 >(
   slug: string,
@@ -987,13 +1001,23 @@ export type RsvpControllerGetV1QueryResult = NonNullable<
   Awaited<ReturnType<typeof rsvpControllerGetV1>>
 >;
 export type RsvpControllerGetV1QueryError = ErrorType<
-  PartySessionInvalidErrorBody | SiteNotFoundErrorBody | SiteDraftErrorBody | RateLimitedErrorBody
+  | PartySessionInvalidErrorBody
+  | SiteNotFoundErrorBody
+  | SiteDraftErrorBody
+  | SiteExpiredErrorBody
+  | SiteUnavailableErrorBody
+  | RateLimitedErrorBody
 >;
 
 export function useRsvpControllerGetV1<
   TData = Awaited<ReturnType<typeof rsvpControllerGetV1>>,
   TError = ErrorType<
-    PartySessionInvalidErrorBody | SiteNotFoundErrorBody | SiteDraftErrorBody | RateLimitedErrorBody
+    | PartySessionInvalidErrorBody
+    | SiteNotFoundErrorBody
+    | SiteDraftErrorBody
+    | SiteExpiredErrorBody
+    | SiteUnavailableErrorBody
+    | RateLimitedErrorBody
   >,
 >(
   slug: string,
@@ -1016,7 +1040,12 @@ export function useRsvpControllerGetV1<
 export function useRsvpControllerGetV1<
   TData = Awaited<ReturnType<typeof rsvpControllerGetV1>>,
   TError = ErrorType<
-    PartySessionInvalidErrorBody | SiteNotFoundErrorBody | SiteDraftErrorBody | RateLimitedErrorBody
+    | PartySessionInvalidErrorBody
+    | SiteNotFoundErrorBody
+    | SiteDraftErrorBody
+    | SiteExpiredErrorBody
+    | SiteUnavailableErrorBody
+    | RateLimitedErrorBody
   >,
 >(
   slug: string,
@@ -1039,7 +1068,12 @@ export function useRsvpControllerGetV1<
 export function useRsvpControllerGetV1<
   TData = Awaited<ReturnType<typeof rsvpControllerGetV1>>,
   TError = ErrorType<
-    PartySessionInvalidErrorBody | SiteNotFoundErrorBody | SiteDraftErrorBody | RateLimitedErrorBody
+    | PartySessionInvalidErrorBody
+    | SiteNotFoundErrorBody
+    | SiteDraftErrorBody
+    | SiteExpiredErrorBody
+    | SiteUnavailableErrorBody
+    | RateLimitedErrorBody
   >,
 >(
   slug: string,
@@ -1058,7 +1092,12 @@ export function useRsvpControllerGetV1<
 export function useRsvpControllerGetV1<
   TData = Awaited<ReturnType<typeof rsvpControllerGetV1>>,
   TError = ErrorType<
-    PartySessionInvalidErrorBody | SiteNotFoundErrorBody | SiteDraftErrorBody | RateLimitedErrorBody
+    | PartySessionInvalidErrorBody
+    | SiteNotFoundErrorBody
+    | SiteDraftErrorBody
+    | SiteExpiredErrorBody
+    | SiteUnavailableErrorBody
+    | RateLimitedErrorBody
   >,
 >(
   slug: string,
@@ -1130,6 +1169,9 @@ export const getRsvpControllerPutV1MutationOptions = <
     | SiteDraftErrorBody
     | RsvpChangedErrorBody
     | RsvpClosedErrorBody
+    | SiteExpiredConflictErrorBody
+    | SiteExpiredErrorBody
+    | SiteUnavailableErrorBody
     | RateLimitedErrorBody
     | RsvpRateLimitedErrorBody
   >,
@@ -1180,6 +1222,9 @@ export type RsvpControllerPutV1MutationError = ErrorType<
   | SiteDraftErrorBody
   | RsvpChangedErrorBody
   | RsvpClosedErrorBody
+  | SiteExpiredConflictErrorBody
+  | SiteExpiredErrorBody
+  | SiteUnavailableErrorBody
   | RateLimitedErrorBody
   | RsvpRateLimitedErrorBody
 >;
@@ -1198,6 +1243,9 @@ export const useRsvpControllerPutV1 = <
     | SiteDraftErrorBody
     | RsvpChangedErrorBody
     | RsvpClosedErrorBody
+    | SiteExpiredConflictErrorBody
+    | SiteExpiredErrorBody
+    | SiteUnavailableErrorBody
     | RateLimitedErrorBody
     | RsvpRateLimitedErrorBody
   >,

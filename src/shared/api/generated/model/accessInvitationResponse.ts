@@ -6,6 +6,7 @@
  */
 import type { AccessInvitationResponseKind } from './accessInvitationResponseKind';
 import type { AccessInvitationResponseSitePreview } from './accessInvitationResponseSitePreview';
+import type { InvitationPlannerCreditResponse } from './invitationPlannerCreditResponse';
 import type { InvitationReferrerResponse } from './invitationReferrerResponse';
 import type { InvitationWeddingResponse } from './invitationWeddingResponse';
 import type { InvitedByResponse } from './invitedByResponse';
@@ -19,6 +20,11 @@ export interface AccessInvitationResponse {
    * @nullable
    */
   sitePreview?: AccessInvitationResponseSitePreview;
+  /**
+   * Só no do casal: "Assessoria: {name}" na prévia do aceite (Assinatura RN04).
+   * @nullable
+   */
+  plannerCredit?: InvitationPlannerCreditResponse | null;
   /**
    * Só no do casal.
    * @nullable

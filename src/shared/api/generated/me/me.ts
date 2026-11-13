@@ -21,11 +21,15 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  ContrastTooLowErrorBody,
   CreatePlannerProfileBody,
   CreatePlannerProfileResponse,
+  CreatePlannerWeddingBody,
+  CreatePlannerWeddingResponse,
   MeResponse,
   MyReferrerResponse,
   OriginNotAllowedErrorBody,
+  OwnerlessWeddingsLimitErrorBody,
   PlannerNotFoundErrorBody,
   PlannerProfileExistsErrorBody,
   PlannerProfileResponse,
@@ -36,6 +40,7 @@ import type {
   SessionExpiredErrorBody,
   SetActiveProfileBody,
   SetActiveProfileResponse,
+  SlugUnavailableErrorBody,
   TermsVersionOutdatedErrorBody,
   UpdatePlannerProfileBody,
   ValidationErrorBody,
@@ -300,6 +305,149 @@ export const useMeControllerChooseProfileV1 = <
   TContext
 > => {
   return useMutation(getMeControllerChooseProfileV1MutationOptions(options), queryClient);
+};
+export const getPlannerControllerCreatePlannerWeddingV1Url = () => {
+  return `/v1/me/weddings`;
+};
+
+/**
+ * @summary Novo casamento pela cerimonialista (Novo casamento RN01 a RN04): sem dono,
+com ela colaboradora. Exige ter o perfil; não muda o perfil ativo.
+ */
+export const plannerControllerCreatePlannerWeddingV1 = async (
+  createPlannerWeddingBody: CreatePlannerWeddingBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<CreatePlannerWeddingResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<CreatePlannerWeddingResponse>(getPlannerControllerCreatePlannerWeddingV1Url(), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(createPlannerWeddingBody),
+  });
+};
+
+export const getPlannerControllerCreatePlannerWeddingV1MutationKey = () =>
+  ['plannerControllerCreatePlannerWeddingV1'] as const;
+
+export const getPlannerControllerCreatePlannerWeddingV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ProfileNotOwnedErrorBody
+    | SlugUnavailableErrorBody
+    | OwnerlessWeddingsLimitErrorBody
+    | ContrastTooLowErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof plannerControllerCreatePlannerWeddingV1>>,
+    TError,
+    PlannerControllerCreatePlannerWeddingV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof plannerControllerCreatePlannerWeddingV1>>,
+  TError,
+  PlannerControllerCreatePlannerWeddingV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getPlannerControllerCreatePlannerWeddingV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof plannerControllerCreatePlannerWeddingV1>>,
+    PlannerControllerCreatePlannerWeddingV1MutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return plannerControllerCreatePlannerWeddingV1(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PlannerControllerCreatePlannerWeddingV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof plannerControllerCreatePlannerWeddingV1>>
+>;
+export type PlannerControllerCreatePlannerWeddingV1MutationBody = CreatePlannerWeddingBody;
+export type PlannerControllerCreatePlannerWeddingV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | ProfileNotOwnedErrorBody
+  | SlugUnavailableErrorBody
+  | OwnerlessWeddingsLimitErrorBody
+  | ContrastTooLowErrorBody
+  | RateLimitedErrorBody
+>;
+export type PlannerControllerCreatePlannerWeddingV1MutationVariables = {
+  data: CreatePlannerWeddingBody;
+};
+
+/**
+ * @summary Novo casamento pela cerimonialista (Novo casamento RN01 a RN04): sem dono,
+com ela colaboradora. Exige ter o perfil; não muda o perfil ativo.
+ */
+export const usePlannerControllerCreatePlannerWeddingV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ProfileNotOwnedErrorBody
+    | SlugUnavailableErrorBody
+    | OwnerlessWeddingsLimitErrorBody
+    | ContrastTooLowErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof plannerControllerCreatePlannerWeddingV1>>,
+      TError,
+      PlannerControllerCreatePlannerWeddingV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof plannerControllerCreatePlannerWeddingV1>>,
+  TError,
+  PlannerControllerCreatePlannerWeddingV1MutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getPlannerControllerCreatePlannerWeddingV1MutationOptions(options),
+    queryClient,
+  );
 };
 export const getPlannerControllerCreateV1Url = () => {
   return `/v1/me/planner`;

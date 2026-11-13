@@ -10,4 +10,8 @@ export type NotificationResponseType =
 
 export const NotificationResponseType = {
   rsvp: 'rsvp',
+  wedding_published: 'wedding_published',
+  membership_removed: 'membership_removed',
+  commission: 'commission',
+  billing: 'billing',
 } as const;

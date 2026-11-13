@@ -6,6 +6,5 @@
  */
 
 export type NotificationsControllerGetPreferencesV1Params = {
-  /** O casamento ativo. */
-  weddingId: string;
+  weddingId?: string;
 };

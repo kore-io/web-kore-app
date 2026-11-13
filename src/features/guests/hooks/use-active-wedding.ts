@@ -14,5 +14,5 @@ export function useActiveWedding() {
   const membership = me?.memberships.find((item) => item.role === 'owner') ?? me?.memberships[0];
   // O vendedor também lê no singular (textos-f2: "vendedor antes do aceite").
   const audience: Audience = !me || me.activeProfile === 'couple' ? 'couple' : 'planner';
-  return { weddingId: membership?.weddingId, audience };
+  return { weddingId: membership?.weddingId, audience, role: membership?.role };
 }

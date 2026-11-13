@@ -3,7 +3,14 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../../../tests/a11y';
 import { meFor, profileUnderTest } from '../../../../tests/profile';
-import { apiError, mockApi, renderAreaScreen, renderRoute } from '../../../../tests/render-route';
+import {
+  apiError,
+  mockApi,
+  renderAreaScreen,
+  renderRoute,
+  isLayoutRead,
+  layoutReadNotFound,
+} from '../../../../tests/render-route';
 import type { TagResponse } from '../../../shared/api/generated/model';
 
 afterEach(() => {
@@ -74,6 +81,8 @@ function mockTags({
     }
     if (method === 'GET' && path === '/v1/weddings/w1/tags')
       return Response.json({ limit: 10, data: current });
+    // O layout lê o site e o contador do sino: não são chamadas da tela.
+    if (isLayoutRead(call)) return layoutReadNotFound();
     calls.push(call);
     const custom = write?.(call);
     if (custom) return custom;

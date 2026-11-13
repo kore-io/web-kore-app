@@ -2,7 +2,13 @@ import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../../../tests/a11y';
-import { apiError, mockApi, renderRoute } from '../../../../tests/render-route';
+import {
+  apiError,
+  mockApi,
+  renderRoute,
+  isLayoutRead,
+  layoutReadNotFound,
+} from '../../../../tests/render-route';
 import type { PartyListItemResponse } from '../../../shared/api/generated/model';
 
 afterEach(() => {
@@ -117,6 +123,8 @@ function mockRow({
         nextCursor: null,
       });
     }
+    // O layout lê o site e o contador do sino: não são chamadas da tela.
+    if (isLayoutRead({ method, path })) return layoutReadNotFound();
     calls.push(`${method} ${path}`);
     if (method === 'DELETE' && path === '/v1/weddings/w1/parties/p1') return trash();
     return apiError({ status: 404, body: { error: 'NOT_FOUND' } });

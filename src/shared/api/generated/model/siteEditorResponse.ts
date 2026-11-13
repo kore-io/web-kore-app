@@ -8,6 +8,7 @@ import type { SiteEditableResponse } from './siteEditableResponse';
 import type { SiteEditorAppearanceResponse } from './siteEditorAppearanceResponse';
 import type { SiteImageRefResponse } from './siteImageRefResponse';
 import type { SitePartnerResponse } from './sitePartnerResponse';
+import type { SitePlannerCreditResponse } from './sitePlannerCreditResponse';
 import type { SitePublicationResponse } from './sitePublicationResponse';
 import type { SiteSectionResponse } from './siteSectionResponse';
 import type { SiteSongQuestionResponse } from './siteSongQuestionResponse';
@@ -42,5 +43,10 @@ export interface SiteEditorResponse {
   editable: SiteEditableResponse;
   publication: SitePublicationResponse;
   songQuestion: SiteSongQuestionResponse;
+  /**
+   * Nulo sem cerimonialista colaboradora: o Switch não aparece (Assinatura RN05).
+   * @nullable
+   */
+  plannerCredit: SitePlannerCreditResponse | null;
   status: string;
 }

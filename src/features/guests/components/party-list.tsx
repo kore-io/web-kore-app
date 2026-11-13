@@ -7,31 +7,18 @@ import {
   GroupTableHeader,
   Spinner,
   Tag,
-  type BadgeTone,
 } from '@kore-io/design';
-import { Check, Clock, Send } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { guestPartyPath } from '../../../app/paths';
-import type {
-  PartyListItemResponse,
-  PartyListItemResponseDeliveryStatus,
-} from '../../../shared/api/generated/model';
+import type { PartyListItemResponse } from '../../../shared/api/generated/model';
+import { deliveryBadges } from './delivery-badges';
+import { useSiteControllerGetV1 } from '../../../shared/api/generated/site/site';
+import { useActiveWedding } from '../hooks/use-active-wedding';
 import { contactText, respondedAtText, responsesText } from '../party-texts';
 import { useLoadMoreOnScroll } from '../hooks/use-load-more-on-scroll';
 import type { usePartySelection } from '../hooks/use-party-selection';
-
-/** Selo do envio, como no Badge do DS (o ícone de 14 px, traço 2,4 no Check). */
-const deliveryBadges: Record<
-  PartyListItemResponseDeliveryStatus,
-  { tone: BadgeTone; icon?: ReactNode }
-> = {
-  not_sent: { tone: 'neutral' },
-  sent: { tone: 'info', icon: <Send /> },
-  viewed: { tone: 'warning', icon: <Clock /> },
-  responded: { tone: 'success', icon: <Check strokeWidth={2.4} /> },
-};
 
 interface PartyListProps {
   parties: PartyListItemResponse[];
@@ -59,6 +46,10 @@ export function PartyList({
 }: PartyListProps) {
   const { t } = useTranslation('guests');
   const { t: tCommon } = useTranslation('common');
+  // O Respondido em no fuso do casamento, como o .xlsx (decisão 246); o site já está em cache.
+  const { weddingId } = useActiveWedding();
+  const site = useSiteControllerGetV1(weddingId ?? '', { query: { enabled: Boolean(weddingId) } });
+  const timezone = (site.data as { timezone?: string | null } | undefined)?.timezone ?? null;
   // Com a próxima página em erro, o marcador para; volta pelo Tentar de novo (200(d)).
   const sentinel = useLoadMoreOnScroll({ enabled: hasMore && !loadMoreFailed, onLoadMore });
 
@@ -113,7 +104,7 @@ export function PartyList({
                   {t(`row.delivery.${party.deliveryStatus}`)}
                 </Badge>
               }
-              respondedAt={respondedAtText({ t, party })}
+              respondedAt={respondedAtText({ t, party, timezone })}
               tags={party.tags.map((tag) => (
                 <Tag key={tag.id} color={tag.color}>
                   {tag.name}

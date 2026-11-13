@@ -61,6 +61,10 @@ describe('Site do casal › endereço e estados (Site público RN01, RN04, RN12)
     });
     expect(parseSiteRoute('/')).toEqual({ kind: 'none' });
     expect(parseSiteRoute('/ana-e-marcos/outra')).toEqual({ kind: 'none' });
+    expect(parseSiteRoute('/Ana-e-Marcos/confirmar-presenca')).toEqual({
+      kind: 'rsvp',
+      slug: 'ana-e-marcos',
+    });
     // Um "%" malformado não derruba a página: vira o endereço que não existe.
     expect(parseSiteRoute('/ana%E0%A4%A')).toEqual({ kind: 'none' });
   });
@@ -284,11 +288,35 @@ const partySite = {
 
 type Call = { method: string; path: string; body: unknown };
 
-function mockParty(session: () => Response, get: () => Response = () => Response.json(partySite)) {
+const partyRsvp = (state: string) => ({
+  party: { id: 'p1', name: 'Família Moreira', version: 1 },
+  guests: [
+    {
+      id: 'g1',
+      name: 'Célia Moreira',
+      rsvpStatus: 'pending',
+      dietaryRestriction: null,
+      songSuggestion: null,
+      isPlusOne: false,
+    },
+  ],
+  rsvpDeadline: null,
+  state,
+  songQuestion: { enabled: false, text: 'Que música não pode faltar na festa?' },
+  contact: { whatsapp: null, email: null },
+  plusOneSlots: 0,
+});
+
+function mockParty(
+  session: () => Response,
+  get: () => Response = () => Response.json(partySite),
+  rsvpState = 'open',
+) {
   const calls: Call[] = [];
   mockApi(({ method, path, body }) => {
     calls.push({ method, path, body });
     if (path.endsWith('/party-session') && method === 'POST') return session();
+    if (path.endsWith('/rsvp') && method === 'GET') return Response.json(partyRsvp(rsvpState));
     if (path.startsWith('/v1/sites/') && method === 'GET') return get();
     return apiError({ status: 404, body: { error: 'X' } });
   });
@@ -311,8 +339,46 @@ describe('Site do casal › o link do grupo (Site público RN06)', () => {
     expect(calls.map((call) => `${call.method} ${call.path}`)).toEqual([
       'POST /v1/sites/ana-e-marcos/party-session',
       'GET /v1/sites/ana-e-marcos',
+      'GET /v1/sites/ana-e-marcos/rsvp',
     ]);
     expect(calls[0]?.body).toEqual({ token: 'q3Xv8LmN2pRtY7wK1cZb4A' });
+  });
+
+  it('a faixa e o Início levam ao Confirmar presença; no pós-evento, sem o botão (RSVP RN01; 232(1))', async () => {
+    mockParty(() => apiError({ status: 404, body: { error: 'X' } }));
+    const view = render(<SiteApp pathname="/ana-e-marcos" />);
+    await screen.findByText('Convite para Família Moreira');
+    const links = await screen.findAllByRole('link', { name: 'Confirmar presença' });
+    expect(links.map((link) => link.getAttribute('href'))).toEqual([
+      '/ana-e-marcos/confirmar-presenca',
+      '/ana-e-marcos/confirmar-presenca',
+    ]);
+    view.unmount();
+    mockParty(() => apiError({ status: 404, body: { error: 'X' } }), undefined, 'post_event');
+    render(<SiteApp pathname="/ana-e-marcos" />);
+    await screen.findByText('Convite para Família Moreira');
+    await waitFor(() =>
+      expect(screen.queryByRole('link', { name: 'Confirmar presença' })).toBeNull(),
+    );
+  });
+
+  it('/<slug>/confirmar-presenca abre a página do grupo, sem o Hero (232(1))', async () => {
+    mockParty(() => apiError({ status: 404, body: { error: 'X' } }));
+    render(<SiteApp pathname="/ana-e-marcos/confirmar-presenca" />);
+    expect(
+      await screen.findByRole('heading', { name: 'Confirmar presença', level: 1 }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'Célia Moreira' })).toBeInTheDocument();
+    expect(screen.queryByText('Vamos nos casar')).toBeNull();
+  });
+
+  it('o visitante em /<slug>/confirmar-presenca volta ao Início (232(1))', async () => {
+    const replace = vi.fn();
+    vi.stubGlobal('location', { ...window.location, replace });
+    mockSite(() => Response.json(site));
+    render(<SiteApp pathname="/ana-e-marcos/confirmar-presenca" />);
+    await waitFor(() => expect(replace).toHaveBeenCalledWith('/ana-e-marcos'));
+    vi.unstubAllGlobals();
   });
 
   it('o slug errado vai ao endereço certo do casamento do token', async () => {

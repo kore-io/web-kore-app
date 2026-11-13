@@ -162,5 +162,52 @@
       "continue": "Continuar de onde pararam",
       "restart": "Começar de novo"
     }
+  },
+  "rsvp": {
+    "title": "Confirmar presença",
+    "open": "Confirmar presença",
+    "deadline": "Vocês podem responder até {{date}}.",
+    "previewReadOnly": "Na prévia, as respostas não são enviadas.",
+    "going": "Vou",
+    "notGoing": "Não vou",
+    "diet": "Restrição alimentar (opcional)",
+    "dietPlaceholder": "Ex.: dieta vegetariana, sem lactose",
+    "dietHelp": "Conte só o que o buffet precisa saber. Ex.: vegetariano, sem glúten, alergia a amendoim.",
+    "songOptional": "{{question}} (opcional)",
+    "songPlaceholder": "Ex.: Evidências, Chitãozinho & Xororó",
+    "plusOnes_one": "Vocês podem levar {{count}} acompanhante",
+    "plusOnes_other": "Vocês podem levar {{count}} acompanhantes",
+    "bring": "Vou levar",
+    "notBring": "Não vou levar",
+    "plusOneName": "Nome do acompanhante",
+    "signer": "Quem está respondendo?",
+    "signerHelp": "O casal vê quem enviou as respostas.",
+    "send": "Enviar respostas",
+    "change": "Alterar respostas",
+    "errors": {
+      "answerMissing": "Falta a resposta de {{name}}. Marquem Vou ou Não vou.",
+      "plusOneNameMissing": "Informem o nome do acompanhante.",
+      "signerMissing": "Escolham quem está respondendo.",
+      "dietTooLong": "A restrição passa de 200 caracteres.",
+      "songTooLong": "A música passa de 120 caracteres.",
+      "nameTooLong": "O nome passa de 80 caracteres.",
+      "changed": "As respostas deste grupo mudaram enquanto vocês preenchiam. O formulário agora mostra as respostas atuais: confiram e enviem de novo.",
+      "limit": "Este grupo já mudou as respostas muitas vezes hoje. Tentem de novo amanhã ou falem com o casal.",
+      "network": "Não foi possível enviar as respostas. Confiram a conexão e tentem de novo. O que vocês marcaram continua na tela.",
+      "rateLimited": "Muitas tentativas seguidas. Esperem um minuto e enviem de novo. O que vocês marcaram continua na tela."
+    },
+    "closed": {
+      "deadline": "O prazo terminou. Se algo mudou, fale com o casal.",
+      "whatsapp": "WhatsApp do casal: {{phone}}",
+      "email": "E-mail do casal: {{email}}",
+      "postEvent": "O casamento já aconteceu. As respostas ficam guardadas aqui."
+    },
+    "done": {
+      "confirmed_one": "Vocês confirmaram {{count}} pessoa.",
+      "confirmed_other": "Vocês confirmaram {{count}} pessoas.",
+      "declined": "Recebemos sua resposta."
+    },
+    "canChangeUntil": "Dá para alterar até {{date}}.",
+    "plusOneSlot": "Acompanhante {{n}}"
   }
 }

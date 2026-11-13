@@ -39,6 +39,7 @@ function site(overrides: Partial<SiteEditorResponse> = {}): SiteEditorResponse {
   return {
     publishedAt: '2026-10-01T12:00:00Z',
     siteUpdatedAt: '2026-11-11T13:31:00Z',
+    songQuestion: { enabled: false, text: 'Que música não pode faltar na festa?' },
     partners: [
       { id: 'pa', title: 'bride', name: 'Ana Beatriz Moreira' },
       { id: 'pm', title: 'groom', name: 'Marcos Vinícius Rocha' },
@@ -74,6 +75,7 @@ function site(overrides: Partial<SiteEditorResponse> = {}): SiteEditorResponse {
     ],
     editable: { names: true, eventDate: true, state: true, slug: false },
     status: 'published',
+    publication: { endDateMin: '2027-01-01', endDateMax: '2027-12-31' },
     ...overrides,
   } as SiteEditorResponse;
 }
@@ -91,7 +93,7 @@ describe('Site › Editor (Dados básicos RN01, RN10, RN11; decisão 214)', () =
     mockSite();
     const { router } = renderRoute({ url: '/app/site' });
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/site/dados-basicos'));
-    await router.navigate('/app/site/pergunta-de-musica');
+    await router.navigate('/app/site/nao-existe');
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/site/dados-basicos'));
   });
 
@@ -118,6 +120,7 @@ describe('Site › Editor (Dados básicos RN01, RN10, RN11; decisão 214)', () =
       'Hospedagem e transportedesligada',
       'Dress codeligada',
       'FAQligada',
+      'Pergunta de músicadesligada',
     ]);
     expect(within(list).getByRole('link', { name: /Dados básicos/ })).toHaveAttribute(
       'aria-current',
@@ -126,10 +129,32 @@ describe('Site › Editor (Dados básicos RN01, RN10, RN11; decisão 214)', () =
     expect(screen.getByRole('heading', { name: 'Dados básicos', level: 2 })).toBeInTheDocument();
   });
 
+  it('publicado: o cabeçalho sem o Publicar (228(5))', async () => {
+    mockSite();
+    renderRoute({ url: '/app/site/dados-basicos' });
+    await screen.findByRole('heading', { name: 'Site', level: 1 });
+    expect(screen.queryByRole('button', { name: 'Publicar' })).not.toBeInTheDocument();
+  });
+
+  it('rascunho: o cabeçalho sem o Publicar até a tela paga do front da F3 (Publicar e pagar RN17; 243)', async () => {
+    mockSite(() => Response.json(site({ status: 'draft', publishedAt: null })));
+    renderRoute({ url: '/app/site/dados-basicos' });
+    await screen.findByRole('heading', { name: 'Site', level: 1 });
+    const header = screen.getByRole('button', { name: 'Salvar' }).parentElement as HTMLElement;
+    expect(
+      within(header)
+        .getAllByRole('button')
+        .map((button) => button.textContent),
+    ).toEqual(['Pré-visualizar', 'Salvar']);
+  });
+
   it('rascunho sem endereço: só o status; sem gravação, sem o "salvo às"', async () => {
     mockSite(() => Response.json(site({ slug: null, status: 'draft', siteUpdatedAt: null })));
     renderRoute({ url: '/app/site/dados-basicos' });
-    expect(await screen.findByText('Rascunho')).toBeInTheDocument();
+    // O subtítulo do Editor; a Topbar também mostra o selo (decisão 239(B3)).
+    expect(
+      await within(await screen.findByRole('main')).findByText('Rascunho'),
+    ).toBeInTheDocument();
   });
 
   it('a lista e o Select levam à seção pelo caminho dela', async () => {

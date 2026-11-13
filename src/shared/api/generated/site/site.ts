@@ -23,14 +23,9 @@ import type {
 import type {
   ActionNotAllowedErrorBody,
   ContrastTooLowErrorBody,
-  CourtesyDisabledErrorBody,
   EndDateOutOfRangeErrorBody,
-  EventDateMissingErrorBody,
-  NotDraftErrorBody,
   OriginNotAllowedErrorBody,
   PreviewModeBody,
-  PublicationResponse,
-  PublishWeddingBody,
   RateLimitedErrorBody,
   SessionExpiredErrorBody,
   SiteAppearanceResponse,
@@ -38,6 +33,7 @@ import type {
   SiteFieldNotAllowedErrorBody,
   SiteImageNotFoundErrorBody,
   SitePartyNotFoundErrorBody,
+  SitePaymentPendingErrorBody,
   SitePreviewResponse,
   SiteSectionResponse,
   SiteSlugLockedErrorBody,
@@ -49,6 +45,8 @@ import type {
   UpdateSiteSectionBody,
   UpdateSongQuestionBody,
   ValidationErrorBody,
+  WeddingBlockedErrorBody,
+  WeddingDeletionScheduledErrorBody,
   WeddingNotFoundErrorBody,
 } from '../model';
 
@@ -120,7 +118,9 @@ export const getSiteControllerSongQuestionV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -166,7 +166,9 @@ export type SiteControllerSongQuestionV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
+  | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
 export type SiteControllerSongQuestionV1MutationVariables = {
@@ -183,7 +185,9 @@ export const useSiteControllerSongQuestionV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -257,8 +261,10 @@ export const getSiteControllerSectionV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | SiteImageNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -304,8 +310,10 @@ export type SiteControllerSectionV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | SiteImageNotFoundErrorBody
+  | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
 export type SiteControllerSectionV1MutationVariables = {
@@ -323,8 +331,10 @@ export const useSiteControllerSectionV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | SiteImageNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -395,7 +405,9 @@ export const getSiteControllerAppearanceV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | ContrastTooLowErrorBody
     | RateLimitedErrorBody
   >,
@@ -442,7 +454,9 @@ export type SiteControllerAppearanceV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
+  | WeddingDeletionScheduledErrorBody
   | ContrastTooLowErrorBody
   | RateLimitedErrorBody
 >;
@@ -460,7 +474,9 @@ export const useSiteControllerAppearanceV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
+    | WeddingDeletionScheduledErrorBody
     | ContrastTooLowErrorBody
     | RateLimitedErrorBody
   >,
@@ -698,10 +714,13 @@ export const getSiteControllerPatchV1MutationOptions = <
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
     | SiteFieldNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | SiteImageNotFoundErrorBody
     | SiteSlugLockedErrorBody
+    | SitePaymentPendingErrorBody
     | SiteSlugUnavailableErrorBody
+    | WeddingDeletionScheduledErrorBody
     | EndDateOutOfRangeErrorBody
     | RateLimitedErrorBody
   >,
@@ -749,10 +768,13 @@ export type SiteControllerPatchV1MutationError = ErrorType<
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
   | SiteFieldNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | SiteImageNotFoundErrorBody
   | SiteSlugLockedErrorBody
+  | SitePaymentPendingErrorBody
   | SiteSlugUnavailableErrorBody
+  | WeddingDeletionScheduledErrorBody
   | EndDateOutOfRangeErrorBody
   | RateLimitedErrorBody
 >;
@@ -768,10 +790,13 @@ export const useSiteControllerPatchV1 = <
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
     | SiteFieldNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | SiteImageNotFoundErrorBody
     | SiteSlugLockedErrorBody
+    | SitePaymentPendingErrorBody
     | SiteSlugUnavailableErrorBody
+    | WeddingDeletionScheduledErrorBody
     | EndDateOutOfRangeErrorBody
     | RateLimitedErrorBody
   >,
@@ -934,153 +959,4 @@ export const useSitePreviewsControllerCreateV1 = <
   TContext
 > => {
   return useMutation(getSitePreviewsControllerCreateV1MutationOptions(options), queryClient);
-};
-export const getPublicationControllerCreateV1Url = (weddingId: string) => {
-  return `/v1/weddings/${weddingId}/publication`;
-};
-
-/**
- * @summary Publica o site sem pagamento, com a data de saída do ar (Publicação RN01 a RN06).
- */
-export const publicationControllerCreateV1 = async (
-  weddingId: string,
-  publishWeddingBody: PublishWeddingBody,
-  options?: Parameters<typeof httpClient>[1],
-): Promise<PublicationResponse> => {
-  const getHeaders = (
-    h?: NonNullable<RequestInit['headers']>,
-  ): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Symbol.iterator in h) {
-      return Object.fromEntries(
-        Array.from(
-          h as Iterable<Iterable<string>>,
-          (entry) => Array.from(entry) as [string, string],
-        ),
-      );
-    }
-    const headers: Record<string, string | readonly string[]> = {};
-    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
-      if (value !== undefined) headers[name] = value;
-    }
-    return headers;
-  };
-  return httpClient<PublicationResponse>(getPublicationControllerCreateV1Url(weddingId), {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(publishWeddingBody),
-  });
-};
-
-export const getPublicationControllerCreateV1MutationKey = () =>
-  ['publicationControllerCreateV1'] as const;
-
-export const getPublicationControllerCreateV1MutationOptions = <
-  TError = ErrorType<
-    | ValidationErrorBody
-    | SessionExpiredErrorBody
-    | OriginNotAllowedErrorBody
-    | ActionNotAllowedErrorBody
-    | WeddingNotFoundErrorBody
-    | CourtesyDisabledErrorBody
-    | NotDraftErrorBody
-    | SiteSlugMissingErrorBody
-    | EventDateMissingErrorBody
-    | EndDateOutOfRangeErrorBody
-    | RateLimitedErrorBody
-  >,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof publicationControllerCreateV1>>,
-    TError,
-    PublicationControllerCreateV1MutationVariables,
-    TContext
-  >;
-  request?: SecondParameter<typeof httpClient>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof publicationControllerCreateV1>>,
-  TError,
-  PublicationControllerCreateV1MutationVariables,
-  TContext
-> => {
-  const mutationKey = getPublicationControllerCreateV1MutationKey();
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof publicationControllerCreateV1>>,
-    PublicationControllerCreateV1MutationVariables
-  > = (props) => {
-    const { weddingId, data } = props ?? {};
-
-    return publicationControllerCreateV1(weddingId, data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type PublicationControllerCreateV1MutationResult = NonNullable<
-  Awaited<ReturnType<typeof publicationControllerCreateV1>>
->;
-export type PublicationControllerCreateV1MutationBody = PublishWeddingBody;
-export type PublicationControllerCreateV1MutationError = ErrorType<
-  | ValidationErrorBody
-  | SessionExpiredErrorBody
-  | OriginNotAllowedErrorBody
-  | ActionNotAllowedErrorBody
-  | WeddingNotFoundErrorBody
-  | CourtesyDisabledErrorBody
-  | NotDraftErrorBody
-  | SiteSlugMissingErrorBody
-  | EventDateMissingErrorBody
-  | EndDateOutOfRangeErrorBody
-  | RateLimitedErrorBody
->;
-export type PublicationControllerCreateV1MutationVariables = {
-  weddingId: string;
-  data: PublishWeddingBody;
-};
-
-/**
- * @summary Publica o site sem pagamento, com a data de saída do ar (Publicação RN01 a RN06).
- */
-export const usePublicationControllerCreateV1 = <
-  TError = ErrorType<
-    | ValidationErrorBody
-    | SessionExpiredErrorBody
-    | OriginNotAllowedErrorBody
-    | ActionNotAllowedErrorBody
-    | WeddingNotFoundErrorBody
-    | CourtesyDisabledErrorBody
-    | NotDraftErrorBody
-    | SiteSlugMissingErrorBody
-    | EventDateMissingErrorBody
-    | EndDateOutOfRangeErrorBody
-    | RateLimitedErrorBody
-  >,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof publicationControllerCreateV1>>,
-      TError,
-      PublicationControllerCreateV1MutationVariables,
-      TContext
-    >;
-    request?: SecondParameter<typeof httpClient>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof publicationControllerCreateV1>>,
-  TError,
-  PublicationControllerCreateV1MutationVariables,
-  TContext
-> => {
-  return useMutation(getPublicationControllerCreateV1MutationOptions(options), queryClient);
 };

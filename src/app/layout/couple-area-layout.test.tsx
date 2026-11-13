@@ -34,10 +34,17 @@ const me = (overrides: Record<string, unknown> = {}) => ({
   ...overrides,
 });
 
+/** Só o /me responde; as telas da área (o Dashboard) ficam com o 404 e o aviso delas. */
+function meOnly(path: string, body: object = me()) {
+  return path === '/v1/me'
+    ? Response.json(body)
+    : apiError({ status: 404, body: { error: 'NOT_FOUND' } });
+}
+
 describe('área do casal com o /v1/me (decisão 163)', () => {
-  it('a Topbar e o menu com os nomes do casal, a pessoa e só o Sair (163(2))', async () => {
+  it('a Topbar e o menu com os nomes do casal, a pessoa, Configurações e o Sair (163(2); Penpot 03)', async () => {
     const user = userEvent.setup();
-    mockApi(() => Response.json(me()));
+    mockApi(({ path }) => meOnly(path));
     renderRoute({ url: '/app' });
     const trigger = await screen.findByRole('button', { name: 'Menu do usuário' });
     expect(screen.getByRole('link', { name: 'Dashboard' })).toHaveAttribute('aria-current', 'page');
@@ -53,12 +60,71 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
       within(menu)
         .getAllByRole('menuitem')
         .map((item) => item.textContent),
-    ).toEqual(['Sair']);
+    ).toEqual(['Configurações', 'Sair']);
+  });
+
+  it('Configurações, no menu, abre as preferências de notificação (decisão 221)', async () => {
+    const user = userEvent.setup();
+    mockApi(({ path }) => meOnly(path));
+    const { router } = renderRoute({ url: '/app' });
+    await user.click(await screen.findByRole('button', { name: 'Menu do usuário' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Configurações' }));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/app/configuracoes/notificacoes'),
+    );
+  });
+
+  it.each([
+    [0, 'Notificações'],
+    [1, 'Notificações, 1 não lida'],
+    [3, 'Notificações, 3 não lidas'],
+    [12, 'Notificações, mais de 9 não lidas'],
+  ])(
+    'o sino com %i não lidas: "%s"; tocar leva às Notificações (Central RN06)',
+    async (count, name) => {
+      const user = userEvent.setup();
+      mockApi(({ path }) =>
+        path.startsWith('/v1/me/notifications/unread-count')
+          ? Response.json({ unreadCount: count })
+          : meOnly(path),
+      );
+      const { router } = renderRoute({ url: '/app' });
+      const bell = await screen.findByRole('button', { name });
+      // O contador visual: o número até 9, "9+" acima (lib 0.2.0-homolog.44; decisão 241(1)).
+      if (count > 0) expect(bell).toHaveTextContent(count > 9 ? '9+' : String(count));
+      await user.click(bell);
+      await waitFor(() => expect(router.state.location.pathname).toBe('/app/notificacoes'));
+    },
+  );
+
+  it.each([
+    ['published', 'Publicado'],
+    ['draft', 'Rascunho'],
+    ['post_event', 'Pós-evento'],
+  ])(
+    'o selo de status do site na Topbar: %s (Dashboard RN07; decisão 239(B3))',
+    async (status, label) => {
+      mockApi(({ path }) =>
+        path === '/v1/weddings/w1/site' ? Response.json({ status }) : meOnly(path),
+      );
+      renderRoute({ url: '/app' });
+      const banner = await screen.findByRole('banner');
+      expect(await within(banner).findByText(label)).toBeInTheDocument();
+    },
+  );
+
+  it('sem a leitura do site, a Topbar fica sem selo', async () => {
+    mockApi(({ path }) => meOnly(path));
+    renderRoute({ url: '/app' });
+    const banner = await screen.findByRole('banner');
+    await screen.findByRole('button', { name: 'Menu do usuário' });
+    expect(within(banner).queryByText(/Publicado|Rascunho/)).toBeNull();
   });
 
   it('conta sem nome: o e-mail no lugar do nome', async () => {
-    mockApi(() =>
-      Response.json(
+    mockApi(({ path }) =>
+      meOnly(
+        path,
         me({ user: { id: 'u1', name: null, email: 'ana@exemplo.com', platformRole: 'none' } }),
       ),
     );
@@ -76,8 +142,9 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
 
   it('com outro perfil ativo (ou nenhum): vai à Seleção de perfil (RN14)', async () => {
     // Dois perfis com o de cerimonialista ativo: a Seleção mostra a escolha.
-    mockApi(() =>
-      Response.json(
+    mockApi(({ path }) =>
+      meOnly(
+        path,
         me({
           activeProfile: 'planner',
           profiles: ['couple', 'planner'],
@@ -97,7 +164,7 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
     const requests: string[] = [];
     mockApi(({ method, path }) => {
       requests.push(`${method} ${path}`);
-      return path === '/v1/auth/logout' ? new Response(null, { status: 204 }) : Response.json(me());
+      return path === '/v1/auth/logout' ? new Response(null, { status: 204 }) : meOnly(path);
     });
     const { router } = renderRoute({ url: '/app' });
     await user.click(await screen.findByRole('button', { name: 'Menu do usuário' }));
@@ -111,13 +178,18 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
     mockApi(({ path }) =>
       path === '/v1/auth/logout'
         ? apiError({ status: 401, body: { error: 'SESSION_EXPIRED' } })
-        : Response.json(me()),
+        : meOnly(path),
     );
     const { router } = renderRoute({ url: '/app' });
     await user.click(await screen.findByRole('button', { name: 'Menu do usuário' }));
     await user.click(await screen.findByRole('menuitem', { name: 'Sair' }));
     await waitFor(() => expect(router.state.location.pathname).toBe('/entrar'));
-    expect(screen.queryByText(/Não foi possível continuar/)).toBeNull();
+    // Sem o Toast de erro do Sair (o aviso do Dashboard, que lê 404 aqui, não conta).
+    expect(
+      within(screen.getByRole('region', { name: /^Avisos/ })).queryByText(
+        /Não foi possível continuar/,
+      ),
+    ).toBeNull();
   });
 
   it.each([
@@ -125,7 +197,7 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
     ['5xx', () => apiError({ status: 503, body: { error: 'Service Unavailable' } })],
   ])('se o Sair falhar (%s), avisa no Toast e fica na área (decisão 163(5))', async (_, fail) => {
     const user = userEvent.setup();
-    mockApi(({ path }) => (path === '/v1/auth/logout' ? fail() : Response.json(me())));
+    mockApi(({ path }) => (path === '/v1/auth/logout' ? fail() : meOnly(path)));
     const { router } = renderRoute({ url: '/app' });
     await user.click(await screen.findByRole('button', { name: 'Menu do usuário' }));
     await user.click(await screen.findByRole('menuitem', { name: 'Sair' }));
@@ -143,7 +215,9 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
     async (_, fail) => {
       const user = userEvent.setup();
       let calls = 0;
-      mockApi(() => {
+      // Conta só o /me: o layout também lê o site (o item Músicas, Música RN03).
+      mockApi(({ path }) => {
+        if (path !== '/v1/me') return apiError({ status: 404, body: { error: 'NOT_FOUND' } });
         calls += 1;
         return calls === 1 ? fail() : Response.json(me());
       });
@@ -153,7 +227,8 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
       await expectNoA11yViolations({ container });
       await user.click(screen.getByRole('button', { name: 'Tentar de novo' }));
       expect(await screen.findByRole('button', { name: 'Menu do usuário' })).toBeInTheDocument();
-      expect(calls).toBe(2);
+      // O Tentar de novo refaz o /me; o Dashboard, ao montar, também o relê (useActiveWedding).
+      expect(calls).toBeGreaterThanOrEqual(2);
     },
   );
 });

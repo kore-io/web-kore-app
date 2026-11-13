@@ -1,0 +1,188 @@
+/*
+ * Envios (Penpot, Área do Casal, página 07): as abas, com o rótulo curto no celular, e o
+ * Prazo de resposta (A7) num painel branco de até 560 px: o Alert do prazo vencido no topo,
+ * o Date Field com a linha de apoio, o Alert de Informação, o Stat Card dos pendentes e,
+ * à direita, Tirar o prazo · Salvar prazo (no celular, em largura cheia, o principal em cima).
+ */
+.kore-deliveries {
+  @apply flex flex-col gap-6;
+}
+
+/* No celular, o rótulo curto à vista e o longo só para o leitor de tela (o nome da aba). */
+.kore-deliveries__tab-short {
+  @apply md:hidden;
+}
+
+.kore-deliveries__tab-long {
+  @apply max-md:sr-only;
+}
+
+.kore-deadline {
+  @apply flex max-w-140 flex-col gap-4 rounded-lg border border-gray-300 bg-white p-5;
+}
+
+.kore-deadline__loading {
+  @apply flex justify-center py-12;
+}
+
+/* O Lembrar pendentes do Stat Card: o link no texto de apoio, em primary sublinhado. */
+.kore-deadline__remind {
+  @apply rounded-sm font-semibold text-primary-dark underline focus-visible:shadow-focus-ring focus-visible:outline-none;
+}
+
+.kore-deadline__actions {
+  @apply flex flex-col-reverse gap-3 md:flex-row md:justify-end;
+}
+
+/*
+ * As abas de envio (Penpot, página 07, A2 a A6): os filtros, a lista com a marcação e a
+ * barra com "{n} grupos marcados" e Continuar; o canal e a mensagem num painel branco com
+ * a prévia ao lado no desktop; a fila com o contador e um cartão por grupo.
+ */
+.kore-send {
+  @apply flex flex-col gap-4;
+}
+
+.kore-send__loading {
+  @apply flex justify-center py-12;
+}
+
+.kore-send__filters {
+  @apply flex flex-col gap-3 md:flex-row;
+}
+
+.kore-send__header,
+.kore-send__note {
+  @apply m-0 type-body-md text-gray-700;
+}
+
+.kore-send__bar {
+  @apply flex flex-col gap-3 md:flex-row md:items-center md:justify-end;
+}
+
+.kore-send__count {
+  @apply m-0 type-label text-ink md:mr-auto;
+}
+
+.kore-send__error {
+  @apply m-0 type-caption text-danger-text;
+}
+
+.kore-send__closed {
+  @apply m-0 type-caption text-gray-700;
+}
+
+.kore-send--channel {
+  @apply lg:grid lg:grid-cols-2 lg:items-start lg:gap-6;
+}
+
+.kore-send--channel > .kore-send__bar {
+  @apply lg:col-span-2;
+}
+
+.kore-send__panel {
+  @apply flex flex-col gap-4 rounded-lg border border-gray-300 bg-white p-5;
+}
+
+.kore-send__channels {
+  @apply flex flex-wrap gap-x-6 gap-y-3;
+}
+
+.kore-send__preview {
+  @apply flex flex-col gap-2 rounded-lg border border-gray-300 bg-gray-100 p-5;
+}
+
+.kore-send__preview-title {
+  @apply m-0 type-label text-ink;
+}
+
+.kore-send__preview-text {
+  @apply m-0 whitespace-pre-line type-body-md text-ink;
+}
+
+.kore-send__preview-note {
+  @apply m-0 type-caption text-gray-700;
+}
+
+.kore-send__queue {
+  @apply m-0 grid list-none gap-3 p-0 lg:grid-cols-2;
+}
+
+.kore-send__card {
+  @apply flex flex-col gap-3 rounded-lg border border-gray-300 bg-white p-4 md:flex-row md:items-center md:justify-between;
+}
+
+.kore-send__card-text {
+  @apply flex min-w-0 flex-col gap-0.5;
+}
+
+.kore-send__card-name {
+  @apply m-0 type-label text-ink;
+}
+
+.kore-send__card-contact,
+.kore-send__card-status {
+  @apply m-0 type-caption text-gray-700;
+}
+
+.kore-send__card-actions {
+  @apply flex shrink-0 items-center gap-2;
+}
+
+/* O contato faltando (Penpot A6): o aviso em warning, com o ícone. */
+.kore-send__card-missing {
+  @apply m-0 flex items-start gap-1.5 type-caption text-warning-text;
+}
+
+.kore-send__card-missing > svg {
+  @apply mt-0.5 size-3.5 shrink-0;
+}
+
+/* As etapas (Penpot, página 07): o número num círculo; a atual e as feitas em primary. */
+.kore-send__steps {
+  @apply m-0 flex list-none gap-6 p-0;
+}
+
+.kore-send__step {
+  @apply flex items-center gap-2 type-body-md text-gray-700;
+}
+
+.kore-send__step-number {
+  @apply flex size-6 items-center justify-center rounded-full bg-gray-100 type-caption text-gray-700;
+}
+
+.kore-send__step[data-state='current'],
+.kore-send__step[data-state='done'] {
+  @apply text-ink;
+}
+
+.kore-send__step[data-state='current'] .kore-send__step-number,
+.kore-send__step[data-state='done'] .kore-send__step-number {
+  @apply bg-primary text-white;
+}
+
+/* No celular, só os números além da atual (Penpot A9). */
+.kore-send__step:not([data-state='current']) .kore-send__step-label {
+  @apply max-md:sr-only;
+}
+
+.kore-send__overline {
+  @apply mb-3 p-0 type-overline text-gray-700;
+}
+
+.kore-send__channels {
+  @apply m-0 border-0 p-0;
+}
+
+.kore-send__restore {
+  @apply self-start cursor-pointer border-0 bg-transparent p-0 type-caption text-primary-dark hover:underline disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+/* A lista do QR code (Penpot A6): um cartão só, os grupos separados por linha, sem botão. */
+.kore-send__qr-list {
+  @apply m-0 flex list-none flex-col rounded-lg border border-gray-300 bg-white px-5 py-2;
+}
+
+.kore-send__qr-item {
+  @apply flex flex-col gap-0.5 border-b border-gray-300 py-3 last:border-b-0;
+}

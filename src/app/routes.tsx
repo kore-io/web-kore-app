@@ -7,10 +7,16 @@ import { SignInGooglePage } from '../features/access/pages/sign-in-google-page';
 import { SignInPage } from '../features/access/pages/sign-in-page';
 import { SignUpPage } from '../features/access/pages/sign-up-page';
 import { DashboardPage } from '../features/dashboard/pages/dashboard-page';
+import { DeadlinePage } from '../features/deliveries/pages/deadline-page';
+import { DeliveriesLayout } from '../features/deliveries/pages/deliveries-layout';
+import { SendPage } from '../features/deliveries/pages/send-page';
 import { GuestsLayout } from '../features/guests/pages/guests-layout';
 import { GuestsPage } from '../features/guests/pages/guests-page';
 import { ExportPage } from '../features/guests/pages/export-page';
 import { SiteEditorPage } from '../features/site/pages/site-editor-page';
+import { SongsPage } from '../features/songs/pages/songs-page';
+import { NotificationSettingsPage } from '../features/notifications/pages/notification-settings-page';
+import { NotificationsPage } from '../features/notifications/pages/notifications-page';
 import { ImportPage } from '../features/guests/pages/import-page';
 import { EditPartyPage, NewPartyPage } from '../features/guests/pages/party-form-page';
 import { PartyPanelPage } from '../features/guests/pages/party-panel-page';
@@ -58,6 +64,29 @@ export const routes: RouteObject[] = [
             element: <Navigate to={siteSectionPath({ section: FIRST_SECTION_SLUG })} replace />,
           },
           { id: 'site-editor', path: 'site/:section', element: <SiteEditorPage /> },
+          { id: 'songs', path: 'musicas', element: <SongsPage /> },
+          { id: 'notifications', path: 'notificacoes', element: <NotificationsPage /> },
+          {
+            id: 'settings-notifications',
+            path: 'configuracoes/notificacoes',
+            element: <NotificationSettingsPage />,
+          },
+          {
+            path: 'envios',
+            element: <DeliveriesLayout />,
+            children: [
+              // Envios abre em Enviar convites (decisão 235).
+              { index: true, element: <Navigate to={paths.deliveryInvites} replace /> },
+              { id: 'delivery-invites', path: 'convites', element: <SendPage kind="invite" /> },
+              {
+                id: 'delivery-save-the-date',
+                path: 'save-the-date',
+                element: <SendPage kind="save_the_date" />,
+              },
+              { id: 'delivery-reminder', path: 'lembrete', element: <SendPage kind="reminder" /> },
+              { id: 'delivery-deadline', path: 'prazo', element: <DeadlinePage /> },
+            ],
+          },
           {
             id: 'guest-party-edit',
             path: 'convidados/grupos/:partyId/editar',

@@ -3,7 +3,13 @@ import userEvent from '@testing-library/user-event';
 import i18next from 'i18next';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../../../tests/a11y';
-import { apiError, mockApi, renderRoute } from '../../../../tests/render-route';
+import {
+  apiError,
+  mockApi,
+  renderRoute,
+  isLayoutRead,
+  layoutReadNotFound,
+} from '../../../../tests/render-route';
 import type { PartyResponse } from '../../../shared/api/generated/model';
 import { fieldErrorText } from '../components/party-form';
 import type { FieldError } from '../party-form';
@@ -121,6 +127,8 @@ function mockParties({
         nextCursor: null,
       });
     }
+    // O layout lê o site e o contador do sino: não são chamadas da tela.
+    if (isLayoutRead({ method, path })) return layoutReadNotFound();
     calls.push({ method, path, body });
     if (method === 'POST' && path === '/v1/weddings/w1/parties') return create();
     if (method === 'PATCH' && path === '/v1/weddings/w1/parties/p1') return update();

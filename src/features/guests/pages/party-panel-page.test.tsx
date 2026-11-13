@@ -281,19 +281,18 @@ describe('Painel do grupo (RN14)', () => {
     );
   });
 
-  it('as ações, sem "Alterar resposta" (RN14; 201); o "Ver como este grupo" chega com a prévia da F2', async () => {
+  it('as ações do convidado, com o Alterar resposta da F4 (Prazo RN04; 201); o "Ver como este grupo" chega com a prévia da F2', async () => {
     const user = userEvent.setup();
     mockPanel();
     renderRoute({ url: '/app/convidados/grupos/p1' });
     await screen.findByRole('heading', { name: 'Família Moreira', level: 1 });
-    expect(screen.queryByText(/Alterar resposta/)).toBeNull();
     expect(screen.getByRole('button', { name: 'Ver como este grupo' })).toBeEnabled();
     await user.click(screen.getByRole('button', { name: 'Ações de Célia Moreira' }));
     expect(
       within(screen.getByRole('menu'))
         .getAllByRole('menuitem')
         .map((item) => item.textContent),
-    ).toEqual(['Mover de grupo', 'Mover para a lixeira']);
+    ).toEqual(['Alterar resposta', 'Mover de grupo', 'Mover para a lixeira']);
   });
 
   it('Ver como este grupo abre a aba no clique e a aponta para a prévia como o grupo (Pré-visualização RN01)', async () => {
@@ -421,11 +420,18 @@ async function openMove(user: ReturnType<typeof userEvent.setup>, name: string) 
 }
 
 describe('Mover de grupo (RN10; decisão 201)', () => {
-  it('só os convidados com nome têm o ⋮ (a vaga vazia não se move)', async () => {
+  it('a vaga vazia tem o ⋮ só com o Alterar resposta (não se move; Prazo RN04)', async () => {
+    const user = userEvent.setup();
     mockMove();
     renderRoute({ url: '/app/convidados/grupos/p1' });
     await screen.findByRole('button', { name: 'Ações de Luiz Moreira' });
-    expect(screen.getAllByRole('button', { name: /^Ações de / })).toHaveLength(3);
+    expect(screen.getAllByRole('button', { name: /^Ações de / })).toHaveLength(4);
+    await user.click(screen.getByRole('button', { name: 'Ações de Acompanhante' }));
+    expect(
+      within(screen.getByRole('menu'))
+        .getAllByRole('menuitem')
+        .map((item) => item.textContent),
+    ).toEqual(['Alterar resposta']);
   });
 
   it('escolhe o grupo (sem o atual), move e mostra o Toast', async () => {
