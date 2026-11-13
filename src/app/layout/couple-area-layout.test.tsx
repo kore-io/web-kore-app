@@ -143,7 +143,9 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
     async (_, fail) => {
       const user = userEvent.setup();
       let calls = 0;
-      mockApi(() => {
+      // Conta só o /me: o layout também lê o site (o item Músicas, Música RN03).
+      mockApi(({ path }) => {
+        if (path !== '/v1/me') return apiError({ status: 404, body: { error: 'NOT_FOUND' } });
         calls += 1;
         return calls === 1 ? fail() : Response.json(me());
       });

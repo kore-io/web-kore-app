@@ -101,6 +101,9 @@ function mockAll({
         nextCursor: null,
       });
     }
+    // A Sidebar lê o site (o item Músicas, Música RN03): não é chamada da tela.
+    if (call.path === '/v1/weddings/w1/site')
+      return apiError({ status: 404, body: { error: 'NOT_FOUND' } });
     calls.push(call);
     const custom = write?.(call);
     if (custom) return custom;

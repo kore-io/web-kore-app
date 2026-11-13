@@ -1,10 +1,12 @@
 import { NavItem } from '@kore-io/design';
-import { Globe, LayoutDashboard, Send, Users } from 'lucide-react';
+import { Globe, LayoutDashboard, Music, Send, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, Outlet, useMatch } from 'react-router';
 import { useCoupleSession } from '../../features/access/hooks/use-couple-session';
 import { useSignOut } from '../../features/access/hooks/use-sign-out';
+import { useActiveWedding } from '../../features/guests/hooks/use-active-wedding';
 import { menuUser } from '../../features/access/session-user';
+import { useSiteControllerGetV1 } from '../../shared/api/generated/site/site';
 import { LoadError } from '../../shared/components/load-error';
 import { paths } from '../paths';
 import { AppShell } from './app-shell';
@@ -22,6 +24,13 @@ export function CoupleAreaLayout() {
   const onGuests = useMatch({ path: paths.guests, end: false }) !== null;
   const onSite = useMatch({ path: paths.site, end: false }) !== null;
   const onDeliveries = useMatch({ path: paths.deliveries, end: false }) !== null;
+  const onSongs = useMatch({ path: paths.songs, end: false }) !== null;
+  // Músicas só com a pergunta de música ligada (Música RN03), pelo mesmo GET do Editor.
+  const { weddingId } = useActiveWedding();
+  const site = useSiteControllerGetV1(weddingId ?? '', { query: { enabled: Boolean(weddingId) } });
+  // Resposta sem a pergunta (ex.: falha parcial): sem o item, e a área segue de pé.
+  const songQuestion = site.data?.songQuestion as { enabled?: boolean } | undefined;
+  const songsEnabled = songQuestion?.enabled === true;
   // O Dashboard só em /app: telas sem item na Sidebar (ex.: Publicar o site) não marcam nada.
   const onDashboard = useMatch({ path: paths.coupleArea, end: true }) !== null;
 
@@ -53,6 +62,11 @@ export function CoupleAreaLayout() {
           <NavItem asChild icon={<Globe />} current={onSite}>
             <Link to={paths.site}>{t('nav.site')}</Link>
           </NavItem>
+          {songsEnabled && (
+            <NavItem asChild icon={<Music />} current={onSongs}>
+              <Link to={paths.songs}>{t('nav.songs')}</Link>
+            </NavItem>
+          )}
         </>
       }
     >
