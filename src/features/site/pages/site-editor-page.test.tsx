@@ -136,20 +136,16 @@ describe('Site › Editor (Dados básicos RN01, RN10, RN11; decisão 214)', () =
     expect(screen.queryByRole('button', { name: 'Publicar' })).not.toBeInTheDocument();
   });
 
-  it('rascunho: o Publicar secundário entre Pré-visualizar e Salvar abre a tela de publicar (Publicação RN07; 228(5))', async () => {
-    const user = userEvent.setup();
+  it('rascunho: o cabeçalho sem o Publicar até a tela paga do front da F3 (Publicar e pagar RN17; 243)', async () => {
     mockSite(() => Response.json(site({ status: 'draft', publishedAt: null })));
-    const { router } = renderRoute({ url: '/app/site/dados-basicos' });
+    renderRoute({ url: '/app/site/dados-basicos' });
     await screen.findByRole('heading', { name: 'Site', level: 1 });
     const header = screen.getByRole('button', { name: 'Salvar' }).parentElement as HTMLElement;
     expect(
       within(header)
         .getAllByRole('button')
         .map((button) => button.textContent),
-    ).toEqual(['Pré-visualizar', 'Publicar', 'Salvar']);
-    await user.click(within(header).getByRole('button', { name: 'Publicar' }));
-    await waitFor(() => expect(router.state.location.pathname).toBe('/app/cobranca/publicar'));
-    expect(await screen.findByRole('heading', { name: 'Publicar o site' })).toBeInTheDocument();
+    ).toEqual(['Pré-visualizar', 'Salvar']);
   });
 
   it('rascunho sem endereço: só o status; sem gravação, sem o "salvo às"', async () => {

@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { guestPartyPath, paths } from '../../../app/paths';
 import type {
+  NotificationEntryResponse,
   NotificationResponse,
   NotificationsControllerListV1Type,
 } from '../../../shared/api/generated/model';
@@ -20,13 +21,13 @@ import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { activityDate, activityTexts } from '../../dashboard/dashboard-texts';
 import { useActiveWedding } from '../../guests/hooks/use-active-wedding';
 import { useMarkNotificationRead } from '../hooks/use-mark-notification-read';
-import { isResponseItem } from '../notification-shape';
+import { isResponseItem, responseGroups } from '../notification-shape';
 
 type Filter = '' | NotificationsControllerListV1Type;
 
 /** O tipo que a central desenha na F5: a resposta do convite, com ao menos um grupo. */
 function isDrawn(item: NotificationResponse): boolean {
-  return (item.type as string) === 'rsvp' && isResponseItem(item.payload);
+  return item.type === 'rsvp' && isResponseItem(item.payload);
 }
 
 /**
@@ -167,9 +168,11 @@ function NotificationItem({ weddingId, item }: { weddingId: string; item: Notifi
   const { t: tDashboard } = useTranslation('dashboard');
   const navigate = useNavigate();
   const markRead = useMarkNotificationRead({ weddingId });
-  const texts = activityTexts({ t: tDashboard, item: { count: item.count, groups: item.payload } });
+  // A lista já só tem respostas (isDrawn); aqui, os grupos com o tipo de resposta.
+  const groups = (responseGroups(item.payload) ?? []) as NotificationEntryResponse[];
+  const texts = activityTexts({ t: tDashboard, item: { count: item.count, groups } });
   const date = activityDate({ t: tDashboard, at: item.updatedAt, now: new Date() });
-  const [first] = item.payload;
+  const [first] = groups;
   const single = item.count <= 1 && first;
   const unread = item.readAt === null;
   return (

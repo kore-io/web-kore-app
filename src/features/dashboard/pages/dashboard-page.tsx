@@ -15,7 +15,6 @@ import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { deliveryBadges } from '../../guests/components/delivery-badges';
 import { useActiveWedding, type Audience } from '../../guests/hooks/use-active-wedding';
 import type { sentFilters } from '../../guests/hooks/use-party-filters';
-import { canOpenPublish } from '../../publication/publication';
 import { useMarkNotificationRead } from '../../notifications/hooks/use-mark-notification-read';
 import { isResponseItem } from '../../notifications/notification-shape';
 import { siteStatus } from '../../site/site-texts';
@@ -33,7 +32,8 @@ import {
 const CHECKLIST_PATHS: Record<ChecklistItemResponse['key'], string> = {
   guests: paths.guests,
   appearance: siteSectionPath({ section: 'aparencia' }),
-  publish: paths.publish,
+  // A tela paga de publicar vem com o front da F3 (decisão 243): até lá, o Editor.
+  publish: paths.site,
   invites: paths.deliveryInvites,
   reminders: paths.deliveryReminder,
 };
@@ -272,15 +272,10 @@ function SiteCard({ data, now }: { data: DashboardResponse; now: Date }) {
         <p className="kore-dashboard__card-text">{t('site.awaitingCouple')}</p>
       )}
       <div className="kore-dashboard__card-actions">
-        {canOpenPublish(data.site.status) ? (
-          <Button size="sm" variant="secondary" onClick={() => void navigate(paths.publish)}>
-            {t('site.publish')}
-          </Button>
-        ) : (
-          <Button size="sm" variant="secondary" onClick={() => void navigate(paths.site)}>
-            {t('site.edit')}
-          </Button>
-        )}
+        {/* O Publicar volta com a tela paga do front da F3 (Publicar e pagar RN17; 243). */}
+        <Button size="sm" variant="secondary" onClick={() => void navigate(paths.site)}>
+          {t('site.edit')}
+        </Button>
       </div>
     </section>
   );

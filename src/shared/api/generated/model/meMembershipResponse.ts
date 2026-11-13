@@ -4,12 +4,15 @@
  * Kore API
  * OpenAPI spec version: 1
  */
+import type { MeLifecycleResponse } from './meLifecycleResponse';
 import type { MeMembershipResponseRole } from './meMembershipResponseRole';
 
 export interface MeMembershipResponse {
   role: MeMembershipResponseRole;
   /** @nullable */
   eventDate: string | null;
+  /** As faixas e o selo da Topbar (Data de saída do ar RN06; decisão 231). */
+  lifecycle: MeLifecycleResponse;
   weddingId: string;
   /** "Ana & Marcos" (decisão 163). */
   weddingName: string;

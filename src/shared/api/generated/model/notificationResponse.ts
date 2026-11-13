@@ -4,6 +4,7 @@
  * Kore API
  * OpenAPI spec version: 1
  */
+import type { BillingEntryResponse } from './billingEntryResponse';
 import type { NotificationEntryResponse } from './notificationEntryResponse';
 import type { NotificationResponseType } from './notificationResponseType';
 
@@ -14,8 +15,9 @@ export interface NotificationResponse {
   /**
    * rsvp: por grupo, sem restrição, música nem nome de convidado (Central RN04).
    * wedding_published e membership_removed: [{ partnerNames }] (revisão C8-3).
+   * billing: um item por pagamento, com o valor só no detalhe (RN13).
    */
-  payload: NotificationEntryResponse[];
+  payload: (NotificationEntryResponse | BillingEntryResponse)[];
   /** @nullable */
   readAt: string | null;
   updatedAt: string;
