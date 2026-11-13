@@ -155,7 +155,10 @@ describe('Site › Editor (Dados básicos RN01, RN10, RN11; decisão 214)', () =
   it('rascunho sem endereço: só o status; sem gravação, sem o "salvo às"', async () => {
     mockSite(() => Response.json(site({ slug: null, status: 'draft', siteUpdatedAt: null })));
     renderRoute({ url: '/app/site/dados-basicos' });
-    expect(await screen.findByText('Rascunho')).toBeInTheDocument();
+    // O subtítulo do Editor; a Topbar também mostra o selo (decisão 239(B3)).
+    expect(
+      await within(await screen.findByRole('main')).findByText('Rascunho'),
+    ).toBeInTheDocument();
   });
 
   it('a lista e o Select levam à seção pelo caminho dela', async () => {

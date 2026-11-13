@@ -10,6 +10,7 @@ import { useSiteControllerGetV1 } from '../../shared/api/generated/site/site';
 import { LoadError } from '../../shared/components/load-error';
 import { paths } from '../paths';
 import { AppShell } from './app-shell';
+import { SiteStatusBadge } from './site-status-badge';
 
 /**
  * Área do casal (/app) com a sessão do GET /v1/me (decisão 163): a Topbar com os nomes do
@@ -31,6 +32,8 @@ export function CoupleAreaLayout() {
   // Resposta sem a pergunta (ex.: falha parcial): sem o item, e a área segue de pé.
   const songQuestion = site.data?.songQuestion as { enabled?: boolean } | undefined;
   const songsEnabled = songQuestion?.enabled === true;
+  // O selo de status do site na Topbar (Dashboard RN07; decisão 239(B3)).
+  const siteStatusValue = (site.data as { status?: unknown } | undefined)?.status;
   // O Dashboard só em /app: telas sem item na Sidebar (ex.: Publicar o site) não marcam nada.
   const onDashboard = useMatch({ path: paths.coupleArea, end: true }) !== null;
 
@@ -43,6 +46,9 @@ export function CoupleAreaLayout() {
   return (
     <AppShell
       title={couple ?? null}
+      {...(typeof siteStatusValue === 'string' && {
+        status: <SiteStatusBadge status={siteStatusValue} />,
+      })}
       user={menuUser({ user: me.user })}
       activeProfile={
         couple ? t('activeProfileCoupleWedding', { couple }) : t('activeProfileCouple')

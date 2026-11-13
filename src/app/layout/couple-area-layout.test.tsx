@@ -63,6 +63,30 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
     ).toEqual(['Sair']);
   });
 
+  it.each([
+    ['published', 'Publicado'],
+    ['draft', 'Rascunho'],
+    ['post_event', 'Pós-evento'],
+  ])(
+    'o selo de status do site na Topbar: %s (Dashboard RN07; decisão 239(B3))',
+    async (status, label) => {
+      mockApi(({ path }) =>
+        path === '/v1/weddings/w1/site' ? Response.json({ status }) : meOnly(path),
+      );
+      renderRoute({ url: '/app' });
+      const banner = await screen.findByRole('banner');
+      expect(await within(banner).findByText(label)).toBeInTheDocument();
+    },
+  );
+
+  it('sem a leitura do site, a Topbar fica sem selo', async () => {
+    mockApi(({ path }) => meOnly(path));
+    renderRoute({ url: '/app' });
+    const banner = await screen.findByRole('banner');
+    await screen.findByRole('button', { name: 'Menu do usuário' });
+    expect(within(banner).queryByText(/Publicado|Rascunho/)).toBeNull();
+  });
+
   it('conta sem nome: o e-mail no lugar do nome', async () => {
     mockApi(({ path }) =>
       meOnly(

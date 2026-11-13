@@ -19,6 +19,8 @@ export interface AppShellProps {
   userMenuGroups: UserMenuItem[][];
   /** Os Nav Items da área (a Sidebar mostra só o que existe na fase). */
   navigation: ReactNode;
+  /** Selo de status ao lado do título (ex.: o do site); sai no celular, como no DS. */
+  status?: ReactNode;
   /** Sino de notificações, quando a área tiver: número de não lidas e a ação. */
   notifications?: { unread: number; onOpen: () => void };
   children: ReactNode;
@@ -34,6 +36,7 @@ export function AppShell({
   activeProfile,
   userMenuGroups,
   navigation,
+  status,
   notifications,
   children,
 }: AppShellProps) {
@@ -62,6 +65,7 @@ export function AppShell({
       <div className="kore-app-shell__main">
         <Topbar
           title={title}
+          {...(status !== undefined && { status })}
           menuLabel={t('openMenu')}
           onMenuClick={() => setDrawerOpen(true)}
           menuExpanded={drawerOpen}
