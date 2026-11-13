@@ -12,6 +12,10 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
+      // O service worker próprio, com o push (Notificações por e-mail e push RN07; R8-5).
+      strategies: 'injectManifest',
+      srcDir: 'src/sw',
+      filename: 'sw.ts',
       registerType: 'autoUpdate',
       includeAssets: ['kore-icon.svg', 'kore-apple-touch-180.png'],
       manifest: { ...pwaManifest, icons: [...pwaManifest.icons] },
