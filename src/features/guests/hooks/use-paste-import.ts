@@ -3,7 +3,6 @@ import { useQueryClient, type Query } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { paths } from '../../../app/paths';
 import {
   useGuestImportsControllerPastePreviewV1,
   useGuestImportsControllerPasteV1,
@@ -11,6 +10,7 @@ import {
 import { apiErrorCode } from '../../../shared/api/http-client';
 import { draftFromPreview, draftToBody, removeGuest, type PasteDraft } from '../paste-draft';
 import type { Audience } from './use-active-wedding';
+import { useAreaPaths } from '../../../app/area';
 
 /**
  * Colar a lista (Importação RN10 a RN12): o texto vai para a prévia (nada é gravado), o
@@ -20,6 +20,7 @@ import type { Audience } from './use-active-wedding';
  * "{n} grupos importados" (RN12).
  */
 export function usePasteImport({ weddingId, audience }: { weddingId: string; audience: Audience }) {
+  const area = useAreaPaths();
   const { t } = useTranslation('guests');
   const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
@@ -109,7 +110,7 @@ export function usePasteImport({ weddingId, audience }: { weddingId: string; aud
                 ),
             });
             showToast({ tone: 'success', message: t('importSheet.imported', { count: parties }) });
-            void navigate(paths.guests);
+            void navigate(area.guests);
           },
           onError,
         },

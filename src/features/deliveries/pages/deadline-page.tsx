@@ -3,7 +3,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
-import { paths } from '../../../app/paths';
 import type { DashboardResponse } from '../../../shared/api/generated/model';
 import {
   getDashboardControllerGetV1QueryKey,
@@ -20,6 +19,7 @@ import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { oneDot, shortDayMonth } from '../../../shared/date-texts';
 import { useActiveWedding, type Audience } from '../../guests/hooks/use-active-wedding';
 import { deadlineState } from '../deadline';
+import { useAreaPaths } from '../../../app/area';
 
 /** Envios › Prazo de resposta (Prazo e respostas RN01 a RN03; Penpot A7). */
 export function DeadlinePage() {
@@ -74,6 +74,7 @@ function DeadlineForm({
   dashboard: DashboardResponse;
   timezone: string | null;
 }) {
+  const area = useAreaPaths();
   const { t } = useTranslation('deliveries');
   const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
@@ -174,7 +175,7 @@ function DeadlineForm({
               parties: t('deadline.pendingParties', { count: pending.parties }),
             })}
             {' · '}
-            <Link className="kore-deadline__remind" to={paths.deliveryReminder}>
+            <Link className="kore-deadline__remind" to={area.deliveryReminder}>
               {t('deadline.remind')}
             </Link>
           </>

@@ -2,7 +2,6 @@ import { Alert, Badge, Button, EmptyState, PageHeader, StatCard } from '@kore-io
 import { Check, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router';
-import { guestPartyPath, paths, siteSectionPath } from '../../../app/paths';
 import { useMeControllerMeV1 } from '../../../shared/api/generated/me/me';
 import type {
   ActivityResponse,
@@ -28,16 +27,19 @@ import {
   rateDetail,
 } from '../dashboard-texts';
 import { guestsByRespondedAt } from '../../guests/hooks/use-party-filters';
+import { useAreaPaths, type AreaPaths } from '../../../app/area';
 
-/** O caminho de cada item do Checklist (RN03). */
-const CHECKLIST_PATHS: Record<ChecklistItemResponse['key'], string> = {
-  guests: paths.guests,
-  appearance: siteSectionPath({ section: 'aparencia' }),
-  // A tela paga de publicar vem com o front da F3 (decisão 243): até lá, o Editor.
-  publish: paths.site,
-  invites: paths.deliveryInvites,
-  reminders: paths.deliveryReminder,
-};
+/** O caminho de cada item do Checklist (RN03), na área da tela. */
+function checklistPaths(area: AreaPaths): Record<ChecklistItemResponse['key'], string> {
+  return {
+    guests: area.guests,
+    appearance: area.siteSection({ section: 'aparencia' }),
+    // A tela paga de publicar vem com o front da F3 (decisão 243): até lá, o Editor.
+    publish: area.site,
+    invites: area.deliveryInvites,
+    reminders: area.deliveryReminder,
+  };
+}
 
 /** O status de envio e o valor do filtro de Envios na URL (RN02). */
 const DELIVERY_ROWS = [
@@ -64,6 +66,7 @@ export function DashboardPage() {
 }
 
 function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audience }) {
+  const area = useAreaPaths();
   const { t } = useTranslation('dashboard');
   const navigate = useNavigate();
   const { data: me } = useMeControllerMeV1();
@@ -92,13 +95,13 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
       }
       actions={
         <div className="kore-dashboard__actions">
-          <Button variant="secondary" onClick={() => void navigate(paths.site)}>
+          <Button variant="secondary" onClick={() => void navigate(area.site)}>
             {t('actions.editSite')}
           </Button>
           <Button
             disabled={!data || closed}
             {...(data && closed && { 'aria-describedby': 'kore-dashboard-closed' })}
-            onClick={() => void navigate(paths.deliveryInvites)}
+            onClick={() => void navigate(area.deliveryInvites)}
           >
             {t('actions.sendInvites')}
           </Button>
@@ -145,13 +148,11 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
             icon={<Users />}
             title={t(`guests.empty.${audience}`)}
             titleAs="h2"
-            action={
-              <Button onClick={() => void navigate(paths.guestNew)}>{t('guests.add')}</Button>
-            }
+            action={<Button onClick={() => void navigate(area.guestNew)}>{t('guests.add')}</Button>}
           />
         ) : (
           <>
-            <Link to={paths.guests} className="kore-dashboard__card-link kore-dashboard__stat">
+            <Link to={area.guests} className="kore-dashboard__card-link kore-dashboard__stat">
               <StatCard
                 label={t('guests.title')}
                 value={data.stats.guestsTotal}
@@ -159,7 +160,7 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
               />
             </Link>
             <Link
-              to={`${paths.guests}?resposta=confirmados`}
+              to={`${area.guests}?resposta=confirmados`}
               className="kore-dashboard__card-link kore-dashboard__stat"
             >
               <StatCard
@@ -169,7 +170,7 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
               />
             </Link>
             <Link
-              to={paths.deliveryDeadline}
+              to={area.deliveryDeadline}
               className="kore-dashboard__card-link kore-dashboard__stat"
             >
               <StatCard
@@ -193,6 +194,7 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
 
 /** Envios (RN02): os grupos por status; cada um abre Enviar convites com o filtro. */
 function DeliveryCard({ data, closed }: { data: DashboardResponse; closed: boolean }) {
+  const area = useAreaPaths();
   const { t } = useTranslation('dashboard');
   return (
     <section
@@ -222,7 +224,7 @@ function DeliveryCard({ data, closed }: { data: DashboardResponse; closed: boole
                 <span className="kore-dashboard__delivery-row">{content}</span>
               ) : (
                 <Link
-                  to={`${paths.deliveryInvites}?envio=${row.slug}`}
+                  to={`${area.deliveryInvites}?envio=${row.slug}`}
                   className="kore-dashboard__delivery-row"
                 >
                   {content}
@@ -239,6 +241,7 @@ function DeliveryCard({ data, closed }: { data: DashboardResponse; closed: boole
 
 /** Status do site (RN02, RN07): o selo, o endereço e "No ar até {data}.", e o botão. */
 function SiteCard({ data, now }: { data: DashboardResponse; now: Date }) {
+  const area = useAreaPaths();
   const { t } = useTranslation('dashboard');
   const { t: tSite } = useTranslation('site');
   const navigate = useNavigate();
@@ -274,7 +277,7 @@ function SiteCard({ data, now }: { data: DashboardResponse; now: Date }) {
       )}
       <div className="kore-dashboard__card-actions">
         {/* O Publicar volta com a tela paga do front da F3 (Publicar e pagar RN17; 243). */}
-        <Button size="sm" variant="secondary" onClick={() => void navigate(paths.site)}>
+        <Button size="sm" variant="secondary" onClick={() => void navigate(area.site)}>
           {t('site.edit')}
         </Button>
       </div>
@@ -284,6 +287,7 @@ function SiteCard({ data, now }: { data: DashboardResponse; now: Date }) {
 
 /** Checklist (RN03): na ordem do servidor; o feito com o ícone e riscado. */
 function ChecklistCard({ items }: { items: ChecklistItemResponse[] }) {
+  const area = useAreaPaths();
   const { t } = useTranslation('dashboard');
   const next = items.find((item) => !item.done)?.key;
   const label = (item: ChecklistItemResponse) => {
@@ -319,7 +323,7 @@ function ChecklistCard({ items }: { items: ChecklistItemResponse[] }) {
             <span className="kore-dashboard__check-box" aria-hidden="true">
               {item.done && <Check strokeWidth={2.4} />}
             </span>
-            <Link to={CHECKLIST_PATHS[item.key]} className="kore-dashboard__check-link">
+            <Link to={checklistPaths(area)[item.key]} className="kore-dashboard__check-link">
               {label(item)}
               {/* O estado para o leitor de tela; na tela, a caixa marcada (decisão 239(B2)). */}
               {item.done && (
@@ -349,6 +353,7 @@ function ActivityCard({
   items: ActivityResponse[];
   now: Date;
 }) {
+  const area = useAreaPaths();
   const { t } = useTranslation('dashboard');
   // Só as respostas: a API monta os grupos do payload da notificação, e a central do casal
   // já recebe os avisos de cobrança (outro formato), que o app desenha no front da F3.
@@ -371,8 +376,8 @@ function ActivityCard({
             const [first] = item.groups;
             const to =
               item.count <= 1 && first
-                ? guestPartyPath({ partyId: first.partyId })
-                : guestsByRespondedAt(paths.guests);
+                ? area.guestParty({ partyId: first.partyId })
+                : guestsByRespondedAt(area.guests);
             return (
               <li key={item.id}>
                 <Link

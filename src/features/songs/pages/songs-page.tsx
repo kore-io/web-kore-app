@@ -3,7 +3,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Music } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
-import { siteSectionPath } from '../../../app/paths';
 import { downloadFile } from '../../../shared/api/download-file';
 import {
   getSongSuggestionsControllerExportV1Url,
@@ -17,8 +16,7 @@ import { useLoadMoreOnScroll } from '../../guests/hooks/use-load-more-on-scroll'
 import { SONG_QUESTION_SLUG } from '../../site/sections';
 import { useSongSuggestions } from '../hooks/use-song-suggestions';
 import { suggestedAtText } from '../song-texts';
-
-const EDITOR_PATH = siteSectionPath({ section: SONG_QUESTION_SLUG });
+import { useAreaPaths } from '../../../app/area';
 
 /**
  * Músicas (/app/musicas; Música RN03, RN05, RN06): as sugestões com quem sugeriu, o grupo
@@ -26,11 +24,13 @@ const EDITOR_PATH = siteSectionPath({ section: SONG_QUESTION_SLUG });
  * caminho leva ao Editor › Pergunta de música.
  */
 export function SongsPage() {
+  const area = useAreaPaths();
   const { weddingId } = useActiveWedding();
   const { t } = useTranslation('songs');
   const site = useSiteControllerGetV1(weddingId ?? '', { query: { enabled: Boolean(weddingId) } });
   if (!weddingId) return null;
-  if (site.data && !site.data.songQuestion.enabled) return <Navigate to={EDITOR_PATH} replace />;
+  if (site.data && !site.data.songQuestion.enabled)
+    return <Navigate to={area.siteSection({ section: SONG_QUESTION_SLUG })} replace />;
   if (site.isError) return <LoadErrorNotice onRetry={() => void site.refetch()} />;
   if (!site.data) {
     return (
@@ -43,6 +43,7 @@ export function SongsPage() {
 }
 
 function Songs({ weddingId, timezone }: { weddingId: string; timezone: string | null }) {
+  const area = useAreaPaths();
   const { t } = useTranslation('songs');
   const { t: tCommon } = useTranslation('common');
   const { t: tAccess } = useTranslation('access');
@@ -72,7 +73,8 @@ function Songs({ weddingId, timezone }: { weddingId: string; timezone: string | 
   });
 
   // Desligada entre a leitura do site e a da lista: o Editor (RN03).
-  if (list.disabled) return <Navigate to={EDITOR_PATH} replace />;
+  if (list.disabled)
+    return <Navigate to={area.siteSection({ section: SONG_QUESTION_SLUG })} replace />;
   const empty = list.total === 0;
 
   return (

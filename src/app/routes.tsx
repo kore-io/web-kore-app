@@ -25,7 +25,82 @@ import { TrashPage } from '../features/guests/pages/trash-page';
 import { AppRoot } from './app-root';
 import { CoupleAreaLayout } from './layout/couple-area-layout';
 import { FIRST_SECTION_SLUG } from '../features/site/sections';
-import { paths, siteSectionPath } from './paths';
+import { PlannerWeddingArea } from './layout/planner-wedding-area';
+import { paths } from './paths';
+
+/**
+ * As telas do casamento, com caminhos relativos ao caminho-base da área (Colaboradora
+ * RN09): montadas em `/app` (o casal) e em `/cerimonialista/casamentos/:weddingId` (a
+ * colaboradora). O `prefix` deixa os ids das rotas únicos.
+ */
+function areaRoutes({ prefix }: { prefix: 'couple' | 'planner' }): RouteObject[] {
+  const routes: RouteObject[] = [
+    { id: 'dashboard', index: true, element: <DashboardPage /> },
+    {
+      path: 'convidados',
+      element: <GuestsLayout />,
+      children: [
+        { id: 'guests', index: true, element: <GuestsPage /> },
+        { id: 'guest-import', path: 'importar', element: <ImportPage /> },
+        { id: 'guest-export', path: 'exportar', element: <ExportPage /> },
+        { id: 'guest-tags', path: 'tags', element: <TagsPage /> },
+        { id: 'guest-trash', path: 'lixeira', element: <TrashPage /> },
+      ],
+    },
+    { id: 'guest-party', path: 'convidados/grupos/:partyId', element: <PartyPanelPage /> },
+    { id: 'guest-new', path: 'convidados/novo', element: <NewPartyPage /> },
+    {
+      id: 'site',
+      path: 'site',
+      element: <Navigate to={FIRST_SECTION_SLUG} replace />,
+    },
+    { id: 'site-editor', path: 'site/:section', element: <SiteEditorPage /> },
+    { id: 'songs', path: 'musicas', element: <SongsPage /> },
+    { id: 'notifications', path: 'notificacoes', element: <NotificationsPage /> },
+    {
+      id: 'settings-notifications',
+      path: 'configuracoes/notificacoes',
+      element: <NotificationSettingsPage />,
+    },
+    {
+      path: 'envios',
+      element: <DeliveriesLayout />,
+      children: [
+        // Envios abre em Enviar convites (decisão 235).
+        { index: true, element: <Navigate to="convites" replace /> },
+        { id: 'delivery-invites', path: 'convites', element: <SendPage kind="invite" /> },
+        {
+          id: 'delivery-save-the-date',
+          path: 'save-the-date',
+          element: <SendPage kind="save_the_date" />,
+        },
+        { id: 'delivery-reminder', path: 'lembrete', element: <SendPage kind="reminder" /> },
+        { id: 'delivery-deadline', path: 'prazo', element: <DeadlinePage /> },
+      ],
+    },
+    {
+      id: 'guest-party-edit',
+      path: 'convidados/grupos/:partyId/editar',
+      element: <EditPartyPage />,
+    },
+  ];
+  return prefix === 'couple' ? routes : withIdPrefix({ routes, prefix });
+}
+
+/** Os ids da área da colaboradora levam o prefixo (os do casal ficam como eram). */
+function withIdPrefix({
+  routes,
+  prefix,
+}: {
+  routes: RouteObject[];
+  prefix: string;
+}): RouteObject[] {
+  return routes.map((route) => ({
+    ...route,
+    ...(route.id && { id: `${prefix}-${route.id}` }),
+    ...(route.children && { children: withIdPrefix({ routes: route.children, prefix }) }),
+  })) as RouteObject[];
+}
 
 export const routes: RouteObject[] = [
   {
@@ -43,56 +118,15 @@ export const routes: RouteObject[] = [
         id: 'couple-area',
         path: paths.coupleArea,
         element: <CoupleAreaLayout />,
-        children: [
-          { id: 'dashboard', index: true, element: <DashboardPage /> },
-          {
-            path: 'convidados',
-            element: <GuestsLayout />,
-            children: [
-              { id: 'guests', index: true, element: <GuestsPage /> },
-              { id: 'guest-import', path: 'importar', element: <ImportPage /> },
-              { id: 'guest-export', path: 'exportar', element: <ExportPage /> },
-              { id: 'guest-tags', path: 'tags', element: <TagsPage /> },
-              { id: 'guest-trash', path: 'lixeira', element: <TrashPage /> },
-            ],
-          },
-          { id: 'guest-party', path: 'convidados/grupos/:partyId', element: <PartyPanelPage /> },
-          { id: 'guest-new', path: 'convidados/novo', element: <NewPartyPage /> },
-          {
-            id: 'site',
-            path: 'site',
-            element: <Navigate to={siteSectionPath({ section: FIRST_SECTION_SLUG })} replace />,
-          },
-          { id: 'site-editor', path: 'site/:section', element: <SiteEditorPage /> },
-          { id: 'songs', path: 'musicas', element: <SongsPage /> },
-          { id: 'notifications', path: 'notificacoes', element: <NotificationsPage /> },
-          {
-            id: 'settings-notifications',
-            path: 'configuracoes/notificacoes',
-            element: <NotificationSettingsPage />,
-          },
-          {
-            path: 'envios',
-            element: <DeliveriesLayout />,
-            children: [
-              // Envios abre em Enviar convites (decisão 235).
-              { index: true, element: <Navigate to={paths.deliveryInvites} replace /> },
-              { id: 'delivery-invites', path: 'convites', element: <SendPage kind="invite" /> },
-              {
-                id: 'delivery-save-the-date',
-                path: 'save-the-date',
-                element: <SendPage kind="save_the_date" />,
-              },
-              { id: 'delivery-reminder', path: 'lembrete', element: <SendPage kind="reminder" /> },
-              { id: 'delivery-deadline', path: 'prazo', element: <DeadlinePage /> },
-            ],
-          },
-          {
-            id: 'guest-party-edit',
-            path: 'convidados/grupos/:partyId/editar',
-            element: <EditPartyPage />,
-          },
-        ],
+        children: areaRoutes({ prefix: 'couple' }),
+      },
+      {
+        // A colaboradora dentro do casamento (Colaboradora RN01, RN09): as mesmas telas,
+        // com o casamento da rota. A moldura dela (faixa, seletor, Voltar) vem no D5.
+        id: 'planner-wedding',
+        path: paths.plannerWedding,
+        element: <PlannerWeddingArea />,
+        children: areaRoutes({ prefix: 'planner' }),
       },
       // Sem página de "não encontrado" no DS: o caminho desconhecido volta para a área.
       { path: '*', element: <Navigate to={paths.coupleArea} replace /> },

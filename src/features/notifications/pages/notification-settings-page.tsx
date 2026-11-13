@@ -3,7 +3,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
-import { paths } from '../../../app/paths';
 import { useMeControllerMeV1 } from '../../../shared/api/generated/me/me';
 import type {
   PreferencesResponse,
@@ -17,6 +16,7 @@ import {
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { useActiveWedding } from '../../guests/hooks/use-active-wedding';
 import { disablePush, enablePush, pushAvailability, type PushAvailability } from '../push';
+import { useAreaPaths } from '../../../app/area';
 
 const EMAIL_OPTIONS: SavePreferenceBodyEmail[] = ['immediate', 'daily', 'off'];
 
@@ -35,6 +35,7 @@ export function NotificationSettingsPage() {
 }
 
 function NotificationSettings({ weddingId }: { weddingId: string }) {
+  const area = useAreaPaths();
   const { t } = useTranslation('notifications');
   const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
@@ -102,7 +103,7 @@ function NotificationSettings({ weddingId }: { weddingId: string }) {
       <PageHeader title={t('settings.title')} description={description} />
       <Tabs aria-label={t('settings.tabs')}>
         <Tab asChild current>
-          <Link to={paths.settingsNotifications}>{t('settings.tab')}</Link>
+          <Link to={area.settingsNotifications}>{t('settings.tab')}</Link>
         </Tab>
       </Tabs>
       {preferences.isError ? (

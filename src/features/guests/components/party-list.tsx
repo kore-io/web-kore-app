@@ -11,7 +11,6 @@ import {
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
-import { guestPartyPath } from '../../../app/paths';
 import type { PartyListItemResponse } from '../../../shared/api/generated/model';
 import { deliveryBadges } from './delivery-badges';
 import { useSiteControllerGetV1 } from '../../../shared/api/generated/site/site';
@@ -19,6 +18,7 @@ import { useActiveWedding } from '../hooks/use-active-wedding';
 import { contactText, respondedAtText, responsesText } from '../party-texts';
 import { useLoadMoreOnScroll } from '../hooks/use-load-more-on-scroll';
 import type { usePartySelection } from '../hooks/use-party-selection';
+import { useAreaPaths } from '../../../app/area';
 
 interface PartyListProps {
   parties: PartyListItemResponse[];
@@ -44,6 +44,7 @@ export function PartyList({
   onLoadMore,
   actionsFor,
 }: PartyListProps) {
+  const area = useAreaPaths();
   const { t } = useTranslation('guests');
   const { t: tCommon } = useTranslation('common');
   // O Respondido em no fuso do casamento, como o .xlsx (decisão 246); o site já está em cache.
@@ -92,7 +93,7 @@ export function PartyList({
                 />
               }
               name={
-                <Link to={guestPartyPath({ partyId: party.id })} className="kore-party-list__name">
+                <Link to={area.guestParty({ partyId: party.id })} className="kore-party-list__name">
                   {party.name}
                 </Link>
               }

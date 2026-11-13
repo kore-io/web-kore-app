@@ -3,13 +3,13 @@ import { ChevronDown, ChevronUp, X } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
-import { siteSectionPath } from '../../../app/paths';
 import type { SiteEditorResponse, SiteSectionResponse } from '../../../shared/api/generated/model';
 import { FormField } from '../../../shared/components/form-field';
 import type { Audience } from '../../guests/hooks/use-active-wedding';
 import { ImageField, type ImageValue } from '../components/image-field';
 import { FIRST_SECTION_SLUG } from '../sections';
 import { useSiteSection, type SectionErrors } from './use-site-section';
+import { useAreaPaths } from '../../../app/area';
 
 const NUMBER = new Intl.NumberFormat('pt-BR');
 const TITLE_MAX = 80;
@@ -135,6 +135,7 @@ const text = (content: Record<string, unknown>) =>
 
 /** Contagem regressiva (RN06): só o Switch; sem data, desabilitado com o motivo. */
 export function CountdownSection({ weddingId, site, section, audience }: SectionProps) {
+  const area = useAreaPaths();
   const { t } = useTranslation('site');
   const state = useSiteSection({
     weddingId,
@@ -166,7 +167,7 @@ export function CountdownSection({ weddingId, site, section, audience }: Section
               <>
                 {' '}
                 <Link
-                  to={siteSectionPath({ section: FIRST_SECTION_SLUG })}
+                  to={area.siteSection({ section: FIRST_SECTION_SLUG })}
                   className="kore-site-section__link"
                 >
                   {t('section.countdown.goToBasics')}

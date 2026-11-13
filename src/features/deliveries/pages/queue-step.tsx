@@ -4,7 +4,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router';
-import { guestPartyEditPath } from '../../../app/paths';
 import type { DeliveryQueueItemResponse } from '../../../shared/api/generated/model';
 import {
   deliveriesControllerMarkV1,
@@ -18,6 +17,7 @@ import { deliveryStatusText, sentAtOf, type DeliveryKind } from '../delivery-tex
 import { DELIVERY_LIMIT, useDeliverySelection } from '../hooks/use-delivery-selection';
 import { QrStep } from './qr-step';
 import type { Closed } from './send-page';
+import { useAreaPaths } from '../../../app/area';
 
 type Sent = Record<string, { at: string; channel: 'whatsapp' | 'email' | 'link' }>;
 
@@ -53,6 +53,7 @@ function ChannelQueue({
   kind: DeliveryKind;
   closed: Closed;
 }) {
+  const area = useAreaPaths();
   const { t } = useTranslation('deliveries');
   const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
@@ -180,7 +181,7 @@ function ChannelQueue({
                   <Button
                     variant="secondary"
                     size="sm"
-                    onClick={() => void navigate(guestPartyEditPath({ partyId: item.id }))}
+                    onClick={() => void navigate(area.guestPartyEdit({ partyId: item.id }))}
                   >
                     {t('queue.editParty')}
                   </Button>
