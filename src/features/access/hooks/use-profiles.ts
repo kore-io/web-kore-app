@@ -3,13 +3,13 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { externalUrls, paths } from '../../../app/paths';
+import { paths } from '../../../app/paths';
 import {
   getMeControllerMeV1QueryKey,
   useMeControllerMeV1,
 } from '../../../shared/api/generated/me/me';
 import { ApiError } from '../../../shared/api/http-client';
-import { redirectTo } from '../../../shared/browser/redirect';
+import { safeReturnPath } from '../login-navigation';
 import { useSetActiveProfile, type ProfileKind } from '../api/me-active-profile';
 
 /**
@@ -39,10 +39,9 @@ export function useProfiles() {
       {
         onSuccess: ({ home }) => {
           void queryClient.resetQueries({ queryKey: getMeControllerMeV1QueryKey() });
-          // Só a área do casal existe na F0; o cerimonialista vai ao destino do Fazer
-          // parceria até a F6 (decisão 152).
-          if (home.startsWith(paths.coupleArea)) void navigate(home, { replace: true });
-          else redirectTo({ url: externalUrls.plannerPartnership });
+          // O app segue o home da API: /app para o casal, /cerimonialista para o
+          // cerimonialista (Cadastro e perfil RN07, que revê a 176(1)). Só caminho do app.
+          void navigate(safeReturnPath({ path: home }) ?? paths.profiles, { replace: true });
         },
         onError: (error) => {
           if (error instanceof ApiError && error.status === 401) {
@@ -83,6 +82,6 @@ export function useProfiles() {
     choosing: setActiveProfile.isPending,
     choose,
     createWedding: () => void navigate(paths.signUp),
-    partnership: () => redirectTo({ url: externalUrls.plannerPartnership }),
+    partnership: () => void navigate(paths.plannerSignUp),
   };
 }

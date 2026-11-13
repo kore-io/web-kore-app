@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation, useSearchParams } from 'react-router';
-import { externalUrls, paths } from '../../../app/paths';
+import { paths } from '../../../app/paths';
 import { AccessLayout } from '../components/access-layout';
 import { SignInAlert, type SignInNotice } from '../components/sign-in-alert';
 import { SignInCodeStep } from '../components/sign-in-code-step';
@@ -55,7 +55,7 @@ export function SignInPage({ initialNotice }: { initialNotice?: SignInNotice }) 
           {...(signIn.emailError !== undefined && { emailError: signIn.emailError })}
           submitting={signIn.submitting}
           signUpHref={paths.signUp}
-          plannerHref={externalUrls.plannerPartnership}
+          plannerHref={paths.plannerSignUp}
         />
       ) : (
         <SignInCodeStep

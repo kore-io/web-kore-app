@@ -214,5 +214,100 @@
     "nameError": "Informe seu nome.",
     "accept": "Aceitar convite",
     "decline": "Recusar convite"
+  },
+  "plannerSignUp": {
+    "title": "Fazer parceria com o Kore",
+    "description": "Grátis para usar, sempre. Você ganha comissão pelos casais que trouxer.",
+    "benefits": {
+      "panel": {
+        "title": "Todos os seus casamentos num painel",
+        "description": "Veja quem respondeu em cada casamento sem abrir um por um."
+      },
+      "site": {
+        "title": "O site e a lista dos seus clientes",
+        "description": "Monte tudo antes do casal entrar; o casal só confere e publica."
+      },
+      "commission": {
+        "title": "Comissão na publicação e nas extensões",
+        "description": "Sem os juros do cartão. As regras estão no termo de parceria."
+      }
+    },
+    "submit": "Continuar",
+    "account": "Você vai usar a conta {{email}}.",
+    "signInPrompt": "Já tem conta?",
+    "signInLink": "Entrar",
+    "couplePrompt": "Vão casar?",
+    "coupleLink": "Criar meu site",
+    "details": {
+      "title": "Como os casais vão ver você",
+      "description": "Esses dados aparecem para os seus clientes. Dá para mudar depois.",
+      "submit": "Continuar"
+    },
+    "ready": {
+      "title": "Seu link de indicação está pronto",
+      "description": "Mande para os seus clientes.",
+      "descriptionDiscount": "Mande para os seus clientes. Quem se cadastrar por ele ganha {{percent}}% de desconto na ativação.",
+      "whatsapp": "Compartilhar no WhatsApp",
+      "copy": "Copiar link",
+      "copied": "Link copiado.",
+      "note": "O link também fica no seu painel, em Link de indicação.",
+      "continue": "Continuar",
+      "whatsappMessage": "Oi! Uso o Kore para organizar os casamentos dos meus clientes. Vocês podem se cadastrar por este link: {{link}}",
+      "whatsappMessageDiscount": "Oi! Uso o Kore para organizar os casamentos dos meus clientes. Se vocês se cadastrarem por este link, ganham {{percent}}% de desconto na ativação do site: {{link}}"
+    },
+    "howItWorks": {
+      "title": "Como funciona",
+      "description": "Três passos, do primeiro casamento ao repasse.",
+      "steps": {
+        "bring": {
+          "title": "Trazer o casal",
+          "description": "Mande o seu link de indicação ou crie o casamento no painel e convide o casal para conferir."
+        },
+        "publish": {
+          "title": "O casal publica o site",
+          "description": "O casal escolhe até quando o site fica no ar e paga uma vez só, na publicação. Você continua ajudando no site e na lista."
+        },
+        "commission": {
+          "title": "Receber a comissão",
+          "description": "A cada casal que publicar o site, você ganha comissão no pagamento da publicação e em cada extensão, sem os juros do cartão."
+        }
+      },
+      "goToWeddings": "Ir para Meus casamentos"
+    },
+    "closed": {
+      "title": "O cadastro de parceria ainda não está aberto.",
+      "description": "Estamos começando com as primeiras assessorias. Se quiser participar, escreva para suporte@kore.com.br.",
+      "back": "Voltar ao Kore"
+    },
+    "seller": "Esta conta tem o perfil Vendas · Kore e não pode ter o de cerimonialista. Se precisar, escreva para suporte@kore.com.br."
+  },
+  "plannerProfile": {
+    "creditName": "Nome da assessoria",
+    "creditNameHint": "Aparece no rodapé dos sites que você monta. Se você atende sem empresa, use o seu nome.",
+    "name": "Seu nome",
+    "phone": "Telefone",
+    "whatsapp": "WhatsApp",
+    "optional": "(opcional)",
+    "sameAsPhone": "O mesmo do telefone",
+    "cities": "Cidades de atuação",
+    "citiesHint": "Adicione as cidades onde você atende. Assim sabemos onde o Kore está chegando.",
+    "city": "Cidade",
+    "state": "UF",
+    "addCity": "Adicionar",
+    "removeCity": "Remover {{city}}",
+    "terms": "Li e aceito os <terms>Termos de uso</terms> e a <privacy>Política de privacidade</privacy>.",
+    "errors": {
+      "creditNameRequired": "Informe o nome da assessoria.",
+      "creditNameTooShort": "O nome precisa de pelo menos 2 caracteres.",
+      "creditNameInvalid": "Use só o nome da assessoria, sem link, telefone ou e-mail.",
+      "nameRequired": "Informe seu nome.",
+      "nameTooLong": "O nome passa de 80 caracteres.",
+      "phone": "Confira o telefone: use DDD e número, como (19) 98812-7730.",
+      "citiesRequired": "Adicione pelo menos uma cidade.",
+      "cityDuplicate": "Essa cidade já está na lista.",
+      "cityTooLong": "A cidade passa de 80 caracteres.",
+      "terms": "Aceite os termos para continuar.",
+      "termsOutdated": "Os termos mudaram. Leia e aceite a versão nova para continuar."
+    }
   }
 }

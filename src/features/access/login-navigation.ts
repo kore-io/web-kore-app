@@ -1,4 +1,4 @@
-import { externalUrls, paths } from '../../app/paths';
+import { paths } from '../../app/paths';
 import type { VerifyLoginChallengeResponseNext } from '../../shared/api/generated/model';
 
 /** Onde guardamos o token do convite ao abrir /convite/{token} (decisão 142). */
@@ -58,7 +58,7 @@ export function destinationAfterLogin({
     case 'couple_signup':
       return { kind: 'route', path: paths.signUp };
     case 'planner_signup':
-      return { kind: 'external', url: externalUrls.plannerPartnership };
+      return { kind: 'route', path: paths.plannerSignUp };
     case 'invite': {
       const token = storedInviteToken();
       return token

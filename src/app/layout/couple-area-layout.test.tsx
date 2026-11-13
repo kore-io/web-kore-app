@@ -60,7 +60,52 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
       within(menu)
         .getAllByRole('menuitem')
         .map((item) => item.textContent),
-    ).toEqual(['Configurações', 'Sair']);
+    ).toEqual(['Configurações', 'Criar outro perfil Cerimonialista', 'Sair']);
+  });
+
+  it('Criar outro perfil leva ao cadastro do cerimonialista (Cadastro e perfil RN08; decisão 85)', async () => {
+    const user = userEvent.setup();
+    mockApi(({ path }) => meOnly(path));
+    const { router } = renderRoute({ url: '/app' });
+    await user.click(await screen.findByRole('button', { name: 'Menu do usuário' }));
+    await user.click(await screen.findByRole('menuitem', { name: /Criar outro perfil/ }));
+    await waitFor(() => expect(router.state.location.pathname).toBe('/cerimonialista/cadastro'));
+  });
+
+  it('com os dois perfis, só o Trocar de perfil, com a assessoria (RN08; Voz)', async () => {
+    const user = userEvent.setup();
+    mockApi(({ path }) =>
+      meOnly(
+        path,
+        me({
+          profiles: ['couple', 'planner'],
+          planner: { organization: 'Prado Assessoria', weddingsCount: 2 },
+        }),
+      ),
+    );
+    const { router } = renderRoute({ url: '/app' });
+    await user.click(await screen.findByRole('button', { name: 'Menu do usuário' }));
+    const menu = await screen.findByRole('menu');
+    expect(
+      within(menu)
+        .getAllByRole('menuitem')
+        .map((item) => item.textContent),
+    ).toEqual(['Configurações', 'Trocar de perfil Cerimonialista · Prado Assessoria', 'Sair']);
+    await user.click(within(menu).getByRole('menuitem', { name: /Trocar de perfil/ }));
+    await waitFor(() => expect(router.state.location.pathname).toBe('/perfis'));
+  });
+
+  it('com o perfil de vendas: Trocar de perfil, sem o Criar outro perfil (RN08; RN15 do Login)', async () => {
+    const user = userEvent.setup();
+    mockApi(({ path }) => meOnly(path, me({ profiles: ['couple', 'seller'] })));
+    renderRoute({ url: '/app' });
+    await user.click(await screen.findByRole('button', { name: 'Menu do usuário' }));
+    const menu = await screen.findByRole('menu');
+    expect(
+      within(menu)
+        .getAllByRole('menuitem')
+        .map((item) => item.textContent),
+    ).toEqual(['Configurações', 'Trocar de perfil Vendas · Kore', 'Sair']);
   });
 
   it('Configurações, no menu, abre as preferências de notificação (decisão 221)', async () => {
