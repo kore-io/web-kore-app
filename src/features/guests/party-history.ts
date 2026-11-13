@@ -1,21 +1,24 @@
 import type { TFunction } from 'i18next';
 import type { PartyHistoryEntryResponse } from '../../shared/api/generated/model';
+import { dayAndTimeIn } from '../../shared/date-texts';
 
 type GuestsT = TFunction<'guests'>;
 
-const two = (value: number) => String(value).padStart(2, '0');
-
-/** "12/09 às 20h14"; a hora cheia sem minutos ("21/06 às 9h"), como nas listas (Voz). */
-export function historyAt({ t, at }: { t: GuestsT; at: string }): string {
-  const date = new Date(at);
-  const time =
-    date.getMinutes() === 0
-      ? `${date.getHours()}h`
-      : `${date.getHours()}h${two(date.getMinutes())}`;
-  return t('panel.history.at', {
-    date: `${two(date.getDate())}/${two(date.getMonth() + 1)}`,
-    time,
-  });
+/**
+ * "12/09 às 20h14"; a hora cheia sem minutos ("21/06 às 9h"), como nas listas (Voz). No fuso
+ * do casamento (decisão 248).
+ */
+export function historyAt({
+  t,
+  at,
+  timezone,
+}: {
+  t: GuestsT;
+  at: string;
+  timezone: string | null;
+}): string {
+  const { date, time } = dayAndTimeIn({ at, timezone });
+  return t('panel.history.at', { date, time });
 }
 
 /** "3 confirmados" · "2 confirmados, 1 recusado" · "3 recusados": a parte com zero sai. */

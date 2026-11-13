@@ -23,6 +23,7 @@ import { historyAt, historyLine } from '../party-history';
 import { TrashDialog } from '../components/trash-dialog';
 import { useOpenPreview } from '../../site/preview/use-open-preview';
 import { useActiveWedding, type Audience } from '../hooks/use-active-wedding';
+import { useWeddingTimezone } from '../../../shared/use-wedding-timezone';
 import { useMoveGuest } from '../hooks/use-move-guest';
 import { useResponseLock } from '../hooks/use-response-lock';
 import { useTrash } from '../hooks/use-trash';
@@ -455,6 +456,8 @@ function GuestItem({
 /** O Histórico do grupo (Prazo e respostas RN05): oculto enquanto vazio. */
 function HistoryCard({ party }: { party: PartyResponse }) {
   const { t } = useTranslation('guests');
+  const { weddingId } = useActiveWedding();
+  const timezone = useWeddingTimezone({ weddingId });
   if (party.history.length === 0) return null;
   return (
     <Card title={t('panel.history.title')}>
@@ -462,7 +465,9 @@ function HistoryCard({ party }: { party: PartyResponse }) {
         {party.history.map((entry, index) => (
           <li key={`${entry.at}-${index}`} className="kore-party-panel__history-item">
             <span>{historyLine({ t, entry, plusOneLabel: t('panel.guests.plusOne') })}</span>
-            <span className="kore-party-panel__history-at">{historyAt({ t, at: entry.at })}</span>
+            <span className="kore-party-panel__history-at">
+              {historyAt({ t, at: entry.at, timezone })}
+            </span>
           </li>
         ))}
       </ul>
