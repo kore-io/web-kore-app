@@ -5,7 +5,7 @@
 }
 
 .kore-songs__actions {
-  @apply flex flex-col items-stretch gap-2 md:items-end;
+  @apply flex flex-col items-stretch gap-2 md:items-start lg:items-end;
 }
 
 .kore-songs__export-help {
