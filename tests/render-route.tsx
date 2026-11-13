@@ -80,3 +80,20 @@ export function mockApi(handler: Handler) {
 export function apiError({ status, body }: { status: number; body: Record<string, unknown> }) {
   return Response.json({ statusCode: status, message: 'x', ...body }, { status });
 }
+
+/**
+ * As leituras do layout da área (o site, para o item Músicas e o selo, e o contador do
+ * sino): os testes que guardam as chamadas da tela as deixam de fora.
+ */
+export function isLayoutRead({ method, path }: { method: string; path: string }): boolean {
+  return (
+    method === 'GET' &&
+    (/^\/v1\/weddings\/[^/]+\/site$/.test(path) ||
+      path.startsWith('/v1/me/notifications/unread-count'))
+  );
+}
+
+/** A resposta das leituras do layout nos testes que não as simulam: 404, sem selo nem contador. */
+export function layoutReadNotFound() {
+  return apiError({ status: 404, body: { error: 'NOT_FOUND' } });
+}

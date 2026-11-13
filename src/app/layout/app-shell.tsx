@@ -76,9 +76,11 @@ export function AppShell({
                 <IconButton
                   icon={<Bell size={20} strokeWidth={1.75} />}
                   label={
-                    notifications.unread > 0
-                      ? t('notificationsUnread', { count: notifications.unread })
-                      : t('notifications')
+                    notifications.unread > 9
+                      ? t('notificationsUnreadMany')
+                      : notifications.unread > 0
+                        ? t('notificationsUnread', { count: notifications.unread })
+                        : t('notifications')
                   }
                   count={notifications.unread}
                   onClick={notifications.onOpen}

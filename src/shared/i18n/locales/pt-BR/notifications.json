@@ -1,0 +1,35 @@
+{
+  "title": "Notificações",
+  "loading": "Carregando as notificações",
+  "markAll": "Marcar todas como lidas",
+  "markedAll": "Todas as notificações foram marcadas como lidas.",
+  "loadMore": "Carregar mais",
+  "unread": "não lida",
+  "filter": {
+    "label": "Tipo",
+    "all": "Todas",
+    "rsvp": "Respostas"
+  },
+  "empty": {
+    "title": "Ainda não há notificações",
+    "description": "Elas aparecem aqui quando um grupo responder o convite."
+  },
+  "filterEmpty": "Nenhuma notificação deste tipo.",
+  "collaborator": "Por enquanto, os avisos deste casamento vão só para o casal.",
+  "settings": {
+    "title": "Configurações",
+    "tabs": "Configurações",
+    "tab": "Notificações",
+    "section": "O que avisar",
+    "subtitle": "Escolha como você quer receber cada aviso.",
+    "rsvp": "Respostas do convite",
+    "email": "E-mail",
+    "emailOptions": {
+      "immediate": "Na hora",
+      "daily": "Resumo diário às 20h",
+      "off": "Desligado"
+    },
+    "note": "A central do app sempre recebe tudo. O push mostra só o nome do grupo, sem valores nem o texto do recado.",
+    "saved": "Preferências salvas."
+  }
+}

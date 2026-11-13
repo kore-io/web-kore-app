@@ -49,6 +49,10 @@ export const paths = {
    * Pergunta de música (RN03).
    */
   songs: '/app/musicas',
+  /** Notificações (Central RN06; decisão 217(13)): o sino da Topbar leva aqui. */
+  notifications: '/app/notificacoes',
+  /** Configurações › Notificações (Central RN07; decisão 221). */
+  settingsNotifications: '/app/configuracoes/notificacoes',
   /** Site › Editor (decisão 214): /app/site abre os Dados básicos. */
   site: '/app/site',
   siteSection: '/app/site/:section',

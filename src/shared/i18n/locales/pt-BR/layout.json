@@ -15,5 +15,7 @@
   },
   "activeProfileCouple": "Perfil ativo: Casal",
   "activeProfileCoupleWedding": "Perfil ativo: Casal · {{couple}}",
-  "signOut": "Sair"
+  "signOut": "Sair",
+  "notificationsUnreadMany": "Notificações, mais de 9 não lidas",
+  "settings": "Configurações"
 }

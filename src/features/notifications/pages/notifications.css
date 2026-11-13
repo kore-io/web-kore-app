@@ -1,0 +1,89 @@
+/* Notificações (Central RN06; Penpot 25) e Configurações › Notificações (RN07; Penpot 27). */
+.kore-notifications,
+.kore-settings {
+  @apply flex flex-col gap-6;
+}
+
+.kore-notifications__actions {
+  @apply flex flex-col gap-2 md:flex-row md:items-center;
+}
+
+.kore-notifications__loading,
+.kore-settings__loading,
+.kore-notifications__more {
+  @apply flex justify-center py-6;
+}
+
+.kore-notifications__filter-empty {
+  @apply m-0 type-body-md text-gray-700;
+}
+
+.kore-notifications__list {
+  @apply m-0 flex list-none flex-col rounded-lg border border-gray-300 bg-white p-0;
+}
+
+.kore-notifications__list > li + li {
+  @apply border-t border-gray-300;
+}
+
+.kore-notifications__item {
+  @apply relative flex min-h-11 w-full cursor-pointer items-start gap-3 bg-transparent px-5 py-4 text-left focus-visible:shadow-focus-ring focus-visible:outline-none hover:bg-gray-100;
+}
+
+/* Não lida: o ponto em primary e o título com peso maior. */
+.kore-notifications__dot {
+  @apply mt-2 size-2 shrink-0 rounded-full bg-primary;
+}
+
+.kore-notifications__text {
+  @apply flex min-w-0 flex-col gap-0.5;
+}
+
+.kore-notifications__item:not([data-unread]) .kore-notifications__text {
+  @apply pl-5;
+}
+
+.kore-notifications__title {
+  @apply type-body-md text-ink;
+}
+
+.kore-notifications__item[data-unread] .kore-notifications__title {
+  @apply type-label;
+}
+
+.kore-notifications__detail {
+  @apply type-caption text-gray-700;
+}
+
+.kore-notifications__sr {
+  @apply sr-only;
+}
+
+.kore-settings__panel {
+  @apply flex flex-col gap-4 rounded-lg border border-gray-300 bg-white p-5;
+}
+
+.kore-settings__section {
+  @apply m-0 type-overline text-gray-700;
+}
+
+.kore-settings__subtitle,
+.kore-settings__note {
+  @apply m-0 type-body-md text-gray-700;
+}
+
+.kore-settings__row {
+  @apply flex flex-col gap-3 border-y border-gray-300 py-4 md:flex-row md:items-end md:justify-between;
+}
+
+.kore-settings__type {
+  @apply m-0 type-label text-ink;
+}
+
+.kore-settings__field {
+  @apply flex flex-col gap-1.5 md:w-72;
+}
+
+.kore-settings__label {
+  @apply type-label text-ink;
+}

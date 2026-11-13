@@ -42,7 +42,7 @@ function meOnly(path: string, body: object = me()) {
 }
 
 describe('área do casal com o /v1/me (decisão 163)', () => {
-  it('a Topbar e o menu com os nomes do casal, a pessoa e só o Sair (163(2))', async () => {
+  it('a Topbar e o menu com os nomes do casal, a pessoa, Configurações e o Sair (163(2); Penpot 03)', async () => {
     const user = userEvent.setup();
     mockApi(({ path }) => meOnly(path));
     renderRoute({ url: '/app' });
@@ -60,8 +60,40 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
       within(menu)
         .getAllByRole('menuitem')
         .map((item) => item.textContent),
-    ).toEqual(['Sair']);
+    ).toEqual(['Configurações', 'Sair']);
   });
+
+  it('Configurações, no menu, abre as preferências de notificação (decisão 221)', async () => {
+    const user = userEvent.setup();
+    mockApi(({ path }) => meOnly(path));
+    const { router } = renderRoute({ url: '/app' });
+    await user.click(await screen.findByRole('button', { name: 'Menu do usuário' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Configurações' }));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/app/configuracoes/notificacoes'),
+    );
+  });
+
+  it.each([
+    [0, 'Notificações'],
+    [1, 'Notificações, 1 não lida'],
+    [3, 'Notificações, 3 não lidas'],
+    [12, 'Notificações, mais de 9 não lidas'],
+  ])(
+    'o sino com %i não lidas: "%s"; tocar leva às Notificações (Central RN06)',
+    async (count, name) => {
+      const user = userEvent.setup();
+      mockApi(({ path }) =>
+        path.startsWith('/v1/me/notifications/unread-count')
+          ? Response.json({ unreadCount: count })
+          : meOnly(path),
+      );
+      const { router } = renderRoute({ url: '/app' });
+      const bell = await screen.findByRole('button', { name });
+      await user.click(bell);
+      await waitFor(() => expect(router.state.location.pathname).toBe('/app/notificacoes'));
+    },
+  );
 
   it.each([
     ['published', 'Publicado'],

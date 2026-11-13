@@ -4,7 +4,14 @@ import i18next from 'i18next';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../../../tests/a11y';
 import { meFor, profileUnderTest } from '../../../../tests/profile';
-import { apiError, mockApi, renderAreaScreen, renderRoute } from '../../../../tests/render-route';
+import {
+  apiError,
+  mockApi,
+  renderAreaScreen,
+  renderRoute,
+  isLayoutRead,
+  layoutReadNotFound,
+} from '../../../../tests/render-route';
 import type { SiteEditorResponse } from '../../../shared/api/generated/model';
 import { compressImage } from '../images/compress-image';
 import { basicsErrorText } from './basics-section';
@@ -134,6 +141,8 @@ function mockBasics({
         },
       });
     }
+    // O layout lê o contador do sino: não é chamada da tela.
+    if (isLayoutRead({ method, path })) return layoutReadNotFound();
     calls.push({ method, path, body });
     if (path === '/v1/weddings/w1/site' && method === 'PATCH') return patch(body);
     return apiError({ status: 404, body: { error: 'NOT_FOUND' } });
