@@ -309,6 +309,25 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/convidados/novo'));
   });
 
+  it('sem grupos, "Enviar os convites" sem a contagem "(0 de 0 grupos)"', async () => {
+    mockDashboard({
+      data: dashboard({
+        stats: { ...dashboard().stats, guestsTotal: 0, partiesTotal: 0 },
+        checklist: [
+          { key: 'guests', done: false, progress: null },
+          { key: 'invites', done: false, progress: { done: 0, total: 0 } },
+        ],
+      }),
+    });
+    renderRoute({ url: '/app' });
+    await screen.findByRole('heading', { name: 'Vocês ainda não cadastraram convidados.' });
+    expect(
+      within(card('Checklist'))
+        .getAllByRole('listitem')
+        .map((item) => item.textContent),
+    ).toEqual(['Cadastrar os convidados', 'Enviar os convites']);
+  });
+
   it('se o Dashboard não carrega, o aviso com o Tentar de novo', async () => {
     mockDashboard({ data: null });
     renderRoute({ url: '/app' });

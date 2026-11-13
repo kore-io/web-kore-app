@@ -290,7 +290,8 @@ function ChecklistCard({ items }: { items: ChecklistItemResponse[] }) {
   const { t } = useTranslation('dashboard');
   const next = items.find((item) => !item.done)?.key;
   const label = (item: ChecklistItemResponse) => {
-    if (!item.done && item.progress && item.key === 'invites') {
+    // Sem grupos, sem a contagem "(0 de 0 grupos)": só "Enviar os convites".
+    if (!item.done && item.progress && item.progress.total > 0 && item.key === 'invites') {
       return t('checklist.invitesProgress', {
         done: item.progress.done,
         total: item.progress.total,
