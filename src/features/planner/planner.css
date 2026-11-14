@@ -1,0 +1,157 @@
+/*
+ * Cadastro do cerimonialista (Penpot da Área do Cerimonialista, 01 Primeiro acesso), no
+ * quadro do Acessos: os benefícios com o ícone num círculo primary.tint de 40 px e 12 px até
+ * os textos (título em type.label, apoio em body.md gray.700); 16 px entre os benefícios.
+ */
+.kore-planner-benefits {
+  @apply m-0 flex list-none flex-col gap-4 p-0;
+}
+
+.kore-planner-benefits__item {
+  @apply flex items-start gap-3;
+}
+
+.kore-planner-benefits__icon {
+  @apply flex size-10 shrink-0 items-center justify-center rounded-full bg-primary-tint text-primary;
+}
+
+.kore-planner-benefits__icon > svg {
+  @apply size-5;
+}
+
+.kore-planner-benefits__text,
+.kore-planner-steps__text {
+  @apply flex min-w-0 flex-col gap-0.5;
+}
+
+.kore-planner-benefits__title {
+  @apply type-label text-ink;
+}
+
+.kore-planner-benefits__description,
+.kore-planner-steps__description {
+  @apply type-body-md text-gray-700;
+}
+
+/* Com sessão (A5): a conta em body.md e o Continuar, com 16 px. */
+.kore-planner-account {
+  @apply flex flex-col gap-4;
+}
+
+.kore-planner-account__text {
+  @apply type-body-md text-ink;
+}
+
+/* Dados profissionais: Telefone e WhatsApp lado a lado (também no celular), com 12 px. */
+.kore-planner-profile__phones {
+  @apply grid grid-cols-2 gap-3;
+}
+
+.kore-planner-profile__terms {
+  @apply flex flex-col gap-1.5;
+}
+
+.kore-planner-profile__error {
+  @apply type-caption text-danger-text;
+}
+
+.kore-planner-profile__terms a {
+  @apply text-primary underline;
+}
+
+/*
+ * Cidades de atuação (decisão 249): o rótulo, Cidade e UF (96 px) lado a lado com o
+ * Adicionar, a ajuda e os chips em gray.100, raio full, com o x de 44 px de alvo.
+ */
+.kore-city-list {
+  @apply m-0 flex min-w-0 flex-col gap-1.5 border-0 p-0;
+}
+
+.kore-city-list__legend {
+  @apply type-label mb-1.5 p-0 text-ink;
+}
+
+.kore-city-list__inputs {
+  @apply flex items-end gap-3;
+}
+
+.kore-city-list__city {
+  @apply flex min-w-0 flex-1 flex-col gap-1.5;
+}
+
+.kore-city-list__state {
+  @apply flex w-24 flex-col gap-1.5;
+}
+
+/* O Adicionar na altura do campo ao lado (48 px; 40 px no desktop), acima do alvo de 44 px. */
+.kore-city-list__add {
+  @apply h-12 shrink-0 lg:h-10;
+}
+
+.kore-city-list__hint {
+  @apply type-caption text-gray-700;
+}
+
+.kore-city-list__hint--danger {
+  @apply text-danger-text;
+}
+
+.kore-city-list__chips {
+  @apply m-0 mt-1.5 flex list-none flex-wrap gap-2 p-0;
+}
+
+.kore-city-list__chip {
+  @apply type-body-md flex items-center gap-1 rounded-full bg-gray-100 py-0 pl-3 text-ink;
+}
+
+.kore-city-list__remove {
+  @apply flex size-11 items-center justify-center rounded-full text-gray-700 hover:text-ink focus-visible:outline-2 focus-visible:outline-ring;
+}
+
+.kore-city-list__remove-icon {
+  @apply size-4;
+}
+
+/*
+ * Link pronto: o link em destaque (Penpot A1): primary.tint, raio md, 16 px, o ícone de link
+ * de 24 px e 12 px até o texto em type.label-lg primary.
+ */
+.kore-planner-ready__link {
+  @apply m-0 flex items-center gap-3 rounded-md bg-primary-tint p-4 text-primary;
+}
+
+.kore-planner-ready__link-icon {
+  @apply size-6 shrink-0;
+}
+
+.kore-planner-ready__link-text {
+  @apply type-label-lg min-w-0 break-all;
+}
+
+.kore-planner-ready__actions {
+  @apply flex flex-col gap-3;
+}
+
+.kore-planner-ready__note {
+  @apply type-caption text-center text-gray-700;
+}
+
+/*
+ * Como funciona (Penpot A3): o número num círculo primary de 40 px (type.label-lg em
+ * primary-foreground), 16 px até os textos (título em type.label-lg) e 24 px entre os passos.
+ */
+.kore-planner-steps {
+  @apply m-0 flex list-none flex-col gap-6 p-0;
+}
+
+.kore-planner-steps__item {
+  @apply flex items-start gap-4;
+}
+
+.kore-planner-steps__number {
+  @apply type-label-lg flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground;
+}
+
+.kore-planner-steps__title {
+  @apply type-label-lg text-ink;
+}

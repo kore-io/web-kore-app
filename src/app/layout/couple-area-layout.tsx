@@ -5,6 +5,7 @@ import { Link, Outlet, useMatch, useNavigate } from 'react-router';
 import { useCoupleSession } from '../../features/access/hooks/use-couple-session';
 import { useSignOut } from '../../features/access/hooks/use-sign-out';
 import { useActiveWedding } from '../../features/guests/hooks/use-active-wedding';
+import { paths } from '../paths';
 import { menuUser } from '../../features/access/session-user';
 import { useNotificationsControllerUnreadV1 } from '../../shared/api/generated/notifications/notifications';
 import { useSiteControllerGetV1 } from '../../shared/api/generated/site/site';
@@ -61,6 +62,33 @@ export function CoupleAreaLayout() {
   if (!me) return null;
 
   const couple = me.memberships.find((membership) => membership.role === 'owner')?.weddingName;
+  // Trocar de perfil com mais de um perfil; Criar outro perfil quando falta o de
+  // cerimonialista e a conta não é de vendas (Cadastro e perfil RN08; decisão 85).
+  const profileItems = [
+    ...(me.profiles.length > 1
+      ? [
+          {
+            id: 'switch-profile',
+            label: t('switchProfile'),
+            // O outro perfil na linha de apoio (Voz): o de cerimonialista ou o de vendas.
+            ...(me.planner
+              ? { detail: t('switchProfilePlanner', { organization: me.planner.organization }) }
+              : me.profiles.includes('seller') && { detail: t('switchProfileSeller') }),
+            onSelect: () => void navigate(paths.profiles),
+          },
+        ]
+      : []),
+    ...(!me.profiles.includes('planner') && !me.profiles.includes('seller')
+      ? [
+          {
+            id: 'create-profile',
+            label: t('createProfile'),
+            detail: t('createProfilePlanner'),
+            onSelect: () => void navigate(paths.plannerSignUp),
+          },
+        ]
+      : []),
+  ];
 
   return (
     <AppShell
@@ -79,6 +107,7 @@ export function CoupleAreaLayout() {
             label: t('settings'),
             onSelect: () => void navigate(AREA.settingsNotifications),
           },
+          ...profileItems,
         ],
         [{ id: 'sign-out', label: t('signOut'), onSelect: signOut }],
       ]}

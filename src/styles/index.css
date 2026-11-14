@@ -15,6 +15,7 @@
 @import '../shared/components/form-field.css' layer(components);
 @import '../shared/components/load-error.css' layer(components);
 @import '../features/access/components/sign-up.css' layer(components);
+@import '../features/planner/planner.css' layer(components);
 @import '../features/guests/pages/guests-page.css' layer(components);
 @import '../features/guests/pages/party-panel-page.css' layer(components);
 @import '../features/guests/pages/tags-page.css' layer(components);

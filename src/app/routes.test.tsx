@@ -22,6 +22,8 @@ describe('rotas do app (decisões 139, 146, 147 e 198)', () => {
       sessionExpired: '/sessao-expirada',
       coupleArea: '/app',
       plannerWedding: '/cerimonialista/casamentos/:weddingId',
+      plannerArea: '/cerimonialista',
+      plannerSignUp: '/cerimonialista/cadastro',
     });
   });
 

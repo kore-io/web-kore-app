@@ -24,10 +24,11 @@ export const paths = {
    * `areaPaths` (src/app/area.tsx), a partir do caminho-base da área.
    */
   plannerWedding: '/cerimonialista/casamentos/:weddingId',
-} as const;
-
-/** Endereços fora do app. */
-export const externalUrls = {
-  /** "Fazer parceria" na F0 (decisões 150(4) e 157(4)); na F6, o cadastro do cerimonialista. */
-  plannerPartnership: 'https://kore.com.br/cerimonialistas',
+  /**
+   * Área do cerimonialista: Meus casamentos é a raiz (Cadastro e perfil RN07). A tela chega
+   * no D3 da F6; até lá, a rota fica vazia (decisão 250(d)).
+   */
+  plannerArea: '/cerimonialista',
+  /** Cadastro do cerimonialista (Cadastro e perfil RN01): o Fazer parceria do app. */
+  plannerSignUp: '/cerimonialista/cadastro',
 } as const;

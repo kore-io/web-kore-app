@@ -95,14 +95,21 @@ describe('Seleção de perfil (RN14 a RN16 do Login; decisões 152, 174(7) e 176
     expect(chosen(calls)).toEqual([{ profile: 'couple' }]);
   });
 
-  it('cerimonialista na F0: vai ao destino do Fazer parceria (decisão 176(1))', async () => {
+  it('cerimonialista: segue o home da API, /cerimonialista (Cadastro e perfil RN07; revê a 176(1))', async () => {
     const user = userEvent.setup();
-    api({ me: twoProfiles, home: '/cerimonial' });
-    renderRoute({ url: '/perfis' });
+    api({ me: twoProfiles, home: '/cerimonialista' });
+    const { router } = renderRoute({ url: '/perfis' });
     await user.click(await screen.findByRole('button', { name: /^Cerimonialista/ }));
-    await waitFor(() =>
-      expect(redirectTo).toHaveBeenCalledWith({ url: 'https://kore.com.br/cerimonialistas' }),
-    );
+    await waitFor(() => expect(router.state.location.pathname).toBe('/cerimonialista'));
+    expect(redirectTo).not.toHaveBeenCalled();
+  });
+
+  it('um home fora do app não é seguido: a Seleção de perfil fica', async () => {
+    const user = userEvent.setup();
+    api({ me: twoProfiles, home: 'https://outro.site/x' });
+    const { router } = renderRoute({ url: '/perfis' });
+    await user.click(await screen.findByRole('button', { name: /^Cerimonialista/ }));
+    await waitFor(() => expect(router.state.location.pathname).toBe('/perfis'));
   });
 
   it('um perfil só: entra direto, sem a lista (RN14; decisão 176(2))', async () => {
@@ -127,10 +134,16 @@ describe('Seleção de perfil (RN14 a RN16 do Login; decisões 152, 174(7) e 176
         'Ainda não há nenhum perfil com juliana@prado.com.br. Escolha um para começar; dá para criar outro depois.',
       ),
     ).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: /^Quero fazer parceria/ }));
-    expect(redirectTo).toHaveBeenCalledWith({ url: 'https://kore.com.br/cerimonialistas' });
     await user.click(screen.getByRole('button', { name: /^Criar o site do casamento/ }));
     await waitFor(() => expect(router.state.location.pathname).toBe('/cadastro'));
+  });
+
+  it('sem perfil: Quero fazer parceria abre o cadastro do cerimonialista (Cadastro e perfil RN01)', async () => {
+    const user = userEvent.setup();
+    api({ me: { ...base, profiles: [], memberships: [], planner: null } });
+    const { router } = renderRoute({ url: '/perfis' });
+    await user.click(await screen.findByRole('button', { name: /^Quero fazer parceria/ }));
+    await waitFor(() => expect(router.state.location.pathname).toBe('/cerimonialista/cadastro'));
   });
 
   it('a escolha falhou: o aviso genérico no Toast, e a pessoa fica na tela', async () => {

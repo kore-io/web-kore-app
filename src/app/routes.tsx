@@ -6,6 +6,7 @@ import { SignInConfirmPage } from '../features/access/pages/sign-in-confirm-page
 import { SignInGooglePage } from '../features/access/pages/sign-in-google-page';
 import { SignInPage } from '../features/access/pages/sign-in-page';
 import { SignUpPage } from '../features/access/pages/sign-up-page';
+import { PlannerSignUpPage } from '../features/planner/pages/planner-sign-up-page';
 import { DashboardPage } from '../features/dashboard/pages/dashboard-page';
 import { DeadlinePage } from '../features/deliveries/pages/deadline-page';
 import { DeliveriesLayout } from '../features/deliveries/pages/deliveries-layout';
@@ -113,6 +114,10 @@ export const routes: RouteObject[] = [
       { id: 'invite', path: paths.invite, element: <InvitePage /> },
       { id: 'profiles', path: paths.profiles, element: <ProfilesPage /> },
       { id: 'sign-up', path: paths.signUp, element: <SignUpPage /> },
+      { id: 'planner-sign-up', path: paths.plannerSignUp, element: <PlannerSignUpPage /> },
+      // A Área do cerimonialista (Meus casamentos) chega no D3: até lá, a rota fica vazia
+      // (decisão 250(d)), para o home do perfil não cair no caminho desconhecido (/app).
+      { id: 'planner-area', path: paths.plannerArea, element: null },
       { id: 'session-expired', path: paths.sessionExpired, element: <SessionExpiredPage /> },
       {
         id: 'couple-area',
