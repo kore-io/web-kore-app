@@ -119,6 +119,85 @@
       "create": "Criar casamento",
       "copyLink": "Copiar link de indicação",
       "copied": "Link copiado."
+    },
+    "detail": {
+      "loading": "Carregando o casamento",
+      "close": "Fechar",
+      "dateCity": "Data e cidade",
+      "site": "Site",
+      "siteValue": "kore.com.br/{{slug}} · {{status}}",
+      "invitation": "Convite para o casal",
+      "invitationSent": "Enviado para {{email}} em {{date}}, ainda sem resposta",
+      "guests": "Convidados e RSVP",
+      "guestsSummary_one": "{{count}} convidado · {{percent}} responderam",
+      "guestsSummary_other": "{{count}} convidados · {{percent}} responderam",
+      "confirmed_one": "{{count}} confirmado",
+      "confirmed_other": "{{count}} confirmados",
+      "declined_one": "{{count}} recusado",
+      "declined_other": "{{count}} recusados",
+      "pending_one": "{{count}} pendente",
+      "pending_other": "{{count}} pendentes",
+      "noGuests": "Ainda não há convidados.",
+      "awaitingCouple": "O casal ainda não aceitou o convite.",
+      "noInvitation": "Você ainda não convidou o casal.",
+      "identity": "Dados básicos",
+      "identityText": "Você pode mudar a data, a UF e o endereço até o casal aceitar o convite.",
+      "editIdentity": "Editar dados básicos",
+      "buildSite": "Montar o site",
+      "editSite": "Editar o site",
+      "inviteCouple": "Convidar o casal",
+      "resend": "Reenviar convite",
+      "resent": "Convite reenviado para {{email}}.",
+      "resendError": "Não foi possível reenviar agora. Verifique sua conexão e tente de novo.",
+      "inviteAnother": "Convidar outro e-mail",
+      "delete": "Excluir este casamento",
+      "leave": "Sair deste casamento",
+      "unavailable": "Este casamento não está mais disponível.",
+      "inviteDialog": {
+        "title": "Convidar outro e-mail",
+        "description": "O convite enviado para {{email}} deixa de funcionar.",
+        "email": "E-mail do casal",
+        "submit": "Enviar convite",
+        "cancel": "Cancelar",
+        "sent": "Convite enviado para {{email}}."
+      },
+      "link": {
+        "title": "Link para o casal",
+        "description": "Mande este link ao casal. Ele vale por 30 dias e serve para um aceite só.",
+        "field": "Link para o casal",
+        "copy": "Copiar link",
+        "copied": "Link copiado.",
+        "whatsapp": "Compartilhar no WhatsApp",
+        "whatsappMessage": "Oi! Olha como fica o site de vocês: {{link}}",
+        "regenerate": "Gerar novo link",
+        "regenerated": "Novo link gerado. O anterior deixou de funcionar.",
+        "cancel": "Cancelar link",
+        "canceled": "Link cancelado.",
+        "expired": "Este link venceu.",
+        "cancelDialog": {
+          "title": "Cancelar o link do casal?",
+          "description": "O link deixa de funcionar. Você pode gerar outro quando quiser.",
+          "confirm": "Cancelar link",
+          "back": "Voltar"
+        }
+      },
+      "leaveDialog": {
+        "title": "Sair de {{couple}}?",
+        "description": "Você perde o acesso a este casamento. O casal vai receber um aviso. Sua comissão continua.",
+        "confirm": "Sair do casamento",
+        "cancel": "Cancelar",
+        "done": "Você saiu do casamento de {{couple}}."
+      },
+      "deleteDialog": {
+        "title": "Excluir o casamento de {{couple}}?",
+        "draft": "Tudo o que você preparou é apagado. Não dá para desfazer.",
+        "link": "O link que você mandou ao casal deixa de funcionar e tudo o que você preparou é apagado. Não dá para desfazer.",
+        "email": "O convite que você enviou ao casal deixa de funcionar e tudo o que você preparou é apagado. Não dá para desfazer.",
+        "confirm": "Excluir casamento",
+        "cancel": "Cancelar",
+        "done": "Casamento de {{couple}} excluído.",
+        "hasOwner": "O casal acabou de aceitar o convite, então o casamento não pode mais ser excluído. Se quiser, saia deste casamento."
+      }
     }
   }
 }

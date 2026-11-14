@@ -14,8 +14,7 @@ import {
 import { Heart } from 'lucide-react';
 import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router';
-import { plannerWeddingBase } from '../../../app/area';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { paths } from '../../../app/paths';
 import {
   plannerControllerReferrerV1,
@@ -32,11 +31,17 @@ import {
   type MyWeddingsFilters,
   type StatusFilter,
 } from './my-weddings-filters';
+import { WeddingDetailPanel } from './wedding-detail-panel';
 import { WeddingsAlerts } from './weddings-alerts';
 import { WeddingsList } from './weddings-list';
 
-/** Até o D4b, a linha leva ao casamento dela (o Dashboard, D1); depois, ao detalhe. */
-const weddingPath = (weddingId: string) => plannerWeddingBase({ weddingId });
+/**
+ * O detalhe abre sobre a lista, por `/cerimonialista?casamento={id}` (decisão 260(1)): a
+ * linha, os nomes dos alertas e (no D9) a notificação de respostas levam a ele.
+ */
+const DETAIL_PARAM = 'casamento';
+const weddingPath = (weddingId: string) =>
+  `${paths.plannerArea}?${DETAIL_PARAM}=${encodeURIComponent(weddingId)}`;
 
 /**
  * Meus casamentos (`/cerimonialista`; Meus casamentos RN01 a RN07, RN12 e RN13; Penpot 03,
@@ -50,6 +55,15 @@ export function MyWeddingsPage() {
   const me = useMeControllerMeV1();
   const profile = usePlannerControllerProfileV1();
   const [filters, setFilters] = useState<MyWeddingsFilters>(NO_FILTERS);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const openWeddingId = searchParams.get(DETAIL_PARAM);
+  const detail = openWeddingId && (
+    <WeddingDetailPanel
+      weddingId={openWeddingId}
+      // O Fechar volta à lista cheia (Navegação, Meus casamentos).
+      onClose={() => setSearchParams({}, { replace: true })}
+    />
+  );
 
   const newWedding = (
     <Button type="button" onClick={() => void navigate(paths.plannerNewWedding)}>
@@ -62,6 +76,7 @@ export function MyWeddingsPage() {
       <div className="kore-my-weddings">
         <PageHeader title={t('myWeddings.title')} actions={newWedding} />
         <LoadErrorNotice onRetry={() => void list.refetch()} />
+        {detail}
       </div>
     );
   }
@@ -142,6 +157,7 @@ export function MyWeddingsPage() {
           )}
         </>
       )}
+      {detail}
     </div>
   );
 }

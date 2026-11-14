@@ -83,6 +83,17 @@ function api({
   mockApi(({ path }) => {
     if (path === '/v1/me') return Response.json(me);
     if (path === '/v1/me/weddings') return Response.json(list);
+    if (path.startsWith('/v1/me/weddings/')) {
+      return Response.json({
+        ...item({ weddingId: path.split('/').pop() }),
+        slug: 'ana-e-marcos',
+        stats: { guestsTotal: 120, confirmed: 80, declined: 16, pending: 24 },
+        coupleInvitations: [],
+        hasOwner: true,
+        canEditIdentity: false,
+        myMembershipId: 'm1',
+      });
+    }
     if (path === '/v1/me/planner') {
       return Response.json({
         name: 'Juliana Prado',
@@ -132,20 +143,18 @@ describe('Meus casamentos (RN01 a RN07, RN12, RN13; Penpot 03, sem a F3)', () =>
     expect(rows[3]).toHaveTextContent('Data a definirAguardando o casal—Criado por você');
     expect(within(table()).getByRole('link', { name: 'Ana e Marcos' })).toHaveAttribute(
       'href',
-      '/cerimonialista/casamentos/w1',
+      '/cerimonialista?casamento=w1',
     );
     await expectNoA11yViolations({ container });
   });
 
-  it('a linha inteira leva ao casamento (até o D4b, o Dashboard dela)', async () => {
+  it('a linha inteira abre o detalhe (decisão 260(1))', async () => {
     const user = userEvent.setup();
     api();
     const { router } = renderRoute({ url: URL });
     await screen.findByRole('table');
     await user.click(within(table()).getByText('14/11/2026'));
-    await waitFor(() =>
-      expect(router.state.location.pathname).toBe('/cerimonialista/casamentos/w1'),
-    );
+    await waitFor(() => expect(router.state.location.search).toBe('?casamento=w1'));
   });
 
   it('os cartões do celular: a data, a cidade, o status, as Respostas e a origem', async () => {
@@ -262,7 +271,7 @@ describe('Meus casamentos (RN01 a RN07, RN12, RN13; Penpot 03, sem a F3)', () =>
     ]);
     expect(
       within(list as HTMLElement).getByRole('link', { name: 'Noiva1 e Noivo1' }),
-    ).toHaveAttribute('href', '/cerimonialista/casamentos/a1');
+    ).toHaveAttribute('href', '/cerimonialista?casamento=a1');
     await user.click(opened);
     expect(screen.getAllByRole('button', { name: 'Ver casamentos' })).toHaveLength(2);
   });
