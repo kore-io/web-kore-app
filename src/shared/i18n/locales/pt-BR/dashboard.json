@@ -47,7 +47,6 @@
   },
   "rate": {
     "title": "Taxa de resposta",
-    "value": "{{percent}}%",
     "responded": "{{responded}} de {{total}} responderam",
     "deadline": "prazo: {{date}}",
     "noDeadline": "sem prazo"

@@ -213,6 +213,16 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     );
   });
 
+  it('a taxa de resposta sai inteira, sem as casas da API (decisão 258)', async () => {
+    mockDashboard({
+      data: dashboard({ stats: { ...dashboard().stats, rsvpPercent: 66.67 } }),
+    });
+    renderRoute({ url: '/app' });
+    await screen.findByText('142');
+    expect(screen.getByText('67%')).toBeInTheDocument();
+    expect(screen.queryByText(/66[.,]67/)).toBeNull();
+  });
+
   it('antes de publicar: Enviar convites desabilitado com o motivo, Envios com a frase e o Editor no lugar do Publicar (RN03, RN05; 243)', async () => {
     mockDashboard({
       data: dashboard({
