@@ -28,6 +28,7 @@ import {
 } from '../dashboard-texts';
 import { guestsByRespondedAt } from '../../guests/hooks/use-party-filters';
 import { useAreaPaths, type AreaPaths } from '../../../app/area';
+import { formatRsvpPercent } from '../../../shared/rsvp-percent';
 
 /** O caminho de cada item do Checklist (RN03), na área da tela. */
 function checklistPaths(area: AreaPaths): Record<ChecklistItemResponse['key'], string> {
@@ -175,7 +176,7 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
             >
               <StatCard
                 label={t('rate.title')}
-                value={t('rate.value', { percent: data.stats.rsvpPercent })}
+                value={formatRsvpPercent({ percent: data.stats.rsvpPercent })}
                 detail={oneDot(
                   rateDetail({ t, stats: data.stats, deadline: data.rsvpDeadline, now }),
                 )}
