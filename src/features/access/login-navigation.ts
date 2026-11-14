@@ -5,7 +5,17 @@ import type { VerifyLoginChallengeResponseNext } from '../../shared/api/generate
 export const INVITE_TOKEN_STORAGE_KEY = 'kore.inviteToken';
 
 /** Destino depois do login: dentro do app (rota) ou fora (endereço completo). */
-export type LoginDestination = { kind: 'route'; path: string } | { kind: 'external'; url: string };
+export type LoginDestination =
+  | { kind: 'route'; path: string; state?: PlannerSignUpLocationState }
+  | { kind: 'external'; url: string };
+
+/**
+ * O estado da volta ao cadastro do cerimonialista depois do login: sem sessão, os Dados
+ * profissionais vêm logo depois do login, sem o Início com a conta (Cadastro e perfil RN02).
+ */
+export interface PlannerSignUpLocationState {
+  afterLogin: true;
+}
 
 /** Mesmo limite da API (domain/return-path do api-kore-api). */
 const MAX_RETURN_PATH_LENGTH = 512;
@@ -58,7 +68,7 @@ export function destinationAfterLogin({
     case 'couple_signup':
       return { kind: 'route', path: paths.signUp };
     case 'planner_signup':
-      return { kind: 'route', path: paths.plannerSignUp };
+      return { kind: 'route', path: paths.plannerSignUp, state: { afterLogin: true } };
     case 'invite': {
       const token = storedInviteToken();
       return token

@@ -44,6 +44,7 @@ describe('destino depois do login (RN06; decisões 142 e 157(4))', () => {
     expect(destinationAfterLogin({ next: 'planner_signup' })).toEqual({
       kind: 'route',
       path: '/cerimonialista/cadastro',
+      state: { afterLogin: true },
     });
   });
 

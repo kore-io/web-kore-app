@@ -136,6 +136,21 @@ describe('Cadastro do cerimonialista: o Início (Cadastro e perfil RN01 a RN03)'
     expect(screen.queryByLabelText(/^E-/)).toBeNull();
   });
 
+  it('logo depois do login por este cadastro: os Dados direto, sem o Início com a conta (RN02)', async () => {
+    api();
+    renderRoute({ url: URL, state: { afterLogin: true } });
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Como os casais vão ver você' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/Você vai usar a conta/)).toBeNull();
+  });
+
+  it('o perfil de vendas, logo depois do login, segue no Início com o aviso no Continuar (RN03)', async () => {
+    api({ meBody: me({ profiles: ['seller'] }) });
+    renderRoute({ url: URL, state: { afterLogin: true } });
+    expect(await screen.findByText(/Você vai usar a conta/)).toBeInTheDocument();
+  });
+
   it('com o cadastro fechado, a tela Cadastro fechado antes dos dados (RN02)', async () => {
     api({ meBody: me({ plannerSignupEnabled: false }) });
     renderRoute({ url: URL });

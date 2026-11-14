@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router';
 import {
   getMeControllerMeV1QueryKey,
   useMeControllerMeV1,
@@ -10,6 +11,7 @@ import { ApiError, apiErrorCode } from '../../../shared/api/http-client';
 import { reloadPage } from '../../../shared/browser/redirect';
 import type { SignInNotice } from '../../access/components/sign-in-alert';
 import { useSignIn } from '../../access/hooks/use-sign-in';
+import type { PlannerSignUpLocationState } from '../../access/login-navigation';
 import { TERMS_VERSION } from '../../access/terms';
 import {
   fieldErrorsFromApi,
@@ -43,6 +45,7 @@ type Step = 'start' | 'details' | 'ready' | 'how-it-works';
 export function usePlannerSignUp() {
   const { t } = useTranslation('access');
   const queryClient = useQueryClient();
+  const location = useLocation();
   const me = useMeControllerMeV1({ query: { retry: false } });
   const signIn = useSignIn({ origin: 'planner_signup' });
   const create = usePlannerControllerCreateV1();
@@ -64,6 +67,11 @@ export function usePlannerSignUp() {
   const createdHere = step === 'ready' || step === 'how-it-works';
   const hasPlanner = data?.profiles.includes('planner') === true;
   const needsName = !data?.user.name;
+  // Acabou de entrar por este cadastro: os Dados vêm direto, sem o Início com a conta (RN02).
+  // O vendedor segue no Início, que mostra o aviso no Continuar (RN03).
+  const afterLogin = (location.state as PlannerSignUpLocationState | null)?.afterLogin === true;
+  const currentStep =
+    step === 'start' && afterLogin && data?.profiles.includes('seller') !== true ? 'details' : step;
 
   const stage = me.isPending
     ? ('loading' as const)
@@ -75,7 +83,7 @@ export function usePlannerSignUp() {
           ? ('planner' as const)
           : closedByServer || (!data.plannerSignupEnabled && !createdHere)
             ? ('closed' as const)
-            : step;
+            : currentStep;
 
   function continueWithAccount() {
     // Vendedor não vira cerimonialista (RN03; decisão 175): o aviso, sem os dados.
