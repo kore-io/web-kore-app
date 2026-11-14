@@ -184,6 +184,7 @@ describe('Detalhe do casamento (Meus casamentos RN08 a RN11; decisão 260)', () 
       ),
     ).toBeInTheDocument();
     expect(within(dialog).getByText('O casal ainda não aceitou o convite.')).toBeInTheDocument();
+    expect(within(dialog).getByText('kore.com.br/fernanda-e-joao · rascunho')).toBeInTheDocument();
     expect(within(dialog).getByText('Ainda não há convidados.')).toBeInTheDocument();
     expect(
       within(dialog).getByText(

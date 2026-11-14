@@ -249,7 +249,10 @@ function DetailContent({
             <dd>
               {t('myWeddings.detail.siteValue', {
                 slug: detail.slug,
-                status: t(`myWeddings.status.${detail.status}`).toLocaleLowerCase('pt-BR'),
+                // O site de quem aguarda o casal ainda é rascunho (Penpot 03).
+                status: t(
+                  `myWeddings.status.${detail.status === 'awaiting_couple' ? 'draft' : detail.status}`,
+                ).toLocaleLowerCase('pt-BR'),
               })}
             </dd>
           </div>
