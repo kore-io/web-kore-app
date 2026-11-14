@@ -14,4 +14,6 @@ export interface WeddingMemberResponse {
   /** Só no colaborador (decisão 177, item 8). */
   kind?: WeddingMemberResponseKind;
   id: string;
+  /** O vínculo de quem lê (decisão 261(2)). */
+  isMe: boolean;
 }

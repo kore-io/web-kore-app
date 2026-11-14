@@ -23,4 +23,6 @@ export const AdminAlertResponseType = {
   photo_flood: 'photo_flood',
   purge_failed: 'purge_failed',
   access_email_changed: 'access_email_changed',
+  access_email_locked: 'access_email_locked',
+  access_email_unlocked: 'access_email_unlocked',
 } as const;

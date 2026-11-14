@@ -132,3 +132,96 @@
 .kore-my-weddings__card-status {
   @apply type-body-md flex flex-wrap items-center gap-2;
 }
+
+/*
+ * O Detalhe do casamento (Penpot 03): no celular, a tela inteira; do tablet em diante, o
+ * painel de 480 px à direita, na altura toda, sobre o véu. Os fatos num cartão em
+ * background com borda (o rótulo em type.overline), os blocos com borda, as ações embaixo.
+ */
+.kore-wedding-detail__veil {
+  @apply fixed inset-0 z-40 bg-ink/40;
+}
+
+.kore-wedding-detail {
+  @apply fixed inset-0 z-50 overflow-y-auto bg-white p-4 shadow-lg focus:outline-none md:inset-y-0 md:right-0 md:left-auto md:w-120 md:p-7;
+}
+
+.kore-wedding-detail__sr-title {
+  @apply sr-only;
+}
+
+.kore-wedding-detail__loading {
+  @apply flex justify-center py-10;
+}
+
+.kore-wedding-detail__body {
+  @apply flex flex-col gap-5;
+}
+
+.kore-wedding-detail__header {
+  @apply flex items-start justify-between gap-3;
+}
+
+.kore-wedding-detail__heading {
+  @apply flex min-w-0 flex-col gap-2;
+}
+
+.kore-wedding-detail__title {
+  @apply type-display-sm m-0 text-ink;
+}
+
+.kore-wedding-detail__meta {
+  @apply type-caption m-0 flex flex-wrap items-center gap-2 text-gray-700;
+}
+
+.kore-wedding-detail__facts {
+  @apply m-0 flex flex-col gap-3 rounded-lg border border-gray-300 bg-background p-4;
+}
+
+.kore-wedding-detail__facts dt {
+  @apply type-overline text-gray-700;
+}
+
+.kore-wedding-detail__facts dd {
+  @apply type-body-md m-0 mt-1 text-ink;
+}
+
+.kore-wedding-detail__line {
+  @apply block;
+}
+
+.kore-wedding-detail__block {
+  @apply flex flex-col gap-3 rounded-lg border border-gray-300 p-4;
+}
+
+.kore-wedding-detail__block-title {
+  @apply type-label m-0 text-ink;
+}
+
+.kore-wedding-detail__block-text {
+  @apply type-body-md m-0 text-gray-700;
+}
+
+.kore-wedding-detail__link {
+  @apply type-body-md inline-flex min-h-11 items-center text-primary underline;
+}
+
+.kore-wedding-detail__link-row {
+  @apply flex items-end gap-3;
+}
+
+.kore-wedding-detail__link-row > :first-child {
+  @apply min-w-0 flex-1;
+}
+
+.kore-wedding-detail__actions {
+  @apply flex flex-col gap-3;
+}
+
+.kore-wedding-detail__secondary {
+  @apply flex flex-col border-t border-gray-300 pt-3;
+}
+
+.kore-wedding-detail__secondary > button {
+  @apply justify-start;
+}

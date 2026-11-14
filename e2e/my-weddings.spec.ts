@@ -108,9 +108,10 @@ test.describe('Meus casamentos (/cerimonialista)', () => {
     await expect(card({ page, couple: `${gabriela} e Rafael` })).toHaveCount(0);
     await expect(card({ page, couple: `${fernanda} e João` })).toBeVisible();
 
-    // A linha leva ao casamento dela (até o D4b, o Dashboard).
+    // A linha abre o detalhe (decisão 260(1)).
     await card({ page, couple: `${fernanda} e João` }).click();
-    await expect(page).toHaveURL(/\/cerimonialista\/casamentos\/[0-9a-f-]+$/);
+    await expect(page).toHaveURL(/\/cerimonialista\?casamento=[0-9a-f-]+$/);
+    await expect(page.getByRole('dialog', { name: `${fernanda} e João` })).toBeVisible();
   });
 
   test('o perfil mínimo e o vazio: o Alert com Abrir Meu perfil e o Copiar link (RN12, RN13)', async ({

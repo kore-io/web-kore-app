@@ -21,6 +21,10 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AccessChangeRateLimitedErrorBody,
+  AccessEmailChangedResponse,
+  AccessEmailLockedErrorBody,
+  AccessEmailUnlockedResponse,
   ActionNotAllowedErrorBody,
   AdminAlertResolvedResponse,
   AdminAlertsResponse,
@@ -39,11 +43,30 @@ import type {
   AlertAlreadyResolvedErrorBody,
   AlertNotFoundErrorBody,
   AlreadyBlockedErrorBody,
+  AlreadyPaidErrorBody,
+  ChangeAccessEmailBody,
+  ChecksFailedErrorBody,
+  ChecksRequiredErrorBody,
+  EmailInUseErrorBody,
+  EraseGuestBody,
+  GuestErasedResponse,
+  GuestNotFoundErrorBody,
+  NoOwnerErrorBody,
   NotBlockedErrorBody,
+  NotLockedErrorBody,
   OriginNotAllowedErrorBody,
   RateLimitedErrorBody,
+  ReassignPaymentPendingErrorBody,
+  ReassignReferrerBody,
+  ReassignReferrerResponse,
+  ReferrerNotActiveErrorBody,
+  SelfReferralErrorBody,
   SessionExpiredErrorBody,
   StaffOnlyErrorBody,
+  SupportSessionEndedResponse,
+  SupportSessionNotFoundErrorBody,
+  SupportSessionResponse,
+  UnlockTooSoonErrorBody,
   ValidationErrorBody,
   WeddingNotFoundErrorBody,
 } from '../model';
@@ -693,6 +716,598 @@ export const useAdminWeddingsControllerUnblockV1 = <
   TContext
 > => {
   return useMutation(getAdminWeddingsControllerUnblockV1MutationOptions(options), queryClient);
+};
+export const getAdminWeddingsControllerReferrerV1Url = (id: string) => {
+  return `/v1/admin/weddings/${id}/referrer`;
+};
+
+/**
+ * @summary Reatribuir o indicador (RN07): só o Admin, antes da publicação paga e sem pendente.
+ */
+export const adminWeddingsControllerReferrerV1 = async (
+  id: string,
+  reassignReferrerBody: ReassignReferrerBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<ReassignReferrerResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<ReassignReferrerResponse>(getAdminWeddingsControllerReferrerV1Url(id), {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(reassignReferrerBody),
+  });
+};
+
+export const getAdminWeddingsControllerReferrerV1MutationKey = () =>
+  ['adminWeddingsControllerReferrerV1'] as const;
+
+export const getAdminWeddingsControllerReferrerV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | AlreadyPaidErrorBody
+    | ReassignPaymentPendingErrorBody
+    | ReferrerNotActiveErrorBody
+    | SelfReferralErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminWeddingsControllerReferrerV1>>,
+    TError,
+    AdminWeddingsControllerReferrerV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminWeddingsControllerReferrerV1>>,
+  TError,
+  AdminWeddingsControllerReferrerV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getAdminWeddingsControllerReferrerV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminWeddingsControllerReferrerV1>>,
+    AdminWeddingsControllerReferrerV1MutationVariables
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return adminWeddingsControllerReferrerV1(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminWeddingsControllerReferrerV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminWeddingsControllerReferrerV1>>
+>;
+export type AdminWeddingsControllerReferrerV1MutationBody = ReassignReferrerBody;
+export type AdminWeddingsControllerReferrerV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | WeddingNotFoundErrorBody
+  | AlreadyPaidErrorBody
+  | ReassignPaymentPendingErrorBody
+  | ReferrerNotActiveErrorBody
+  | SelfReferralErrorBody
+  | RateLimitedErrorBody
+>;
+export type AdminWeddingsControllerReferrerV1MutationVariables = {
+  id: string;
+  data: ReassignReferrerBody;
+};
+
+/**
+ * @summary Reatribuir o indicador (RN07): só o Admin, antes da publicação paga e sem pendente.
+ */
+export const useAdminWeddingsControllerReferrerV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | AlreadyPaidErrorBody
+    | ReassignPaymentPendingErrorBody
+    | ReferrerNotActiveErrorBody
+    | SelfReferralErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof adminWeddingsControllerReferrerV1>>,
+      TError,
+      AdminWeddingsControllerReferrerV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof adminWeddingsControllerReferrerV1>>,
+  TError,
+  AdminWeddingsControllerReferrerV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getAdminWeddingsControllerReferrerV1MutationOptions(options), queryClient);
+};
+export const getAdminWeddingsControllerEraseV1Url = (id: string, guestId: string) => {
+  return `/v1/admin/weddings/${id}/guests/${guestId}/erase`;
+};
+
+/**
+ * @summary Remover os dados de um convidado a pedido do titular (RN10): Admin e suporte.
+ */
+export const adminWeddingsControllerEraseV1 = async (
+  id: string,
+  guestId: string,
+  eraseGuestBody: EraseGuestBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<GuestErasedResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<GuestErasedResponse>(getAdminWeddingsControllerEraseV1Url(id, guestId), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(eraseGuestBody),
+  });
+};
+
+export const getAdminWeddingsControllerEraseV1MutationKey = () =>
+  ['adminWeddingsControllerEraseV1'] as const;
+
+export const getAdminWeddingsControllerEraseV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | GuestNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminWeddingsControllerEraseV1>>,
+    TError,
+    AdminWeddingsControllerEraseV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminWeddingsControllerEraseV1>>,
+  TError,
+  AdminWeddingsControllerEraseV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getAdminWeddingsControllerEraseV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminWeddingsControllerEraseV1>>,
+    AdminWeddingsControllerEraseV1MutationVariables
+  > = (props) => {
+    const { id, guestId, data } = props ?? {};
+
+    return adminWeddingsControllerEraseV1(id, guestId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminWeddingsControllerEraseV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminWeddingsControllerEraseV1>>
+>;
+export type AdminWeddingsControllerEraseV1MutationBody = EraseGuestBody;
+export type AdminWeddingsControllerEraseV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | StaffOnlyErrorBody
+  | GuestNotFoundErrorBody
+  | RateLimitedErrorBody
+>;
+export type AdminWeddingsControllerEraseV1MutationVariables = {
+  id: string;
+  guestId: string;
+  data: EraseGuestBody;
+};
+
+/**
+ * @summary Remover os dados de um convidado a pedido do titular (RN10): Admin e suporte.
+ */
+export const useAdminWeddingsControllerEraseV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | GuestNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof adminWeddingsControllerEraseV1>>,
+      TError,
+      AdminWeddingsControllerEraseV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof adminWeddingsControllerEraseV1>>,
+  TError,
+  AdminWeddingsControllerEraseV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getAdminWeddingsControllerEraseV1MutationOptions(options), queryClient);
+};
+export const getAdminWeddingsControllerChangeAccessEmailV1Url = (id: string) => {
+  return `/v1/admin/weddings/${id}/access-email`;
+};
+
+/**
+ * @summary Ajudar a recuperar o acesso (RN09; decisão 253): Admin e suporte.
+ */
+export const adminWeddingsControllerChangeAccessEmailV1 = async (
+  id: string,
+  changeAccessEmailBody: ChangeAccessEmailBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<AccessEmailChangedResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<AccessEmailChangedResponse>(
+    getAdminWeddingsControllerChangeAccessEmailV1Url(id),
+    {
+      ...options,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+      body: JSON.stringify(changeAccessEmailBody),
+    },
+  );
+};
+
+export const getAdminWeddingsControllerChangeAccessEmailV1MutationKey = () =>
+  ['adminWeddingsControllerChangeAccessEmailV1'] as const;
+
+export const getAdminWeddingsControllerChangeAccessEmailV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | EmailInUseErrorBody
+    | AccessEmailLockedErrorBody
+    | ChecksRequiredErrorBody
+    | ChecksFailedErrorBody
+    | RateLimitedErrorBody
+    | AccessChangeRateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminWeddingsControllerChangeAccessEmailV1>>,
+    TError,
+    AdminWeddingsControllerChangeAccessEmailV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminWeddingsControllerChangeAccessEmailV1>>,
+  TError,
+  AdminWeddingsControllerChangeAccessEmailV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getAdminWeddingsControllerChangeAccessEmailV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminWeddingsControllerChangeAccessEmailV1>>,
+    AdminWeddingsControllerChangeAccessEmailV1MutationVariables
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return adminWeddingsControllerChangeAccessEmailV1(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminWeddingsControllerChangeAccessEmailV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminWeddingsControllerChangeAccessEmailV1>>
+>;
+export type AdminWeddingsControllerChangeAccessEmailV1MutationBody = ChangeAccessEmailBody;
+export type AdminWeddingsControllerChangeAccessEmailV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | WeddingNotFoundErrorBody
+  | EmailInUseErrorBody
+  | AccessEmailLockedErrorBody
+  | ChecksRequiredErrorBody
+  | ChecksFailedErrorBody
+  | RateLimitedErrorBody
+  | AccessChangeRateLimitedErrorBody
+>;
+export type AdminWeddingsControllerChangeAccessEmailV1MutationVariables = {
+  id: string;
+  data: ChangeAccessEmailBody;
+};
+
+/**
+ * @summary Ajudar a recuperar o acesso (RN09; decisão 253): Admin e suporte.
+ */
+export const useAdminWeddingsControllerChangeAccessEmailV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | EmailInUseErrorBody
+    | AccessEmailLockedErrorBody
+    | ChecksRequiredErrorBody
+    | ChecksFailedErrorBody
+    | RateLimitedErrorBody
+    | AccessChangeRateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof adminWeddingsControllerChangeAccessEmailV1>>,
+      TError,
+      AdminWeddingsControllerChangeAccessEmailV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof adminWeddingsControllerChangeAccessEmailV1>>,
+  TError,
+  AdminWeddingsControllerChangeAccessEmailV1MutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getAdminWeddingsControllerChangeAccessEmailV1MutationOptions(options),
+    queryClient,
+  );
+};
+export const getAdminWeddingsControllerUnlockAccessEmailV1Url = (id: string) => {
+  return `/v1/admin/weddings/${id}/access-email/unlock`;
+};
+
+/**
+ * @summary Liberar a trava da troca do e-mail de acesso (decisão 253(1)): só o Admin.
+ */
+export const adminWeddingsControllerUnlockAccessEmailV1 = async (
+  id: string,
+  adminReasonBody: AdminReasonBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<AccessEmailUnlockedResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<AccessEmailUnlockedResponse>(
+    getAdminWeddingsControllerUnlockAccessEmailV1Url(id),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+      body: JSON.stringify(adminReasonBody),
+    },
+  );
+};
+
+export const getAdminWeddingsControllerUnlockAccessEmailV1MutationKey = () =>
+  ['adminWeddingsControllerUnlockAccessEmailV1'] as const;
+
+export const getAdminWeddingsControllerUnlockAccessEmailV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | NotLockedErrorBody
+    | UnlockTooSoonErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminWeddingsControllerUnlockAccessEmailV1>>,
+    TError,
+    AdminWeddingsControllerUnlockAccessEmailV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminWeddingsControllerUnlockAccessEmailV1>>,
+  TError,
+  AdminWeddingsControllerUnlockAccessEmailV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getAdminWeddingsControllerUnlockAccessEmailV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminWeddingsControllerUnlockAccessEmailV1>>,
+    AdminWeddingsControllerUnlockAccessEmailV1MutationVariables
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return adminWeddingsControllerUnlockAccessEmailV1(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminWeddingsControllerUnlockAccessEmailV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminWeddingsControllerUnlockAccessEmailV1>>
+>;
+export type AdminWeddingsControllerUnlockAccessEmailV1MutationBody = AdminReasonBody;
+export type AdminWeddingsControllerUnlockAccessEmailV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | WeddingNotFoundErrorBody
+  | NotLockedErrorBody
+  | UnlockTooSoonErrorBody
+  | RateLimitedErrorBody
+>;
+export type AdminWeddingsControllerUnlockAccessEmailV1MutationVariables = {
+  id: string;
+  data: AdminReasonBody;
+};
+
+/**
+ * @summary Liberar a trava da troca do e-mail de acesso (decisão 253(1)): só o Admin.
+ */
+export const useAdminWeddingsControllerUnlockAccessEmailV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | NotLockedErrorBody
+    | UnlockTooSoonErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof adminWeddingsControllerUnlockAccessEmailV1>>,
+      TError,
+      AdminWeddingsControllerUnlockAccessEmailV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof adminWeddingsControllerUnlockAccessEmailV1>>,
+  TError,
+  AdminWeddingsControllerUnlockAccessEmailV1MutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getAdminWeddingsControllerUnlockAccessEmailV1MutationOptions(options),
+    queryClient,
+  );
 };
 export const getAdminInsightsControllerOverviewV1Url = () => {
   return `/v1/admin/overview`;
@@ -1387,4 +2002,235 @@ export const useAdminInsightsControllerResolveV1 = <
   TContext
 > => {
   return useMutation(getAdminInsightsControllerResolveV1MutationOptions(options), queryClient);
+};
+export const getSupportSessionsControllerStartV1Url = (id: string) => {
+  return `/v1/admin/weddings/${id}/support-sessions`;
+};
+
+export const supportSessionsControllerStartV1 = async (
+  id: string,
+  adminReasonBody: AdminReasonBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<SupportSessionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<SupportSessionResponse>(getSupportSessionsControllerStartV1Url(id), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(adminReasonBody),
+  });
+};
+
+export const getSupportSessionsControllerStartV1MutationKey = () =>
+  ['supportSessionsControllerStartV1'] as const;
+
+export const getSupportSessionsControllerStartV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | WeddingNotFoundErrorBody
+    | NoOwnerErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof supportSessionsControllerStartV1>>,
+    TError,
+    SupportSessionsControllerStartV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof supportSessionsControllerStartV1>>,
+  TError,
+  SupportSessionsControllerStartV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getSupportSessionsControllerStartV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof supportSessionsControllerStartV1>>,
+    SupportSessionsControllerStartV1MutationVariables
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return supportSessionsControllerStartV1(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SupportSessionsControllerStartV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof supportSessionsControllerStartV1>>
+>;
+export type SupportSessionsControllerStartV1MutationBody = AdminReasonBody;
+export type SupportSessionsControllerStartV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | StaffOnlyErrorBody
+  | WeddingNotFoundErrorBody
+  | NoOwnerErrorBody
+  | RateLimitedErrorBody
+>;
+export type SupportSessionsControllerStartV1MutationVariables = {
+  id: string;
+  data: AdminReasonBody;
+};
+
+export const useSupportSessionsControllerStartV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | WeddingNotFoundErrorBody
+    | NoOwnerErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof supportSessionsControllerStartV1>>,
+      TError,
+      SupportSessionsControllerStartV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof supportSessionsControllerStartV1>>,
+  TError,
+  SupportSessionsControllerStartV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getSupportSessionsControllerStartV1MutationOptions(options), queryClient);
+};
+export const getSupportSessionsControllerEndV1Url = (id: string) => {
+  return `/v1/admin/support-sessions/${id}/end`;
+};
+
+export const supportSessionsControllerEndV1 = async (
+  id: string,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<SupportSessionEndedResponse> => {
+  return httpClient<SupportSessionEndedResponse>(getSupportSessionsControllerEndV1Url(id), {
+    ...options,
+    method: 'POST',
+  });
+};
+
+export const getSupportSessionsControllerEndV1MutationKey = () =>
+  ['supportSessionsControllerEndV1'] as const;
+
+export const getSupportSessionsControllerEndV1MutationOptions = <
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | SupportSessionNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof supportSessionsControllerEndV1>>,
+    TError,
+    SupportSessionsControllerEndV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof supportSessionsControllerEndV1>>,
+  TError,
+  SupportSessionsControllerEndV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getSupportSessionsControllerEndV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof supportSessionsControllerEndV1>>,
+    SupportSessionsControllerEndV1MutationVariables
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return supportSessionsControllerEndV1(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SupportSessionsControllerEndV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof supportSessionsControllerEndV1>>
+>;
+
+export type SupportSessionsControllerEndV1MutationError = ErrorType<
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | StaffOnlyErrorBody
+  | SupportSessionNotFoundErrorBody
+  | RateLimitedErrorBody
+>;
+export type SupportSessionsControllerEndV1MutationVariables = { id: string };
+
+export const useSupportSessionsControllerEndV1 = <
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | SupportSessionNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof supportSessionsControllerEndV1>>,
+      TError,
+      SupportSessionsControllerEndV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof supportSessionsControllerEndV1>>,
+  TError,
+  SupportSessionsControllerEndV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getSupportSessionsControllerEndV1MutationOptions(options), queryClient);
 };

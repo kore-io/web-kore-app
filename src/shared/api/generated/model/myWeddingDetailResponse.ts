@@ -20,6 +20,8 @@ export interface MyWeddingDetailResponse {
   /** @nullable */
   slug: string | null;
   stats: MyWeddingStatsResponse;
+  /** O vínculo ativo de quem lê (decisão 261(1)). */
+  myMembershipId: string;
   /** Só quando ela criou o casamento. */
   coupleInvitations: CoupleInvitationResponse[];
   hasOwner: boolean;
