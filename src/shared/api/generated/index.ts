@@ -1,4 +1,5 @@
 export * from './access-invitations/access-invitations';
+export * from './admin/admin';
 export * from './auth/auth';
 export * from './billing/billing';
 export * from './guest-imports/guest-imports';

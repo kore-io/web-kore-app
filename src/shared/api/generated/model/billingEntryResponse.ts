@@ -22,6 +22,8 @@ export interface BillingEntryResponse {
   expiredAt?: string;
   /** @nullable */
   renewUntil?: string | null;
+  /** purge_soon (Retenção e expurgo RN02): o dia em que os dados são apagados, AAAA-MM-DD. */
+  purgeAt?: string;
   /** A data de saída do ar paga, AAAA-MM-DD (só no payment_confirmed). */
   endDate?: string;
   amountCents?: number;

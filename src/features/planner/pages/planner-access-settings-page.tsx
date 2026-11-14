@@ -2,22 +2,20 @@ import { Badge, Button, Dialog } from '@kore-io/design';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMeControllerMeV1 } from '../../../shared/api/generated/me/me';
+import {
+  MeIdentityResponseProvider,
+  type MeIdentityResponse,
+} from '../../../shared/api/generated/model';
 import { useSignOutEverywhere } from '../../access/hooks/use-sign-out';
 
-/** As formas de entrar que a tela conhece, na ordem do Penpot 15. */
-const PROVIDERS = ['google', 'email'] as const;
-type Provider = (typeof PROVIDERS)[number];
+/** As formas de entrar, na ordem do Penpot 15. */
+const PROVIDERS: readonly MeIdentityResponseProvider[] = [
+  MeIdentityResponseProvider.google,
+  MeIdentityResponseProvider.email,
+];
 
-/**
- * As formas de entrar da conta, do `identities[]` do GET /v1/me (decisão 254(1)). O campo
- * chega com o PR curto da API; até o `api:sync`, a leitura é defensiva: sem o campo, a lista
- * fica vazia.
- */
-function connectedProviders(me: unknown): Provider[] {
-  const identities =
-    typeof me === 'object' && me !== null && 'identities' in me && Array.isArray(me.identities)
-      ? (me.identities as { provider?: unknown }[])
-      : [];
+/** As formas de entrar da conta, do `identities[]` do GET /v1/me (decisão 254(1)). */
+function connectedProviders({ identities }: { identities: readonly MeIdentityResponse[] }) {
   const providers = new Set(identities.map((identity) => identity.provider));
   return PROVIDERS.filter((provider) => providers.has(provider));
 }
@@ -34,7 +32,7 @@ export function PlannerAccessSettingsPage() {
   const { signOutEverywhere, pending } = useSignOutEverywhere();
   const [confirming, setConfirming] = useState(false);
   const openButton = useRef<HTMLButtonElement>(null);
-  const providers = connectedProviders(me.data);
+  const providers = connectedProviders({ identities: me.data?.identities ?? [] });
 
   return (
     <div className="kore-planner-access">
