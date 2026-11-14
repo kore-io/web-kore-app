@@ -85,7 +85,7 @@
       "origin": "Origem"
     },
     "noDate": "Data a definir",
-    "responses": "Respostas {{percent}}%",
+    "responses": "Respostas {{percent}}",
     "status": {
       "awaiting_couple": "Aguardando o casal",
       "draft": "Rascunho",

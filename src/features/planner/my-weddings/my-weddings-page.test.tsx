@@ -53,7 +53,8 @@ const weddings = [
     guestsTotal: 0,
     rsvpPercent: 0,
   }),
-  item({ weddingId: 'w1' }),
+  // A API devolve o % com duas casas (DECIMAL(5,2)); a tela mostra o inteiro (RN02).
+  item({ weddingId: 'w1', rsvpPercent: 66.67 }),
   item({
     weddingId: 'w3',
     partnerNames: ['Fernanda', 'João'],
@@ -127,7 +128,7 @@ describe('Meus casamentos (RN01 a RN07, RN12, RN13; Penpot 03, sem a F3)', () =>
     expect(rowNames()).toEqual(['Natália e Vinícius', 'Ana e Marcos', 'Fernanda e João']);
     const rows = within(table()).getAllByRole('row');
     expect(rows[1]).toHaveTextContent('15/03/2026Expirado—Criado por você');
-    expect(rows[2]).toHaveTextContent('14/11/2026Publicado80%Pelo seu link');
+    expect(rows[2]).toHaveTextContent('14/11/2026Publicado67%Pelo seu link');
     expect(rows[3]).toHaveTextContent('Data a definirAguardando o casal—Criado por você');
     expect(within(table()).getByRole('link', { name: 'Ana e Marcos' })).toHaveAttribute(
       'href',
@@ -155,7 +156,7 @@ describe('Meus casamentos (RN01 a RN07, RN12, RN13; Penpot 03, sem a F3)', () =>
     const cards = document.querySelector('.kore-my-weddings__cards') as HTMLElement;
     const ana = within(cards).getByRole('link', { name: /^Ana e Marcos/ });
     expect(ana).toHaveTextContent('14/11/2026 · Campinas (SP)');
-    expect(ana).toHaveTextContent('Respostas 80%');
+    expect(ana).toHaveTextContent('Respostas 67%');
     expect(ana).toHaveTextContent('Pelo seu link');
   });
 

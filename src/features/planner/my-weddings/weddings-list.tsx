@@ -2,6 +2,7 @@ import { ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router';
 import type { MyWeddingItemResponse } from '../../../shared/api/generated/model';
+import { formatRsvpPercent } from '../../../shared/rsvp-percent';
 import { coupleName, shortDate } from './my-weddings-filters';
 import { WeddingStatusBadge } from './wedding-status-badge';
 
@@ -23,7 +24,7 @@ export function WeddingsList({
     wedding.eventDate ? shortDate({ date: wedding.eventDate }) : t('myWeddings.noDate');
   // Sem convidados, "—" (RN02).
   const responses = (wedding: MyWeddingItemResponse) =>
-    wedding.guestsTotal > 0 ? `${wedding.rsvpPercent}%` : '—';
+    wedding.guestsTotal > 0 ? formatRsvpPercent({ percent: wedding.rsvpPercent }) : '—';
 
   return (
     <>
@@ -80,7 +81,11 @@ export function WeddingsList({
                 <span className="kore-my-weddings__card-status">
                   <WeddingStatusBadge status={wedding.status} />
                   {wedding.guestsTotal > 0 && (
-                    <span>{t('myWeddings.responses', { percent: wedding.rsvpPercent })}</span>
+                    <span>
+                      {t('myWeddings.responses', {
+                        percent: formatRsvpPercent({ percent: wedding.rsvpPercent }),
+                      })}
+                    </span>
                   )}
                 </span>
                 <span className="kore-my-weddings__card-origin">
