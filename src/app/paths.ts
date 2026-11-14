@@ -25,10 +25,25 @@ export const paths = {
    */
   plannerWedding: '/cerimonialista/casamentos/:weddingId',
   /**
-   * Área do cerimonialista: Meus casamentos é a raiz (Cadastro e perfil RN07). A tela chega
-   * no D3 da F6; até lá, a rota fica vazia (decisão 250(d)).
+   * Área do cerimonialista (Cadastro e perfil RN07): Meus casamentos é a raiz. A moldura
+   * chegou no D3 da F6; as telas de cada item chegam nos PRs seguintes (D4 a D9) e, até lá,
+   * a rota fica em branco dentro da moldura (decisões 250(d) e 254).
    */
   plannerArea: '/cerimonialista',
+  /** Novo casamento (D6); o caminho estático vale sobre o `:weddingId`. */
+  plannerNewWedding: '/cerimonialista/casamentos/novo',
+  /** Link de indicação (D7). */
+  plannerReferral: '/cerimonialista/link-de-indicacao',
+  /** Modelos (D8). */
+  plannerTemplates: '/cerimonialista/modelos',
+  /** Notificações da cerimonialista, pelo sino (D9; decisão 254(2)). */
+  plannerNotifications: '/cerimonialista/notificacoes',
+  /** Meu perfil (Cadastro e perfil RN09). */
+  plannerProfile: '/cerimonialista/perfil',
+  /** Configurações (RN11): abre em Acesso; a aba Notificações liga no D9 (254(3)). */
+  plannerSettings: '/cerimonialista/configuracoes',
+  plannerSettingsAccess: '/cerimonialista/configuracoes/acesso',
+  plannerSettingsNotifications: '/cerimonialista/configuracoes/notificacoes',
   /** Cadastro do cerimonialista (Cadastro e perfil RN01): o Fazer parceria do app. */
   plannerSignUp: '/cerimonialista/cadastro',
 } as const;

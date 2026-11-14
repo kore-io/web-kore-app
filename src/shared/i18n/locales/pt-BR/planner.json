@@ -1,0 +1,48 @@
+{
+  "nav": {
+    "myWeddings": "Meus casamentos",
+    "newWedding": "Novo casamento",
+    "referral": "Link de indicação",
+    "templates": "Modelos"
+  },
+  "menu": {
+    "activeProfile": "Cerimonialista · {{organization}}",
+    "profile": "Meu perfil",
+    "settings": "Configurações",
+    "switchProfile": "Trocar de perfil",
+    "switchProfileCouple": "Casal · {{couple}}",
+    "createProfile": "Criar outro perfil",
+    "createProfileCouple": "Casal",
+    "signOut": "Sair"
+  },
+  "profile": {
+    "title": "Meu perfil",
+    "description": "Como você aparece para os casais e no rodapé dos sites.",
+    "loading": "Carregando o perfil",
+    "email": "E-mail da conta",
+    "emailHint": "Para mudar o e-mail, escreva para suporte@kore.com.br.",
+    "creditNameHint": "Aparece no rodapé dos sites que você monta. O casal pode ocultar. Se você atende sem empresa, use o seu nome.",
+    "creditHidden": "O Kore ocultou a sua assinatura. Para saber mais, escreva para suporte@kore.com.br.",
+    "termsRequired": "Aceite os termos para salvar.",
+    "save": "Salvar alterações",
+    "cancel": "Cancelar",
+    "saved": "Alterações salvas."
+  },
+  "settings": {
+    "title": "Configurações",
+    "tabs": "Configurações",
+    "access": "Acesso",
+    "notifications": "Notificações",
+    "signInMethods": "Formas de entrar",
+    "providers": {
+      "google": "Google",
+      "email": "E-mail com código"
+    },
+    "connected": "Conectado",
+    "signOutAll": "Sair de todos os aparelhos",
+    "signOutAllTitle": "Sair de todos os aparelhos?",
+    "signOutAllDescription": "Você vai precisar entrar de novo em cada aparelho, inclusive neste.",
+    "signOutAllConfirm": "Sair de todos",
+    "cancel": "Cancelar"
+  }
+}

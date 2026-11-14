@@ -155,3 +155,75 @@
 .kore-planner-steps__title {
   @apply type-label-lg text-ink;
 }
+
+/*
+ * Meu perfil (Penpot 15): o cartão branco com borda gray.300, raio lg e 24 px; o e-mail
+ * da conta como texto (rótulo em type.label, valor em body.md, ajuda em caption gray.700).
+ * As ações: no celular, Salvar alterações em cima e Cancelar embaixo, na largura toda;
+ * do tablet em diante, lado a lado à direita.
+ */
+.kore-planner-profile,
+.kore-planner-settings {
+  @apply flex flex-col gap-6;
+}
+
+.kore-planner-profile__loading {
+  @apply flex justify-center py-10;
+}
+
+.kore-planner-profile__card {
+  @apply flex max-w-160 flex-col gap-5 rounded-lg border border-gray-300 bg-white p-6;
+}
+
+.kore-planner-profile__email {
+  @apply flex flex-col gap-1.5;
+}
+
+.kore-planner-profile__email-label {
+  @apply type-label text-ink;
+}
+
+.kore-planner-profile__email-value {
+  @apply type-body-md text-ink;
+}
+
+.kore-planner-profile__email-hint {
+  @apply type-caption text-gray-700;
+}
+
+.kore-planner-profile__actions {
+  @apply flex flex-col-reverse gap-3 md:flex-row md:justify-end;
+}
+
+/*
+ * Configurações › Acesso (Penpot 15): o título da seção em type.heading, a lista num
+ * cartão branco com borda e divisórias, cada linha com 16 px e o selo à direita; o Sair de
+ * todos os aparelhos em secondary com o texto em danger, na largura toda no celular.
+ */
+.kore-planner-access {
+  @apply flex max-w-160 flex-col gap-6;
+}
+
+.kore-planner-access__section {
+  @apply flex flex-col gap-3;
+}
+
+.kore-planner-access__title {
+  @apply type-heading text-ink;
+}
+
+.kore-planner-access__list {
+  @apply m-0 flex list-none flex-col divide-y divide-gray-300 rounded-lg border border-gray-300 bg-white p-0;
+}
+
+.kore-planner-access__item {
+  @apply flex min-h-14 items-center justify-between gap-3 px-4 py-3;
+}
+
+.kore-planner-access__provider {
+  @apply type-label text-ink;
+}
+
+.kore-planner-access__sign-out {
+  @apply w-full text-danger-text md:w-auto md:self-start;
+}

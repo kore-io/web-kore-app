@@ -358,7 +358,23 @@ describe('Cadastro do cerimonialista: os Dados profissionais (RN04, RN05)', () =
     ['PLANNER_PROFILE_EXISTS', 'a Área (a outra aba)'],
   ])('o 409 %s leva a %s', async (code) => {
     const user = userEvent.setup();
-    api({ create: () => apiError({ status: 409, body: { error: code } }) });
+    // O perfil existe (criado na outra aba): depois do 409, o /me já o traz.
+    let refused = false;
+    api({
+      meBody: () =>
+        Response.json(
+          refused && code === 'PLANNER_PROFILE_EXISTS'
+            ? me({
+                profiles: ['planner'],
+                planner: { organization: 'Prado Assessoria', weddingsCount: 0 },
+              })
+            : me(),
+        ),
+      create: () => {
+        refused = true;
+        return apiError({ status: 409, body: { error: code } });
+      },
+    });
     const { router } = renderRoute({ url: URL });
     await openDetails(user);
     await fillValid(user);

@@ -23,6 +23,14 @@ describe('rotas do app (decisões 139, 146, 147 e 198)', () => {
       coupleArea: '/app',
       plannerWedding: '/cerimonialista/casamentos/:weddingId',
       plannerArea: '/cerimonialista',
+      plannerNewWedding: '/cerimonialista/casamentos/novo',
+      plannerReferral: '/cerimonialista/link-de-indicacao',
+      plannerTemplates: '/cerimonialista/modelos',
+      plannerNotifications: '/cerimonialista/notificacoes',
+      plannerProfile: '/cerimonialista/perfil',
+      plannerSettings: '/cerimonialista/configuracoes',
+      plannerSettingsAccess: '/cerimonialista/configuracoes/acesso',
+      plannerSettingsNotifications: '/cerimonialista/configuracoes/notificacoes',
       plannerSignUp: '/cerimonialista/cadastro',
     });
   });
@@ -65,6 +73,21 @@ describe('rotas do app (decisões 139, 146, 147 e 198)', () => {
     ['/cerimonialista/casamentos/w9/site/dados-basicos', 'planner-site-editor'],
     ['/cerimonialista/casamentos/w9/musicas', 'planner-songs'],
   ])('%s abre a mesma tela na área da colaboradora (%s)', (url, id) => {
+    expect(routeIdAt({ url })).toBe(id);
+  });
+
+  it.each([
+    ['/cerimonialista', 'planner-area-my-weddings'],
+    ['/cerimonialista/cadastro', 'planner-sign-up'],
+    // O caminho estático do Novo casamento vale sobre o casamento da rota.
+    ['/cerimonialista/casamentos/novo', 'planner-area-new-wedding'],
+    ['/cerimonialista/link-de-indicacao', 'planner-area-referral'],
+    ['/cerimonialista/modelos', 'planner-area-templates'],
+    ['/cerimonialista/notificacoes', 'planner-area-notifications'],
+    ['/cerimonialista/perfil', 'planner-area-profile'],
+    ['/cerimonialista/configuracoes/acesso', 'planner-area-settings-access'],
+    ['/cerimonialista/configuracoes/notificacoes', 'planner-area-settings-notifications'],
+  ])('%s abre a tela da Área do cerimonialista (%s)', (url, id) => {
     expect(routeIdAt({ url })).toBe(id);
   });
 
