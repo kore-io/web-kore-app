@@ -199,6 +199,10 @@ test.describe('Área do cerimonialista (/cerimonialista)', () => {
     await expect(page).toHaveURL(/\/cerimonialista$/);
     await openUserMenuItem({ page, name: 'Configurações' });
     await expect(page).toHaveURL(/\/cerimonialista\/configuracoes\/acesso$/);
+    // Formas de entrar pelo identities do /me (decisão 254(1)): entrou pelo código do e-mail.
+    const methods = page.getByRole('region', { name: 'Formas de entrar' });
+    await expect(methods.getByText('E-\u2060mail com código')).toBeVisible();
+    await expect(methods.getByText('Conectado')).toHaveCount(1);
     await page.getByRole('button', { name: 'Sair de todos os aparelhos' }).click();
     await page
       .getByRole('alertdialog', { name: 'Sair de todos os aparelhos?' })
