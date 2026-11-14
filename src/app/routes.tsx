@@ -6,6 +6,10 @@ import { SignInConfirmPage } from '../features/access/pages/sign-in-confirm-page
 import { SignInGooglePage } from '../features/access/pages/sign-in-google-page';
 import { SignInPage } from '../features/access/pages/sign-in-page';
 import { SignUpPage } from '../features/access/pages/sign-up-page';
+import { PlannerAreaLayout } from '../features/planner/layout/planner-area-layout';
+import { PlannerAccessSettingsPage } from '../features/planner/pages/planner-access-settings-page';
+import { PlannerProfilePage } from '../features/planner/pages/planner-profile-page';
+import { PlannerSettingsLayout } from '../features/planner/pages/planner-settings-layout';
 import { PlannerSignUpPage } from '../features/planner/pages/planner-sign-up-page';
 import { DashboardPage } from '../features/dashboard/pages/dashboard-page';
 import { DeadlinePage } from '../features/deliveries/pages/deadline-page';
@@ -115,9 +119,36 @@ export const routes: RouteObject[] = [
       { id: 'profiles', path: paths.profiles, element: <ProfilesPage /> },
       { id: 'sign-up', path: paths.signUp, element: <SignUpPage /> },
       { id: 'planner-sign-up', path: paths.plannerSignUp, element: <PlannerSignUpPage /> },
-      // A Área do cerimonialista (Meus casamentos) chega no D3: até lá, a rota fica vazia
-      // (decisão 250(d)), para o home do perfil não cair no caminho desconhecido (/app).
-      { id: 'planner-area', path: paths.plannerArea, element: null },
+      {
+        // A Área do cerimonialista (Cadastro e perfil RN07): a moldura, o Meu perfil e as
+        // Configurações (D3). As outras telas chegam nos PRs seguintes; até lá, ficam em
+        // branco dentro da moldura (decisões 250(d) e 254).
+        id: 'planner-area',
+        path: paths.plannerArea,
+        element: <PlannerAreaLayout />,
+        children: [
+          { id: 'planner-area-my-weddings', index: true, element: null },
+          { id: 'planner-area-new-wedding', path: 'casamentos/novo', element: null },
+          { id: 'planner-area-referral', path: 'link-de-indicacao', element: null },
+          { id: 'planner-area-templates', path: 'modelos', element: null },
+          { id: 'planner-area-notifications', path: 'notificacoes', element: null },
+          { id: 'planner-area-profile', path: 'perfil', element: <PlannerProfilePage /> },
+          {
+            id: 'planner-area-settings',
+            path: 'configuracoes',
+            element: <PlannerSettingsLayout />,
+            children: [
+              { index: true, element: <Navigate to="acesso" replace /> },
+              {
+                id: 'planner-area-settings-access',
+                path: 'acesso',
+                element: <PlannerAccessSettingsPage />,
+              },
+              { id: 'planner-area-settings-notifications', path: 'notificacoes', element: null },
+            ],
+          },
+        ],
+      },
       { id: 'session-expired', path: paths.sessionExpired, element: <SessionExpiredPage /> },
       {
         id: 'couple-area',

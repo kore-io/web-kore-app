@@ -26,6 +26,7 @@ import type {
   BillingQuoteResponse,
   BillingResponse,
   ChangeEndDateBody,
+  ConfirmNameMismatchErrorBody,
   CreatePaymentBody,
   EndDateBeyondPaidErrorBody,
   EndDateChangedResponse,
@@ -37,6 +38,7 @@ import type {
   InstallmentsOutOfRangeErrorBody,
   InvalidSignatureErrorBody,
   MalformedWebhookErrorBody,
+  NoDeletionScheduledErrorBody,
   NotDraftErrorBody,
   NotPublishedErrorBody,
   OriginNotAllowedErrorBody,
@@ -49,19 +51,24 @@ import type {
   PriceChangedErrorBody,
   PricingResponse,
   RateLimitedErrorBody,
+  ReauthRequiredErrorBody,
   RefundAlreadyRequestedErrorBody,
   RefundInProgressErrorBody,
   RefundNotLastExtensionErrorBody,
   RefundRequestBody,
   RefundRequestedResponse,
   RefundWindowClosedErrorBody,
+  RefundWindowOpenErrorBody,
   SessionExpiredErrorBody,
   SiteSlugMissingErrorBody,
   UnknownGatewayErrorBody,
   ValidationErrorBody,
   WebhookReceivedResponse,
   WeddingBlockedErrorBody,
+  WeddingDeletionBody,
+  WeddingDeletionCanceledResponse,
   WeddingDeletionScheduledErrorBody,
+  WeddingDeletionScheduledResponse,
   WeddingNotFoundErrorBody,
 } from '../model';
 
@@ -1177,3 +1184,280 @@ export function usePaymentsControllerBillingV1<
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+export const getWeddingDeletionControllerRequestV1Url = (weddingId: string) => {
+  return `/v1/weddings/${weddingId}/deletion`;
+};
+
+/**
+ * @summary Excluir o casamento: o site sai do ar na hora e tudo é apagado em 7 dias.
+ */
+export const weddingDeletionControllerRequestV1 = async (
+  weddingId: string,
+  weddingDeletionBody: WeddingDeletionBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<WeddingDeletionScheduledResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<WeddingDeletionScheduledResponse>(
+    getWeddingDeletionControllerRequestV1Url(weddingId),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+      body: JSON.stringify(weddingDeletionBody),
+    },
+  );
+};
+
+export const getWeddingDeletionControllerRequestV1MutationKey = () =>
+  ['weddingDeletionControllerRequestV1'] as const;
+
+export const getWeddingDeletionControllerRequestV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ReauthRequiredErrorBody
+    | WeddingBlockedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | RefundWindowOpenErrorBody
+    | RefundInProgressErrorBody
+    | PaymentDisputedErrorBody
+    | WeddingDeletionScheduledErrorBody
+    | ConfirmNameMismatchErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof weddingDeletionControllerRequestV1>>,
+    TError,
+    WeddingDeletionControllerRequestV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof weddingDeletionControllerRequestV1>>,
+  TError,
+  WeddingDeletionControllerRequestV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getWeddingDeletionControllerRequestV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof weddingDeletionControllerRequestV1>>,
+    WeddingDeletionControllerRequestV1MutationVariables
+  > = (props) => {
+    const { weddingId, data } = props ?? {};
+
+    return weddingDeletionControllerRequestV1(weddingId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type WeddingDeletionControllerRequestV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof weddingDeletionControllerRequestV1>>
+>;
+export type WeddingDeletionControllerRequestV1MutationBody = WeddingDeletionBody;
+export type WeddingDeletionControllerRequestV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | ReauthRequiredErrorBody
+  | WeddingBlockedErrorBody
+  | ActionNotAllowedErrorBody
+  | WeddingNotFoundErrorBody
+  | RefundWindowOpenErrorBody
+  | RefundInProgressErrorBody
+  | PaymentDisputedErrorBody
+  | WeddingDeletionScheduledErrorBody
+  | ConfirmNameMismatchErrorBody
+  | RateLimitedErrorBody
+>;
+export type WeddingDeletionControllerRequestV1MutationVariables = {
+  weddingId: string;
+  data: WeddingDeletionBody;
+};
+
+/**
+ * @summary Excluir o casamento: o site sai do ar na hora e tudo é apagado em 7 dias.
+ */
+export const useWeddingDeletionControllerRequestV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | ReauthRequiredErrorBody
+    | WeddingBlockedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | RefundWindowOpenErrorBody
+    | RefundInProgressErrorBody
+    | PaymentDisputedErrorBody
+    | WeddingDeletionScheduledErrorBody
+    | ConfirmNameMismatchErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof weddingDeletionControllerRequestV1>>,
+      TError,
+      WeddingDeletionControllerRequestV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof weddingDeletionControllerRequestV1>>,
+  TError,
+  WeddingDeletionControllerRequestV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getWeddingDeletionControllerRequestV1MutationOptions(options), queryClient);
+};
+export const getWeddingDeletionControllerCancelV1Url = (weddingId: string) => {
+  return `/v1/weddings/${weddingId}/deletion/cancel`;
+};
+
+/**
+ * @summary Cancelar a exclusão: qualquer dono, até o expurgo.
+ */
+export const weddingDeletionControllerCancelV1 = async (
+  weddingId: string,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<WeddingDeletionCanceledResponse> => {
+  return httpClient<WeddingDeletionCanceledResponse>(
+    getWeddingDeletionControllerCancelV1Url(weddingId),
+    {
+      ...options,
+      method: 'POST',
+    },
+  );
+};
+
+export const getWeddingDeletionControllerCancelV1MutationKey = () =>
+  ['weddingDeletionControllerCancelV1'] as const;
+
+export const getWeddingDeletionControllerCancelV1MutationOptions = <
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | WeddingBlockedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | NoDeletionScheduledErrorBody
+    | WeddingDeletionScheduledErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof weddingDeletionControllerCancelV1>>,
+    TError,
+    WeddingDeletionControllerCancelV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof weddingDeletionControllerCancelV1>>,
+  TError,
+  WeddingDeletionControllerCancelV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getWeddingDeletionControllerCancelV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof weddingDeletionControllerCancelV1>>,
+    WeddingDeletionControllerCancelV1MutationVariables
+  > = (props) => {
+    const { weddingId } = props ?? {};
+
+    return weddingDeletionControllerCancelV1(weddingId, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type WeddingDeletionControllerCancelV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof weddingDeletionControllerCancelV1>>
+>;
+
+export type WeddingDeletionControllerCancelV1MutationError = ErrorType<
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | WeddingBlockedErrorBody
+  | ActionNotAllowedErrorBody
+  | WeddingNotFoundErrorBody
+  | NoDeletionScheduledErrorBody
+  | WeddingDeletionScheduledErrorBody
+  | RateLimitedErrorBody
+>;
+export type WeddingDeletionControllerCancelV1MutationVariables = { weddingId: string };
+
+/**
+ * @summary Cancelar a exclusão: qualquer dono, até o expurgo.
+ */
+export const useWeddingDeletionControllerCancelV1 = <
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | WeddingBlockedErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | NoDeletionScheduledErrorBody
+    | WeddingDeletionScheduledErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof weddingDeletionControllerCancelV1>>,
+      TError,
+      WeddingDeletionControllerCancelV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof weddingDeletionControllerCancelV1>>,
+  TError,
+  WeddingDeletionControllerCancelV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getWeddingDeletionControllerCancelV1MutationOptions(options), queryClient);
+};

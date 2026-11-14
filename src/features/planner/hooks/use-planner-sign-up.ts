@@ -124,7 +124,11 @@ export function usePlannerSignUp() {
               setClosedByServer(true);
               return;
             case 'PLANNER_PROFILE_EXISTS':
-              setAlreadyPlanner(true);
+              // O perfil foi criado na outra aba: relê o /me antes de ir à Área, que só
+              // abre para quem tem o perfil (Colaboradora RN01).
+              void queryClient
+                .invalidateQueries({ queryKey: getMeControllerMeV1QueryKey() })
+                .then(() => setAlreadyPlanner(true));
               return;
             case 'SELLER_CANNOT_BE_PLANNER':
               setSellerBlocked(true);

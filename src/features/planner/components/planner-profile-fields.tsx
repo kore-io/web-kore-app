@@ -1,4 +1,5 @@
 import { Checkbox, Input } from '@kore-io/design';
+import type { ReactNode } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { FormField } from '../../../shared/components/form-field';
 import { PRIVACY_URL, TERMS_URL } from '../../../site/links';
@@ -13,6 +14,10 @@ export interface PlannerProfileFieldsProps {
   needsName: boolean;
   /** A caixa dos Termos: no Cadastro, sempre; no Meu perfil, só no perfil mínimo (RN10). */
   showTerms: boolean;
+  /** A ajuda do Nome da assessoria; o Meu perfil usa a versão com "O casal pode ocultar." */
+  creditNameHint?: string;
+  /** Um aviso logo abaixo do Nome da assessoria (o da assinatura ocultada; decisão 254(4)). */
+  creditNameNotice?: ReactNode;
 }
 
 /**
@@ -26,6 +31,8 @@ export function PlannerProfileFields({
   errors,
   needsName,
   showTerms,
+  creditNameHint,
+  creditNameNotice,
 }: PlannerProfileFieldsProps) {
   const { t } = useTranslation('access');
   const set = (patch: Partial<PlannerProfileValues>) => onChange({ ...values, ...patch });
@@ -36,7 +43,7 @@ export function PlannerProfileFields({
     <>
       <FormField
         label={t('plannerProfile.creditName')}
-        hint={errors.creditName ?? t('plannerProfile.creditNameHint')}
+        hint={errors.creditName ?? creditNameHint ?? t('plannerProfile.creditNameHint')}
         hintTone={errors.creditName ? 'danger' : 'neutral'}
       >
         {({ id, describedBy, invalid }) => (
@@ -50,6 +57,7 @@ export function PlannerProfileFields({
           />
         )}
       </FormField>
+      {creditNameNotice}
       {needsName && (
         <FormField label={t('plannerProfile.name')} {...danger(errors.name)}>
           {({ id, describedBy, invalid }) => (
