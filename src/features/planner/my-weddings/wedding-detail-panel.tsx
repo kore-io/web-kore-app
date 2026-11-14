@@ -63,10 +63,23 @@ export function WeddingDetailPanel({
   }, [notFound, queryClient, showToast, t, onClose]);
 
   return (
-    <RadixDialog.Root open onOpenChange={(open) => !open && onClose()}>
+    // Não modal: o modal do Radix esconde do leitor de tela tudo fora do painel, inclusive a
+    // região dos avisos, e os Toasts (Convite reenviado, Link copiado) não seriam anunciados.
+    // O véu é desenhado à parte e fecha o painel no clique, como no Penpot.
+    <RadixDialog.Root open modal={false} onOpenChange={(open) => !open && onClose()}>
       <RadixDialog.Portal>
-        <RadixDialog.Overlay className="kore-wedding-detail__veil" />
-        <RadixDialog.Content className="kore-wedding-detail" aria-describedby={undefined}>
+        <div className="kore-wedding-detail__veil" aria-hidden="true" onClick={onClose} />
+        <RadixDialog.Content
+          className="kore-wedding-detail"
+          aria-describedby={undefined}
+          // Os avisos e os diálogos de confirmação ficam fora do painel: mexer neles não o fecha.
+          onInteractOutside={(event) => {
+            const target = event.target as Element | null;
+            if (target?.closest('[role="region"], [role="dialog"], [role="alertdialog"]')) {
+              event.preventDefault();
+            }
+          }}
+        >
           {detail.data ? (
             <DetailContent detail={detail.data} onClose={onClose} />
           ) : (
@@ -208,7 +221,7 @@ function DetailContent({
 
   return (
     <div className="kore-wedding-detail__body">
-      <header className="kore-wedding-detail__header">
+      <div className="kore-wedding-detail__header">
         <div className="kore-wedding-detail__heading">
           <RadixDialog.Title className="kore-wedding-detail__title">{couple}</RadixDialog.Title>
           <p className="kore-wedding-detail__meta">
@@ -221,7 +234,7 @@ function DetailContent({
             {t('myWeddings.detail.close')}
           </Button>
         </RadixDialog.Close>
-      </header>
+      </div>
 
       <dl className="kore-wedding-detail__facts">
         <div>
