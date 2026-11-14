@@ -7,6 +7,7 @@ import { SignInGooglePage } from '../features/access/pages/sign-in-google-page';
 import { SignInPage } from '../features/access/pages/sign-in-page';
 import { SignUpPage } from '../features/access/pages/sign-up-page';
 import { PlannerAreaLayout } from '../features/planner/layout/planner-area-layout';
+import { MyWeddingsPage } from '../features/planner/my-weddings/my-weddings-page';
 import { PlannerAccessSettingsPage } from '../features/planner/pages/planner-access-settings-page';
 import { PlannerProfilePage } from '../features/planner/pages/planner-profile-page';
 import { PlannerSettingsLayout } from '../features/planner/pages/planner-settings-layout';
@@ -127,7 +128,7 @@ export const routes: RouteObject[] = [
         path: paths.plannerArea,
         element: <PlannerAreaLayout />,
         children: [
-          { id: 'planner-area-my-weddings', index: true, element: null },
+          { id: 'planner-area-my-weddings', index: true, element: <MyWeddingsPage /> },
           { id: 'planner-area-new-wedding', path: 'casamentos/novo', element: null },
           { id: 'planner-area-referral', path: 'link-de-indicacao', element: null },
           { id: 'planner-area-templates', path: 'modelos', element: null },
