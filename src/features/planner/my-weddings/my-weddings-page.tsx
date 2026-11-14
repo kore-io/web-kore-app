@@ -171,6 +171,7 @@ function WeddingsFilters({
         onChange={(event) => set({ search: event.target.value })}
       />
       <Select
+        className="kore-my-weddings__filter"
         aria-label={t('myWeddings.filters.status')}
         value={filters.status}
         onChange={(event) => set({ status: event.target.value as StatusFilter })}
@@ -183,6 +184,7 @@ function WeddingsFilters({
         ))}
       </Select>
       <Select
+        className="kore-my-weddings__filter"
         aria-label={t('myWeddings.filters.date')}
         value={filters.dateMode}
         onChange={(event) =>

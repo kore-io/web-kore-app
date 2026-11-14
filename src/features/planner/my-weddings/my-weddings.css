@@ -56,7 +56,7 @@
   @apply col-span-2 md:min-w-60 md:flex-1;
 }
 
-.kore-my-weddings__filters > .kore-select {
+.kore-my-weddings__filter {
   @apply md:w-80;
 }
 

@@ -148,7 +148,8 @@ test.describe('Área do cerimonialista (/cerimonialista)', () => {
 
     await openUserMenuItem({ page, name: 'Meu perfil' });
     await expect(page).toHaveURL(/\/cerimonialista\/perfil$/);
-    await expect(page.getByText(email, { exact: true })).toBeVisible();
+    // O e-mail do Meu perfil, dentro do conteúdo (o menu do usuário também o mostra).
+    await expect(page.getByRole('main').getByText(email, { exact: true })).toBeVisible();
     const creditName = `Dias Eventos ${letters()}`;
     await page.getByRole('textbox', { name: 'Nome da assessoria' }).fill(creditName);
     await addCity({ page, city: 'Vinhedo' });
