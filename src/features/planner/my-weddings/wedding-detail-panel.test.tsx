@@ -17,7 +17,25 @@ const me = {
   },
   activeProfile: 'planner',
   authenticatedAt: '2026-11-14T12:00:00Z',
-  memberships: [],
+  // O vínculo de w1: o Editar o site abre a moldura da colaboradora (D5a).
+  memberships: [
+    {
+      weddingId: 'w1',
+      role: 'collaborator',
+      weddingName: 'Ana & Marcos',
+      eventDate: '2026-11-14',
+      city: 'Campinas',
+      state: 'SP',
+      lifecycle: {
+        status: 'published',
+        endDate: null,
+        graceUntil: null,
+        expiredAt: null,
+        deletionScheduledFor: null,
+        blocked: false,
+      },
+    },
+  ],
   profiles: ['planner'],
   lastProfileOnDevice: 'planner',
   planner: { organization: 'Prado Assessoria', weddingsCount: 1 },

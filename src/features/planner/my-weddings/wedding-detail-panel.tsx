@@ -429,7 +429,7 @@ function DetailContent({
 }
 
 /** Convidar outro e-mail (Voz): o convite anterior deixa de funcionar. */
-function InviteAnotherDialog({
+export function InviteAnotherDialog({
   open,
   weddingId,
   previousEmail,
