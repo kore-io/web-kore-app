@@ -44,5 +44,81 @@
     "signOutAllDescription": "Você vai precisar entrar de novo em cada aparelho, inclusive neste.",
     "signOutAllConfirm": "Sair de todos",
     "cancel": "Cancelar"
+  },
+  "myWeddings": {
+    "title": "Meus casamentos",
+    "loading": "Carregando os casamentos",
+    "weddings_one": "{{count}} casamento",
+    "weddings_other": "{{count}} casamentos",
+    "ofOrganization": "{{weddings}} da {{organization}}",
+    "active_one": "{{count}} ativo",
+    "active_other": "{{count}} ativos",
+    "subtitle": "{{weddings}} · {{active}}",
+    "filtered_one": "{{shown}} de {{count}} casamento",
+    "filtered_other": "{{shown}} de {{count}} casamentos",
+    "newWedding": "Novo casamento",
+    "summary": {
+      "active": "Ativos",
+      "activeDetail_one": "de {{count}} casamento",
+      "activeDetail_other": "de {{count}} casamentos",
+      "awaitingCouple": "Aguardando o casal",
+      "awaitingCoupleDetail": "convite enviado, sem resposta",
+      "awaitingCoupleDetailShort": "sem resposta"
+    },
+    "filters": {
+      "search": "Buscar pelo nome do casal",
+      "status": "Status",
+      "allStatuses": "Todos os status",
+      "date": "Data",
+      "anyDate": "Qualquer data",
+      "period": "Escolher período",
+      "from": "De",
+      "to": "Até",
+      "clear": "Limpar filtros",
+      "noResults": "Nenhum casamento com esses filtros."
+    },
+    "columns": {
+      "couple": "Casal",
+      "date": "Data",
+      "status": "Status",
+      "responses": "Respostas",
+      "origin": "Origem"
+    },
+    "noDate": "Data a definir",
+    "responses": "Respostas {{percent}}%",
+    "status": {
+      "awaiting_couple": "Aguardando o casal",
+      "draft": "Rascunho",
+      "published": "Publicado",
+      "post_event": "Pós-evento",
+      "grace": "Em carência",
+      "expired": "Expirado"
+    },
+    "origin": {
+      "created_by_me": "Criado por você",
+      "referral_link": "Pelo seu link",
+      "couple_invite": "Convite do casal"
+    },
+    "alerts": {
+      "pendingResponses_one": "{{count}} casamento com muitas respostas pendentes e prazo em até 7 dias.",
+      "pendingResponses_other": "{{count}} casamentos com muitas respostas pendentes e prazo em até 7 dias.",
+      "invitationsNotSent_one": "{{count}} casamento com convites ainda não enviados, a menos de 90 dias da data.",
+      "invitationsNotSent_other": "{{count}} casamentos com convites ainda não enviados, a menos de 90 dias da data.",
+      "show": "Ver casamentos",
+      "hide": "Ocultar casamentos",
+      "more": "e mais {{count}}"
+    },
+    "minimalProfile": {
+      "title": "Completar os dados profissionais",
+      "description": "Confira o nome da sua assessoria e adicione as cidades onde você atende. O nome aparece no rodapé dos sites que você monta.",
+      "link": "Abrir Meu perfil"
+    },
+    "empty": {
+      "title": "Você ainda não tem casamentos.",
+      "description": "Os casamentos que você criar ou em que colaborar aparecem aqui.",
+      "create": "Criar casamento",
+      "copyLink": "Copiar link de indicação",
+      "copied": "Link copiado."
+    }
   }
 }

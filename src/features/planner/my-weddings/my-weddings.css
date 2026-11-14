@@ -1,0 +1,134 @@
+/*
+ * Meus casamentos (Penpot 03, "sem a F3"): os alertas acima do Resumo, os dois Stat Cards
+ * lado a lado, os filtros (a busca larga e os dois Selects), a tabela num cartão branco com
+ * o cabeçalho em gray.100 do tablet em diante, e os cartões no celular.
+ */
+.kore-my-weddings {
+  @apply flex flex-col gap-6;
+}
+
+.kore-my-weddings__loading {
+  @apply flex justify-center py-10;
+}
+
+.kore-my-weddings__alerts {
+  @apply flex flex-col gap-3;
+}
+
+.kore-my-weddings__alert-text {
+  @apply m-0;
+}
+
+.kore-my-weddings__alert-list {
+  @apply m-0 mt-1 flex list-none flex-col gap-1 p-0;
+}
+
+.kore-my-weddings__alert-link,
+.kore-my-weddings__alert-toggle {
+  @apply type-body-md text-primary underline;
+}
+
+.kore-my-weddings__alert-toggle {
+  @apply mt-1 inline-flex min-h-11 cursor-pointer items-center gap-1 border-0 bg-transparent p-0;
+}
+
+.kore-my-weddings__alert-chevron {
+  @apply size-4;
+}
+
+.kore-my-weddings__summary {
+  @apply grid grid-cols-2 gap-3 md:gap-4;
+}
+
+.kore-my-weddings__detail-long {
+  @apply hidden md:inline;
+}
+
+.kore-my-weddings__detail-short {
+  @apply md:hidden;
+}
+
+.kore-my-weddings__filters {
+  @apply grid grid-cols-2 items-end gap-3 md:flex md:flex-wrap;
+}
+
+.kore-my-weddings__search {
+  @apply col-span-2 md:min-w-60 md:flex-1;
+}
+
+.kore-my-weddings__filters > .kore-select {
+  @apply md:w-80;
+}
+
+.kore-my-weddings__period {
+  @apply col-span-2 grid grid-cols-2 gap-3 md:flex;
+}
+
+.kore-my-weddings__period-field {
+  @apply flex flex-col gap-1.5;
+}
+
+.kore-my-weddings__no-results {
+  @apply flex flex-col items-center gap-3 py-10 text-center type-body-md text-gray-700;
+}
+
+.kore-my-weddings__empty-actions {
+  @apply flex flex-col gap-3 md:flex-row;
+}
+
+/* A tabela, do tablet em diante. */
+.kore-my-weddings__table {
+  @apply hidden w-full border-separate border-spacing-0 overflow-hidden rounded-lg border border-gray-300 bg-white md:table;
+}
+
+.kore-my-weddings__table thead th,
+.kore-my-weddings__table thead td {
+  @apply type-overline bg-gray-100 px-5 py-3 text-left text-gray-700;
+}
+
+.kore-my-weddings__table tbody th,
+.kore-my-weddings__table tbody td {
+  @apply type-body-md border-t border-gray-300 px-5 py-3 text-left font-normal text-ink;
+}
+
+.kore-my-weddings__row {
+  @apply cursor-pointer hover:bg-background;
+}
+
+.kore-my-weddings__couple {
+  @apply text-ink no-underline hover:underline focus-visible:underline;
+}
+
+.kore-my-weddings__chevron-cell {
+  @apply w-12;
+}
+
+.kore-my-weddings__chevron {
+  @apply size-5 shrink-0 text-gray-700;
+}
+
+/* Os cartões, no celular. */
+.kore-my-weddings__cards {
+  @apply m-0 flex list-none flex-col gap-3 p-0 md:hidden;
+}
+
+.kore-my-weddings__card {
+  @apply flex items-start justify-between gap-3 rounded-lg border border-gray-300 bg-white p-4 text-ink no-underline;
+}
+
+.kore-my-weddings__card-body {
+  @apply flex min-w-0 flex-col gap-1.5;
+}
+
+.kore-my-weddings__card-couple {
+  @apply type-label-lg;
+}
+
+.kore-my-weddings__card-meta,
+.kore-my-weddings__card-origin {
+  @apply type-caption text-gray-700;
+}
+
+.kore-my-weddings__card-status {
+  @apply type-body-md flex flex-wrap items-center gap-2;
+}
