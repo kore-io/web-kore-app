@@ -27,13 +27,7 @@ import { isValidEmail } from '../../access/email';
 import { CoupleLinkBlock } from './couple-link-block';
 import { coupleName } from './my-weddings-filters';
 import { WeddingStatusBadge } from './wedding-status-badge';
-import {
-  coupleInvitations,
-  deleteCase,
-  longWeddingDate,
-  myMembershipId,
-  sentDay,
-} from './wedding-detail-texts';
+import { coupleInvitations, deleteCase, longWeddingDate, sentDay } from './wedding-detail-texts';
 
 /**
  * O Detalhe do casamento (Meus casamentos RN08 a RN11; Penpot 03; decisão 260): o painel
@@ -125,7 +119,8 @@ function DetailContent({
   const { email, link } = coupleInvitations({ detail });
   const area = areaPaths(plannerWeddingBase({ weddingId }));
   const toDelete = deleteCase({ detail });
-  const membershipId = myMembershipId({ detail });
+  // O vínculo dela, para o Sair (decisão 261).
+  const membershipId = detail.myMembershipId;
   const withoutInvitation =
     detail.status === 'draft' && !detail.hasOwner && detail.createdByMe && !email && !link;
 

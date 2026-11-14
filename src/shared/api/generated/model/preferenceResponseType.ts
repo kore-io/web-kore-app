@@ -13,5 +13,6 @@ export const PreferenceResponseType = {
   wedding_published: 'wedding_published',
   membership_removed: 'membership_removed',
   commission: 'commission',
+  referrer_reassigned: 'referrer_reassigned',
   billing: 'billing',
 } as const;

@@ -11,5 +11,10 @@ export interface AdminPersonResponse {
   /** @nullable */
   name: string | null;
   role: AdminPersonResponseRole;
+  /**
+   * A troca do e-mail pelo staff trava chave Pix e remoção de membros até aqui (decisão 253(2)).
+   * @nullable
+   */
+  accessChangeLockedUntil: string | null;
   email: string;
 }

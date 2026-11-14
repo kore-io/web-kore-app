@@ -56,12 +56,3 @@ export function deleteCase({
   if (link) return 'link';
   return 'draft';
 }
-
-/**
- * O id do vínculo dela, para o Sair (decisão 261): o `myMembershipId` chega no PR curto da
- * API; até o `api:sync`, a leitura é defensiva.
- */
-export function myMembershipId({ detail }: { detail: MyWeddingDetailResponse }): string | null {
-  const value = (detail as { myMembershipId?: unknown }).myMembershipId;
-  return typeof value === 'string' ? value : null;
-}

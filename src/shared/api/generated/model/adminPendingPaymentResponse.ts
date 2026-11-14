@@ -4,9 +4,12 @@
  * Kore API
  * OpenAPI spec version: 1
  */
+import type { AdminPendingPaymentResponseMethod } from './adminPendingPaymentResponseMethod';
 
 export interface AdminPendingPaymentResponse {
   paymentId: string;
+  /** "Pix de R$ 308,10 gerado em 25/09…" ou o cartão em análise. */
+  method: AdminPendingPaymentResponseMethod;
   createdAt: string;
   amountCents: number;
 }

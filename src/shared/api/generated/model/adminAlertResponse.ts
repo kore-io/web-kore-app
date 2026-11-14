@@ -7,6 +7,7 @@
 import type { AdminAlertResponseData } from './adminAlertResponseData';
 import type { AdminAlertResponseStatus } from './adminAlertResponseStatus';
 import type { AdminAlertResponseType } from './adminAlertResponseType';
+import type { AdminAlertUserResponse } from './adminAlertUserResponse';
 
 export interface AdminAlertResponse {
   id: string;
@@ -19,6 +20,11 @@ export interface AdminAlertResponse {
   coupleNames: string | null;
   /** @nullable */
   userId: string | null;
+  /**
+   * A pessoa do alerta de usuário.
+   * @nullable
+   */
+  user: AdminAlertUserResponse | null;
   /**
    * O detalhe do tipo; o app monta o texto (RN12).
    * @nullable

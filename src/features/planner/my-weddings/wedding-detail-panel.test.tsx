@@ -173,13 +173,6 @@ describe('Detalhe do casamento (Meus casamentos RN08 a RN11; decisão 260)', () 
     expect(router.state.location.search).toBe('');
   });
 
-  it('sem o id do próprio vínculo, sem o Sair', async () => {
-    api({ detail: { ...published, myMembershipId: undefined } });
-    renderRoute({ url: URL });
-    const dialog = await screen.findByRole('dialog', { name: 'Ana e Marcos' });
-    expect(within(dialog).queryByRole('button', { name: 'Sair deste casamento' })).toBeNull();
-  });
-
   it('aguardando, por e-mail: o convite, o aviso, Reenviar com o Toast e os dados básicos (RN08, RN09)', async () => {
     const user = userEvent.setup();
     const writes = api({ detail: awaiting([emailInvitation]) });
