@@ -251,6 +251,9 @@ describe('Cadastro do cerimonialista: os Dados profissionais (RN04, RN05)', () =
     await user.type(screen.getByLabelText('Cidade'), 'Campinas');
     await user.click(screen.getByRole('button', { name: 'Adicionar' }));
     expect(screen.getByText('Escolha a UF.')).toBeInTheDocument();
+    // O erro da UF marca o Select, e não a Cidade.
+    expect(screen.getByLabelText('UF')).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByLabelText('Cidade')).not.toHaveAttribute('aria-invalid', 'true');
     await user.selectOptions(screen.getByLabelText('UF'), 'SP');
     await user.click(screen.getByRole('button', { name: 'Adicionar' }));
     expect(screen.getByRole('listitem')).toHaveTextContent('Campinas (SP)');

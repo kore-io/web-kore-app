@@ -25,12 +25,16 @@ export function CityListField({ cities, onChange, error }: CityListFieldProps) {
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
   const [addError, setAddError] = useState<string>();
+  /** O campo do erro do Adicionar: a UF só no "Informe a UF."; o resto é da Cidade. */
+  const [addErrorField, setAddErrorField] = useState<'city' | 'state'>('city');
   const shownError = addError ?? error;
+  const stateInvalid = addError !== undefined && addErrorField === 'state';
 
   function add() {
     const problem = addCityError({ t, cities, city, state });
     if (problem) {
       setAddError(problem);
+      setAddErrorField(city.trim() && !state ? 'state' : 'city');
       return;
     }
     onChange([...cities, cityLabel({ city, state })]);
@@ -48,7 +52,7 @@ export function CityListField({ cities, onChange, error }: CityListFieldProps) {
             id={cityId}
             value={city}
             autoComplete="address-level2"
-            invalid={shownError !== undefined}
+            invalid={shownError !== undefined && !stateInvalid}
             aria-describedby={hintId}
             onChange={(event) => {
               setCity(event.target.value);
@@ -67,6 +71,8 @@ export function CityListField({ cities, onChange, error }: CityListFieldProps) {
             id={stateId}
             value={state}
             placeholder={t('weddingDetails.statePlaceholder')}
+            invalid={stateInvalid}
+            aria-describedby={hintId}
             onChange={(event) => {
               setState(event.target.value);
               setAddError(undefined);

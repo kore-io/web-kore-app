@@ -66,7 +66,8 @@ test.describe('Cadastro do cerimonialista (/cerimonialista/cadastro)', () => {
     await expect(page.getByText('Adicione pelo menos uma cidade.')).toBeVisible();
     await expect(page.getByText('Aceite os termos para continuar.')).toBeVisible();
 
-    const creditName = `Prado Assessoria ${run}`;
+    // Só letras: um sufixo de 8 dígitos parece telefone, e a API recusa (CREDIT_NAME_INVALID).
+    const creditName = `Prado Assessoria ${run.replace(/\d/g, (digit) => 'abcdefghij'[Number(digit)] ?? '')}`;
     await page.getByRole('textbox', { name: 'Nome da assessoria' }).fill(creditName);
     // Conta nova, sem nome: o Seu nome aparece (RN04).
     await page.getByRole('textbox', { name: 'Seu nome' }).fill('Juliana Prado');
