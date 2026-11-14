@@ -179,4 +179,40 @@ test.describe('Detalhe do casamento (/cerimonialista?casamento={id})', () => {
       .click();
     await expect(page).toHaveURL(new RegExp(`/cerimonialista/casamentos/${weddingId}/site/`));
   });
+  test('Sair deste casamento: o próprio vínculo pelo myMembershipId e o Toast (RN10; decisão 261)', async ({
+    page,
+  }) => {
+    const email = newEmail({ label: `sair-${unique()}` });
+    const userId = await createUser({ db, email, name: 'Juliana Prado' });
+    await createPlanner({ db, userId, creditName: `Prado ${letters()}` });
+    const ownerId = await createUser({
+      db,
+      email: newEmail({ label: `dono-${unique()}` }),
+      name: 'Bruna Lima',
+    });
+    const first = `Bruna${letters()}`;
+    await createWedding({
+      db,
+      partners: [first, 'Thiago Reis'],
+      eventDate: '2027-06-12',
+      city: 'Campinas',
+      status: 'draft',
+      createdByUserId: ownerId,
+      owners: [ownerId, null],
+      collaboratorIds: [userId],
+    });
+    const couple = `${first} e Thiago`;
+    await signIn({ page, email });
+    await page.getByRole('link', { name: new RegExp(`^${couple}`) }).click();
+    await page
+      .getByRole('dialog', { name: couple })
+      .getByRole('button', { name: 'Sair deste casamento' })
+      .click();
+    await page
+      .getByRole('alertdialog', { name: `Sair de ${couple}?` })
+      .getByRole('button', { name: 'Sair do casamento' })
+      .click();
+    await expect(toast({ page, text: `Você saiu do casamento de ${couple}.` })).toBeVisible();
+    await expect(page.getByText('Você ainda não tem casamentos.')).toBeVisible();
+  });
 });
