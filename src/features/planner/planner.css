@@ -83,8 +83,9 @@
   @apply flex w-24 flex-col gap-1.5;
 }
 
+/* O Adicionar na altura do campo ao lado (48 px; 40 px no desktop), acima do alvo de 44 px. */
 .kore-city-list__add {
-  @apply shrink-0;
+  @apply h-12 shrink-0 lg:h-10;
 }
 
 .kore-city-list__hint {
@@ -111,9 +112,20 @@
   @apply size-4;
 }
 
-/* Link pronto: o link em destaque (type.label, primary, gray.100, raio md, 16 px). */
+/*
+ * Link pronto: o link em destaque (Penpot A1): primary.tint, raio md, 16 px, o ícone de link
+ * de 24 px e 12 px até o texto em type.label-lg primary.
+ */
 .kore-planner-ready__link {
-  @apply type-label rounded-md bg-gray-100 p-4 break-all text-primary;
+  @apply m-0 flex items-center gap-3 rounded-md bg-primary-tint p-4 text-primary;
+}
+
+.kore-planner-ready__link-icon {
+  @apply size-6 shrink-0;
+}
+
+.kore-planner-ready__link-text {
+  @apply type-label-lg min-w-0 break-all;
 }
 
 .kore-planner-ready__actions {
@@ -124,19 +136,22 @@
   @apply type-caption text-center text-gray-700;
 }
 
-/* Como funciona: o número num círculo primary.tint de 32 px e 12 px até os textos. */
+/*
+ * Como funciona (Penpot A3): o número num círculo primary de 40 px (type.label-lg em
+ * primary-foreground), 16 px até os textos (título em type.label-lg) e 24 px entre os passos.
+ */
 .kore-planner-steps {
-  @apply m-0 flex list-none flex-col gap-5 p-0;
+  @apply m-0 flex list-none flex-col gap-6 p-0;
 }
 
 .kore-planner-steps__item {
-  @apply flex items-start gap-3;
+  @apply flex items-start gap-4;
 }
 
 .kore-planner-steps__number {
-  @apply type-label flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-tint text-primary;
+  @apply type-label-lg flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground;
 }
 
 .kore-planner-steps__title {
-  @apply type-label text-ink;
+  @apply type-label-lg text-ink;
 }

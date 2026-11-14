@@ -1,5 +1,5 @@
 import { Button } from '@kore-io/design';
-import { CreditCard, Globe, LayoutDashboard } from 'lucide-react';
+import { CreditCard, Globe, LayoutDashboard, Link as LinkIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -99,7 +99,10 @@ export function PlannerReferralReadyStep({
             : t('plannerSignUp.ready.descriptionDiscount', { percent: discountPercent })}
         </p>
       </div>
-      <p className="kore-planner-ready__link">{link.replace(/^https?:\/\//, '')}</p>
+      <p className="kore-planner-ready__link">
+        <LinkIcon aria-hidden="true" className="kore-planner-ready__link-icon" />
+        <span className="kore-planner-ready__link-text">{link.replace(/^https?:\/\//, '')}</span>
+      </p>
       <div className="kore-planner-ready__actions">
         <Button
           type="button"
@@ -172,13 +175,7 @@ export function PlannerSignUpClosed({ onBack }: { onBack: () => void }) {
         <h1 className="kore-sign-in__title">{t('plannerSignUp.closed.title')}</h1>
         <p className="kore-sign-in__description">{t('plannerSignUp.closed.description')}</p>
       </div>
-      <Button
-        type="button"
-        variant="secondary"
-        size="lg"
-        className="kore-sign-in__submit"
-        onClick={onBack}
-      >
+      <Button type="button" size="lg" className="kore-sign-in__submit" onClick={onBack}>
         {t('plannerSignUp.closed.back')}
       </Button>
     </div>
