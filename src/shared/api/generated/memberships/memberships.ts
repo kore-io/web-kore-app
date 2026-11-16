@@ -27,6 +27,7 @@ import type {
   MembershipNotFoundErrorBody,
   OriginNotAllowedErrorBody,
   RateLimitedErrorBody,
+  RecentAccessChangeErrorBody,
   SessionExpiredErrorBody,
   WeddingBlockedErrorBody,
   WeddingDeletionScheduledErrorBody,
@@ -228,6 +229,7 @@ export const getWeddingMembersControllerRemoveV1MutationOptions = <
     | CannotRemoveOwnerErrorBody
     | LastOwnerErrorBody
     | WeddingHasNoOwnerErrorBody
+    | RecentAccessChangeErrorBody
     | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
@@ -279,6 +281,7 @@ export type WeddingMembersControllerRemoveV1MutationError = ErrorType<
   | CannotRemoveOwnerErrorBody
   | LastOwnerErrorBody
   | WeddingHasNoOwnerErrorBody
+  | RecentAccessChangeErrorBody
   | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
@@ -298,6 +301,7 @@ export const useWeddingMembersControllerRemoveV1 = <
     | CannotRemoveOwnerErrorBody
     | LastOwnerErrorBody
     | WeddingHasNoOwnerErrorBody
+    | RecentAccessChangeErrorBody
     | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
