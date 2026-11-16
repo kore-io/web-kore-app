@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../../../tests/a11y';
 import { meFor, profileUnderTest } from '../../../../tests/profile';
 import { apiError, mockApi, renderAreaScreen, renderRoute } from '../../../../tests/render-route';
@@ -139,6 +139,12 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
   });
 
   it('a contagem com prazo e data, e o Dashboard marcado na Sidebar', async () => {
+    // O relógio fixo em 2026: o ano aparece porque o casamento e o prazo são de outro ano.
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-11-12T15:00:00Z'));
+    onTestFinished(() => {
+      vi.useRealTimers();
+    });
     mockDashboard({
       data: dashboard({
         daysUntilEvent: 1,
@@ -176,6 +182,12 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
   });
 
   it('o Status do site publicado: o selo, o endereço, "No ar até" e Editar site', async () => {
+    // O relógio fixo em 2026: o ano do "No ar até" (2028) aparece por ser de outro ano.
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-11-12T15:00:00Z'));
+    onTestFinished(() => {
+      vi.useRealTimers();
+    });
     mockDashboard();
     renderRoute({ url: '/app' });
     await screen.findByText('142');

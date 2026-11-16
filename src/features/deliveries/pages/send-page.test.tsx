@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../../../tests/a11y';
 import { meFor, profileUnderTest } from '../../../../tests/profile';
 import { apiError, mockApi, renderAreaScreen, renderRoute } from '../../../../tests/render-route';
@@ -161,6 +161,12 @@ afterEach(() => vi.unstubAllGlobals());
 
 describe('Envios › as abas e os grupos (Envios RN01, RN03, RN04, RN10; decisão 235)', () => {
   it('/app/envios abre em Enviar convites, com as 4 abas e o resumo', async () => {
+    // O relógio fixo em 2026: o prazo de 2026 aparece sem o ano só dentro do mesmo ano.
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-09-20T15:00:00Z'));
+    onTestFinished(() => {
+      vi.useRealTimers();
+    });
     const calls = mockSend();
     const { router } = renderRoute({ url: '/app/envios' });
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/envios/convites'));
