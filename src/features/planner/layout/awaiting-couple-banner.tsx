@@ -52,53 +52,60 @@ export function AwaitingCoupleBanner({ weddingId }: { weddingId: string }) {
   }
 
   return (
-    <Alert tone="info" title={t('weddingArea.awaiting.title')}>
-      {email?.email && email.sentAt ? (
-        <>
-          <p className="kore-planner-wedding__awaiting-text">
-            {t('weddingArea.awaiting.email', {
-              email: email.email,
-              date: sentDay({ at: email.sentAt, timezone: detail.data.timezone }),
-            })}
-          </p>
-          <div className="kore-planner-wedding__awaiting-actions">
-            <Button
-              type="button"
-              variant="secondary"
-              disabled={send.isPending}
-              onClick={() => resend(email.email ?? '')}
-            >
-              {t('myWeddings.detail.resend')}
-            </Button>
-            <Button type="button" variant="ghost" onClick={() => setInviting(true)}>
-              {t('myWeddings.detail.inviteAnother')}
-            </Button>
-          </div>
-          <InviteAnotherDialog
-            open={inviting}
-            weddingId={weddingId}
-            previousEmail={email.email}
-            onClose={() => setInviting(false)}
-            onSent={refresh}
-          />
-        </>
-      ) : (
-        link && (
+    <div className="kore-planner-wedding__awaiting">
+      <Alert tone="info" title={t('weddingArea.awaiting.title')}>
+        {email?.email && email.sentAt ? (
           <>
             <p className="kore-planner-wedding__awaiting-text">
-              {t('weddingArea.awaiting.link', {
-                date: sentDay({ at: link.expiresAt, timezone: detail.data.timezone }),
+              {t('weddingArea.awaiting.email', {
+                email: email.email,
+                date: sentDay({ at: email.sentAt, timezone: detail.data.timezone }),
               })}
             </p>
-            <Link
-              className="kore-planner-wedding__awaiting-link"
-              to={`${paths.plannerArea}?casamento=${encodeURIComponent(weddingId)}`}
-            >
-              {t('weddingArea.awaiting.seeLink')}
-            </Link>
+            <div className="kore-planner-wedding__awaiting-actions">
+              <Button
+                type="button"
+                variant="secondary"
+                disabled={send.isPending}
+                onClick={() => resend(email.email ?? '')}
+              >
+                {t('myWeddings.detail.resend')}
+              </Button>
+              {/* Penpot 17: o segundo, como link sublinhado ao lado do Reenviar. */}
+              <button
+                type="button"
+                className="kore-planner-wedding__awaiting-link"
+                onClick={() => setInviting(true)}
+              >
+                {t('myWeddings.detail.inviteAnother')}
+              </button>
+            </div>
+            <InviteAnotherDialog
+              open={inviting}
+              weddingId={weddingId}
+              previousEmail={email.email}
+              onClose={() => setInviting(false)}
+              onSent={refresh}
+            />
           </>
-        )
-      )}
-    </Alert>
+        ) : (
+          link && (
+            <>
+              <p className="kore-planner-wedding__awaiting-text">
+                {t('weddingArea.awaiting.link', {
+                  date: sentDay({ at: link.expiresAt, timezone: detail.data.timezone }),
+                })}
+              </p>
+              <Link
+                className="kore-planner-wedding__awaiting-link"
+                to={`${paths.plannerArea}?casamento=${encodeURIComponent(weddingId)}`}
+              >
+                {t('weddingArea.awaiting.seeLink')}
+              </Link>
+            </>
+          )
+        )}
+      </Alert>
+    </div>
   );
 }

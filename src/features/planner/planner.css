@@ -250,9 +250,17 @@
   @apply type-caption m-0;
 }
 
+.kore-planner-wedding__awaiting {
+  @apply mb-4 md:mb-6;
+}
+
 .kore-planner-wedding__banner-link,
 .kore-planner-wedding__awaiting-link {
   @apply type-body-md inline-flex min-h-11 items-center text-primary underline;
+}
+
+button.kore-planner-wedding__awaiting-link {
+  @apply cursor-pointer border-0 bg-transparent p-0;
 }
 
 .kore-planner-wedding__awaiting-text {
