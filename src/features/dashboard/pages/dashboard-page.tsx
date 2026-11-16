@@ -27,7 +27,7 @@ import {
   rateDetail,
 } from '../dashboard-texts';
 import { guestsByRespondedAt } from '../../guests/hooks/use-party-filters';
-import { useAreaPaths, type AreaPaths } from '../../../app/area';
+import { useArea, useAreaPaths, type AreaPaths } from '../../../app/area';
 import { formatRsvpPercent } from '../../../shared/rsvp-percent';
 
 /** O caminho de cada item do Checklist (RN03), na área da tela. */
@@ -68,6 +68,7 @@ export function DashboardPage() {
 
 function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audience }) {
   const area = useAreaPaths();
+  const { kind } = useArea();
   const { t } = useTranslation('dashboard');
   const navigate = useNavigate();
   const { data: me } = useMeControllerMeV1();
@@ -141,7 +142,10 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
   return (
     <div className="kore-dashboard">
       {header}
-      {data.role === 'collaborator' && <Alert tone="info">{t('header.collaborator')}</Alert>}
+      {/* Na área da colaboradora, a faixa da moldura já diz isso em toda tela (D5a). */}
+      {data.role === 'collaborator' && kind !== 'planner' && (
+        <Alert tone="info">{t('header.collaborator')}</Alert>
+      )}
       <div className="kore-dashboard__grid">
         {empty ? (
           <EmptyState

@@ -118,6 +118,40 @@ describe('a moldura da colaboradora dentro do casamento (Colaboradora RN01 a RN0
     await expectNoA11yViolations({ container });
   });
 
+  it('o Dashboard dentro do casamento: a frase da colaboradora só na faixa, sem repetir', async () => {
+    api({
+      handler: ({ path }) =>
+        path === '/v1/weddings/w2/dashboard'
+          ? Response.json({
+              role: 'collaborator',
+              stats: {
+                guestsTotal: 0,
+                confirmed: 0,
+                declined: 0,
+                pending: 0,
+                adultsConfirmed: 0,
+                childrenConfirmed: 0,
+                babiesConfirmed: 0,
+                partiesPending: 0,
+                rsvpPercent: 0,
+                partiesTotal: 0,
+              },
+              delivery: { notSent: 0, sent: 0, viewed: 0, responded: 0 },
+              reminderQueue: { parties: 0, guests: 0, notReminded: 0 },
+              site: { slug: 'ana-e-marcos', publishedAt: null, endDate: null, status: 'draft' },
+              rsvpDeadline: null,
+              eventDate: null,
+              daysUntilEvent: null,
+              checklist: [],
+              activity: [],
+            })
+          : undefined,
+    });
+    renderRoute({ url: '/cerimonialista/casamentos/w2' });
+    expect(await screen.findByText('Este casamento ainda não tem convidados.')).toBeInTheDocument();
+    expect(screen.getAllByText('Você colabora neste casamento.')).toHaveLength(1);
+  });
+
   it('o seletor: só os casamentos em que colabora, o "Atual", a busca e a troca (RN02, RN06)', async () => {
     const user = userEvent.setup();
     api();
