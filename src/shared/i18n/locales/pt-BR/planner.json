@@ -199,5 +199,23 @@
         "hasOwner": "O casal acabou de aceitar o convite, então o casamento não pode mais ser excluído. Se quiser, saia deste casamento."
       }
     }
+  },
+  "weddingArea": {
+    "banner": "Você colabora neste casamento.",
+    "bannerDescription": "Você monta o site e cuida da lista. Publicar, pagar e a chave Pix são do casal.",
+    "backToWeddings": "Voltar a Meus casamentos",
+    "switcher": {
+      "label": "Trocar de casamento",
+      "search": "Buscar casal",
+      "current": "Atual",
+      "noResults": "Nenhum casamento com esse nome.",
+      "noDate": "Data a definir"
+    },
+    "awaiting": {
+      "title": "Aguardando o casal aceitar o convite.",
+      "email": "Enviamos o convite para {{email}} em {{date}}.",
+      "link": "O convite foi por link e vale até {{date}}.",
+      "seeLink": "Ver o link para o casal"
+    }
   }
 }

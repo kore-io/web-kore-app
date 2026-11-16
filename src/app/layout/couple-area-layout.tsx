@@ -1,7 +1,5 @@
-import { NavItem } from '@kore-io/design';
-import { Globe, LayoutDashboard, Music, Send, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Link, Outlet, useMatch, useNavigate } from 'react-router';
+import { Outlet, useNavigate } from 'react-router';
 import { useCoupleSession } from '../../features/access/hooks/use-couple-session';
 import { useSignOut } from '../../features/access/hooks/use-sign-out';
 import { useActiveWedding } from '../../features/guests/hooks/use-active-wedding';
@@ -13,6 +11,7 @@ import { LoadError } from '../../shared/components/load-error';
 import { areaPaths, COUPLE_AREA } from '../area';
 import { AppShell } from './app-shell';
 import { SiteStatusBadge } from './site-status-badge';
+import { WeddingNavigation } from './wedding-navigation';
 
 /**
  * Área do casal (/app) com a sessão do GET /v1/me (decisão 163): a Topbar com os nomes do
@@ -27,10 +26,6 @@ export function CoupleAreaLayout() {
   const { t } = useTranslation('layout');
   const { me, failed, retry } = useCoupleSession();
   const signOut = useSignOut();
-  const onGuests = useMatch({ path: AREA.guests, end: false }) !== null;
-  const onSite = useMatch({ path: AREA.site, end: false }) !== null;
-  const onDeliveries = useMatch({ path: AREA.deliveries, end: false }) !== null;
-  const onSongs = useMatch({ path: AREA.songs, end: false }) !== null;
   // Músicas só com a pergunta de música ligada (Música RN03), pelo mesmo GET do Editor.
   const { weddingId, role } = useActiveWedding();
   const navigate = useNavigate();
@@ -54,8 +49,6 @@ export function CoupleAreaLayout() {
   const songsEnabled = songQuestion?.enabled === true;
   // O selo de status do site na Topbar (Dashboard RN07; decisão 239(B3)).
   const siteStatusValue = (site.data as { status?: unknown } | undefined)?.status;
-  // O Dashboard só em /app: telas sem item na Sidebar (ex.: Publicar o site) não marcam nada.
-  const onDashboard = useMatch({ path: AREA.dashboard, end: true }) !== null;
 
   // Sem os dados da pessoa, sem o AppShell: o aviso no meio da tela (decisão 164).
   if (failed) return <LoadError onRetry={retry} />;
@@ -115,27 +108,7 @@ export function CoupleAreaLayout() {
         unread: owner ? (unread.data?.unreadCount ?? 0) : 0,
         onOpen: () => void navigate(AREA.notifications),
       }}
-      navigation={
-        <>
-          <NavItem asChild icon={<LayoutDashboard />} current={onDashboard}>
-            <Link to={AREA.dashboard}>{t('nav.dashboard')}</Link>
-          </NavItem>
-          <NavItem asChild icon={<Users />} current={onGuests}>
-            <Link to={AREA.guests}>{t('nav.guests')}</Link>
-          </NavItem>
-          <NavItem asChild icon={<Send />} current={onDeliveries}>
-            <Link to={AREA.deliveries}>{t('nav.deliveries')}</Link>
-          </NavItem>
-          <NavItem asChild icon={<Globe />} current={onSite}>
-            <Link to={AREA.site}>{t('nav.site')}</Link>
-          </NavItem>
-          {songsEnabled && (
-            <NavItem asChild icon={<Music />} current={onSongs}>
-              <Link to={AREA.songs}>{t('nav.songs')}</Link>
-            </NavItem>
-          )}
-        </>
-      }
+      navigation={<WeddingNavigation area={AREA} songsEnabled={songsEnabled} />}
     >
       <Outlet />
     </AppShell>

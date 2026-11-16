@@ -263,7 +263,7 @@ function DetailContent({
             <dd>
               {t('myWeddings.detail.invitationSent', {
                 email: email.email,
-                date: sentDay({ at: email.sentAt }),
+                date: sentDay({ at: email.sentAt, timezone: detail.timezone }),
               })}
             </dd>
           </div>
@@ -429,7 +429,7 @@ function DetailContent({
 }
 
 /** Convidar outro e-mail (Voz): o convite anterior deixa de funcionar. */
-function InviteAnotherDialog({
+export function InviteAnotherDialog({
   open,
   weddingId,
   previousEmail,

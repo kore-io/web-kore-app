@@ -13,4 +13,5 @@ export const AdminWeddingsControllerDetailV1Tab = {
   numbers: 'numbers',
   guests: 'guests',
   log: 'log',
+  billing: 'billing',
 } as const;

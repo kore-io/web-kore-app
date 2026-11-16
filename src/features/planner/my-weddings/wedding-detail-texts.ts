@@ -2,8 +2,6 @@ import type {
   CoupleInvitationResponse,
   MyWeddingDetailResponse,
 } from '../../../shared/api/generated/model';
-import { DEFAULT_TIMEZONE } from '../../../shared/date-texts';
-
 const LONG = new Intl.DateTimeFormat('pt-BR', {
   weekday: 'short',
   day: 'numeric',
@@ -17,12 +15,12 @@ export function longWeddingDate({ date }: { date: string }): string {
   return LONG.format(new Date(`${date.slice(0, 10)}T12:00:00Z`));
 }
 
-/** "20/09": o dia do envio do convite, no fuso de São Paulo (o detalhe não traz o fuso). */
-export function sentDay({ at }: { at: string }): string {
+/** "20/09": o dia do envio do convite, no fuso do casamento (decisão 263(2)). */
+export function sentDay({ at, timezone }: { at: string; timezone: string }): string {
   return new Intl.DateTimeFormat('pt-BR', {
     day: '2-digit',
     month: '2-digit',
-    timeZone: DEFAULT_TIMEZONE,
+    timeZone: timezone,
   }).format(new Date(at));
 }
 
