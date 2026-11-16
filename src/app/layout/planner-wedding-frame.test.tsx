@@ -154,10 +154,35 @@ describe('a moldura da colaboradora dentro do casamento (Colaboradora RN01 a RN0
     expect(button).toHaveFocus();
   });
 
-  it('o casamento de que ela é dona abre na Área do Casal (RN01)', async () => {
-    api();
+  it('o casamento de que ela é dona: o perfil ativo vira casal e abre /app, sem a Seleção (RN01; decisão 268)', async () => {
+    const switches: unknown[] = [];
+    let active = 'planner';
+    mockApi(({ method, path, body }) => {
+      if (path === '/v1/me') return Response.json(me({ activeProfile: active }));
+      if (method === 'POST' && path === '/v1/me/active-profile') {
+        switches.push(body);
+        active = 'couple';
+        return Response.json({ home: '/app' });
+      }
+      return apiError({ status: 404, body: { error: 'NOT_FOUND' } });
+    });
     const { router } = renderRoute({ url: '/cerimonialista/casamentos/w1' });
-    await waitFor(() => expect(router.state.location.pathname).not.toMatch(/^\/cerimonialista/));
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app'));
+    expect(switches).toEqual([{ profile: 'couple' }]);
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(router.state.location.pathname).toBe('/app');
+  });
+
+  it('a dona com o perfil de casal já ativo abre /app sem trocar de perfil (RN01)', async () => {
+    const posts: string[] = [];
+    mockApi(({ method, path }) => {
+      if (method === 'POST') posts.push(path);
+      if (path === '/v1/me') return Response.json(me({ activeProfile: 'couple' }));
+      return apiError({ status: 404, body: { error: 'NOT_FOUND' } });
+    });
+    const { router } = renderRoute({ url: '/cerimonialista/casamentos/w1' });
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app'));
+    expect(posts).toEqual([]);
   });
 
   it('sem vínculo: volta a Meus casamentos com o aviso (RN07)', async () => {

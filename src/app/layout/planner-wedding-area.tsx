@@ -8,6 +8,7 @@ import { usePlannerSession } from '../../features/planner/hooks/use-planner-sess
 import { AwaitingCoupleBanner } from '../../features/planner/layout/awaiting-couple-banner';
 import { usePlannerShell } from '../../features/planner/layout/use-planner-shell';
 import { WeddingSwitcher } from '../../features/planner/layout/wedding-switcher';
+import { useSetActiveProfile } from '../../features/access/api/me-active-profile';
 import { getMeControllerMeV1QueryKey } from '../../shared/api/generated/me/me';
 import { useSiteControllerGetV1 } from '../../shared/api/generated/site/site';
 import { ApiError, apiErrorCode } from '../../shared/api/http-client';
@@ -52,6 +53,8 @@ export function PlannerWeddingArea() {
     query: { enabled: membership?.role === 'collaborator' },
   });
   const leaving = useRef(false);
+  const setActiveProfile = useSetActiveProfile();
+  const switching = useRef(false);
 
   // A perda de acesso, um texto só (RN07): a próxima leitura ou gravação recebe o 404.
   useEffect(() => {
@@ -90,15 +93,29 @@ export function PlannerWeddingArea() {
   // Sem vínculo no /me: o casamento não está disponível; o de dona abre na Área do Casal.
   const missing = me !== undefined && !membership;
   const owner = membership?.role === 'owner';
+  const activeProfile = me?.activeProfile;
   useEffect(() => {
     if (owner) {
-      void navigate(paths.coupleArea, { replace: true });
+      // A dona abre em /app sem a Seleção de perfil (decisão 268; Colaboradora RN01): o perfil
+      // ativo passa a casal, que só guia a navegação (o gate é pelo perfil que a conta tem).
+      if (activeProfile === 'couple') {
+        void navigate(paths.coupleArea, { replace: true });
+        return;
+      }
+      if (switching.current) return;
+      switching.current = true;
+      const open = () => {
+        void queryClient.resetQueries({ queryKey: getMeControllerMeV1QueryKey() });
+        void navigate(paths.coupleArea, { replace: true });
+      };
+      // Se a troca falhar, o /app leva à Seleção de perfil, que já mostra os dois perfis.
+      setActiveProfile.mutate({ data: { profile: 'couple' } }, { onSettled: open });
     } else if (missing && !leaving.current) {
       leaving.current = true;
       showToast({ tone: 'danger', message: t('myWeddings.detail.unavailable') });
       void navigate(paths.plannerArea, { replace: true });
     }
-  }, [owner, missing, navigate, showToast, t]);
+  }, [owner, activeProfile, missing, navigate, showToast, t, queryClient, setActiveProfile]);
 
   if (failed) return <LoadError onRetry={retry} />;
   if (!me || !membership || membership.role !== 'collaborator') return null;
