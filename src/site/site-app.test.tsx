@@ -1,7 +1,7 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { StrictMode } from 'react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../tests/a11y';
 import { apiError, mockApi } from '../../tests/render-route';
 import type { PublicSiteResponse } from '../shared/api/generated/model';
@@ -130,6 +130,12 @@ describe('Site do casal › endereço e estados (Site público RN01, RN04, RN12)
 
 describe('Site do casal › layout (Site público RN10, RN11)', () => {
   it('a Topbar com os nomes, o menu pelo título das seções (sem a contagem) e o Hero', async () => {
+    // O relógio fixo antes do casamento: com o de verdade, a contagem some depois de 14/11/2026.
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-11-12T15:00:00Z'));
+    onTestFinished(() => {
+      vi.useRealTimers();
+    });
     mockSite(() => Response.json(site));
     render(<SiteApp pathname="/ana-e-marcos" />);
     const menu = await screen.findByRole('navigation', { name: 'Menu principal' });
@@ -149,7 +155,7 @@ describe('Site do casal › layout (Site público RN10, RN11)', () => {
     );
     expect(screen.getByText('Vamos nos casar')).toBeInTheDocument();
     expect(screen.getByText('sábado, 14 de novembro de 2026 · Campinas (SP)')).toBeInTheDocument();
-    expect(screen.getByText(/^(Faltam \d+ dias|Falta 1 dia|É hoje)$/)).toBeInTheDocument();
+    expect(screen.getByText('Faltam 2 dias')).toBeInTheDocument();
   });
 
   // A contagem conta no fuso do casamento (Seções RN06), com o relógio fixo.
