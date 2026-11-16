@@ -6,6 +6,7 @@ import { apiError, mockApi, renderRoute } from '../../../tests/render-route';
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 
 const lifecycle = (status: string) => ({
@@ -156,7 +157,7 @@ describe('a moldura da colaboradora dentro do casamento (Colaboradora RN01 a RN0
     const user = userEvent.setup();
     api();
     const { router } = renderRoute({ url: '/cerimonialista/casamentos/w2/convidados' });
-    const button = await screen.findByRole('button', { name: 'Trocar de casamento' });
+    const button = await screen.findByRole('button', { name: /Trocar de casamento/ });
     expect(button).toHaveTextContent('Ana & Marcos');
     expect(button).toHaveAttribute('aria-expanded', 'false');
     await user.click(button);
@@ -177,11 +178,57 @@ describe('a moldura da colaboradora dentro do casamento (Colaboradora RN01 a RN0
     );
   });
 
+  it('o nome do botão tem o casal e o "Trocar de casamento" (A11)', async () => {
+    api();
+    renderRoute({ url: '/cerimonialista/casamentos/w2' });
+    expect(
+      await screen.findByRole('button', { name: 'Ana & Marcos Trocar de casamento' }),
+    ).toBeInTheDocument();
+  });
+
+  it.each([390, 360])(
+    'o painel do seletor cabe na tela de %i px, com 16 px de margem (DoD responsivo)',
+    async (viewportWidth) => {
+      const user = userEvent.setup();
+      vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(viewportWidth);
+      api();
+      renderRoute({ url: '/cerimonialista/casamentos/w2' });
+      const button = await screen.findByRole('button', { name: /Trocar de casamento/ });
+      // O botão começa em x=68 no celular (depois do menu), como na sonda do Crivo.
+      vi.spyOn(button, 'getBoundingClientRect').mockReturnValue(
+        DOMRect.fromRect({ x: 68, y: 12, width: 160, height: 44 }),
+      );
+      await user.click(button);
+      const panel = screen
+        .getByRole('searchbox', { name: 'Buscar casal' })
+        .closest('.kore-wedding-switcher__panel') as HTMLElement;
+      const left = parseFloat(panel.style.left);
+      const width = parseFloat(panel.style.width);
+      expect(left).toBeGreaterThanOrEqual(16);
+      expect(left + width).toBeLessThanOrEqual(viewportWidth - 16);
+      expect(width).toBe(Math.min(360, viewportWidth - 32));
+    },
+  );
+
+  it('sair do painel com o Tab fecha o seletor', async () => {
+    const user = userEvent.setup();
+    api();
+    renderRoute({ url: '/cerimonialista/casamentos/w2' });
+    const button = await screen.findByRole('button', { name: /Trocar de casamento/ });
+    await user.click(button);
+    expect(screen.getByRole('searchbox', { name: 'Buscar casal' })).toHaveFocus();
+    // A busca, os dois casamentos e, depois, para fora do painel (o foco sai da página).
+    await user.tab();
+    await user.tab();
+    await user.tab();
+    await waitFor(() => expect(button).toHaveAttribute('aria-expanded', 'false'));
+  });
+
   it('o Esc fecha o seletor e devolve o foco ao botão', async () => {
     const user = userEvent.setup();
     api();
     renderRoute({ url: '/cerimonialista/casamentos/w2' });
-    const button = await screen.findByRole('button', { name: 'Trocar de casamento' });
+    const button = await screen.findByRole('button', { name: /Trocar de casamento/ });
     await user.click(button);
     await user.keyboard('{Escape}');
     expect(button).toHaveAttribute('aria-expanded', 'false');

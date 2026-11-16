@@ -97,7 +97,7 @@ test.describe('A colaboradora dentro do casamento (/cerimonialista/casamentos/{i
       ),
     ).toBeVisible();
 
-    const switcher = page.getByRole('button', { name: 'Trocar de casamento' });
+    const switcher = page.getByRole('button', { name: /Trocar de casamento/ });
     await expect(switcher).toHaveAttribute('aria-expanded', 'false');
     await switcher.click();
     await expect(switcher).toHaveAttribute('aria-expanded', 'true');

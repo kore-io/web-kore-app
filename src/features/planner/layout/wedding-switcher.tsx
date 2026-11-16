@@ -29,6 +29,23 @@ function coupleOf({ weddingName }: { weddingName: string }): string {
  * a busca "Buscar casal", o atual com o selo "Atual" e `aria-current`, e o vazio "Nenhum
  * casamento com esse nome.". Escolher um abre o Dashboard dele.
  */
+/** A largura do painel no Penpot 17. */
+const PANEL_WIDTH = 360;
+const MARGIN = 16;
+
+/** Sob o botão, sem passar da tela: a largura e a esquerda limitadas pela janela. */
+export function panelPosition({
+  rect,
+  viewportWidth = window.innerWidth,
+}: {
+  rect: Pick<DOMRect, 'left' | 'bottom'>;
+  viewportWidth?: number;
+}) {
+  const width = Math.min(PANEL_WIDTH, viewportWidth - 2 * MARGIN);
+  const left = Math.min(Math.max(MARGIN, rect.left), viewportWidth - MARGIN - width);
+  return { top: rect.bottom + 8, left, width };
+}
+
 export function WeddingSwitcher({
   weddingId,
   title,
@@ -46,12 +63,21 @@ export function WeddingSwitcher({
   const rootRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
-  // O título da Topbar corta o que transborda: o painel sai por portal, sob o botão.
-  const [position, setPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  const pointerInPanel = useRef(false);
+  const titleId = useId();
+  const labelId = useId();
+  // O título da Topbar corta o que transborda: o painel sai por portal, sob o botão, e cabe
+  // na tela (16 px de margem dos dois lados, mesmo em 360 px).
+  const [position, setPosition] = useState(() => ({ top: 0, left: 0, width: PANEL_WIDTH }));
   useLayoutEffect(() => {
-    if (!open || !buttonRef.current) return;
-    const rect = buttonRef.current.getBoundingClientRect();
-    setPosition({ top: rect.bottom + 8, left: Math.max(16, rect.left) });
+    if (!open) return;
+    function place() {
+      if (!buttonRef.current) return;
+      setPosition(panelPosition({ rect: buttonRef.current.getBoundingClientRect() }));
+    }
+    place();
+    window.addEventListener('resize', place);
+    return () => window.removeEventListener('resize', place);
   }, [open]);
 
   const weddings = memberships
@@ -90,12 +116,16 @@ export function WeddingSwitcher({
         ref={buttonRef}
         type="button"
         className="kore-wedding-switcher__button"
-        aria-label={t('weddingArea.switcher.label')}
+        // O nome do casal e o "Trocar de casamento" para o leitor de tela.
+        aria-labelledby={`${titleId} ${labelId}`}
         aria-expanded={open}
         {...(open && { 'aria-controls': panelId })}
         onClick={() => setOpen((current) => !current)}
       >
-        <span>{title}</span>
+        <span id={titleId}>{title}</span>
+        <span id={labelId} className="kore-wedding-switcher__label">
+          {t('weddingArea.switcher.label')}
+        </span>
         <Chevron aria-hidden="true" className="kore-wedding-switcher__chevron" />
       </button>
       {open &&
@@ -104,7 +134,23 @@ export function WeddingSwitcher({
             id={panelId}
             ref={panelRef}
             className="kore-wedding-switcher__panel"
-            style={{ top: position.top, left: position.left }}
+            style={{ top: position.top, left: position.left, width: position.width }}
+            // Um clique dentro do painel (fora da busca e dos links) não conta como saída.
+            onPointerDown={() => {
+              pointerInPanel.current = true;
+            }}
+            onPointerUp={() => {
+              pointerInPanel.current = false;
+            }}
+            // Sair do painel com o Tab fecha, também quando o foco sai da página.
+            onBlur={(event) => {
+              const next = event.relatedTarget as Node | null;
+              if (pointerInPanel.current) return;
+              if (next && (panelRef.current?.contains(next) || rootRef.current?.contains(next))) {
+                return;
+              }
+              setOpen(false);
+            }}
           >
             <Input
               id={searchId}
