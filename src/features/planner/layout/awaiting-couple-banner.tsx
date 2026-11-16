@@ -58,7 +58,7 @@ export function AwaitingCoupleBanner({ weddingId }: { weddingId: string }) {
           <p className="kore-planner-wedding__awaiting-text">
             {t('weddingArea.awaiting.email', {
               email: email.email,
-              date: sentDay({ at: email.sentAt }),
+              date: sentDay({ at: email.sentAt, timezone: detail.data.timezone }),
             })}
           </p>
           <div className="kore-planner-wedding__awaiting-actions">
@@ -86,7 +86,9 @@ export function AwaitingCoupleBanner({ weddingId }: { weddingId: string }) {
         link && (
           <>
             <p className="kore-planner-wedding__awaiting-text">
-              {t('weddingArea.awaiting.link', { date: sentDay({ at: link.expiresAt }) })}
+              {t('weddingArea.awaiting.link', {
+                date: sentDay({ at: link.expiresAt, timezone: detail.data.timezone }),
+              })}
             </p>
             <Link
               className="kore-planner-wedding__awaiting-link"

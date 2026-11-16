@@ -92,6 +92,7 @@ function api({
         hasOwner: true,
         canEditIdentity: false,
         myMembershipId: 'm1',
+        timezone: 'America/Sao_Paulo',
       });
     }
     if (path === '/v1/me/planner') {

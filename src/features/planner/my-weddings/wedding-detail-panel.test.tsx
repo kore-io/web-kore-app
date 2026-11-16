@@ -62,6 +62,7 @@ const published = {
   createdByMe: false,
   awaitingPayment: false,
   myMembershipId: 'm1',
+  timezone: 'America/Sao_Paulo',
 };
 
 const awaiting = (invitations: object[], overrides: Record<string, unknown> = {}) => ({
@@ -193,12 +194,17 @@ describe('Detalhe do casamento (Meus casamentos RN08 a RN11; decisão 260)', () 
 
   it('aguardando, por e-mail: o convite, o aviso, Reenviar com o Toast e os dados básicos (RN08, RN09)', async () => {
     const user = userEvent.setup();
-    const writes = api({ detail: awaiting([emailInvitation]) });
+    // 03h30 UTC de 20/09: ainda 19/09 em Manaus, o fuso do casamento (decisão 263(2)).
+    const writes = api({
+      detail: awaiting([{ ...emailInvitation, sentAt: '2026-09-20T03:30:00Z' }], {
+        timezone: 'America/Manaus',
+      }),
+    });
     renderRoute({ url: URL });
     const dialog = await screen.findByRole('dialog', { name: 'Fernanda e João' });
     expect(
       within(dialog).getByText(
-        'Enviado para fernanda.alves@gmail.com em 20/09, ainda sem resposta',
+        'Enviado para fernanda.alves@gmail.com em 19/09, ainda sem resposta',
       ),
     ).toBeInTheDocument();
     expect(within(dialog).getByText('O casal ainda não aceitou o convite.')).toBeInTheDocument();

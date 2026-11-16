@@ -74,6 +74,8 @@ const detail = (invitations: object[]) => ({
   createdByMe: true,
   awaitingPayment: false,
   myMembershipId: 'm3',
+  // Manaus, para o "Enviado em" no fuso do casamento (decisão 263(2)).
+  timezone: 'America/Manaus',
 });
 
 /** O /me e o resto com 404 comum (as telas mostram os avisos delas). */
@@ -194,7 +196,7 @@ describe('a moldura da colaboradora dentro do casamento (Colaboradora RN01 a RN0
                 id: 'i1',
                 type: 'email',
                 email: 'fernanda.alves@gmail.com',
-                sentAt: '2026-09-20T15:00:00Z',
+                sentAt: '2026-09-20T03:30:00Z',
                 expiresAt: '2026-10-20T15:00:00Z',
               },
             ]),
@@ -207,7 +209,7 @@ describe('a moldura da colaboradora dentro do casamento (Colaboradora RN01 a RN0
     renderRoute({ url: '/cerimonialista/casamentos/w3' });
     expect(await screen.findByText('Aguardando o casal aceitar o convite.')).toBeInTheDocument();
     expect(
-      screen.getByText('Enviamos o convite para fernanda.alves@gmail.com em 20/09.'),
+      screen.getByText('Enviamos o convite para fernanda.alves@gmail.com em 19/09.'),
     ).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Reenviar convite' }));
     expect(

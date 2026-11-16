@@ -263,7 +263,7 @@ function DetailContent({
             <dd>
               {t('myWeddings.detail.invitationSent', {
                 email: email.email,
-                date: sentDay({ at: email.sentAt }),
+                date: sentDay({ at: email.sentAt, timezone: detail.timezone }),
               })}
             </dd>
           </div>
