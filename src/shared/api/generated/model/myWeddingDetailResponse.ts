@@ -22,6 +22,8 @@ export interface MyWeddingDetailResponse {
   stats: MyWeddingStatsResponse;
   /** O vínculo ativo de quem lê (decisão 261(1)). */
   myMembershipId: string;
+  /** O fuso IANA do casamento, para o "Enviado em" (decisão 263). */
+  timezone: string;
   /** Só quando ela criou o casamento. */
   coupleInvitations: CoupleInvitationResponse[];
   hasOwner: boolean;

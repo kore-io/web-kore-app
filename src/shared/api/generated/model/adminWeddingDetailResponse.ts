@@ -4,6 +4,7 @@
  * Kore API
  * OpenAPI spec version: 1
  */
+import type { AdminWeddingBillingResponse } from './adminWeddingBillingResponse';
 import type { AdminWeddingDetailResponseTab } from './adminWeddingDetailResponseTab';
 import type { AdminWeddingGeneralResponse } from './adminWeddingGeneralResponse';
 import type { AdminWeddingGuestsResponse } from './adminWeddingGuestsResponse';
@@ -16,4 +17,6 @@ export interface AdminWeddingDetailResponse {
   numbers?: AdminWeddingNumbersResponse;
   guests?: AdminWeddingGuestsResponse;
   log?: AdminWeddingLogResponse;
+  /** A aba Cobrança (só o Admin; Backoffice - cobrança RN02). */
+  billing?: AdminWeddingBillingResponse;
 }

@@ -26,6 +26,8 @@ import type {
   AccessEmailLockedErrorBody,
   AccessEmailUnlockedResponse,
   ActionNotAllowedErrorBody,
+  AdjustmentBody,
+  AdjustmentResponse,
   AdminAlertResolvedResponse,
   AdminAlertsResponse,
   AdminBlockStateResponse,
@@ -34,7 +36,16 @@ import type {
   AdminInsightsControllerSearchV1Params,
   AdminLogsResponse,
   AdminOverviewResponse,
+  AdminPaymentActionResponse,
+  AdminPaymentDetailResponse,
+  AdminPaymentsControllerExportV1Params,
+  AdminPaymentsControllerListV1Params,
+  AdminPaymentsResponse,
+  AdminPayoutsControllerListV1Params,
+  AdminPayoutsResponse,
   AdminReasonBody,
+  AdminRefundBody,
+  AdminRefundResponse,
   AdminSearchResponse,
   AdminWeddingDetailResponse,
   AdminWeddingsControllerDetailV1Params,
@@ -47,25 +58,64 @@ import type {
   ChangeAccessEmailBody,
   ChecksFailedErrorBody,
   ChecksRequiredErrorBody,
+  CommissionBlockResponse,
+  CommissionNotBlockableErrorBody,
+  CommissionNotFoundErrorBody,
+  CommissionUnblockResponse,
+  CorrectTaxIdBody,
+  CorrectTaxIdResponse,
+  CourtesyBody,
+  CourtesyResponse,
   EmailInUseErrorBody,
+  EndDateOutOfRangeErrorBody,
   EraseGuestBody,
   GuestErasedResponse,
   GuestNotFoundErrorBody,
+  IdempotencyKeyRequiredErrorBody,
+  ManualRefundBody,
   NoOwnerErrorBody,
   NotBlockedErrorBody,
   NotLockedErrorBody,
+  NotPublishedErrorBody,
   OriginNotAllowedErrorBody,
+  PaymentDisputedErrorBody,
+  PaymentNotFoundErrorBody,
+  PaymentNotMismatchedErrorBody,
+  PaymentNotPaidErrorBody,
+  PayoutActionResponse,
+  PayoutAmountMismatchErrorBody,
+  PayoutBelowMinimumAdminErrorBody,
+  PayoutHeldErrorBody,
+  PayoutNotFoundErrorBody,
+  PayoutNotRequestedErrorBody,
+  PayoutPixKeyChangePendingErrorBody,
+  PayoutStatusConflictErrorBody,
+  PayoutsDisabledAdminErrorBody,
   RateLimitedErrorBody,
   ReassignPaymentPendingErrorBody,
   ReassignReferrerBody,
   ReassignReferrerResponse,
+  ReauthRequiredErrorBody,
+  ReferrerBlockResponse,
+  ReferrerBlockedErrorBody,
   ReferrerNotActiveErrorBody,
+  ReferrerNotFoundErrorBody,
+  ReferrerUnblockResponse,
+  RefundAlreadyRequestedErrorBody,
+  RefundNotFailedErrorBody,
+  RefundNotLastExtensionErrorBody,
+  RefundNotRequestedErrorBody,
+  RefundReceiptMissingErrorBody,
+  RefundReceiptNotFoundErrorBody,
+  RefundReceiptUploadBody,
+  RefundReceiptUploadResponse,
   SelfReferralErrorBody,
   SessionExpiredErrorBody,
   StaffOnlyErrorBody,
   SupportSessionEndedResponse,
   SupportSessionNotFoundErrorBody,
   SupportSessionResponse,
+  TaxIdInUseErrorBody,
   UnlockTooSoonErrorBody,
   ValidationErrorBody,
   WeddingNotFoundErrorBody,
@@ -91,6 +141,3003 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   return result;
 };
 
+export const getAdminPaymentsControllerListV1Url = (
+  params?: AdminPaymentsControllerListV1Params,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/v1/admin/payments?${stringifiedParams}`
+    : `/v1/admin/payments`;
+};
+
+export const adminPaymentsControllerListV1 = async (
+  params?: AdminPaymentsControllerListV1Params,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<AdminPaymentsResponse> => {
+  return httpClient<AdminPaymentsResponse>(getAdminPaymentsControllerListV1Url(params), {
+    ...options,
+    method: 'GET',
+  });
+};
+
+export const getAdminPaymentsControllerListV1QueryKey = (
+  params?: AdminPaymentsControllerListV1Params,
+) => {
+  return [`/v1/admin/payments`, ...(params ? [params] : [])] as const;
+};
+
+export const getAdminPaymentsControllerListV1QueryOptions = <
+  TData = Awaited<ReturnType<typeof adminPaymentsControllerListV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  params?: AdminPaymentsControllerListV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPaymentsControllerListV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getAdminPaymentsControllerListV1QueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminPaymentsControllerListV1>>> = ({
+    signal,
+  }) => adminPaymentsControllerListV1(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof adminPaymentsControllerListV1>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type AdminPaymentsControllerListV1QueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminPaymentsControllerListV1>>
+>;
+export type AdminPaymentsControllerListV1QueryError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | RateLimitedErrorBody
+>;
+
+export function useAdminPaymentsControllerListV1<
+  TData = Awaited<ReturnType<typeof adminPaymentsControllerListV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  params: undefined | AdminPaymentsControllerListV1Params,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPaymentsControllerListV1>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminPaymentsControllerListV1>>,
+          TError,
+          Awaited<ReturnType<typeof adminPaymentsControllerListV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAdminPaymentsControllerListV1<
+  TData = Awaited<ReturnType<typeof adminPaymentsControllerListV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  params?: AdminPaymentsControllerListV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPaymentsControllerListV1>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminPaymentsControllerListV1>>,
+          TError,
+          Awaited<ReturnType<typeof adminPaymentsControllerListV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAdminPaymentsControllerListV1<
+  TData = Awaited<ReturnType<typeof adminPaymentsControllerListV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  params?: AdminPaymentsControllerListV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPaymentsControllerListV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useAdminPaymentsControllerListV1<
+  TData = Awaited<ReturnType<typeof adminPaymentsControllerListV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  params?: AdminPaymentsControllerListV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPaymentsControllerListV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getAdminPaymentsControllerListV1QueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export const getAdminPaymentsControllerExportV1Url = (
+  params: AdminPaymentsControllerExportV1Params,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/v1/admin/payments/export?${stringifiedParams}`
+    : `/v1/admin/payments/export`;
+};
+
+/**
+ * @summary Exportar CSV (RN07): os pagamentos e os estornos do período, para a contabilidade.
+ */
+export const adminPaymentsControllerExportV1 = async (
+  params: AdminPaymentsControllerExportV1Params,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<Blob> => {
+  return httpClient<Blob>(getAdminPaymentsControllerExportV1Url(params), {
+    ...options,
+    method: 'GET',
+  });
+};
+
+export const getAdminPaymentsControllerExportV1QueryKey = (
+  params?: AdminPaymentsControllerExportV1Params,
+) => {
+  return [`/v1/admin/payments/export`, ...(params ? [params] : [])] as const;
+};
+
+export const getAdminPaymentsControllerExportV1QueryOptions = <
+  TData = Awaited<ReturnType<typeof adminPaymentsControllerExportV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  params: AdminPaymentsControllerExportV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPaymentsControllerExportV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getAdminPaymentsControllerExportV1QueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminPaymentsControllerExportV1>>> = ({
+    signal,
+  }) => adminPaymentsControllerExportV1(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof adminPaymentsControllerExportV1>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type AdminPaymentsControllerExportV1QueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminPaymentsControllerExportV1>>
+>;
+export type AdminPaymentsControllerExportV1QueryError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | RateLimitedErrorBody
+>;
+
+export function useAdminPaymentsControllerExportV1<
+  TData = Awaited<ReturnType<typeof adminPaymentsControllerExportV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  params: AdminPaymentsControllerExportV1Params,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPaymentsControllerExportV1>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminPaymentsControllerExportV1>>,
+          TError,
+          Awaited<ReturnType<typeof adminPaymentsControllerExportV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAdminPaymentsControllerExportV1<
+  TData = Awaited<ReturnType<typeof adminPaymentsControllerExportV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  params: AdminPaymentsControllerExportV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPaymentsControllerExportV1>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminPaymentsControllerExportV1>>,
+          TError,
+          Awaited<ReturnType<typeof adminPaymentsControllerExportV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAdminPaymentsControllerExportV1<
+  TData = Awaited<ReturnType<typeof adminPaymentsControllerExportV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  params: AdminPaymentsControllerExportV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPaymentsControllerExportV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Exportar CSV (RN07): os pagamentos e os estornos do período, para a contabilidade.
+ */
+
+export function useAdminPaymentsControllerExportV1<
+  TData = Awaited<ReturnType<typeof adminPaymentsControllerExportV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  params: AdminPaymentsControllerExportV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPaymentsControllerExportV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getAdminPaymentsControllerExportV1QueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export const getAdminPaymentsControllerDetailV1Url = (id: string) => {
+  return `/v1/admin/payments/${id}`;
+};
+
+export const adminPaymentsControllerDetailV1 = async (
+  id: string,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<AdminPaymentDetailResponse> => {
+  return httpClient<AdminPaymentDetailResponse>(getAdminPaymentsControllerDetailV1Url(id), {
+    ...options,
+    method: 'GET',
+  });
+};
+
+export const getAdminPaymentsControllerDetailV1QueryKey = (id: string) => {
+  return [`/v1/admin/payments/${id}`] as const;
+};
+
+export const getAdminPaymentsControllerDetailV1QueryOptions = <
+  TData = Awaited<ReturnType<typeof adminPaymentsControllerDetailV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PaymentNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPaymentsControllerDetailV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getAdminPaymentsControllerDetailV1QueryKey(id);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminPaymentsControllerDetailV1>>> = ({
+    signal,
+  }) => adminPaymentsControllerDetailV1(id, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: id !== null && id !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof adminPaymentsControllerDetailV1>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type AdminPaymentsControllerDetailV1QueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminPaymentsControllerDetailV1>>
+>;
+export type AdminPaymentsControllerDetailV1QueryError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | PaymentNotFoundErrorBody
+  | RateLimitedErrorBody
+>;
+
+export function useAdminPaymentsControllerDetailV1<
+  TData = Awaited<ReturnType<typeof adminPaymentsControllerDetailV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PaymentNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPaymentsControllerDetailV1>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminPaymentsControllerDetailV1>>,
+          TError,
+          Awaited<ReturnType<typeof adminPaymentsControllerDetailV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAdminPaymentsControllerDetailV1<
+  TData = Awaited<ReturnType<typeof adminPaymentsControllerDetailV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PaymentNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPaymentsControllerDetailV1>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminPaymentsControllerDetailV1>>,
+          TError,
+          Awaited<ReturnType<typeof adminPaymentsControllerDetailV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAdminPaymentsControllerDetailV1<
+  TData = Awaited<ReturnType<typeof adminPaymentsControllerDetailV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PaymentNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPaymentsControllerDetailV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useAdminPaymentsControllerDetailV1<
+  TData = Awaited<ReturnType<typeof adminPaymentsControllerDetailV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PaymentNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPaymentsControllerDetailV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getAdminPaymentsControllerDetailV1QueryOptions(id, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export const getAdminPaymentsControllerRefundPaymentV1Url = (id: string) => {
+  return `/v1/admin/payments/${id}/refund`;
+};
+
+/**
+ * @summary Reembolsar (RN05): integral, a qualquer momento; o estorno por job.
+ */
+export const adminPaymentsControllerRefundPaymentV1 = async (
+  id: string,
+  adminRefundBody: AdminRefundBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<AdminRefundResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<AdminRefundResponse>(getAdminPaymentsControllerRefundPaymentV1Url(id), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(adminRefundBody),
+  });
+};
+
+export const getAdminPaymentsControllerRefundPaymentV1MutationKey = () =>
+  ['adminPaymentsControllerRefundPaymentV1'] as const;
+
+export const getAdminPaymentsControllerRefundPaymentV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PaymentNotFoundErrorBody
+    | PaymentDisputedErrorBody
+    | RefundAlreadyRequestedErrorBody
+    | PaymentNotPaidErrorBody
+    | RefundNotLastExtensionErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminPaymentsControllerRefundPaymentV1>>,
+    TError,
+    AdminPaymentsControllerRefundPaymentV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminPaymentsControllerRefundPaymentV1>>,
+  TError,
+  AdminPaymentsControllerRefundPaymentV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getAdminPaymentsControllerRefundPaymentV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminPaymentsControllerRefundPaymentV1>>,
+    AdminPaymentsControllerRefundPaymentV1MutationVariables
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return adminPaymentsControllerRefundPaymentV1(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminPaymentsControllerRefundPaymentV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminPaymentsControllerRefundPaymentV1>>
+>;
+export type AdminPaymentsControllerRefundPaymentV1MutationBody = AdminRefundBody;
+export type AdminPaymentsControllerRefundPaymentV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | PaymentNotFoundErrorBody
+  | PaymentDisputedErrorBody
+  | RefundAlreadyRequestedErrorBody
+  | PaymentNotPaidErrorBody
+  | RefundNotLastExtensionErrorBody
+  | RateLimitedErrorBody
+>;
+export type AdminPaymentsControllerRefundPaymentV1MutationVariables = {
+  id: string;
+  data: AdminRefundBody;
+};
+
+/**
+ * @summary Reembolsar (RN05): integral, a qualquer momento; o estorno por job.
+ */
+export const useAdminPaymentsControllerRefundPaymentV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PaymentNotFoundErrorBody
+    | PaymentDisputedErrorBody
+    | RefundAlreadyRequestedErrorBody
+    | PaymentNotPaidErrorBody
+    | RefundNotLastExtensionErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof adminPaymentsControllerRefundPaymentV1>>,
+      TError,
+      AdminPaymentsControllerRefundPaymentV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof adminPaymentsControllerRefundPaymentV1>>,
+  TError,
+  AdminPaymentsControllerRefundPaymentV1MutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getAdminPaymentsControllerRefundPaymentV1MutationOptions(options),
+    queryClient,
+  );
+};
+export const getAdminPaymentsControllerApplyV1Url = (id: string) => {
+  return `/v1/admin/payments/${id}/apply`;
+};
+
+/**
+ * @summary Aplicar mesmo assim (RN11, o valor menor no gateway).
+ */
+export const adminPaymentsControllerApplyV1 = async (
+  id: string,
+  adminReasonBody: AdminReasonBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<AdminPaymentActionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<AdminPaymentActionResponse>(getAdminPaymentsControllerApplyV1Url(id), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(adminReasonBody),
+  });
+};
+
+export const getAdminPaymentsControllerApplyV1MutationKey = () =>
+  ['adminPaymentsControllerApplyV1'] as const;
+
+export const getAdminPaymentsControllerApplyV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PaymentNotFoundErrorBody
+    | PaymentNotMismatchedErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminPaymentsControllerApplyV1>>,
+    TError,
+    AdminPaymentsControllerApplyV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminPaymentsControllerApplyV1>>,
+  TError,
+  AdminPaymentsControllerApplyV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getAdminPaymentsControllerApplyV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminPaymentsControllerApplyV1>>,
+    AdminPaymentsControllerApplyV1MutationVariables
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return adminPaymentsControllerApplyV1(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminPaymentsControllerApplyV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminPaymentsControllerApplyV1>>
+>;
+export type AdminPaymentsControllerApplyV1MutationBody = AdminReasonBody;
+export type AdminPaymentsControllerApplyV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | PaymentNotFoundErrorBody
+  | PaymentNotMismatchedErrorBody
+  | RateLimitedErrorBody
+>;
+export type AdminPaymentsControllerApplyV1MutationVariables = { id: string; data: AdminReasonBody };
+
+/**
+ * @summary Aplicar mesmo assim (RN11, o valor menor no gateway).
+ */
+export const useAdminPaymentsControllerApplyV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PaymentNotFoundErrorBody
+    | PaymentNotMismatchedErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof adminPaymentsControllerApplyV1>>,
+      TError,
+      AdminPaymentsControllerApplyV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof adminPaymentsControllerApplyV1>>,
+  TError,
+  AdminPaymentsControllerApplyV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getAdminPaymentsControllerApplyV1MutationOptions(options), queryClient);
+};
+export const getAdminPaymentsControllerRetryRefundV1Url = (id: string) => {
+  return `/v1/admin/payments/${id}/refund/retry`;
+};
+
+/**
+ * @summary Tentar o estorno de novo (RN11, o estorno que falhou).
+ */
+export const adminPaymentsControllerRetryRefundV1 = async (
+  id: string,
+  adminReasonBody: AdminReasonBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<AdminPaymentActionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<AdminPaymentActionResponse>(getAdminPaymentsControllerRetryRefundV1Url(id), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(adminReasonBody),
+  });
+};
+
+export const getAdminPaymentsControllerRetryRefundV1MutationKey = () =>
+  ['adminPaymentsControllerRetryRefundV1'] as const;
+
+export const getAdminPaymentsControllerRetryRefundV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PaymentNotFoundErrorBody
+    | RefundNotFailedErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminPaymentsControllerRetryRefundV1>>,
+    TError,
+    AdminPaymentsControllerRetryRefundV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminPaymentsControllerRetryRefundV1>>,
+  TError,
+  AdminPaymentsControllerRetryRefundV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getAdminPaymentsControllerRetryRefundV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminPaymentsControllerRetryRefundV1>>,
+    AdminPaymentsControllerRetryRefundV1MutationVariables
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return adminPaymentsControllerRetryRefundV1(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminPaymentsControllerRetryRefundV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminPaymentsControllerRetryRefundV1>>
+>;
+export type AdminPaymentsControllerRetryRefundV1MutationBody = AdminReasonBody;
+export type AdminPaymentsControllerRetryRefundV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | PaymentNotFoundErrorBody
+  | RefundNotFailedErrorBody
+  | RateLimitedErrorBody
+>;
+export type AdminPaymentsControllerRetryRefundV1MutationVariables = {
+  id: string;
+  data: AdminReasonBody;
+};
+
+/**
+ * @summary Tentar o estorno de novo (RN11, o estorno que falhou).
+ */
+export const useAdminPaymentsControllerRetryRefundV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PaymentNotFoundErrorBody
+    | RefundNotFailedErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof adminPaymentsControllerRetryRefundV1>>,
+      TError,
+      AdminPaymentsControllerRetryRefundV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof adminPaymentsControllerRetryRefundV1>>,
+  TError,
+  AdminPaymentsControllerRetryRefundV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getAdminPaymentsControllerRetryRefundV1MutationOptions(options), queryClient);
+};
+export const getAdminPaymentsControllerManualRefundV1Url = (id: string) => {
+  return `/v1/admin/payments/${id}/refund/manual`;
+};
+
+/**
+ * @summary Registrar reembolso feito por fora (RN11): motivo e comprovante.
+ */
+export const adminPaymentsControllerManualRefundV1 = async (
+  id: string,
+  manualRefundBody: ManualRefundBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<AdminPaymentActionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<AdminPaymentActionResponse>(getAdminPaymentsControllerManualRefundV1Url(id), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(manualRefundBody),
+  });
+};
+
+export const getAdminPaymentsControllerManualRefundV1MutationKey = () =>
+  ['adminPaymentsControllerManualRefundV1'] as const;
+
+export const getAdminPaymentsControllerManualRefundV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PaymentNotFoundErrorBody
+    | RefundNotRequestedErrorBody
+    | RefundNotFailedErrorBody
+    | RefundReceiptMissingErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminPaymentsControllerManualRefundV1>>,
+    TError,
+    AdminPaymentsControllerManualRefundV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminPaymentsControllerManualRefundV1>>,
+  TError,
+  AdminPaymentsControllerManualRefundV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getAdminPaymentsControllerManualRefundV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminPaymentsControllerManualRefundV1>>,
+    AdminPaymentsControllerManualRefundV1MutationVariables
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return adminPaymentsControllerManualRefundV1(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminPaymentsControllerManualRefundV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminPaymentsControllerManualRefundV1>>
+>;
+export type AdminPaymentsControllerManualRefundV1MutationBody = ManualRefundBody;
+export type AdminPaymentsControllerManualRefundV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | PaymentNotFoundErrorBody
+  | RefundNotRequestedErrorBody
+  | RefundNotFailedErrorBody
+  | RefundReceiptMissingErrorBody
+  | RateLimitedErrorBody
+>;
+export type AdminPaymentsControllerManualRefundV1MutationVariables = {
+  id: string;
+  data: ManualRefundBody;
+};
+
+/**
+ * @summary Registrar reembolso feito por fora (RN11): motivo e comprovante.
+ */
+export const useAdminPaymentsControllerManualRefundV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PaymentNotFoundErrorBody
+    | RefundNotRequestedErrorBody
+    | RefundNotFailedErrorBody
+    | RefundReceiptMissingErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof adminPaymentsControllerManualRefundV1>>,
+      TError,
+      AdminPaymentsControllerManualRefundV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof adminPaymentsControllerManualRefundV1>>,
+  TError,
+  AdminPaymentsControllerManualRefundV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getAdminPaymentsControllerManualRefundV1MutationOptions(options), queryClient);
+};
+export const getAdminPaymentsControllerAuthorizeReceiptUploadV1Url = (id: string) => {
+  return `/v1/admin/payments/${id}/refund/receipt-upload`;
+};
+
+/**
+ * @summary O envio do comprovante do reembolso feito por fora (decisão 259(1)): a URL de PUT.
+ */
+export const adminPaymentsControllerAuthorizeReceiptUploadV1 = async (
+  id: string,
+  refundReceiptUploadBody: RefundReceiptUploadBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<RefundReceiptUploadResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<RefundReceiptUploadResponse>(
+    getAdminPaymentsControllerAuthorizeReceiptUploadV1Url(id),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+      body: JSON.stringify(refundReceiptUploadBody),
+    },
+  );
+};
+
+export const getAdminPaymentsControllerAuthorizeReceiptUploadV1MutationKey = () =>
+  ['adminPaymentsControllerAuthorizeReceiptUploadV1'] as const;
+
+export const getAdminPaymentsControllerAuthorizeReceiptUploadV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PaymentNotFoundErrorBody
+    | RefundNotRequestedErrorBody
+    | RefundNotFailedErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminPaymentsControllerAuthorizeReceiptUploadV1>>,
+    TError,
+    AdminPaymentsControllerAuthorizeReceiptUploadV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminPaymentsControllerAuthorizeReceiptUploadV1>>,
+  TError,
+  AdminPaymentsControllerAuthorizeReceiptUploadV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getAdminPaymentsControllerAuthorizeReceiptUploadV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminPaymentsControllerAuthorizeReceiptUploadV1>>,
+    AdminPaymentsControllerAuthorizeReceiptUploadV1MutationVariables
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return adminPaymentsControllerAuthorizeReceiptUploadV1(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminPaymentsControllerAuthorizeReceiptUploadV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminPaymentsControllerAuthorizeReceiptUploadV1>>
+>;
+export type AdminPaymentsControllerAuthorizeReceiptUploadV1MutationBody = RefundReceiptUploadBody;
+export type AdminPaymentsControllerAuthorizeReceiptUploadV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | PaymentNotFoundErrorBody
+  | RefundNotRequestedErrorBody
+  | RefundNotFailedErrorBody
+  | RateLimitedErrorBody
+>;
+export type AdminPaymentsControllerAuthorizeReceiptUploadV1MutationVariables = {
+  id: string;
+  data: RefundReceiptUploadBody;
+};
+
+/**
+ * @summary O envio do comprovante do reembolso feito por fora (decisão 259(1)): a URL de PUT.
+ */
+export const useAdminPaymentsControllerAuthorizeReceiptUploadV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PaymentNotFoundErrorBody
+    | RefundNotRequestedErrorBody
+    | RefundNotFailedErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof adminPaymentsControllerAuthorizeReceiptUploadV1>>,
+      TError,
+      AdminPaymentsControllerAuthorizeReceiptUploadV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof adminPaymentsControllerAuthorizeReceiptUploadV1>>,
+  TError,
+  AdminPaymentsControllerAuthorizeReceiptUploadV1MutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getAdminPaymentsControllerAuthorizeReceiptUploadV1MutationOptions(options),
+    queryClient,
+  );
+};
+export const getAdminPaymentsControllerReceiptV1Url = (id: string) => {
+  return `/v1/admin/payments/${id}/refund/receipt`;
+};
+
+/**
+ * @summary O comprovante, só para o Admin (decisão 259(1)): lido pela API, nunca público.
+ */
+export const adminPaymentsControllerReceiptV1 = async (
+  id: string,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<void> => {
+  return httpClient<void>(getAdminPaymentsControllerReceiptV1Url(id), {
+    ...options,
+    method: 'GET',
+  });
+};
+
+export const getAdminPaymentsControllerReceiptV1QueryKey = (id: string) => {
+  return [`/v1/admin/payments/${id}/refund/receipt`] as const;
+};
+
+export const getAdminPaymentsControllerReceiptV1QueryOptions = <
+  TData = Awaited<ReturnType<typeof adminPaymentsControllerReceiptV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PaymentNotFoundErrorBody
+    | RefundReceiptNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPaymentsControllerReceiptV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getAdminPaymentsControllerReceiptV1QueryKey(id);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminPaymentsControllerReceiptV1>>> = ({
+    signal,
+  }) => adminPaymentsControllerReceiptV1(id, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: id !== null && id !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof adminPaymentsControllerReceiptV1>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type AdminPaymentsControllerReceiptV1QueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminPaymentsControllerReceiptV1>>
+>;
+export type AdminPaymentsControllerReceiptV1QueryError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | PaymentNotFoundErrorBody
+  | RefundReceiptNotFoundErrorBody
+  | RateLimitedErrorBody
+>;
+
+export function useAdminPaymentsControllerReceiptV1<
+  TData = Awaited<ReturnType<typeof adminPaymentsControllerReceiptV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PaymentNotFoundErrorBody
+    | RefundReceiptNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPaymentsControllerReceiptV1>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminPaymentsControllerReceiptV1>>,
+          TError,
+          Awaited<ReturnType<typeof adminPaymentsControllerReceiptV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAdminPaymentsControllerReceiptV1<
+  TData = Awaited<ReturnType<typeof adminPaymentsControllerReceiptV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PaymentNotFoundErrorBody
+    | RefundReceiptNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPaymentsControllerReceiptV1>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminPaymentsControllerReceiptV1>>,
+          TError,
+          Awaited<ReturnType<typeof adminPaymentsControllerReceiptV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAdminPaymentsControllerReceiptV1<
+  TData = Awaited<ReturnType<typeof adminPaymentsControllerReceiptV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PaymentNotFoundErrorBody
+    | RefundReceiptNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPaymentsControllerReceiptV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary O comprovante, só para o Admin (decisão 259(1)): lido pela API, nunca público.
+ */
+
+export function useAdminPaymentsControllerReceiptV1<
+  TData = Awaited<ReturnType<typeof adminPaymentsControllerReceiptV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PaymentNotFoundErrorBody
+    | RefundReceiptNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPaymentsControllerReceiptV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getAdminPaymentsControllerReceiptV1QueryOptions(id, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export const getAdminReferrersControllerBlockV1Url = (id: string) => {
+  return `/v1/admin/referrers/${id}/block`;
+};
+
+/**
+ * @summary Bloquear a cerimonialista (decisão 68; 230 D15), com motivo.
+ */
+export const adminReferrersControllerBlockV1 = async (
+  id: string,
+  adminReasonBody: AdminReasonBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<ReferrerBlockResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<ReferrerBlockResponse>(getAdminReferrersControllerBlockV1Url(id), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(adminReasonBody),
+  });
+};
+
+export const getAdminReferrersControllerBlockV1MutationKey = () =>
+  ['adminReferrersControllerBlockV1'] as const;
+
+export const getAdminReferrersControllerBlockV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | ReferrerNotFoundErrorBody
+    | AlreadyBlockedErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminReferrersControllerBlockV1>>,
+    TError,
+    AdminReferrersControllerBlockV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminReferrersControllerBlockV1>>,
+  TError,
+  AdminReferrersControllerBlockV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getAdminReferrersControllerBlockV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminReferrersControllerBlockV1>>,
+    AdminReferrersControllerBlockV1MutationVariables
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return adminReferrersControllerBlockV1(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminReferrersControllerBlockV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminReferrersControllerBlockV1>>
+>;
+export type AdminReferrersControllerBlockV1MutationBody = AdminReasonBody;
+export type AdminReferrersControllerBlockV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | ReferrerNotFoundErrorBody
+  | AlreadyBlockedErrorBody
+  | RateLimitedErrorBody
+>;
+export type AdminReferrersControllerBlockV1MutationVariables = {
+  id: string;
+  data: AdminReasonBody;
+};
+
+/**
+ * @summary Bloquear a cerimonialista (decisão 68; 230 D15), com motivo.
+ */
+export const useAdminReferrersControllerBlockV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | ReferrerNotFoundErrorBody
+    | AlreadyBlockedErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof adminReferrersControllerBlockV1>>,
+      TError,
+      AdminReferrersControllerBlockV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof adminReferrersControllerBlockV1>>,
+  TError,
+  AdminReferrersControllerBlockV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getAdminReferrersControllerBlockV1MutationOptions(options), queryClient);
+};
+export const getAdminReferrersControllerUnblockV1Url = (id: string) => {
+  return `/v1/admin/referrers/${id}/unblock`;
+};
+
+/**
+ * @summary Desbloquear: as comissões bloqueadas continuam bloqueadas.
+ */
+export const adminReferrersControllerUnblockV1 = async (
+  id: string,
+  adminReasonBody: AdminReasonBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<ReferrerUnblockResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<ReferrerUnblockResponse>(getAdminReferrersControllerUnblockV1Url(id), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(adminReasonBody),
+  });
+};
+
+export const getAdminReferrersControllerUnblockV1MutationKey = () =>
+  ['adminReferrersControllerUnblockV1'] as const;
+
+export const getAdminReferrersControllerUnblockV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | ReferrerNotFoundErrorBody
+    | NotBlockedErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminReferrersControllerUnblockV1>>,
+    TError,
+    AdminReferrersControllerUnblockV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminReferrersControllerUnblockV1>>,
+  TError,
+  AdminReferrersControllerUnblockV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getAdminReferrersControllerUnblockV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminReferrersControllerUnblockV1>>,
+    AdminReferrersControllerUnblockV1MutationVariables
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return adminReferrersControllerUnblockV1(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminReferrersControllerUnblockV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminReferrersControllerUnblockV1>>
+>;
+export type AdminReferrersControllerUnblockV1MutationBody = AdminReasonBody;
+export type AdminReferrersControllerUnblockV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | ReferrerNotFoundErrorBody
+  | NotBlockedErrorBody
+  | RateLimitedErrorBody
+>;
+export type AdminReferrersControllerUnblockV1MutationVariables = {
+  id: string;
+  data: AdminReasonBody;
+};
+
+/**
+ * @summary Desbloquear: as comissões bloqueadas continuam bloqueadas.
+ */
+export const useAdminReferrersControllerUnblockV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | ReferrerNotFoundErrorBody
+    | NotBlockedErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof adminReferrersControllerUnblockV1>>,
+      TError,
+      AdminReferrersControllerUnblockV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof adminReferrersControllerUnblockV1>>,
+  TError,
+  AdminReferrersControllerUnblockV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getAdminReferrersControllerUnblockV1MutationOptions(options), queryClient);
+};
+export const getAdminReferrersControllerCorrectTaxIdV1Url = (id: string) => {
+  return `/v1/admin/referrers/${id}/document`;
+};
+
+/**
+ * @summary Corrigir CPF ou CNPJ (decisão 74): sessão recente; 409 TAX_ID_IN_USE.
+ */
+export const adminReferrersControllerCorrectTaxIdV1 = async (
+  id: string,
+  correctTaxIdBody: CorrectTaxIdBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<CorrectTaxIdResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<CorrectTaxIdResponse>(getAdminReferrersControllerCorrectTaxIdV1Url(id), {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(correctTaxIdBody),
+  });
+};
+
+export const getAdminReferrersControllerCorrectTaxIdV1MutationKey = () =>
+  ['adminReferrersControllerCorrectTaxIdV1'] as const;
+
+export const getAdminReferrersControllerCorrectTaxIdV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | ReauthRequiredErrorBody
+    | ReferrerNotFoundErrorBody
+    | TaxIdInUseErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminReferrersControllerCorrectTaxIdV1>>,
+    TError,
+    AdminReferrersControllerCorrectTaxIdV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminReferrersControllerCorrectTaxIdV1>>,
+  TError,
+  AdminReferrersControllerCorrectTaxIdV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getAdminReferrersControllerCorrectTaxIdV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminReferrersControllerCorrectTaxIdV1>>,
+    AdminReferrersControllerCorrectTaxIdV1MutationVariables
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return adminReferrersControllerCorrectTaxIdV1(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminReferrersControllerCorrectTaxIdV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminReferrersControllerCorrectTaxIdV1>>
+>;
+export type AdminReferrersControllerCorrectTaxIdV1MutationBody = CorrectTaxIdBody;
+export type AdminReferrersControllerCorrectTaxIdV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | ReauthRequiredErrorBody
+  | ReferrerNotFoundErrorBody
+  | TaxIdInUseErrorBody
+  | RateLimitedErrorBody
+>;
+export type AdminReferrersControllerCorrectTaxIdV1MutationVariables = {
+  id: string;
+  data: CorrectTaxIdBody;
+};
+
+/**
+ * @summary Corrigir CPF ou CNPJ (decisão 74): sessão recente; 409 TAX_ID_IN_USE.
+ */
+export const useAdminReferrersControllerCorrectTaxIdV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | ReauthRequiredErrorBody
+    | ReferrerNotFoundErrorBody
+    | TaxIdInUseErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof adminReferrersControllerCorrectTaxIdV1>>,
+      TError,
+      AdminReferrersControllerCorrectTaxIdV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof adminReferrersControllerCorrectTaxIdV1>>,
+  TError,
+  AdminReferrersControllerCorrectTaxIdV1MutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getAdminReferrersControllerCorrectTaxIdV1MutationOptions(options),
+    queryClient,
+  );
+};
+export const getAdminReferrersControllerAdjustV1Url = (id: string) => {
+  return `/v1/admin/referrers/${id}/adjustments`;
+};
+
+/**
+ * @summary Ajustar a comissão: o positivo pede sessão recente; acima de R$ 500,00 abre o alerta.
+ */
+export const adminReferrersControllerAdjustV1 = async (
+  id: string,
+  adjustmentBody: AdjustmentBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<AdjustmentResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<AdjustmentResponse>(getAdminReferrersControllerAdjustV1Url(id), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(adjustmentBody),
+  });
+};
+
+export const getAdminReferrersControllerAdjustV1MutationKey = () =>
+  ['adminReferrersControllerAdjustV1'] as const;
+
+export const getAdminReferrersControllerAdjustV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | ReauthRequiredErrorBody
+    | ReferrerNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminReferrersControllerAdjustV1>>,
+    TError,
+    AdminReferrersControllerAdjustV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminReferrersControllerAdjustV1>>,
+  TError,
+  AdminReferrersControllerAdjustV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getAdminReferrersControllerAdjustV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminReferrersControllerAdjustV1>>,
+    AdminReferrersControllerAdjustV1MutationVariables
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return adminReferrersControllerAdjustV1(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminReferrersControllerAdjustV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminReferrersControllerAdjustV1>>
+>;
+export type AdminReferrersControllerAdjustV1MutationBody = AdjustmentBody;
+export type AdminReferrersControllerAdjustV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | ReauthRequiredErrorBody
+  | ReferrerNotFoundErrorBody
+  | RateLimitedErrorBody
+>;
+export type AdminReferrersControllerAdjustV1MutationVariables = {
+  id: string;
+  data: AdjustmentBody;
+};
+
+/**
+ * @summary Ajustar a comissão: o positivo pede sessão recente; acima de R$ 500,00 abre o alerta.
+ */
+export const useAdminReferrersControllerAdjustV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | ReauthRequiredErrorBody
+    | ReferrerNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof adminReferrersControllerAdjustV1>>,
+      TError,
+      AdminReferrersControllerAdjustV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof adminReferrersControllerAdjustV1>>,
+  TError,
+  AdminReferrersControllerAdjustV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getAdminReferrersControllerAdjustV1MutationOptions(options), queryClient);
+};
+export const getAdminReferrersControllerBlockCommissionV1Url = (id: string) => {
+  return `/v1/admin/commissions/${id}/block`;
+};
+
+/**
+ * @summary Bloquear a comissão (B10-4): dentro de um repasse pedido, ele fica retido.
+ */
+export const adminReferrersControllerBlockCommissionV1 = async (
+  id: string,
+  adminReasonBody: AdminReasonBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<CommissionBlockResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<CommissionBlockResponse>(getAdminReferrersControllerBlockCommissionV1Url(id), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(adminReasonBody),
+  });
+};
+
+export const getAdminReferrersControllerBlockCommissionV1MutationKey = () =>
+  ['adminReferrersControllerBlockCommissionV1'] as const;
+
+export const getAdminReferrersControllerBlockCommissionV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | CommissionNotFoundErrorBody
+    | CommissionNotBlockableErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminReferrersControllerBlockCommissionV1>>,
+    TError,
+    AdminReferrersControllerBlockCommissionV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminReferrersControllerBlockCommissionV1>>,
+  TError,
+  AdminReferrersControllerBlockCommissionV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getAdminReferrersControllerBlockCommissionV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminReferrersControllerBlockCommissionV1>>,
+    AdminReferrersControllerBlockCommissionV1MutationVariables
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return adminReferrersControllerBlockCommissionV1(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminReferrersControllerBlockCommissionV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminReferrersControllerBlockCommissionV1>>
+>;
+export type AdminReferrersControllerBlockCommissionV1MutationBody = AdminReasonBody;
+export type AdminReferrersControllerBlockCommissionV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | CommissionNotFoundErrorBody
+  | CommissionNotBlockableErrorBody
+  | RateLimitedErrorBody
+>;
+export type AdminReferrersControllerBlockCommissionV1MutationVariables = {
+  id: string;
+  data: AdminReasonBody;
+};
+
+/**
+ * @summary Bloquear a comissão (B10-4): dentro de um repasse pedido, ele fica retido.
+ */
+export const useAdminReferrersControllerBlockCommissionV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | CommissionNotFoundErrorBody
+    | CommissionNotBlockableErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof adminReferrersControllerBlockCommissionV1>>,
+      TError,
+      AdminReferrersControllerBlockCommissionV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof adminReferrersControllerBlockCommissionV1>>,
+  TError,
+  AdminReferrersControllerBlockCommissionV1MutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getAdminReferrersControllerBlockCommissionV1MutationOptions(options),
+    queryClient,
+  );
+};
+export const getAdminReferrersControllerUnblockCommissionV1Url = (id: string) => {
+  return `/v1/admin/commissions/${id}/unblock`;
+};
+
+/**
+ * @summary Desbloquear a comissão: sessão recente; volta ao prazo de liberação.
+ */
+export const adminReferrersControllerUnblockCommissionV1 = async (
+  id: string,
+  adminReasonBody: AdminReasonBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<CommissionUnblockResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<CommissionUnblockResponse>(
+    getAdminReferrersControllerUnblockCommissionV1Url(id),
+    {
+      ...options,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+      body: JSON.stringify(adminReasonBody),
+    },
+  );
+};
+
+export const getAdminReferrersControllerUnblockCommissionV1MutationKey = () =>
+  ['adminReferrersControllerUnblockCommissionV1'] as const;
+
+export const getAdminReferrersControllerUnblockCommissionV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | ReauthRequiredErrorBody
+    | CommissionNotFoundErrorBody
+    | CommissionNotBlockableErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminReferrersControllerUnblockCommissionV1>>,
+    TError,
+    AdminReferrersControllerUnblockCommissionV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminReferrersControllerUnblockCommissionV1>>,
+  TError,
+  AdminReferrersControllerUnblockCommissionV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getAdminReferrersControllerUnblockCommissionV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminReferrersControllerUnblockCommissionV1>>,
+    AdminReferrersControllerUnblockCommissionV1MutationVariables
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return adminReferrersControllerUnblockCommissionV1(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminReferrersControllerUnblockCommissionV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminReferrersControllerUnblockCommissionV1>>
+>;
+export type AdminReferrersControllerUnblockCommissionV1MutationBody = AdminReasonBody;
+export type AdminReferrersControllerUnblockCommissionV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | ReauthRequiredErrorBody
+  | CommissionNotFoundErrorBody
+  | CommissionNotBlockableErrorBody
+  | RateLimitedErrorBody
+>;
+export type AdminReferrersControllerUnblockCommissionV1MutationVariables = {
+  id: string;
+  data: AdminReasonBody;
+};
+
+/**
+ * @summary Desbloquear a comissão: sessão recente; volta ao prazo de liberação.
+ */
+export const useAdminReferrersControllerUnblockCommissionV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | ReauthRequiredErrorBody
+    | CommissionNotFoundErrorBody
+    | CommissionNotBlockableErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof adminReferrersControllerUnblockCommissionV1>>,
+      TError,
+      AdminReferrersControllerUnblockCommissionV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof adminReferrersControllerUnblockCommissionV1>>,
+  TError,
+  AdminReferrersControllerUnblockCommissionV1MutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getAdminReferrersControllerUnblockCommissionV1MutationOptions(options),
+    queryClient,
+  );
+};
+export const getAdminPayoutsControllerListV1Url = (params?: AdminPayoutsControllerListV1Params) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/v1/admin/payouts?${stringifiedParams}`
+    : `/v1/admin/payouts`;
+};
+
+export const adminPayoutsControllerListV1 = async (
+  params?: AdminPayoutsControllerListV1Params,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<AdminPayoutsResponse> => {
+  return httpClient<AdminPayoutsResponse>(getAdminPayoutsControllerListV1Url(params), {
+    ...options,
+    method: 'GET',
+  });
+};
+
+export const getAdminPayoutsControllerListV1QueryKey = (
+  params?: AdminPayoutsControllerListV1Params,
+) => {
+  return [`/v1/admin/payouts`, ...(params ? [params] : [])] as const;
+};
+
+export const getAdminPayoutsControllerListV1QueryOptions = <
+  TData = Awaited<ReturnType<typeof adminPayoutsControllerListV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  params?: AdminPayoutsControllerListV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPayoutsControllerListV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getAdminPayoutsControllerListV1QueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminPayoutsControllerListV1>>> = ({
+    signal,
+  }) => adminPayoutsControllerListV1(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof adminPayoutsControllerListV1>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type AdminPayoutsControllerListV1QueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminPayoutsControllerListV1>>
+>;
+export type AdminPayoutsControllerListV1QueryError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | RateLimitedErrorBody
+>;
+
+export function useAdminPayoutsControllerListV1<
+  TData = Awaited<ReturnType<typeof adminPayoutsControllerListV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  params: undefined | AdminPayoutsControllerListV1Params,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPayoutsControllerListV1>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminPayoutsControllerListV1>>,
+          TError,
+          Awaited<ReturnType<typeof adminPayoutsControllerListV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAdminPayoutsControllerListV1<
+  TData = Awaited<ReturnType<typeof adminPayoutsControllerListV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  params?: AdminPayoutsControllerListV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPayoutsControllerListV1>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminPayoutsControllerListV1>>,
+          TError,
+          Awaited<ReturnType<typeof adminPayoutsControllerListV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAdminPayoutsControllerListV1<
+  TData = Awaited<ReturnType<typeof adminPayoutsControllerListV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  params?: AdminPayoutsControllerListV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPayoutsControllerListV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useAdminPayoutsControllerListV1<
+  TData = Awaited<ReturnType<typeof adminPayoutsControllerListV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  params?: AdminPayoutsControllerListV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminPayoutsControllerListV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getAdminPayoutsControllerListV1QueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export const getAdminPayoutsControllerPayPayoutV1Url = (id: string) => {
+  return `/v1/admin/payouts/${id}/pay`;
+};
+
+/**
+ * @summary Pagar (RN09; Repasse RN05): confere tudo na transação e manda o Pix por job.
+ */
+export const adminPayoutsControllerPayPayoutV1 = async (
+  id: string,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<PayoutActionResponse> => {
+  return httpClient<PayoutActionResponse>(getAdminPayoutsControllerPayPayoutV1Url(id), {
+    ...options,
+    method: 'POST',
+  });
+};
+
+export const getAdminPayoutsControllerPayPayoutV1MutationKey = () =>
+  ['adminPayoutsControllerPayPayoutV1'] as const;
+
+export const getAdminPayoutsControllerPayPayoutV1MutationOptions = <
+  TError = ErrorType<
+    | IdempotencyKeyRequiredErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | ReauthRequiredErrorBody
+    | PayoutNotFoundErrorBody
+    | PayoutNotRequestedErrorBody
+    | PayoutHeldErrorBody
+    | PayoutsDisabledAdminErrorBody
+    | ReferrerBlockedErrorBody
+    | PayoutPixKeyChangePendingErrorBody
+    | PayoutAmountMismatchErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminPayoutsControllerPayPayoutV1>>,
+    TError,
+    AdminPayoutsControllerPayPayoutV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminPayoutsControllerPayPayoutV1>>,
+  TError,
+  AdminPayoutsControllerPayPayoutV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getAdminPayoutsControllerPayPayoutV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminPayoutsControllerPayPayoutV1>>,
+    AdminPayoutsControllerPayPayoutV1MutationVariables
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return adminPayoutsControllerPayPayoutV1(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminPayoutsControllerPayPayoutV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminPayoutsControllerPayPayoutV1>>
+>;
+
+export type AdminPayoutsControllerPayPayoutV1MutationError = ErrorType<
+  | IdempotencyKeyRequiredErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | ReauthRequiredErrorBody
+  | PayoutNotFoundErrorBody
+  | PayoutNotRequestedErrorBody
+  | PayoutHeldErrorBody
+  | PayoutsDisabledAdminErrorBody
+  | ReferrerBlockedErrorBody
+  | PayoutPixKeyChangePendingErrorBody
+  | PayoutAmountMismatchErrorBody
+  | RateLimitedErrorBody
+>;
+export type AdminPayoutsControllerPayPayoutV1MutationVariables = { id: string };
+
+/**
+ * @summary Pagar (RN09; Repasse RN05): confere tudo na transação e manda o Pix por job.
+ */
+export const useAdminPayoutsControllerPayPayoutV1 = <
+  TError = ErrorType<
+    | IdempotencyKeyRequiredErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | ReauthRequiredErrorBody
+    | PayoutNotFoundErrorBody
+    | PayoutNotRequestedErrorBody
+    | PayoutHeldErrorBody
+    | PayoutsDisabledAdminErrorBody
+    | ReferrerBlockedErrorBody
+    | PayoutPixKeyChangePendingErrorBody
+    | PayoutAmountMismatchErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof adminPayoutsControllerPayPayoutV1>>,
+      TError,
+      AdminPayoutsControllerPayPayoutV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof adminPayoutsControllerPayPayoutV1>>,
+  TError,
+  AdminPayoutsControllerPayPayoutV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getAdminPayoutsControllerPayPayoutV1MutationOptions(options), queryClient);
+};
+export const getAdminPayoutsControllerRetryPayoutV1Url = (id: string) => {
+  return `/v1/admin/payouts/${id}/retry`;
+};
+
+/**
+ * @summary Tentar o Pix de novo (RN09): consulta o gateway antes; não achou, manda de novo.
+ */
+export const adminPayoutsControllerRetryPayoutV1 = async (
+  id: string,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<PayoutActionResponse> => {
+  return httpClient<PayoutActionResponse>(getAdminPayoutsControllerRetryPayoutV1Url(id), {
+    ...options,
+    method: 'POST',
+  });
+};
+
+export const getAdminPayoutsControllerRetryPayoutV1MutationKey = () =>
+  ['adminPayoutsControllerRetryPayoutV1'] as const;
+
+export const getAdminPayoutsControllerRetryPayoutV1MutationOptions = <
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PayoutNotFoundErrorBody
+    | PayoutStatusConflictErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminPayoutsControllerRetryPayoutV1>>,
+    TError,
+    AdminPayoutsControllerRetryPayoutV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminPayoutsControllerRetryPayoutV1>>,
+  TError,
+  AdminPayoutsControllerRetryPayoutV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getAdminPayoutsControllerRetryPayoutV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminPayoutsControllerRetryPayoutV1>>,
+    AdminPayoutsControllerRetryPayoutV1MutationVariables
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return adminPayoutsControllerRetryPayoutV1(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminPayoutsControllerRetryPayoutV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminPayoutsControllerRetryPayoutV1>>
+>;
+
+export type AdminPayoutsControllerRetryPayoutV1MutationError = ErrorType<
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | PayoutNotFoundErrorBody
+  | PayoutStatusConflictErrorBody
+  | RateLimitedErrorBody
+>;
+export type AdminPayoutsControllerRetryPayoutV1MutationVariables = { id: string };
+
+/**
+ * @summary Tentar o Pix de novo (RN09): consulta o gateway antes; não achou, manda de novo.
+ */
+export const useAdminPayoutsControllerRetryPayoutV1 = <
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PayoutNotFoundErrorBody
+    | PayoutStatusConflictErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof adminPayoutsControllerRetryPayoutV1>>,
+      TError,
+      AdminPayoutsControllerRetryPayoutV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof adminPayoutsControllerRetryPayoutV1>>,
+  TError,
+  AdminPayoutsControllerRetryPayoutV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getAdminPayoutsControllerRetryPayoutV1MutationOptions(options), queryClient);
+};
+export const getAdminPayoutsControllerRejectPayoutV1Url = (id: string) => {
+  return `/v1/admin/payouts/${id}/reject`;
+};
+
+/**
+ * @summary Recusar (RN09), com motivo.
+ */
+export const adminPayoutsControllerRejectPayoutV1 = async (
+  id: string,
+  adminReasonBody: AdminReasonBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<PayoutActionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<PayoutActionResponse>(getAdminPayoutsControllerRejectPayoutV1Url(id), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(adminReasonBody),
+  });
+};
+
+export const getAdminPayoutsControllerRejectPayoutV1MutationKey = () =>
+  ['adminPayoutsControllerRejectPayoutV1'] as const;
+
+export const getAdminPayoutsControllerRejectPayoutV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PayoutNotFoundErrorBody
+    | PayoutNotRequestedErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminPayoutsControllerRejectPayoutV1>>,
+    TError,
+    AdminPayoutsControllerRejectPayoutV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminPayoutsControllerRejectPayoutV1>>,
+  TError,
+  AdminPayoutsControllerRejectPayoutV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getAdminPayoutsControllerRejectPayoutV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminPayoutsControllerRejectPayoutV1>>,
+    AdminPayoutsControllerRejectPayoutV1MutationVariables
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return adminPayoutsControllerRejectPayoutV1(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminPayoutsControllerRejectPayoutV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminPayoutsControllerRejectPayoutV1>>
+>;
+export type AdminPayoutsControllerRejectPayoutV1MutationBody = AdminReasonBody;
+export type AdminPayoutsControllerRejectPayoutV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | PayoutNotFoundErrorBody
+  | PayoutNotRequestedErrorBody
+  | RateLimitedErrorBody
+>;
+export type AdminPayoutsControllerRejectPayoutV1MutationVariables = {
+  id: string;
+  data: AdminReasonBody;
+};
+
+/**
+ * @summary Recusar (RN09), com motivo.
+ */
+export const useAdminPayoutsControllerRejectPayoutV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PayoutNotFoundErrorBody
+    | PayoutNotRequestedErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof adminPayoutsControllerRejectPayoutV1>>,
+      TError,
+      AdminPayoutsControllerRejectPayoutV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof adminPayoutsControllerRejectPayoutV1>>,
+  TError,
+  AdminPayoutsControllerRejectPayoutV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getAdminPayoutsControllerRejectPayoutV1MutationOptions(options), queryClient);
+};
+export const getAdminPayoutsControllerReleasePayoutV1Url = (id: string) => {
+  return `/v1/admin/payouts/${id}/release`;
+};
+
+/**
+ * @summary Liberar o retido (RN09).
+ */
+export const adminPayoutsControllerReleasePayoutV1 = async (
+  id: string,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<PayoutActionResponse> => {
+  return httpClient<PayoutActionResponse>(getAdminPayoutsControllerReleasePayoutV1Url(id), {
+    ...options,
+    method: 'POST',
+  });
+};
+
+export const getAdminPayoutsControllerReleasePayoutV1MutationKey = () =>
+  ['adminPayoutsControllerReleasePayoutV1'] as const;
+
+export const getAdminPayoutsControllerReleasePayoutV1MutationOptions = <
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PayoutNotFoundErrorBody
+    | PayoutStatusConflictErrorBody
+    | PayoutHeldErrorBody
+    | ReferrerBlockedErrorBody
+    | PayoutPixKeyChangePendingErrorBody
+    | PayoutBelowMinimumAdminErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminPayoutsControllerReleasePayoutV1>>,
+    TError,
+    AdminPayoutsControllerReleasePayoutV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminPayoutsControllerReleasePayoutV1>>,
+  TError,
+  AdminPayoutsControllerReleasePayoutV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getAdminPayoutsControllerReleasePayoutV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminPayoutsControllerReleasePayoutV1>>,
+    AdminPayoutsControllerReleasePayoutV1MutationVariables
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return adminPayoutsControllerReleasePayoutV1(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminPayoutsControllerReleasePayoutV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminPayoutsControllerReleasePayoutV1>>
+>;
+
+export type AdminPayoutsControllerReleasePayoutV1MutationError = ErrorType<
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | PayoutNotFoundErrorBody
+  | PayoutStatusConflictErrorBody
+  | PayoutHeldErrorBody
+  | ReferrerBlockedErrorBody
+  | PayoutPixKeyChangePendingErrorBody
+  | PayoutBelowMinimumAdminErrorBody
+  | RateLimitedErrorBody
+>;
+export type AdminPayoutsControllerReleasePayoutV1MutationVariables = { id: string };
+
+/**
+ * @summary Liberar o retido (RN09).
+ */
+export const useAdminPayoutsControllerReleasePayoutV1 = <
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | PayoutNotFoundErrorBody
+    | PayoutStatusConflictErrorBody
+    | PayoutHeldErrorBody
+    | ReferrerBlockedErrorBody
+    | PayoutPixKeyChangePendingErrorBody
+    | PayoutBelowMinimumAdminErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof adminPayoutsControllerReleasePayoutV1>>,
+      TError,
+      AdminPayoutsControllerReleasePayoutV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof adminPayoutsControllerReleasePayoutV1>>,
+  TError,
+  AdminPayoutsControllerReleasePayoutV1MutationVariables,
+  TContext
+> => {
+  return useMutation(getAdminPayoutsControllerReleasePayoutV1MutationOptions(options), queryClient);
+};
 export const getAdminWeddingsControllerListV1Url = (
   params?: AdminWeddingsControllerListV1Params,
 ) => {
@@ -1306,6 +4353,152 @@ export const useAdminWeddingsControllerUnlockAccessEmailV1 = <
 > => {
   return useMutation(
     getAdminWeddingsControllerUnlockAccessEmailV1MutationOptions(options),
+    queryClient,
+  );
+};
+export const getAdminWeddingsControllerExtendAsCourtesyV1Url = (id: string) => {
+  return `/v1/admin/weddings/${id}/courtesy`;
+};
+
+/**
+ * @summary Estender como cortesia (Backoffice - cobrança RN06): só o Admin, meses e motivo.
+ */
+export const adminWeddingsControllerExtendAsCourtesyV1 = async (
+  id: string,
+  courtesyBody: CourtesyBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<CourtesyResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<CourtesyResponse>(getAdminWeddingsControllerExtendAsCourtesyV1Url(id), {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(courtesyBody),
+  });
+};
+
+export const getAdminWeddingsControllerExtendAsCourtesyV1MutationKey = () =>
+  ['adminWeddingsControllerExtendAsCourtesyV1'] as const;
+
+export const getAdminWeddingsControllerExtendAsCourtesyV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | NotPublishedErrorBody
+    | EndDateOutOfRangeErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminWeddingsControllerExtendAsCourtesyV1>>,
+    TError,
+    AdminWeddingsControllerExtendAsCourtesyV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminWeddingsControllerExtendAsCourtesyV1>>,
+  TError,
+  AdminWeddingsControllerExtendAsCourtesyV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getAdminWeddingsControllerExtendAsCourtesyV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminWeddingsControllerExtendAsCourtesyV1>>,
+    AdminWeddingsControllerExtendAsCourtesyV1MutationVariables
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return adminWeddingsControllerExtendAsCourtesyV1(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminWeddingsControllerExtendAsCourtesyV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminWeddingsControllerExtendAsCourtesyV1>>
+>;
+export type AdminWeddingsControllerExtendAsCourtesyV1MutationBody = CourtesyBody;
+export type AdminWeddingsControllerExtendAsCourtesyV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | WeddingNotFoundErrorBody
+  | NotPublishedErrorBody
+  | EndDateOutOfRangeErrorBody
+  | RateLimitedErrorBody
+>;
+export type AdminWeddingsControllerExtendAsCourtesyV1MutationVariables = {
+  id: string;
+  data: CourtesyBody;
+};
+
+/**
+ * @summary Estender como cortesia (Backoffice - cobrança RN06): só o Admin, meses e motivo.
+ */
+export const useAdminWeddingsControllerExtendAsCourtesyV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | WeddingNotFoundErrorBody
+    | NotPublishedErrorBody
+    | EndDateOutOfRangeErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof adminWeddingsControllerExtendAsCourtesyV1>>,
+      TError,
+      AdminWeddingsControllerExtendAsCourtesyV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof adminWeddingsControllerExtendAsCourtesyV1>>,
+  TError,
+  AdminWeddingsControllerExtendAsCourtesyV1MutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getAdminWeddingsControllerExtendAsCourtesyV1MutationOptions(options),
     queryClient,
   );
 };
