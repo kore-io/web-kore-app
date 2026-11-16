@@ -51,6 +51,7 @@ describe('rotas do app (decisões 139, 146, 147 e 198)', () => {
       deliveryReminder: '/app/envios/lembrete',
       deliveryDeadline: '/app/envios/prazo',
       songs: '/app/musicas',
+      collaborators: '/app/colaboradores',
       notifications: '/app/notificacoes',
       settingsNotifications: '/app/configuracoes/notificacoes',
       site: '/app/site',
@@ -72,6 +73,7 @@ describe('rotas do app (decisões 139, 146, 147 e 198)', () => {
     ['/cerimonialista/casamentos/w9/envios/convites', 'planner-delivery-invites'],
     ['/cerimonialista/casamentos/w9/site/dados-basicos', 'planner-site-editor'],
     ['/cerimonialista/casamentos/w9/musicas', 'planner-songs'],
+    ['/cerimonialista/casamentos/w9/colaboradores', 'planner-collaborators'],
   ])('%s abre a mesma tela na área da colaboradora (%s)', (url, id) => {
     expect(routeIdAt({ url })).toBe(id);
   });

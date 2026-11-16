@@ -12,6 +12,7 @@ import { PlannerAccessSettingsPage } from '../features/planner/pages/planner-acc
 import { PlannerProfilePage } from '../features/planner/pages/planner-profile-page';
 import { PlannerSettingsLayout } from '../features/planner/pages/planner-settings-layout';
 import { PlannerSignUpPage } from '../features/planner/pages/planner-sign-up-page';
+import { CollaboratorsPage } from '../features/collaborators/pages/collaborators-page';
 import { DashboardPage } from '../features/dashboard/pages/dashboard-page';
 import { DeadlinePage } from '../features/deliveries/pages/deadline-page';
 import { DeliveriesLayout } from '../features/deliveries/pages/deliveries-layout';
@@ -62,6 +63,7 @@ function areaRoutes({ prefix }: { prefix: 'couple' | 'planner' }): RouteObject[]
     },
     { id: 'site-editor', path: 'site/:section', element: <SiteEditorPage /> },
     { id: 'songs', path: 'musicas', element: <SongsPage /> },
+    { id: 'collaborators', path: 'colaboradores', element: <CollaboratorsPage /> },
     { id: 'notifications', path: 'notificacoes', element: <NotificationsPage /> },
     {
       id: 'settings-notifications',

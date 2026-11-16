@@ -1,4 +1,5 @@
 import access from './locales/pt-BR/access.json';
+import collaborators from './locales/pt-BR/collaborators.json';
 import common from './locales/pt-BR/common.json';
 import dashboard from './locales/pt-BR/dashboard.json';
 import deliveries from './locales/pt-BR/deliveries.json';
@@ -17,6 +18,7 @@ import songs from './locales/pt-BR/songs.json';
 export const resources = {
   'pt-BR': {
     access,
+    collaborators,
     common,
     dashboard,
     deliveries,

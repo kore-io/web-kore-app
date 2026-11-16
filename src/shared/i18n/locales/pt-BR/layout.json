@@ -11,7 +11,8 @@
     "guests": "Convidados",
     "deliveries": "Envios",
     "site": "Site",
-    "songs": "Músicas"
+    "songs": "Músicas",
+    "collaborators": "Colaboradores"
   },
   "activeProfileCouple": "Perfil ativo: Casal",
   "activeProfileCoupleWedding": "Perfil ativo: Casal · {{couple}}",
