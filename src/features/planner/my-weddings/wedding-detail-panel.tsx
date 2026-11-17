@@ -6,10 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router';
 import { areaPaths, plannerWeddingBase } from '../../../app/area';
 import { paths } from '../../../app/paths';
-import {
-  useAccessInvitationsControllerCancelV1,
-  useAccessInvitationsControllerSendV1,
-} from '../../../shared/api/generated/access-invitations/access-invitations';
+import { useAccessInvitationsControllerSendV1 } from '../../../shared/api/generated/access-invitations/access-invitations';
 import { getMeControllerMeV1QueryKey } from '../../../shared/api/generated/me/me';
 import { useWeddingMembersControllerRemoveV1 } from '../../../shared/api/generated/memberships/memberships';
 import type { MyWeddingDetailResponse } from '../../../shared/api/generated/model';
@@ -26,6 +23,7 @@ import { formatRsvpPercent } from '../../../shared/rsvp-percent';
 import { isValidEmail } from '../../access/email';
 import { CoupleLinkBlock } from './couple-link-block';
 import { coupleName } from './my-weddings-filters';
+import { useCoupleLinkActions } from './use-couple-link-actions';
 import { WeddingStatusBadge } from './wedding-status-badge';
 import { coupleInvitations, deleteCase, longWeddingDate, sentDay } from './wedding-detail-texts';
 
@@ -108,7 +106,7 @@ function DetailContent({
   const { showToast } = useToast();
   const queryClient = useQueryClient();
   const send = useAccessInvitationsControllerSendV1();
-  const cancel = useAccessInvitationsControllerCancelV1();
+  const linkActions = useCoupleLinkActions({ weddingId: detail.weddingId });
   const leave = useWeddingMembersControllerRemoveV1();
   const remove = useWeddingsControllerRemoveV1();
   const navigate = useNavigate();
@@ -151,32 +149,6 @@ function DetailContent({
           });
         },
         onError: () => showToast({ tone: 'danger', message: t('myWeddings.detail.resendError') }),
-      },
-    );
-  }
-
-  function regenerateLink() {
-    send.mutate(
-      { weddingId, data: { kind: 'couple' } },
-      {
-        onSuccess: () => {
-          void refresh();
-          showToast({ tone: 'success', message: t('myWeddings.detail.link.regenerated') });
-        },
-        onError: genericError,
-      },
-    );
-  }
-
-  function cancelLink(id: string) {
-    cancel.mutate(
-      { weddingId, id },
-      {
-        onSuccess: () => {
-          void refresh();
-          showToast({ tone: 'success', message: t('myWeddings.detail.link.canceled') });
-        },
-        onError: genericError,
       },
     );
   }
@@ -315,9 +287,9 @@ function DetailContent({
       {link && !detail.hasOwner && (
         <CoupleLinkBlock
           link={link}
-          busy={send.isPending || cancel.isPending}
-          onRegenerate={regenerateLink}
-          onCancel={() => cancelLink(link.id)}
+          busy={send.isPending || linkActions.busy}
+          onRegenerate={linkActions.regenerate}
+          onCancel={() => linkActions.cancelLink({ id: link.id })}
         />
       )}
 
