@@ -284,7 +284,7 @@ export function DoneStep({
         </ul>
       </section>
 
-      <div className="kore-new-wedding__footer">
+      <div className="kore-new-wedding__footer kore-new-wedding__footer--done">
         {invited ? (
           <Button type="button" variant="ghost" onClick={() => void navigate(paths.plannerArea)}>
             {t('newWedding.done.toMyWeddings')}

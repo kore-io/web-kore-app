@@ -164,3 +164,8 @@
 .kore-new-wedding__next-list svg {
   @apply size-4 shrink-0 text-gray-700;
 }
+
+/* No celular, as duas ações do Pronto não cabem lado a lado: empilhadas, a principal em cima. */
+.kore-new-wedding__footer--done {
+  @apply flex-col-reverse items-stretch md:flex-row md:items-center;
+}
