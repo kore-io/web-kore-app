@@ -190,6 +190,32 @@ describe('Colaboradores › versão da colaboradora (Papéis RN03; Colaboradora 
     await expectNoA11yViolations({ container });
   });
 
+  it('sem dono (o casal ainda não aceitou), o Sair não aparece (RN05; Meus casamentos RN10)', async () => {
+    mockApi(({ path }) => {
+      if (path === '/v1/me') return Response.json(plannerMe);
+      if (path === '/v1/weddings/w1/memberships') {
+        return Response.json({
+          members: [
+            {
+              id: 'm3',
+              name: 'Juliana Prado',
+              role: 'collaborator',
+              kind: 'planner',
+              since: '2026-08-05T12:00:00Z',
+              isMe: true,
+            },
+          ],
+          pendingInvitations: [],
+        });
+      }
+      return apiError({ status: 404, body: { error: 'NOT_FOUND' } });
+    });
+    renderRoute({ url: '/cerimonialista/casamentos/w1/colaboradores' });
+    const planners = await screen.findByRole('region', { name: 'Cerimonialista' });
+    expect(within(planners).getByText('Juliana Prado')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Sair deste casamento' })).toBeNull();
+  });
+
   it('Sair deste casamento: a confirmação, o próprio vínculo e Meus casamentos (RN05)', async () => {
     const user = userEvent.setup();
     const calls = api({ me: plannerMe, meId: 'm3' });
