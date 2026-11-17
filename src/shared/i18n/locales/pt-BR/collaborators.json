@@ -16,7 +16,34 @@
       "cancel": "Cancelar",
       "done": "{{name}} não tem mais acesso ao casamento."
     },
-    "recentAccessChange": "Não dá para remover ninguém do casamento agora. Por segurança, isso só pode ser feito 48 horas depois da troca do e-mail de acesso. Disponível a partir de {{date}}."
+    "recentAccessChange": "Não dá para remover ninguém do casamento agora. Por segurança, isso só pode ser feito 48 horas depois da troca do e-mail de acesso. Disponível a partir de {{date}}.",
+    "invite": {
+      "empty": "Este casamento ainda não tem cerimonialista.",
+      "open": "Convidar cerimonialista",
+      "dialog": {
+        "title": "Convidar cerimonialista",
+        "email": "E-mail",
+        "submit": "Enviar convite",
+        "cancel": "Cancelar",
+        "description": "Quem aceitar monta o site e cuida da lista com vocês. O convite vale por 30 dias.",
+        "placeholder": "nome@email.com",
+        "publishedNotice": "O site já está no ar. Quando a cerimonialista aceitar, a assinatura da assessoria aparece no rodapé. Para ocultar, vão em Site › Editor › Dados básicos."
+      },
+      "sent": "Convite enviado para {{email}}.",
+      "pending": "Convite enviado · vale até {{date}}",
+      "expired": "O convite venceu.",
+      "resend": "Reenviar convite",
+      "cancelInvitation": "Cancelar convite",
+      "resent": "Convite reenviado para {{email}}.",
+      "canceled": "Convite cancelado.",
+      "plannerAlready": "Este casamento já tem cerimonialista. Atualize a tela para ver quem colabora.",
+      "ownEmail": "Este é o e-mail da sua conta. Use o e-mail de quem faz o cerimonial.",
+      "invalidEmail": "Informe um e-mail válido.",
+      "sendError": "Não foi possível enviar agora. Verifique sua conexão e tente de novo.",
+      "resendError": "Não foi possível reenviar agora. Verifique sua conexão e tente de novo.",
+      "cancelError": "Não foi possível cancelar agora. Verifique sua conexão e tente de novo.",
+      "notPending": "Este convite já não está pendente. Atualize a tela para ver como ficou."
+    }
   },
   "planner": {
     "ownersTitle": "Casal",

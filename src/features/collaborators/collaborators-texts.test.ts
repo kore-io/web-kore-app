@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { availableAtText, initials, memberGroups, sinceDate } from './collaborators-texts';
+import { availableAtText, initials, memberGroups, cardDate } from './collaborators-texts';
 
 describe('os textos de Colaboradores', () => {
   it('as iniciais do primeiro e do último nome', () => {
@@ -49,10 +49,10 @@ describe('os textos de Colaboradores', () => {
 
   it('o "Desde": sem o ano corrente e com o ano quando é outro (decisão 274)', () => {
     const now = new Date('2026-11-16T15:00:00Z');
-    expect(sinceDate({ at: '2026-08-05T12:00:00Z', timezone: null, now })).toBe('05/08');
-    expect(sinceDate({ at: '2025-08-05T12:00:00Z', timezone: null, now })).toBe('05/08/2025');
+    expect(cardDate({ at: '2026-08-05T12:00:00Z', timezone: null, now })).toBe('05/08');
+    expect(cardDate({ at: '2025-08-05T12:00:00Z', timezone: null, now })).toBe('05/08/2025');
     // 01/01 às 01h UTC: ainda 31/12 de 2025 em São Paulo.
-    expect(sinceDate({ at: '2026-01-01T01:00:00Z', timezone: 'America/Sao_Paulo', now })).toBe(
+    expect(cardDate({ at: '2026-01-01T01:00:00Z', timezone: 'America/Sao_Paulo', now })).toBe(
       '31/12/2025',
     );
   });
