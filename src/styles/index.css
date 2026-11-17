@@ -30,3 +30,4 @@
 @import '../features/songs/pages/songs-page.css' layer(components);
 @import '../features/dashboard/pages/dashboard-page.css' layer(components);
 @import '../features/notifications/pages/notifications.css' layer(components);
+@import '../features/collaborators/pages/collaborators-page.css' layer(components);

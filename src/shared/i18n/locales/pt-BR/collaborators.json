@@ -1,0 +1,29 @@
+{
+  "title": "Colaboradores",
+  "since": "Desde {{date}}",
+  "couple": {
+    "description": "Quem tem acesso a este casamento.",
+    "ownersTitle": "Casal",
+    "plannersTitle": "Cerimonialista",
+    "ownersHelp": "Vocês têm as mesmas permissões: publicar, pagar e trocar a chave Pix.",
+    "plannersHelp": "Quem faz o cerimonial monta o site e cuida da lista. Publicar, pagar e a chave Pix são do casal.",
+    "remove": "Remover",
+    "removeName": "Remover {{name}}",
+    "removeDialog": {
+      "title": "Remover {{name}}?",
+      "description": "{{name}} perde o acesso a este casamento. O site e a lista continuam como estão.",
+      "confirm": "Remover",
+      "cancel": "Cancelar",
+      "done": "{{name}} não tem mais acesso ao casamento."
+    },
+    "recentAccessChange": "Não dá para remover ninguém do casamento agora. Por segurança, isso só pode ser feito 48 horas depois da troca do e-mail de acesso. Disponível a partir de {{date}}."
+  },
+  "planner": {
+    "ownersTitle": "Casal",
+    "plannersTitle": "Cerimonialista",
+    "invite": "Convidar cerimonialista",
+    "remove": "Remover",
+    "onlyCouple": "Só o casal pode convidar ou remover quem colabora.",
+    "leave": "Sair deste casamento"
+  }
+}

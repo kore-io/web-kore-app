@@ -57,6 +57,8 @@ export function areaPaths(base: string) {
     deliveryDeadline: `${base}/envios/prazo`,
     /** Músicas, só com a pergunta ligada (Música RN03 e RN05). */
     songs: `${base}/musicas`,
+    /** Colaboradores (Papéis RN02 e RN03; Colaboradora RN05; decisão 270). */
+    collaborators: `${base}/colaboradores`,
     /** Notificações, pelo sino da Topbar (decisão 217(13)). */
     notifications: `${base}/notificacoes`,
     /** Configurações › Notificações (decisão 221). */

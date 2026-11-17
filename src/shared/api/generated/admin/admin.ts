@@ -44,9 +44,14 @@ import type {
   AdminPayoutsControllerListV1Params,
   AdminPayoutsResponse,
   AdminReasonBody,
+  AdminReferrerDetailResponse,
+  AdminReferrersReadControllerDetailV1Params,
+  AdminReferrersReadControllerListV1Params,
+  AdminReferrersResponse,
   AdminRefundBody,
   AdminRefundResponse,
   AdminSearchResponse,
+  AdminSettingsResponse,
   AdminWeddingDetailResponse,
   AdminWeddingsControllerDetailV1Params,
   AdminWeddingsControllerListV1Params,
@@ -72,6 +77,8 @@ import type {
   GuestErasedResponse,
   GuestNotFoundErrorBody,
   IdempotencyKeyRequiredErrorBody,
+  IntegrationNotConfiguredErrorBody,
+  IntegrationTestResponse,
   ManualRefundBody,
   NoOwnerErrorBody,
   NotBlockedErrorBody,
@@ -96,6 +103,8 @@ import type {
   ReassignReferrerBody,
   ReassignReferrerResponse,
   ReauthRequiredErrorBody,
+  ReferralSettingsBody,
+  ReferralSettingsOutOfRangeErrorBody,
   ReferrerBlockResponse,
   ReferrerBlockedErrorBody,
   ReferrerNotActiveErrorBody,
@@ -117,6 +126,7 @@ import type {
   SupportSessionResponse,
   TaxIdInUseErrorBody,
   UnlockTooSoonErrorBody,
+  UpdateReferralSettingsResponse,
   ValidationErrorBody,
   WeddingNotFoundErrorBody,
 } from '../model';
@@ -5426,4 +5436,811 @@ export const useSupportSessionsControllerEndV1 = <
   TContext
 > => {
   return useMutation(getSupportSessionsControllerEndV1MutationOptions(options), queryClient);
+};
+export const getAdminReferrersReadControllerListV1Url = (
+  params?: AdminReferrersReadControllerListV1Params,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/v1/admin/referrers?${stringifiedParams}`
+    : `/v1/admin/referrers`;
+};
+
+export const adminReferrersReadControllerListV1 = async (
+  params?: AdminReferrersReadControllerListV1Params,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<AdminReferrersResponse> => {
+  return httpClient<AdminReferrersResponse>(getAdminReferrersReadControllerListV1Url(params), {
+    ...options,
+    method: 'GET',
+  });
+};
+
+export const getAdminReferrersReadControllerListV1QueryKey = (
+  params?: AdminReferrersReadControllerListV1Params,
+) => {
+  return [`/v1/admin/referrers`, ...(params ? [params] : [])] as const;
+};
+
+export const getAdminReferrersReadControllerListV1QueryOptions = <
+  TData = Awaited<ReturnType<typeof adminReferrersReadControllerListV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  params?: AdminReferrersReadControllerListV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminReferrersReadControllerListV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getAdminReferrersReadControllerListV1QueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminReferrersReadControllerListV1>>> = ({
+    signal,
+  }) => adminReferrersReadControllerListV1(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof adminReferrersReadControllerListV1>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type AdminReferrersReadControllerListV1QueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminReferrersReadControllerListV1>>
+>;
+export type AdminReferrersReadControllerListV1QueryError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | RateLimitedErrorBody
+>;
+
+export function useAdminReferrersReadControllerListV1<
+  TData = Awaited<ReturnType<typeof adminReferrersReadControllerListV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  params: undefined | AdminReferrersReadControllerListV1Params,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminReferrersReadControllerListV1>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminReferrersReadControllerListV1>>,
+          TError,
+          Awaited<ReturnType<typeof adminReferrersReadControllerListV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAdminReferrersReadControllerListV1<
+  TData = Awaited<ReturnType<typeof adminReferrersReadControllerListV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  params?: AdminReferrersReadControllerListV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminReferrersReadControllerListV1>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminReferrersReadControllerListV1>>,
+          TError,
+          Awaited<ReturnType<typeof adminReferrersReadControllerListV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAdminReferrersReadControllerListV1<
+  TData = Awaited<ReturnType<typeof adminReferrersReadControllerListV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  params?: AdminReferrersReadControllerListV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminReferrersReadControllerListV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useAdminReferrersReadControllerListV1<
+  TData = Awaited<ReturnType<typeof adminReferrersReadControllerListV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  params?: AdminReferrersReadControllerListV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminReferrersReadControllerListV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getAdminReferrersReadControllerListV1QueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export const getAdminReferrersReadControllerDetailV1Url = (
+  id: string,
+  params?: AdminReferrersReadControllerDetailV1Params,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/v1/admin/referrers/${id}?${stringifiedParams}`
+    : `/v1/admin/referrers/${id}`;
+};
+
+export const adminReferrersReadControllerDetailV1 = async (
+  id: string,
+  params?: AdminReferrersReadControllerDetailV1Params,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<AdminReferrerDetailResponse> => {
+  return httpClient<AdminReferrerDetailResponse>(
+    getAdminReferrersReadControllerDetailV1Url(id, params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
+};
+
+export const getAdminReferrersReadControllerDetailV1QueryKey = (
+  id: string,
+  params?: AdminReferrersReadControllerDetailV1Params,
+) => {
+  return [`/v1/admin/referrers/${id}`, ...(params ? [params] : [])] as const;
+};
+
+export const getAdminReferrersReadControllerDetailV1QueryOptions = <
+  TData = Awaited<ReturnType<typeof adminReferrersReadControllerDetailV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | ReferrerNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  id: string,
+  params?: AdminReferrersReadControllerDetailV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof adminReferrersReadControllerDetailV1>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getAdminReferrersReadControllerDetailV1QueryKey(id, params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof adminReferrersReadControllerDetailV1>>
+  > = ({ signal }) =>
+    adminReferrersReadControllerDetailV1(id, params, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: id !== null && id !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof adminReferrersReadControllerDetailV1>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type AdminReferrersReadControllerDetailV1QueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminReferrersReadControllerDetailV1>>
+>;
+export type AdminReferrersReadControllerDetailV1QueryError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | ReferrerNotFoundErrorBody
+  | RateLimitedErrorBody
+>;
+
+export function useAdminReferrersReadControllerDetailV1<
+  TData = Awaited<ReturnType<typeof adminReferrersReadControllerDetailV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | ReferrerNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  id: string,
+  params: undefined | AdminReferrersReadControllerDetailV1Params,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof adminReferrersReadControllerDetailV1>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminReferrersReadControllerDetailV1>>,
+          TError,
+          Awaited<ReturnType<typeof adminReferrersReadControllerDetailV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAdminReferrersReadControllerDetailV1<
+  TData = Awaited<ReturnType<typeof adminReferrersReadControllerDetailV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | ReferrerNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  id: string,
+  params?: AdminReferrersReadControllerDetailV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof adminReferrersReadControllerDetailV1>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminReferrersReadControllerDetailV1>>,
+          TError,
+          Awaited<ReturnType<typeof adminReferrersReadControllerDetailV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAdminReferrersReadControllerDetailV1<
+  TData = Awaited<ReturnType<typeof adminReferrersReadControllerDetailV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | ReferrerNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  id: string,
+  params?: AdminReferrersReadControllerDetailV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof adminReferrersReadControllerDetailV1>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useAdminReferrersReadControllerDetailV1<
+  TData = Awaited<ReturnType<typeof adminReferrersReadControllerDetailV1>>,
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | ReferrerNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
+>(
+  id: string,
+  params?: AdminReferrersReadControllerDetailV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof adminReferrersReadControllerDetailV1>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getAdminReferrersReadControllerDetailV1QueryOptions(id, params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export const getAdminSettingsControllerReadV1Url = () => {
+  return `/v1/admin/settings`;
+};
+
+/**
+ * @summary Valores vigentes, Indicação e Integrações, numa leitura só (Penpot 21).
+ */
+export const adminSettingsControllerReadV1 = async (
+  options?: Parameters<typeof httpClient>[1],
+): Promise<AdminSettingsResponse> => {
+  return httpClient<AdminSettingsResponse>(getAdminSettingsControllerReadV1Url(), {
+    ...options,
+    method: 'GET',
+  });
+};
+
+export const getAdminSettingsControllerReadV1QueryKey = () => {
+  return [`/v1/admin/settings`] as const;
+};
+
+export const getAdminSettingsControllerReadV1QueryOptions = <
+  TData = Awaited<ReturnType<typeof adminSettingsControllerReadV1>>,
+  TError = ErrorType<
+    SessionExpiredErrorBody | StaffOnlyErrorBody | ActionNotAllowedErrorBody | RateLimitedErrorBody
+  >,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof adminSettingsControllerReadV1>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getAdminSettingsControllerReadV1QueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminSettingsControllerReadV1>>> = ({
+    signal,
+  }) => adminSettingsControllerReadV1({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof adminSettingsControllerReadV1>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type AdminSettingsControllerReadV1QueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminSettingsControllerReadV1>>
+>;
+export type AdminSettingsControllerReadV1QueryError = ErrorType<
+  SessionExpiredErrorBody | StaffOnlyErrorBody | ActionNotAllowedErrorBody | RateLimitedErrorBody
+>;
+
+export function useAdminSettingsControllerReadV1<
+  TData = Awaited<ReturnType<typeof adminSettingsControllerReadV1>>,
+  TError = ErrorType<
+    SessionExpiredErrorBody | StaffOnlyErrorBody | ActionNotAllowedErrorBody | RateLimitedErrorBody
+  >,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminSettingsControllerReadV1>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminSettingsControllerReadV1>>,
+          TError,
+          Awaited<ReturnType<typeof adminSettingsControllerReadV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAdminSettingsControllerReadV1<
+  TData = Awaited<ReturnType<typeof adminSettingsControllerReadV1>>,
+  TError = ErrorType<
+    SessionExpiredErrorBody | StaffOnlyErrorBody | ActionNotAllowedErrorBody | RateLimitedErrorBody
+  >,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminSettingsControllerReadV1>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof adminSettingsControllerReadV1>>,
+          TError,
+          Awaited<ReturnType<typeof adminSettingsControllerReadV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAdminSettingsControllerReadV1<
+  TData = Awaited<ReturnType<typeof adminSettingsControllerReadV1>>,
+  TError = ErrorType<
+    SessionExpiredErrorBody | StaffOnlyErrorBody | ActionNotAllowedErrorBody | RateLimitedErrorBody
+  >,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminSettingsControllerReadV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Valores vigentes, Indicação e Integrações, numa leitura só (Penpot 21).
+ */
+
+export function useAdminSettingsControllerReadV1<
+  TData = Awaited<ReturnType<typeof adminSettingsControllerReadV1>>,
+  TError = ErrorType<
+    SessionExpiredErrorBody | StaffOnlyErrorBody | ActionNotAllowedErrorBody | RateLimitedErrorBody
+  >,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof adminSettingsControllerReadV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getAdminSettingsControllerReadV1QueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export const getAdminSettingsControllerUpdateReferralV1Url = () => {
+  return `/v1/admin/settings/referral`;
+};
+
+/**
+ * @summary Salvar a Indicação: sessão recente; 422 fora do formato (decisão 78); a
+cerimonialista acompanha a Comissão padrão (decisão 75).
+ */
+export const adminSettingsControllerUpdateReferralV1 = async (
+  referralSettingsBody: ReferralSettingsBody,
+  options?: Parameters<typeof httpClient>[1],
+): Promise<UpdateReferralSettingsResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit['headers']>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  return httpClient<UpdateReferralSettingsResponse>(
+    getAdminSettingsControllerUpdateReferralV1Url(),
+    {
+      ...options,
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+      body: JSON.stringify(referralSettingsBody),
+    },
+  );
+};
+
+export const getAdminSettingsControllerUpdateReferralV1MutationKey = () =>
+  ['adminSettingsControllerUpdateReferralV1'] as const;
+
+export const getAdminSettingsControllerUpdateReferralV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | ReauthRequiredErrorBody
+    | ReferralSettingsOutOfRangeErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminSettingsControllerUpdateReferralV1>>,
+    TError,
+    AdminSettingsControllerUpdateReferralV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminSettingsControllerUpdateReferralV1>>,
+  TError,
+  AdminSettingsControllerUpdateReferralV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getAdminSettingsControllerUpdateReferralV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminSettingsControllerUpdateReferralV1>>,
+    AdminSettingsControllerUpdateReferralV1MutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return adminSettingsControllerUpdateReferralV1(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminSettingsControllerUpdateReferralV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminSettingsControllerUpdateReferralV1>>
+>;
+export type AdminSettingsControllerUpdateReferralV1MutationBody = ReferralSettingsBody;
+export type AdminSettingsControllerUpdateReferralV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | ReauthRequiredErrorBody
+  | ReferralSettingsOutOfRangeErrorBody
+  | RateLimitedErrorBody
+>;
+export type AdminSettingsControllerUpdateReferralV1MutationVariables = {
+  data: ReferralSettingsBody;
+};
+
+/**
+ * @summary Salvar a Indicação: sessão recente; 422 fora do formato (decisão 78); a
+cerimonialista acompanha a Comissão padrão (decisão 75).
+ */
+export const useAdminSettingsControllerUpdateReferralV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | ReauthRequiredErrorBody
+    | ReferralSettingsOutOfRangeErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof adminSettingsControllerUpdateReferralV1>>,
+      TError,
+      AdminSettingsControllerUpdateReferralV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof adminSettingsControllerUpdateReferralV1>>,
+  TError,
+  AdminSettingsControllerUpdateReferralV1MutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getAdminSettingsControllerUpdateReferralV1MutationOptions(options),
+    queryClient,
+  );
+};
+export const getAdminSettingsControllerTestIntegrationV1Url = (
+  name: 'asaas' | 'email' | 'maps',
+) => {
+  return `/v1/admin/integrations/${name}/test`;
+};
+
+/**
+ * @summary Testar conexão (B10-8): o ping da porta; o local responde "Conectado (local)".
+ */
+export const adminSettingsControllerTestIntegrationV1 = async (
+  name: 'asaas' | 'email' | 'maps',
+  options?: Parameters<typeof httpClient>[1],
+): Promise<IntegrationTestResponse> => {
+  return httpClient<IntegrationTestResponse>(getAdminSettingsControllerTestIntegrationV1Url(name), {
+    ...options,
+    method: 'POST',
+  });
+};
+
+export const getAdminSettingsControllerTestIntegrationV1MutationKey = () =>
+  ['adminSettingsControllerTestIntegrationV1'] as const;
+
+export const getAdminSettingsControllerTestIntegrationV1MutationOptions = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | IntegrationNotConfiguredErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminSettingsControllerTestIntegrationV1>>,
+    TError,
+    AdminSettingsControllerTestIntegrationV1MutationVariables,
+    TContext
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminSettingsControllerTestIntegrationV1>>,
+  TError,
+  AdminSettingsControllerTestIntegrationV1MutationVariables,
+  TContext
+> => {
+  const mutationKey = getAdminSettingsControllerTestIntegrationV1MutationKey();
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminSettingsControllerTestIntegrationV1>>,
+    AdminSettingsControllerTestIntegrationV1MutationVariables
+  > = (props) => {
+    const { name } = props ?? {};
+
+    return adminSettingsControllerTestIntegrationV1(name, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminSettingsControllerTestIntegrationV1MutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminSettingsControllerTestIntegrationV1>>
+>;
+
+export type AdminSettingsControllerTestIntegrationV1MutationError = ErrorType<
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | OriginNotAllowedErrorBody
+  | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
+  | IntegrationNotConfiguredErrorBody
+  | RateLimitedErrorBody
+>;
+export type AdminSettingsControllerTestIntegrationV1MutationVariables = {
+  name: 'asaas' | 'email' | 'maps';
+};
+
+/**
+ * @summary Testar conexão (B10-8): o ping da porta; o local responde "Conectado (local)".
+ */
+export const useAdminSettingsControllerTestIntegrationV1 = <
+  TError = ErrorType<
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | OriginNotAllowedErrorBody
+    | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
+    | IntegrationNotConfiguredErrorBody
+    | RateLimitedErrorBody
+  >,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof adminSettingsControllerTestIntegrationV1>>,
+      TError,
+      AdminSettingsControllerTestIntegrationV1MutationVariables,
+      TContext
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof adminSettingsControllerTestIntegrationV1>>,
+  TError,
+  AdminSettingsControllerTestIntegrationV1MutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getAdminSettingsControllerTestIntegrationV1MutationOptions(options),
+    queryClient,
+  );
 };

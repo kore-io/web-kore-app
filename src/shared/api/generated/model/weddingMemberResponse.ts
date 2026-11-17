@@ -13,6 +13,8 @@ export interface WeddingMemberResponse {
   role: WeddingMemberResponseRole;
   /** Só no colaborador (decisão 177, item 8). */
   kind?: WeddingMemberResponseKind;
+  /** Desde quando tem acesso ao casamento: o início do vínculo (decisão 271(1)). */
+  since: string;
   id: string;
   /** O vínculo de quem lê (decisão 261(2)). */
   isMe: boolean;
