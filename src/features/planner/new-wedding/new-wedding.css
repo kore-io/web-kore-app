@@ -1,0 +1,116 @@
+/*
+ * Novo casamento (Penpot 05): o stepper de 4 passos sob o título, o cartão branco de até
+ * 640 px e, no passo 2, a prévia do site ao lado no computador (abaixo no celular).
+ */
+.kore-new-wedding {
+  @apply flex flex-col gap-6;
+}
+
+.kore-new-wedding__steps {
+  @apply m-0 flex list-none flex-wrap items-center gap-x-3 gap-y-2 p-0;
+}
+
+.kore-new-wedding__step {
+  @apply flex items-center gap-2 type-body-md text-gray-700;
+}
+
+.kore-new-wedding__step[data-state='current'] {
+  @apply text-ink;
+}
+
+.kore-new-wedding__step-mark {
+  @apply inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-gray-100 type-label text-gray-700;
+}
+
+.kore-new-wedding__step-mark > svg {
+  @apply size-4;
+}
+
+.kore-new-wedding__step[data-state='current'] .kore-new-wedding__step-mark {
+  @apply bg-primary text-white;
+}
+
+.kore-new-wedding__step[data-state='done'] .kore-new-wedding__step-mark {
+  @apply bg-success-tint text-success-text;
+}
+
+/* No celular, os passos que não são o atual mostram só o número (Penpot 05, Celular). */
+.kore-new-wedding__step[data-state='next'] .kore-new-wedding__step-label,
+.kore-new-wedding__step[data-state='done'] .kore-new-wedding__step-label {
+  @apply sr-only md:not-sr-only;
+}
+
+.kore-new-wedding__sr {
+  @apply sr-only;
+}
+
+.kore-new-wedding__card {
+  @apply flex max-w-160 flex-col gap-5 rounded-lg border border-gray-300 bg-white p-4 md:p-7;
+}
+
+/* O fieldset tem min-width: min-content por padrão: sem o min-w-0, os dois nomes passam do
+   cartão no celular (390 e 360 px). */
+.kore-new-wedding__names {
+  @apply m-0 flex min-w-0 flex-col gap-2 border-0 p-0;
+}
+
+.kore-new-wedding__legend {
+  @apply mb-2 p-0 type-label text-ink;
+}
+
+.kore-new-wedding__names-row {
+  @apply flex items-start gap-3;
+}
+
+.kore-new-wedding__names-row > .kore-form-field {
+  @apply min-w-0 flex-1;
+}
+
+/* Os rótulos de cada nome ficam para o leitor de tela; a legenda "Nomes do casal" aparece. */
+.kore-new-wedding__names-row .kore-label {
+  @apply sr-only;
+}
+
+.kore-new-wedding__ampersand {
+  @apply flex h-11 shrink-0 items-center type-heading font-display text-ink;
+}
+
+.kore-new-wedding__place {
+  @apply flex gap-3;
+}
+
+.kore-new-wedding__place > .kore-form-field:first-child {
+  @apply flex-1;
+}
+
+.kore-new-wedding__state {
+  @apply w-28;
+}
+
+.kore-new-wedding__slug {
+  @apply flex items-center gap-2;
+}
+
+.kore-new-wedding__slug > :not(.kore-new-wedding__slug-prefix) {
+  @apply min-w-0 flex-1;
+}
+
+.kore-new-wedding__slug-prefix {
+  @apply shrink-0 type-body-md text-gray-700;
+}
+
+.kore-new-wedding__footer {
+  @apply flex items-center justify-between gap-3 border-t border-gray-300 pt-5;
+}
+
+.kore-new-wedding__appearance {
+  @apply flex flex-col gap-6 lg:flex-row lg:items-start;
+}
+
+.kore-new-wedding__appearance > .kore-new-wedding__card {
+  @apply lg:flex-1;
+}
+
+.kore-new-wedding__preview {
+  @apply lg:sticky lg:top-6 lg:w-90 lg:shrink-0;
+}

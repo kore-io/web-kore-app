@@ -217,5 +217,38 @@
       "link": "O convite foi por link e vale até {{date}}.",
       "seeLink": "Ver o link para o casal"
     }
+  },
+  "newWedding": {
+    "title": "Novo casamento",
+    "steps": {
+      "data": "Dados do casamento",
+      "appearance": "Aparência",
+      "invite": "Convidar o casal",
+      "done": "Pronto"
+    },
+    "stepDone": "{{step}}, concluído",
+    "stepCurrent": "{{step}}, passo atual",
+    "subtitle": {
+      "data": "Passo 1 de 4 · O casamento nasce como rascunho. Você monta o site e convida o casal quando quiser.",
+      "appearance": "Passo 2 de 4 · Escolha um ponto de partida. O casal pode mudar tudo depois."
+    },
+    "names": "Nomes do casal",
+    "nameOf": "Nomes do casal, {{n}}",
+    "eventDate": "Data do casamento",
+    "optional": "(opcional)",
+    "noDate": "O casal ainda não sabe a data",
+    "slugPrefix": "kore.com.br/",
+    "slugAvailable": "Endereço disponível. O casal pode mudar até publicar.",
+    "slugTaken": "Esse endereço já está em uso. Tente {{suggestion}}.",
+    "errors": {
+      "name": "Informe o nome.",
+      "nameTooLong": "O nome passa de 80 caracteres.",
+      "cityTooLong": "A cidade passa de 80 caracteres."
+    },
+    "cancel": "Cancelar",
+    "back": "Voltar",
+    "continue": "Continuar",
+    "previewTitle": "Prévia do site",
+    "created": "Casamento criado."
   }
 }
