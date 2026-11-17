@@ -60,10 +60,12 @@ const plannerMe = {
 const members = ({
   meId,
   withPlanner = true,
+  withSecondOwner = true,
   pendingInvitations = [],
 }: {
   meId: string;
   withPlanner?: boolean;
+  withSecondOwner?: boolean;
   pendingInvitations?: object[];
 }) => ({
   members: [
@@ -85,6 +87,7 @@ const members = ({
     },
   ]
     .filter((member) => withPlanner || member.id !== 'm3')
+    .filter((member) => withSecondOwner || member.id !== 'm2')
     .map((member) => ({ ...member, isMe: member.id === meId })),
   pendingInvitations,
 });
@@ -97,6 +100,7 @@ function api({
   remove,
   send,
   withPlanner,
+  withSecondOwner,
   pendingInvitations,
   site,
 }: {
@@ -105,6 +109,7 @@ function api({
   remove?: () => Response;
   send?: () => Response;
   withPlanner?: boolean;
+  withSecondOwner?: boolean;
   pendingInvitations?: object[];
   site?: { status: string; plannerCredit: object | null };
 }) {
@@ -116,6 +121,7 @@ function api({
         members({
           meId,
           ...(withPlanner !== undefined && { withPlanner }),
+          ...(withSecondOwner !== undefined && { withSecondOwner }),
           ...(pendingInvitations && { pendingInvitations }),
         }),
       );
@@ -400,6 +406,106 @@ describe('Colaboradores › Convidar cerimonialista do casal (Convites de acesso
         'Este convite já não está pendente. Atualize a tela para ver como ficou.',
       ),
     ).toBeInTheDocument();
+  });
+});
+
+describe('Colaboradores › Convidar parceiro (Navegação da Área do Casal; decisão 279)', () => {
+  const emailBox = (dialog: HTMLElement) =>
+    within(dialog).getByRole('textbox', { name: /^E-⁠?mail$/ });
+
+  it('com os dois donos, sem o Convidar parceiro', async () => {
+    api({ me: coupleMe, meId: 'm1' });
+    renderRoute({ url: '/app/colaboradores' });
+    const couple = await screen.findByRole('region', { name: 'Casal' });
+    expect(within(couple).queryByRole('button', { name: 'Convidar parceiro' })).toBeNull();
+  });
+
+  it('com um dono só: o Dialog, o próprio e-mail, o POST com kind partner e o Toast', async () => {
+    const user = userEvent.setup();
+    const calls = api({ me: coupleMe, meId: 'm1', withSecondOwner: false });
+    const { container } = renderRoute({ url: '/app/colaboradores' });
+    const couple = await screen.findByRole('region', { name: 'Casal' });
+    await expectNoA11yViolations({ container });
+    await user.click(within(couple).getByRole('button', { name: 'Convidar parceiro' }));
+    const dialog = screen.getByRole('dialog', { name: 'Convidar parceiro' });
+    expect(dialog).toHaveAccessibleDescription(
+      'A outra pessoa do casal vai ter o próprio login, com as mesmas permissões que você. O convite vale por 30 dias.',
+    );
+    expect(within(dialog).queryByText(/O site já está no ar/)).toBeNull();
+    await user.type(emailBox(dialog), 'ana@exemplo.com');
+    await user.click(within(dialog).getByRole('button', { name: 'Enviar convite' }));
+    expect(emailBox(dialog)).toHaveAccessibleDescription(
+      'Este é o e-⁠mail da sua conta. Use o e-⁠mail da outra pessoa do casal.',
+    );
+    expect(calls).toEqual([]);
+    await user.clear(emailBox(dialog));
+    await user.type(emailBox(dialog), 'marcos@exemplo.com');
+    await user.click(within(dialog).getByRole('button', { name: 'Enviar convite' }));
+    expect(await screen.findByText('Convite enviado para marcos@exemplo.com.')).toBeInTheDocument();
+    expect(calls).toEqual([
+      {
+        method: 'POST',
+        path: '/v1/weddings/w1/access-invitations',
+        body: { kind: 'partner', emails: ['marcos@exemplo.com'] },
+      },
+    ]);
+  });
+
+  it('o casal já completo (409 OWNERS_FULL): fecha, relê e avisa', async () => {
+    const user = userEvent.setup();
+    api({
+      me: coupleMe,
+      meId: 'm1',
+      withSecondOwner: false,
+      send: () => apiError({ status: 409, body: { error: 'OWNERS_FULL' } }),
+    });
+    renderRoute({ url: '/app/colaboradores' });
+    await user.click(await screen.findByRole('button', { name: 'Convidar parceiro' }));
+    const dialog = screen.getByRole('dialog', { name: 'Convidar parceiro' });
+    await user.type(emailBox(dialog), 'marcos@exemplo.com');
+    await user.click(within(dialog).getByRole('button', { name: 'Enviar convite' }));
+    expect(
+      await screen.findByText(
+        'Este casamento já tem as duas pessoas do casal. Atualize a tela para ver quem tem acesso.',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('dialog', { name: 'Convidar parceiro' })).toBeNull();
+  });
+
+  it('o convite do parceiro pendente no cartão Casal: "vale até", Reenviar e Cancelar', async () => {
+    const user = userEvent.setup();
+    const calls = api({
+      me: coupleMe,
+      meId: 'm1',
+      withSecondOwner: false,
+      pendingInvitations: [
+        {
+          id: 'p7',
+          kind: 'partner',
+          email: 'marcos@exemplo.com',
+          expiresAt: '2026-12-16T15:00:00Z',
+        },
+      ],
+    });
+    renderRoute({ url: '/app/colaboradores' });
+    const couple = await screen.findByRole('region', { name: 'Casal' });
+    expect(await within(couple).findByText('marcos@exemplo.com')).toBeInTheDocument();
+    expect(within(couple).getByText('Convite enviado · vale até 16/12')).toBeInTheDocument();
+    expect(within(couple).queryByRole('button', { name: 'Convidar parceiro' })).toBeNull();
+    await user.click(within(couple).getByRole('button', { name: 'Reenviar convite' }));
+    expect(
+      await screen.findByText('Convite reenviado para marcos@exemplo.com.'),
+    ).toBeInTheDocument();
+    await user.click(within(couple).getByRole('button', { name: 'Cancelar convite' }));
+    expect(await screen.findByText('Convite cancelado.')).toBeInTheDocument();
+    expect(calls).toEqual([
+      {
+        method: 'POST',
+        path: '/v1/weddings/w1/access-invitations',
+        body: { kind: 'partner', emails: ['marcos@exemplo.com'] },
+      },
+      { method: 'DELETE', path: '/v1/weddings/w1/access-invitations/p7' },
+    ]);
   });
 });
 

@@ -21,6 +21,38 @@ import { cardDate } from '../collaborators-texts';
  */
 const ONLINE = new Set(['published', 'post_event', 'grace']);
 
+export type InvitationKind = 'planner' | 'partner';
+
+/** Os textos de cada convite: o da cerimonialista (276/277) e o do parceiro (decisão 279). */
+function useInviteTexts({ kind }: { kind: InvitationKind }) {
+  const { t } = useTranslation('collaborators');
+  return kind === 'planner'
+    ? {
+        open: t('couple.invite.open'),
+        title: t('couple.invite.dialog.title'),
+        description: t('couple.invite.dialog.description'),
+        email: t('couple.invite.dialog.email'),
+        placeholder: t('couple.invite.dialog.placeholder'),
+        submit: t('couple.invite.dialog.submit'),
+        cancel: t('couple.invite.dialog.cancel'),
+        ownEmail: t('couple.invite.ownEmail'),
+        fullCode: 'PLANNER_ALREADY',
+        full: t('couple.invite.plannerAlready'),
+      }
+    : {
+        open: t('couple.invitePartner.open'),
+        title: t('couple.invitePartner.dialog.title'),
+        description: t('couple.invitePartner.dialog.description'),
+        email: t('couple.invitePartner.dialog.email'),
+        placeholder: t('couple.invitePartner.dialog.placeholder'),
+        submit: t('couple.invitePartner.dialog.submit'),
+        cancel: t('couple.invitePartner.dialog.cancel'),
+        ownEmail: t('couple.invitePartner.ownEmail'),
+        fullCode: 'OWNERS_FULL',
+        full: t('couple.invitePartner.ownersFull'),
+      };
+}
+
 function useRefreshMembers({ weddingId }: { weddingId: string }) {
   const queryClient = useQueryClient();
   return () =>
@@ -35,46 +67,65 @@ function useRefreshMembers({ weddingId }: { weddingId: string }) {
  */
 export function InvitePlanner({ weddingId }: { weddingId: string }) {
   const { t } = useTranslation('collaborators');
-  const [open, setOpen] = useState(false);
   return (
     <>
       <p className="kore-collaborators__empty">{t('couple.invite.empty')}</p>
+      <InviteButton kind="planner" weddingId={weddingId} />
+    </>
+  );
+}
+
+/**
+ * O botão que abre o Dialog do convite. O Convidar parceiro (decisão 279; Navegação da Área
+ * do Casal) aparece no cartão Casal enquanto há menos de 2 donos e nenhum convite pendente.
+ */
+export function InviteButton({ kind, weddingId }: { kind: InvitationKind; weddingId: string }) {
+  const texts = useInviteTexts({ kind });
+  const [open, setOpen] = useState(false);
+  return (
+    <>
       <Button
         type="button"
         variant="secondary"
         className="kore-collaborators__invite"
         onClick={() => setOpen(true)}
       >
-        {t('couple.invite.open')}
+        {texts.open}
       </Button>
-      <InvitePlannerDialog open={open} weddingId={weddingId} onClose={() => setOpen(false)} />
+      <InviteDialog kind={kind} open={open} weddingId={weddingId} onClose={() => setOpen(false)} />
     </>
   );
 }
 
-function InvitePlannerDialog({
+function InviteDialog({
+  kind,
   open,
   weddingId,
   onClose,
 }: {
+  kind: InvitationKind;
   open: boolean;
   weddingId: string;
   onClose: () => void;
 }) {
   const { t } = useTranslation('collaborators');
+  const texts = useInviteTexts({ kind });
   const { showToast } = useToast();
   const refresh = useRefreshMembers({ weddingId });
   const send = useAccessInvitationsControllerSendV1();
   const me = useMeControllerMeV1();
-  const site = useSiteControllerGetV1(weddingId);
+  const site = useSiteControllerGetV1(weddingId, { query: { enabled: kind === 'planner' } });
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string>();
-  const formId = 'kore-invite-planner';
-  // O aviso da C7-6 (decisão 277): o site no ar e a assinatura não ocultada pelo casal. Sem
-  // cerimonialista, o Switch não existe (plannerCredit nulo) e a assinatura sai ao aceitar.
+  const formId = `kore-invite-${kind}`;
+  // O aviso da C7-6 (decisão 277), só no convite da cerimonialista: o site no ar e a
+  // assinatura não ocultada pelo casal. Sem cerimonialista, o Switch não existe
+  // (plannerCredit nulo) e a assinatura sai ao aceitar.
   const credit = site.data?.plannerCredit;
   const showNotice =
-    ONLINE.has(site.data?.status ?? '') && (credit == null || credit.showPlannerCredit);
+    kind === 'planner' &&
+    ONLINE.has(site.data?.status ?? '') &&
+    (credit == null || credit.showPlannerCredit);
 
   function close() {
     setEmail('');
@@ -89,13 +140,13 @@ function InvitePlannerDialog({
       setError(t('couple.invite.invalidEmail'));
       return;
     }
-    // O próprio e-mail só no app: a API não barra no kind planner (decisão 277).
+    // O próprio e-mail só no app: a API não barra nos kinds planner e partner (decisão 277).
     if (me.data && address.toLowerCase() === me.data.user.email.toLowerCase()) {
-      setError(t('couple.invite.ownEmail'));
+      setError(texts.ownEmail);
       return;
     }
     send.mutate(
-      { weddingId, data: { kind: 'planner', emails: [address] } },
+      { weddingId, data: { kind, emails: [address] } },
       {
         onSuccess: () => {
           refresh();
@@ -107,11 +158,11 @@ function InvitePlannerDialog({
             setError(t('couple.invite.invalidEmail'));
             return;
           }
-          if (apiErrorCode({ error: failure }) === 'PLANNER_ALREADY') {
-            // Outra pessoa do casal convidou antes: fecha e relê a lista.
+          if (apiErrorCode({ error: failure }) === texts.fullCode) {
+            // Alguém do casal convidou ou entrou antes: fecha e relê a lista.
             refresh();
             close();
-            showToast({ tone: 'danger', message: t('couple.invite.plannerAlready') });
+            showToast({ tone: 'danger', message: texts.full });
             return;
           }
           showToast({ tone: 'danger', message: t('couple.invite.sendError') });
@@ -125,30 +176,27 @@ function InvitePlannerDialog({
       open={open}
       onOpenChange={(next) => !next && close()}
       role="dialog"
-      title={t('couple.invite.dialog.title')}
-      description={t('couple.invite.dialog.description')}
+      title={texts.title}
+      description={texts.description}
       actions={
         <>
           <Button variant="secondary" onClick={close}>
-            {t('couple.invite.dialog.cancel')}
+            {texts.cancel}
           </Button>
           <Button type="submit" form={formId} disabled={send.isPending}>
-            {t('couple.invite.dialog.submit')}
+            {texts.submit}
           </Button>
         </>
       }
     >
       <form id={formId} noValidate onSubmit={submit} className="kore-collaborators__form">
-        <FormField
-          label={t('couple.invite.dialog.email')}
-          {...(error && { hint: error, hintTone: 'danger' as const })}
-        >
+        <FormField label={texts.email} {...(error && { hint: error, hintTone: 'danger' as const })}>
           {({ id, describedBy, invalid }) => (
             <Input
               id={id}
               type="email"
               autoComplete="email"
-              placeholder={t('couple.invite.dialog.placeholder')}
+              placeholder={texts.placeholder}
               aria-describedby={describedBy}
               invalid={invalid}
               value={email}
@@ -166,11 +214,11 @@ function InvitePlannerDialog({
 }
 
 /**
- * O convite de cerimonialista pendente (decisões 276(3) e 277): o e-mail, "vale até {dd/mm}"
+ * O convite pendente, da cerimonialista ou do parceiro (decisões 276(3), 277 e 279): o e-mail, "vale até {dd/mm}"
  * (com o ano quando não é o atual) ou "O convite venceu.", com Reenviar convite e Cancelar
  * convite (sem confirmação: cancelar não tira ninguém de dentro).
  */
-export function PendingPlannerInvitation({
+export function PendingInvitation({
   weddingId,
   invitation,
   timezone,
@@ -203,7 +251,7 @@ export function PendingPlannerInvitation({
 
   function resend() {
     send.mutate(
-      { weddingId, data: { kind: 'planner', emails: [email] } },
+      { weddingId, data: { kind: invitation.kind, emails: [email] } },
       {
         onSuccess: () => {
           refresh();

@@ -43,6 +43,19 @@
       "resendError": "Não foi possível reenviar agora. Verifique sua conexão e tente de novo.",
       "cancelError": "Não foi possível cancelar agora. Verifique sua conexão e tente de novo.",
       "notPending": "Este convite já não está pendente. Atualize a tela para ver como ficou."
+    },
+    "invitePartner": {
+      "open": "Convidar parceiro",
+      "dialog": {
+        "title": "Convidar parceiro",
+        "description": "A outra pessoa do casal vai ter o próprio login, com as mesmas permissões que você. O convite vale por 30 dias.",
+        "email": "E-mail",
+        "placeholder": "nome@email.com",
+        "submit": "Enviar convite",
+        "cancel": "Cancelar"
+      },
+      "ownersFull": "Este casamento já tem as duas pessoas do casal. Atualize a tela para ver quem tem acesso.",
+      "ownEmail": "Este é o e-mail da sua conta. Use o e-mail da outra pessoa do casal."
     }
   },
   "planner": {

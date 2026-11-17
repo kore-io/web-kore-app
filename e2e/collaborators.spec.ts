@@ -74,7 +74,10 @@ test.describe('Colaboradores', () => {
     await signIn({ page, email: coupleEmail });
 
     await page.goto('/app/colaboradores');
-    await expect(page.getByRole('heading', { name: 'Colaboradores', level: 1 })).toBeVisible();
+    // A primeira tela da rodada pode esperar a compilação do Vite (passou de 5 s localmente).
+    await expect(page.getByRole('heading', { name: 'Colaboradores', level: 1 })).toBeVisible({
+      timeout: 15_000,
+    });
     await expect(page.getByText('Quem tem acesso a este casamento.')).toBeVisible();
     const planners = page.getByRole('region', { name: 'Cerimonialista' });
     await expect(planners.getByText(plannerName)).toBeVisible();
@@ -167,5 +170,41 @@ test.describe('Colaboradores', () => {
     await planners.getByRole('button', { name: 'Cancelar convite' }).click();
     await expect(toast({ page, text: 'Convite cancelado.' })).toBeVisible();
     await expect(planners.getByText('Este casamento ainda não tem cerimonialista.')).toBeVisible();
+  });
+
+  test('com um dono só, o casal convida o parceiro, vê o pendente e cancela (decisão 279)', async ({
+    page,
+  }) => {
+    const coupleEmail = newEmail({ label: `casal-${unique()}` });
+    const ownerId = await createUser({ db, email: coupleEmail, name: 'Ana Beatriz Moreira' });
+    await createWedding({
+      db,
+      partners: ['Ana Beatriz', 'Marcos Lima'],
+      eventDate: '2027-01-30',
+      city: 'Campinas',
+      status: 'draft',
+      createdByUserId: ownerId,
+      owners: [ownerId, null],
+    });
+    await signIn({ page, email: coupleEmail });
+
+    await page.goto('/app/colaboradores');
+    const couple = page.getByRole('region', { name: 'Casal' });
+    await couple.getByRole('button', { name: 'Convidar parceiro' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Convidar parceiro' });
+    const partnerEmail = newEmail({ label: `parceiro-${unique()}` });
+    const since = new Date(Date.now() - 1000);
+    await dialog.getByRole('textbox').fill(partnerEmail);
+    await dialog.getByRole('button', { name: 'Enviar convite' }).click();
+    await expect(toast({ page, text: `Convite enviado para ${partnerEmail}.` })).toBeVisible();
+    expect((await latestEmail({ request: page.request, to: partnerEmail, since })).HTML).toContain(
+      '/convite/',
+    );
+
+    await expect(couple.getByText(partnerEmail)).toBeVisible();
+    await expect(couple.getByRole('button', { name: 'Convidar parceiro' })).toBeHidden();
+    await couple.getByRole('button', { name: 'Cancelar convite' }).click();
+    await expect(toast({ page, text: 'Convite cancelado.' })).toBeVisible();
+    await expect(couple.getByRole('button', { name: 'Convidar parceiro' })).toBeVisible();
   });
 });
