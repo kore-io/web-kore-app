@@ -21,7 +21,7 @@ import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { useWeddingTimezone } from '../../../shared/use-wedding-timezone';
 import { useActiveWedding } from '../../guests/hooks/use-active-wedding';
 import { coupleName } from '../../planner/my-weddings/my-weddings-filters';
-import { InvitePlanner, PendingPlannerInvitation } from '../components/planner-invitation';
+import { InviteButton, InvitePlanner, PendingInvitation } from '../components/access-invitation';
 import { availableAtText, initials, memberGroups, cardDate } from '../collaborators-texts';
 
 /**
@@ -32,7 +32,8 @@ import { availableAtText, initials, memberGroups, cardDate } from '../collaborat
  * - **colaboradora** (Área do Cerimonialista 17): a lista em leitura, Convidar e Remover
  *   desabilitados com o motivo e o Sair deste casamento (o mesmo do detalhe, RN10).
  * O vendedor não aparece (271(4)). Sem cerimonialista, o casal convida uma, ou acompanha
- * o convite pendente (D5c; decisão 276).
+ * o convite pendente (D5c; decisão 276); com um dono só, convida o parceiro ou acompanha
+ * o convite dele (D5d; decisão 279).
  */
 export function CollaboratorsPage() {
   const { weddingId } = useActiveWedding();
@@ -139,6 +140,10 @@ function CoupleCollaborators({ weddingId }: { weddingId: string }) {
   const pendingPlanner = members.data?.pendingInvitations.find(
     (invitation) => invitation.kind === 'planner',
   );
+  // O convite do parceiro pendente, enquanto o casal tem menos de 2 donos (decisão 279).
+  const pendingPartner = members.data?.pendingInvitations.find(
+    (invitation) => invitation.kind === 'partner',
+  );
   return (
     <div className="kore-collaborators">
       {header}
@@ -153,6 +158,16 @@ function CoupleCollaborators({ weddingId }: { weddingId: string }) {
                 <MemberRow key={member.id} member={member} timezone={timezone} withSince={false} />
               ))}
             </ul>
+            {owners.length < 2 &&
+              (pendingPartner ? (
+                <PendingInvitation
+                  weddingId={weddingId}
+                  invitation={pendingPartner}
+                  timezone={timezone}
+                />
+              ) : (
+                <InviteButton kind="partner" weddingId={weddingId} />
+              ))}
             <p className="kore-collaborators__help">{t('couple.ownersHelp')}</p>
           </section>
           <section className="kore-collaborators__card" aria-labelledby={plannersId}>
@@ -184,7 +199,7 @@ function CoupleCollaborators({ weddingId }: { weddingId: string }) {
             {planners.length > 0 ? (
               <p className="kore-collaborators__help">{t('couple.plannersHelp')}</p>
             ) : pendingPlanner ? (
-              <PendingPlannerInvitation
+              <PendingInvitation
                 weddingId={weddingId}
                 invitation={pendingPlanner}
                 timezone={timezone}
