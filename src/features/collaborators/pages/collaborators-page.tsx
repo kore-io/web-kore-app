@@ -21,7 +21,8 @@ import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { useWeddingTimezone } from '../../../shared/use-wedding-timezone';
 import { useActiveWedding } from '../../guests/hooks/use-active-wedding';
 import { coupleName } from '../../planner/my-weddings/my-weddings-filters';
-import { availableAtText, initials, memberGroups, sinceDate } from '../collaborators-texts';
+import { InvitePlanner, PendingPlannerInvitation } from '../components/planner-invitation';
+import { availableAtText, initials, memberGroups, cardDate } from '../collaborators-texts';
 
 /**
  * Colaboradores (Papéis RN02, RN03 e RN06a; Colaboradora RN05; decisões 270 e 271), nas
@@ -30,7 +31,8 @@ import { availableAtText, initials, memberGroups, sinceDate } from '../collabora
  *   o Remover da cerimonialista, com a confirmação e a trava de 48 h;
  * - **colaboradora** (Área do Cerimonialista 17): a lista em leitura, Convidar e Remover
  *   desabilitados com o motivo e o Sair deste casamento (o mesmo do detalhe, RN10).
- * O vendedor não aparece (271(4)); o Convidar cerimonialista do casal chega no D5c.
+ * O vendedor não aparece (271(4)). Sem cerimonialista, o casal convida uma, ou acompanha
+ * o convite pendente (D5c; decisão 276).
  */
 export function CollaboratorsPage() {
   const { weddingId } = useActiveWedding();
@@ -70,7 +72,7 @@ function MemberRow({
         <span className="kore-collaborators__name">{name}</span>
         {withSince && (
           <span className="kore-collaborators__since">
-            {t('since', { date: sinceDate({ at: member.since, timezone }) })}
+            {t('since', { date: cardDate({ at: member.since, timezone }) })}
           </span>
         )}
       </div>
@@ -133,6 +135,10 @@ function CoupleCollaborators({ weddingId }: { weddingId: string }) {
     );
   }
   const { owners, planners } = memberGroups({ members: members.data?.members ?? [] });
+  // O convite de cerimonialista pendente, enquanto ninguém aceitou (decisão 276).
+  const pendingPlanner = members.data?.pendingInvitations.find(
+    (invitation) => invitation.kind === 'planner',
+  );
   return (
     <div className="kore-collaborators">
       {header}
@@ -149,11 +155,11 @@ function CoupleCollaborators({ weddingId }: { weddingId: string }) {
             </ul>
             <p className="kore-collaborators__help">{t('couple.ownersHelp')}</p>
           </section>
-          {planners.length > 0 && (
-            <section className="kore-collaborators__card" aria-labelledby={plannersId}>
-              <h2 id={plannersId} className="kore-collaborators__overline">
-                {t('couple.plannersTitle')}
-              </h2>
+          <section className="kore-collaborators__card" aria-labelledby={plannersId}>
+            <h2 id={plannersId} className="kore-collaborators__overline">
+              {t('couple.plannersTitle')}
+            </h2>
+            {planners.length > 0 && (
               <ul className="kore-collaborators__list">
                 {planners.map((member) => (
                   <MemberRow
@@ -174,9 +180,19 @@ function CoupleCollaborators({ weddingId }: { weddingId: string }) {
                   />
                 ))}
               </ul>
+            )}
+            {planners.length > 0 ? (
               <p className="kore-collaborators__help">{t('couple.plannersHelp')}</p>
-            </section>
-          )}
+            ) : pendingPlanner ? (
+              <PendingPlannerInvitation
+                weddingId={weddingId}
+                invitation={pendingPlanner}
+                timezone={timezone}
+              />
+            ) : (
+              <InvitePlanner weddingId={weddingId} />
+            )}
+          </section>
         </div>
       )}
       <Dialog

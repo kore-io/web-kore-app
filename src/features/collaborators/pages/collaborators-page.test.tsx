@@ -57,7 +57,15 @@ const plannerMe = {
   planner: { organization: 'Prado Assessoria', weddingsCount: 1 },
 };
 
-const members = ({ meId }: { meId: string }) => ({
+const members = ({
+  meId,
+  withPlanner = true,
+  pendingInvitations = [],
+}: {
+  meId: string;
+  withPlanner?: boolean;
+  pendingInvitations?: object[];
+}) => ({
   members: [
     { id: 'm1', name: 'Ana Beatriz Moreira', role: 'owner', since: '2026-08-01T12:00:00Z' },
     { id: 'm2', name: 'Marcos Vinícius Rocha', role: 'owner', since: '2026-08-11T12:00:00Z' },
@@ -75,17 +83,48 @@ const members = ({ meId }: { meId: string }) => ({
       kind: 'seller',
       since: '2026-07-01T12:00:00Z',
     },
-  ].map((member) => ({ ...member, isMe: member.id === meId })),
-  pendingInvitations: [],
+  ]
+    .filter((member) => withPlanner || member.id !== 'm3')
+    .map((member) => ({ ...member, isMe: member.id === meId })),
+  pendingInvitations,
 });
 
-type Call = { method: string; path: string };
+type Call = { method: string; path: string; body?: unknown };
 
-function api({ me, meId, remove }: { me: object; meId: string; remove?: () => Response }) {
+function api({
+  me,
+  meId,
+  remove,
+  send,
+  withPlanner,
+  pendingInvitations,
+  site,
+}: {
+  me: object;
+  meId: string;
+  remove?: () => Response;
+  send?: () => Response;
+  withPlanner?: boolean;
+  pendingInvitations?: object[];
+  site?: { status: string; plannerCredit: object | null };
+}) {
   const calls: Call[] = [];
-  mockApi(({ method, path }) => {
+  mockApi(({ method, path, body }) => {
     if (path === '/v1/me') return Response.json(me);
-    if (path === '/v1/weddings/w1/memberships') return Response.json(members({ meId }));
+    if (path === '/v1/weddings/w1/memberships') {
+      return Response.json(
+        members({
+          meId,
+          ...(withPlanner !== undefined && { withPlanner }),
+          ...(pendingInvitations && { pendingInvitations }),
+        }),
+      );
+    }
+    if (site && path === '/v1/weddings/w1/site') return Response.json(site);
+    if (method === 'POST' && path === '/v1/weddings/w1/access-invitations') {
+      calls.push({ method, path, body });
+      return send?.() ?? Response.json({ invitations: [] }, { status: 201 });
+    }
     if (path === '/v1/me/weddings/w1') {
       return Response.json({ partnerNames: ['Ana Beatriz', 'Marcos'], status: 'published' });
     }
@@ -166,6 +205,199 @@ describe('Colaboradores › versão do casal (Papéis RN02, RN06a; decisões 270
     expect(
       await screen.findByText(
         'Não dá para remover ninguém do casamento agora. Por segurança, isso só pode ser feito 48 horas depois da troca do e-\u2060mail de acesso. Disponível a partir de 16 de nov. às 14h.',
+      ),
+    ).toBeInTheDocument();
+  });
+});
+
+describe('Colaboradores › Convidar cerimonialista do casal (Convites de acesso RN02; decisões 276 e 277)', () => {
+  const emailBox = (dialog: HTMLElement) =>
+    within(dialog).getByRole('textbox', { name: /^E-⁠?mail$/ });
+
+  it('sem cerimonialista: o vazio, o Dialog, as validações do app, o POST e o Toast', async () => {
+    const user = userEvent.setup();
+    const calls = api({ me: coupleMe, meId: 'm1', withPlanner: false });
+    const { container } = renderRoute({ url: '/app/colaboradores' });
+    const planners = await screen.findByRole('region', { name: 'Cerimonialista' });
+    expect(
+      within(planners).getByText('Este casamento ainda não tem cerimonialista.'),
+    ).toBeInTheDocument();
+    expect(within(planners).queryByText(/Quem faz o cerimonial/)).toBeNull();
+    await expectNoA11yViolations({ container });
+    await user.click(within(planners).getByRole('button', { name: 'Convidar cerimonialista' }));
+    const dialog = screen.getByRole('dialog', { name: 'Convidar cerimonialista' });
+    expect(dialog).toHaveAccessibleDescription(
+      'Quem aceitar monta o site e cuida da lista com vocês. O convite vale por 30 dias.',
+    );
+    // Rascunho: sem o aviso da assinatura (decisão 277).
+    expect(within(dialog).queryByText(/O site já está no ar/)).toBeNull();
+    await user.type(emailBox(dialog), 'juliana');
+    await user.click(within(dialog).getByRole('button', { name: 'Enviar convite' }));
+    expect(emailBox(dialog)).toHaveAccessibleDescription('Informe um e-⁠mail válido.');
+    // O próprio e-mail só no app (decisão 277).
+    await user.clear(emailBox(dialog));
+    await user.type(emailBox(dialog), 'ANA@exemplo.com');
+    await user.click(within(dialog).getByRole('button', { name: 'Enviar convite' }));
+    expect(emailBox(dialog)).toHaveAccessibleDescription(
+      'Este é o e-⁠mail da sua conta. Use o e-⁠mail de quem faz o cerimonial.',
+    );
+    expect(calls).toEqual([]);
+    await user.clear(emailBox(dialog));
+    await user.type(emailBox(dialog), 'juliana@prado.com.br');
+    await user.click(within(dialog).getByRole('button', { name: 'Enviar convite' }));
+    expect(
+      await screen.findByText('Convite enviado para juliana@prado.com.br.'),
+    ).toBeInTheDocument();
+    expect(calls).toEqual([
+      {
+        method: 'POST',
+        path: '/v1/weddings/w1/access-invitations',
+        body: { kind: 'planner', emails: ['juliana@prado.com.br'] },
+      },
+    ]);
+  });
+
+  it.each([
+    ['publicado, assinatura não ocultada', 'published', null, true],
+    ['depois do evento (ainda no ar)', 'post_event', { showPlannerCredit: true }, true],
+    ['na carência (ainda no ar)', 'grace', null, true],
+    ['publicado, assinatura ocultada pelo casal', 'published', { showPlannerCredit: false }, false],
+    ['rascunho', 'draft', null, false],
+  ])(
+    'o aviso da assinatura no Dialog: %s (C7-6; decisão 277)',
+    async (_, status, credit, shown) => {
+      const user = userEvent.setup();
+      api({
+        me: coupleMe,
+        meId: 'm1',
+        withPlanner: false,
+        site: { status, plannerCredit: credit },
+      });
+      renderRoute({ url: '/app/colaboradores' });
+      await user.click(await screen.findByRole('button', { name: 'Convidar cerimonialista' }));
+      const dialog = screen.getByRole('dialog', { name: 'Convidar cerimonialista' });
+      const notice =
+        'O site já está no ar. Quando a cerimonialista aceitar, a assinatura da assessoria aparece no rodapé. Para ocultar, vão em Site › Editor › Dados básicos.';
+      if (shown) expect(await within(dialog).findByText(notice)).toBeInTheDocument();
+      else expect(within(dialog).queryByText(notice)).toBeNull();
+    },
+  );
+
+  it('já tem cerimonialista (409 PLANNER_ALREADY): fecha, relê e avisa', async () => {
+    const user = userEvent.setup();
+    api({
+      me: coupleMe,
+      meId: 'm1',
+      withPlanner: false,
+      send: () => apiError({ status: 409, body: { error: 'PLANNER_ALREADY' } }),
+    });
+    renderRoute({ url: '/app/colaboradores' });
+    await user.click(await screen.findByRole('button', { name: 'Convidar cerimonialista' }));
+    const dialog = screen.getByRole('dialog', { name: 'Convidar cerimonialista' });
+    await user.type(emailBox(dialog), 'bia@exemplo.com');
+    await user.click(within(dialog).getByRole('button', { name: 'Enviar convite' }));
+    expect(
+      await screen.findByText(
+        'Este casamento já tem cerimonialista. Atualize a tela para ver quem colabora.',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('dialog', { name: 'Convidar cerimonialista' })).toBeNull();
+  });
+
+  it('o convite pendente: "vale até", Reenviar e Cancelar convite sem confirmação', async () => {
+    const user = userEvent.setup();
+    const calls = api({
+      me: coupleMe,
+      meId: 'm1',
+      withPlanner: false,
+      pendingInvitations: [
+        {
+          id: 'i9',
+          kind: 'planner',
+          email: 'juliana@prado.com.br',
+          expiresAt: '2026-12-16T15:00:00Z',
+        },
+      ],
+    });
+    renderRoute({ url: '/app/colaboradores' });
+    const planners = await screen.findByRole('region', { name: 'Cerimonialista' });
+    expect(await within(planners).findByText('juliana@prado.com.br')).toBeInTheDocument();
+    expect(within(planners).getByText('Convite enviado · vale até 16/12')).toBeInTheDocument();
+    expect(within(planners).queryByRole('button', { name: 'Convidar cerimonialista' })).toBeNull();
+    await user.click(within(planners).getByRole('button', { name: 'Reenviar convite' }));
+    expect(
+      await screen.findByText('Convite reenviado para juliana@prado.com.br.'),
+    ).toBeInTheDocument();
+    await user.click(within(planners).getByRole('button', { name: 'Cancelar convite' }));
+    expect(await screen.findByText('Convite cancelado.')).toBeInTheDocument();
+    expect(screen.queryByRole('alertdialog')).toBeNull();
+    expect(calls).toEqual([
+      {
+        method: 'POST',
+        path: '/v1/weddings/w1/access-invitations',
+        body: { kind: 'planner', emails: ['juliana@prado.com.br'] },
+      },
+      { method: 'DELETE', path: '/v1/weddings/w1/access-invitations/i9' },
+    ]);
+  });
+
+  it('o "vale até" com o ano quando não é o atual, e o vencido (decisão 277)', async () => {
+    api({
+      me: coupleMe,
+      meId: 'm1',
+      withPlanner: false,
+      pendingInvitations: [
+        {
+          id: 'i9',
+          kind: 'planner',
+          email: 'juliana@prado.com.br',
+          expiresAt: '2027-01-05T15:00:00Z',
+        },
+      ],
+    });
+    renderRoute({ url: '/app/colaboradores' });
+    expect(await screen.findByText('Convite enviado · vale até 05/01/2027')).toBeInTheDocument();
+  });
+
+  it('o convite vencido mostra "O convite venceu."', async () => {
+    api({
+      me: coupleMe,
+      meId: 'm1',
+      withPlanner: false,
+      pendingInvitations: [
+        {
+          id: 'i9',
+          kind: 'planner',
+          email: 'juliana@prado.com.br',
+          expiresAt: '2026-11-10T15:00:00Z',
+        },
+      ],
+    });
+    renderRoute({ url: '/app/colaboradores' });
+    expect(await screen.findByText('O convite venceu.')).toBeInTheDocument();
+  });
+
+  it('cancelar um convite que já não está pendente (409 NOT_PENDING) avisa e relê', async () => {
+    const user = userEvent.setup();
+    api({
+      me: coupleMe,
+      meId: 'm1',
+      withPlanner: false,
+      remove: () => apiError({ status: 409, body: { error: 'NOT_PENDING' } }),
+      pendingInvitations: [
+        {
+          id: 'i9',
+          kind: 'planner',
+          email: 'juliana@prado.com.br',
+          expiresAt: '2026-12-16T15:00:00Z',
+        },
+      ],
+    });
+    renderRoute({ url: '/app/colaboradores' });
+    await user.click(await screen.findByRole('button', { name: 'Cancelar convite' }));
+    expect(
+      await screen.findByText(
+        'Este convite já não está pendente. Atualize a tela para ver como ficou.',
       ),
     ).toBeInTheDocument();
   });

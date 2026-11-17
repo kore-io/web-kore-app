@@ -36,10 +36,10 @@ export function availableAtText({ at, timezone }: { at: string; timezone: string
 }
 
 /**
- * "05/08" e, com outro ano, "05/08/2025": o início do vínculo no fuso do casamento
- * (decisões 271(1) e 274).
+ * "05/08" e, com outro ano, "05/08/2025", no fuso do casamento: o "Desde" do vínculo
+ * (decisões 271(1) e 274) e o "vale até" do convite pendente (decisão 277).
  */
-export function sinceDate({
+export function cardDate({
   at,
   timezone,
   now = new Date(),

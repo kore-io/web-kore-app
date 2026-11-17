@@ -86,7 +86,8 @@ test.describe('Colaboradores', () => {
     await expect(
       toast({ page, text: `${plannerName} não tem mais acesso ao casamento.` }),
     ).toBeVisible();
-    await expect(page.getByRole('region', { name: 'Cerimonialista' })).toBeHidden();
+    // Sem cerimonialista, o cartão volta ao vazio com o Convidar (D5c).
+    await expect(planners.getByText('Este casamento ainda não tem cerimonialista.')).toBeVisible();
   });
 
   test('a trava de 48 h depois da troca do e-mail de acesso (Papéis RN06a)', async ({ page }) => {
@@ -127,5 +128,44 @@ test.describe('Colaboradores', () => {
     await expect(page).toHaveURL(/\/cerimonialista$/);
     await expect(toast({ page, text: 'Você saiu do casamento de Ana e Marcos.' })).toBeVisible();
     await expect(toast({ page, text: 'Este casamento não está mais disponível.' })).toBeHidden();
+  });
+
+  test('o casal convida a cerimonialista, vê o convite pendente e cancela (decisões 276 e 277)', async ({
+    page,
+  }) => {
+    const coupleEmail = newEmail({ label: `casal-${unique()}` });
+    const ownerId = await createUser({ db, email: coupleEmail, name: 'Ana Beatriz Moreira' });
+    await createWedding({
+      db,
+      partners: ['Ana Beatriz', 'Marcos Lima'],
+      eventDate: '2027-01-30',
+      city: 'Campinas',
+      status: 'draft',
+      createdByUserId: ownerId,
+      owners: [ownerId, null],
+    });
+    await signIn({ page, email: coupleEmail });
+
+    await page.goto('/app/colaboradores');
+    const planners = page.getByRole('region', { name: 'Cerimonialista' });
+    await expect(planners.getByText('Este casamento ainda não tem cerimonialista.')).toBeVisible();
+    await planners.getByRole('button', { name: 'Convidar cerimonialista' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Convidar cerimonialista' });
+    const plannerEmail = newEmail({ label: `cerimonial-${unique()}` });
+    const since = new Date(Date.now() - 1000);
+    await dialog.getByRole('textbox').fill(plannerEmail);
+    await dialog.getByRole('button', { name: 'Enviar convite' }).click();
+    await expect(toast({ page, text: `Convite enviado para ${plannerEmail}.` })).toBeVisible();
+    expect((await latestEmail({ request: page.request, to: plannerEmail, since })).HTML).toContain(
+      '/convite/',
+    );
+
+    await expect(planners.getByText(plannerEmail)).toBeVisible();
+    await expect(
+      planners.getByText(/^Convite enviado · vale até \d{2}\/\d{2}(\/\d{4})?$/),
+    ).toBeVisible();
+    await planners.getByRole('button', { name: 'Cancelar convite' }).click();
+    await expect(toast({ page, text: 'Convite cancelado.' })).toBeVisible();
+    await expect(planners.getByText('Este casamento ainda não tem cerimonialista.')).toBeVisible();
   });
 });
