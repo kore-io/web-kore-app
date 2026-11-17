@@ -341,10 +341,12 @@ describe('Novo casamento › passos 1 e 2 (Novo casamento RN01 a RN04; D6a)', ()
     api();
     renderRoute({ url: ROUTE });
     await fillData(user);
-    // Antes da resposta (o debounce de 400 ms), não avança.
+    // Antes da resposta (o debounce de 400 ms), não avança e o botão avisa que espera.
+    expect(screen.getByRole('button', { name: 'Continuar' })).toHaveAttribute('aria-busy', 'true');
     await user.click(screen.getByRole('button', { name: 'Continuar' }));
     expect(screen.getByText('Passo 1 de 4', { exact: false })).toBeInTheDocument();
     await screen.findByText('Endereço disponível. O casal pode mudar até publicar.');
+    expect(screen.getByRole('button', { name: 'Continuar' })).not.toHaveAttribute('aria-busy');
     await user.click(screen.getByRole('button', { name: 'Continuar' }));
     expect(await screen.findByText('Passo 2 de 4', { exact: false })).toBeInTheDocument();
   });

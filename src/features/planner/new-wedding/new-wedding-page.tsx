@@ -360,7 +360,10 @@ function DataStep({
         <Button type="button" variant="ghost" onClick={() => void navigate(paths.plannerArea)}>
           {t('newWedding.cancel')}
         </Button>
-        <Button type="submit">{t('newWedding.continue')}</Button>
+        {/* Enquanto a disponibilidade do endereço responde, o Continuar espera (sugestão do Crivo). */}
+        <Button type="submit" aria-busy={wedding.slugChecking || undefined}>
+          {t('newWedding.continue')}
+        </Button>
       </div>
     </form>
   );
