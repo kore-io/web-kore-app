@@ -221,9 +221,12 @@ describe('Detalhe do casamento (Meus casamentos RN08 a RN11; decisão 260)', () 
     );
     expect(within(dialog).queryByRole('button', { name: 'Montar o site' })).toBeNull();
     await user.click(within(dialog).getByRole('button', { name: 'Reenviar convite' }));
-    expect(
-      await screen.findByText('Convite reenviado para fernanda.alves@gmail.com.'),
-    ).toBeInTheDocument();
+    const toast = await screen.findByText('Convite reenviado para fernanda.alves@gmail.com.');
+    // O painel é modal e o Toast fica fora do aria-hidden que ele põe no resto (decisão 263(1)).
+    const page = document.querySelector('main');
+    expect(page).not.toBeNull();
+    expect(page?.closest('[aria-hidden="true"]')).toBeInstanceOf(HTMLElement);
+    expect(toast.closest('[aria-hidden="true"]')).toBeNull();
     expect(writes).toEqual([
       expect.objectContaining({
         method: 'POST',

@@ -57,12 +57,12 @@ export function WeddingDetailPanel({
   }, [notFound, queryClient, showToast, t, onClose]);
 
   return (
-    // Não modal: o modal do Radix esconde do leitor de tela tudo fora do painel, inclusive a
-    // região dos avisos, e os Toasts (Convite reenviado, Link copiado) não seriam anunciados.
-    // O véu é desenhado à parte e fecha o painel no clique, como no Penpot.
-    <RadixDialog.Root open modal={false} onOpenChange={(open) => !open && onClose()}>
+    // Modal (decisão 263(1)): a região dos Toasts da lib fica no body, fora do aria-hidden que
+    // o modal põe no resto da página, e os avisos (Convite reenviado, Link copiado) seguem
+    // anunciados. O clique no véu fecha o painel, como no Penpot.
+    <RadixDialog.Root open onOpenChange={(open) => !open && onClose()}>
       <RadixDialog.Portal>
-        <div className="kore-wedding-detail__veil" aria-hidden="true" onClick={onClose} />
+        <RadixDialog.Overlay className="kore-wedding-detail__veil" />
         <RadixDialog.Content
           className="kore-wedding-detail"
           aria-describedby={undefined}

@@ -60,7 +60,7 @@ export function WeddingSwitcher({
   const [search, setSearch] = useState('');
   const panelId = useId();
   const searchId = useId();
-  const rootRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLSpanElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const pointerInPanel = useRef(false);
@@ -111,7 +111,9 @@ export function WeddingSwitcher({
 
   const Chevron = open ? ChevronUp : ChevronDown;
   return (
-    <div className="kore-wedding-switcher" ref={rootRef}>
+    // Um span: o Topbar da lib põe o título num <p>, que não aceita <div> (o painel vai por
+    // portal para o body).
+    <span className="kore-wedding-switcher" ref={rootRef}>
       <button
         ref={buttonRef}
         type="button"
@@ -197,6 +199,6 @@ export function WeddingSwitcher({
           </div>,
           document.body,
         )}
-    </div>
+    </span>
   );
 }
