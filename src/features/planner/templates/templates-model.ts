@@ -87,6 +87,7 @@ export type TemplateError =
   | 'nameMissing'
   | 'nameTooLong'
   | 'textMissing'
+  | 'textTooLong'
   | 'faqMissing'
   | 'questionMissing'
   | 'answerMissing';
@@ -117,7 +118,10 @@ export function validateText(draft: TextDraft): Partial<Record<'name' | 'text', 
   const errors: Partial<Record<'name' | 'text', TemplateError>> = {};
   const name = nameError(draft.name);
   if (name) errors.name = name;
-  if (!cleanText(draft.text)) errors.text = 'textMissing';
+  const text = cleanText(draft.text);
+  if (!text) errors.text = 'textMissing';
+  // O maxLength não corta o que já está no campo ao trocar a Seção (ex.: para o Dress code).
+  else if (text.length > TEXT_MAX[draft.sectionType]) errors.text = 'textTooLong';
   return errors;
 }
 

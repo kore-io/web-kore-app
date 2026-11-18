@@ -379,6 +379,7 @@
       "nameMissing": "Dê um nome ao modelo.",
       "nameTooLong": "O nome passa de 80 caracteres.",
       "textMissing": "Escreva o texto do modelo.",
+      "textTooLong": "O texto passa de {{max}} caracteres. Encurte antes de salvar.",
       "faqMissing": "Adicione pelo menos uma pergunta com resposta.",
       "questionMissing": "Escreva a pergunta.",
       "answerMissing": "Escreva a resposta.",

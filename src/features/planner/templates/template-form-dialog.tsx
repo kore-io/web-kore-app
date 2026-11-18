@@ -160,8 +160,13 @@ interface FormProps {
 
 function useErrorText() {
   const { t } = useTranslation('planner');
-  return (error: TemplateError | undefined) =>
-    error ? { hint: t(`templates.errors.${error}`), hintTone: 'danger' as const } : {};
+  return (error: TemplateError | undefined, max?: number) =>
+    error
+      ? {
+          hint: t(`templates.errors.${error}`, { max: NUMBER.format(max ?? 0) }),
+          hintTone: 'danger' as const,
+        }
+      : {};
 }
 
 function NameField({
@@ -240,7 +245,10 @@ function TextForm({ template, formId, save }: FormProps) {
             value={sectionType}
             // A seção é a do modelo: no Editar, ela não muda (o PATCH não a recebe).
             disabled={template !== null}
-            onChange={(event) => setSectionType(event.target.value as TextSection)}
+            onChange={(event) => {
+              setSectionType(event.target.value as TextSection);
+              setErrors((current) => without(current, 'text'));
+            }}
           >
             {TEXT_SECTIONS.map((section) => (
               <option key={section} value={section}>
@@ -252,7 +260,7 @@ function TextForm({ template, formId, save }: FormProps) {
       </FormField>
       <FormField
         label={t('templates.form.text')}
-        {...(errors.text ? errorText(errors.text) : { hint: t('templates.form.textHelp') })}
+        {...(errors.text ? errorText(errors.text, max) : { hint: t('templates.form.textHelp') })}
       >
         {({ id, describedBy, invalid }) => (
           <>

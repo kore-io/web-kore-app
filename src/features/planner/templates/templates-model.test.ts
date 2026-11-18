@@ -46,6 +46,11 @@ describe('Modelos › o conteúdo e a validação (RN01, RN04)', () => {
     expect(validateText({ name: 'a'.repeat(81), sectionType: 'story', text: 'x' })).toEqual({
       name: 'nameTooLong',
     });
+    // O limite é o da seção: 2.000 no Dress code (RN04).
+    expect(validateText({ name: 'D', sectionType: 'dress_code', text: 'x'.repeat(2001) })).toEqual({
+      text: 'textTooLong',
+    });
+    expect(validateText({ name: 'D', sectionType: 'story', text: 'x'.repeat(2001) })).toEqual({});
     expect(textBody({ name: ' Tom acolhedor ', sectionType: 'story', text: ' {casal} ' })).toEqual({
       name: 'Tom acolhedor',
       content: { text: '{casal}' },

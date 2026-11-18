@@ -194,6 +194,24 @@ describe('Modelos (Modelos do cerimonialista RN01 a RN06; Voz, Modelos)', () => 
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 
+  it('o texto acima do limite da seção, depois de trocar para o Dress code, não sai (RN04)', async () => {
+    const user = userEvent.setup();
+    const calls = api({ templates: [] });
+    renderRoute({ url: PAGE });
+    await clickCreate(user);
+    const dialog = screen.getByRole('dialog', { name: 'Novo modelo de texto' });
+    await user.type(within(dialog).getByRole('textbox', { name: 'Nome do modelo' }), 'Traje');
+    const text = within(dialog).getByRole('textbox', { name: 'Texto' });
+    await user.click(text);
+    await user.paste('x'.repeat(2500));
+    await user.selectOptions(within(dialog).getByRole('combobox', { name: 'Seção' }), 'dress_code');
+    await user.click(within(dialog).getByRole('button', { name: 'Criar modelo' }));
+    expect(text).toHaveAccessibleDescription(
+      'O texto passa de 2.000 caracteres. Encurte antes de salvar.',
+    );
+    expect(calls).toEqual([]);
+  });
+
   it('Editar: os dados do modelo, a seção fixa e o PATCH com o Toast "Alterações salvas."', async () => {
     const user = userEvent.setup();
     const calls = api();
