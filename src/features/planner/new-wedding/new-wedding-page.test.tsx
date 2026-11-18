@@ -81,18 +81,24 @@ function api({
   detail = draft as Record<string, unknown>,
   discountPercent = 10 as number | null,
   invite,
+  templates,
 }: {
   available?: boolean;
   create?: () => Response;
   detail?: Record<string, unknown>;
   discountPercent?: number | null;
   invite?: (body: unknown) => Response;
+  /** Os modelos de Aparência dela (RN09); sem a opção, a leitura falha e o Select some. */
+  templates?: object[];
 } = {}) {
   const calls: Call[] = [];
   // O detalhe muda depois do envio: aguarda o casal, com o convite.
   let current = detail;
   mockApi(({ method, path, body }) => {
     if (path === '/v1/me') return Response.json(me);
+    if (templates && path === '/v1/me/planner-templates?kind=appearance') {
+      return Response.json(templates);
+    }
     if (path.startsWith('/v1/weddings/slug-availability')) {
       const slug = new URL(`http://x${path}`).searchParams.get('slug') ?? '';
       return Response.json(
@@ -282,6 +288,91 @@ describe('Novo casamento › passos 1 e 2 (Novo casamento RN01 a RN04; D6a)', ()
         },
       },
     ]);
+  });
+
+  it('Começar de um modelo: o Select com Sem modelo de partida; escolher preenche a Aparência, sem confirmação (Modelos RN09; decisão 298)', async () => {
+    const user = userEvent.setup();
+    const calls = api({
+      templates: [
+        {
+          id: 't2',
+          kind: 'appearance',
+          sectionType: null,
+          name: 'Padrão Prado Assessoria',
+          locale: 'pt-BR',
+          content: {
+            fontPairKey: 'classico',
+            starterPaletteKey: 'salvia',
+            primaryColor: '#566C4B',
+            accentColor: '#C9A66B',
+            backgroundMode: 'light',
+          },
+          createdAt: '2026-11-12T12:00:00Z',
+          updatedAt: '2026-11-12T12:00:00Z',
+        },
+        {
+          id: 't1',
+          kind: 'appearance',
+          sectionType: null,
+          name: 'Marinho clássico',
+          locale: 'pt-BR',
+          content: {
+            fontPairKey: 'moderno',
+            starterPaletteKey: 'marinho',
+            primaryColor: '#1F2A44',
+            accentColor: '#B08D57',
+            backgroundMode: 'light',
+          },
+          createdAt: '2026-11-10T12:00:00Z',
+          updatedAt: '2026-11-10T12:00:00Z',
+        },
+      ],
+    });
+    renderRoute({ url: ROUTE });
+    await fillData(user);
+    await user.click(screen.getByRole('checkbox', { name: 'O casal ainda não sabe a data' }));
+    await screen.findByText('Endereço disponível. Dá para mudar até publicar.');
+    await user.click(screen.getByRole('button', { name: 'Continuar' }));
+    const select = await screen.findByRole('combobox', {
+      name: 'Começar de um modelo (opcional)',
+    });
+    expect(select).toHaveAccessibleDescription(
+      'As fontes, as cores e o fundo do modelo entram na Aparência. Dá para mudar depois.',
+    );
+    expect(select).toHaveDisplayValue('Sem modelo');
+    // Só o nome, na ordem da API (do mais novo ao mais antigo).
+    expect(
+      within(select)
+        .getAllByRole('option')
+        .map((option) => option.textContent),
+    ).toEqual(['Sem modelo', 'Padrão Prado Assessoria', 'Marinho clássico']);
+    await user.selectOptions(select, 'Padrão Prado Assessoria');
+    expect(screen.queryByRole('alertdialog')).toBeNull();
+    expect(screen.getByRole('radio', { name: 'Sálvia' })).toBeChecked();
+    expect(screen.getByRole('radio', { name: 'Claro' })).toBeChecked();
+    await user.click(screen.getByRole('button', { name: 'Criar casamento' }));
+    await waitFor(() => expect(calls).toHaveLength(1));
+    expect(calls[0]?.body).toMatchObject({
+      appearance: {
+        fontPairKey: 'classico',
+        starterPaletteKey: 'salvia',
+        primaryColor: '#566C4B',
+        accentColor: '#C9A66B',
+        backgroundMode: 'light',
+      },
+    });
+  });
+
+  it('sem modelos de Aparência, o Select não aparece (Modelos RN09)', async () => {
+    const user = userEvent.setup();
+    api({ templates: [] });
+    renderRoute({ url: ROUTE });
+    await fillData(user);
+    await user.click(screen.getByRole('checkbox', { name: 'O casal ainda não sabe a data' }));
+    await screen.findByText('Endereço disponível. Dá para mudar até publicar.');
+    await user.click(screen.getByRole('button', { name: 'Continuar' }));
+    await screen.findByRole('button', { name: 'Criar casamento' });
+    expect(screen.queryByRole('combobox', { name: /Começar de um modelo/ })).toBeNull();
   });
 
   it('o endereço ocupado na criação (409 SLUG_UNAVAILABLE) volta ao passo 1 com a sugestão', async () => {

@@ -114,8 +114,14 @@ export function mockSite({
   site = siteWith(),
   put,
   preview,
+  planner = null,
+  templates,
 }: {
   site?: SiteEditorResponse;
+  /** O `planner` do /me: com o perfil de cerimonialista, a colaboradora vê o Aplicar modelo. */
+  planner?: { organization: string; weddingsCount: number } | null;
+  /** O GET /v1/me/planner-templates, pela query (`?kind=…&sectionType=…`). */
+  templates?: (query: URLSearchParams) => unknown[];
   put?: (type: string, body: Record<string, unknown>) => Response;
   /** A resposta do POST …/site-previews (o padrão é a url da prévia). */
   preview?: () => Response;
@@ -123,7 +129,10 @@ export function mockSite({
   const calls: Call[] = [];
   let uploads = 0;
   mockApi(({ method, path, body }) => {
-    if (path === '/v1/me') return Response.json(meFor(me));
+    if (path === '/v1/me') return Response.json({ ...meFor(me), planner });
+    if (templates && method === 'GET' && path.startsWith('/v1/me/planner-templates')) {
+      return Response.json(templates(new URLSearchParams(path.split('?')[1] ?? '')));
+    }
     if (path === '/v1/weddings/w1/site' && method === 'GET') return Response.json(site);
     if (path === '/v1/weddings/w1/site-previews' && method === 'POST') {
       calls.push({ method, path, body: body as Record<string, unknown> });

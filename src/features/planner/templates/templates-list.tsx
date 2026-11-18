@@ -129,7 +129,7 @@ export function TemplatesList({
  * cor principal e do destaque; para o leitor de tela, o texto da Voz ("Fontes Romântico ·
  * Cor principal Sálvia · Destaque … · Fundo creme").
  */
-function AppearanceSample({ template }: { template: PlannerTemplateResponse }) {
+export function AppearanceSample({ template }: { template: PlannerTemplateResponse }) {
   const { t } = useTranslation('planner');
   const { t: tSite } = useTranslation('site');
   const content = appearanceOf(template);

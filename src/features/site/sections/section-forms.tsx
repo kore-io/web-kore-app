@@ -10,6 +10,7 @@ import { ImageField, type ImageValue } from '../components/image-field';
 import { FIRST_SECTION_SLUG } from '../sections';
 import { useSiteSection, type SectionErrors } from './use-site-section';
 import { useAreaPaths } from '../../../app/area';
+import { FaqTemplateAction, TextTemplateAction } from '../../planner/templates/apply-template';
 
 const NUMBER = new Intl.NumberFormat('pt-BR');
 const TITLE_MAX = 80;
@@ -49,6 +50,7 @@ export function SectionFrame({
   audience,
   empty,
   notice,
+  action,
   children,
 }: {
   state: Pick<Section, 'draft' | 'errors' | 'setEnabled' | 'setTitle' | 'clearError'>;
@@ -56,11 +58,14 @@ export function SectionFrame({
   empty: boolean;
   /** O aviso fixo da seção, embaixo do título (Penpot 1.4). */
   notice?: ReactNode;
+  /** A ação da seção no topo (o Aplicar modelo da colaboradora, Modelos RN08). */
+  action?: ReactNode;
   children: ReactNode;
 }) {
   const { t } = useTranslation('site');
   return (
     <div className="kore-site-section">
+      {action}
       {state.draft.enabled && empty && <Alert tone="warning">{t('section.empty')}</Alert>}
       <Switch
         checked={state.draft.enabled}
@@ -110,15 +115,29 @@ export function TextWithCounter({
   onChange: (value: string) => void;
 }) {
   const { t } = useTranslation('site');
+  const { t: tPlanner } = useTranslation('planner');
+  // Só um modelo aplicado passa do limite: a digitação já trava no maxLength (Modelos RN08).
+  const over = value.length > max;
   return (
     <FormField
       label={label}
-      hint={t('section.counter', { count: NUMBER.format(value.length), max: NUMBER.format(max) })}
+      {...(over
+        ? {
+            hint: tPlanner('templates.apply.overLimit', { max: NUMBER.format(max) }),
+            hintTone: 'danger' as const,
+          }
+        : {
+            hint: t('section.counter', {
+              count: NUMBER.format(value.length),
+              max: NUMBER.format(max),
+            }),
+          })}
     >
-      {({ id, describedBy }) => (
+      {({ id, describedBy, invalid }) => (
         <Textarea
           id={id}
           aria-describedby={describedBy}
+          invalid={invalid}
           rows={6}
           maxLength={max}
           {...(placeholder !== undefined && { placeholder })}
@@ -182,7 +201,7 @@ export function CountdownSection({ weddingId, site, section, audience }: Section
 }
 
 /** Hospedagem e transporte (RN08): título e texto até 5.000. */
-export function LodgingSection({ weddingId, section, audience }: SectionProps) {
+export function LodgingSection({ weddingId, site, section, audience }: SectionProps) {
   const { t } = useTranslation('site');
   const state = useSiteSection({
     weddingId,
@@ -190,9 +209,21 @@ export function LodgingSection({ weddingId, section, audience }: SectionProps) {
     fromResponse: (content) => ({ text: text(content) }),
     toBody: (content) => ({ text: content.text }),
     validate: () => ({}),
+    blocked: (content) => content.text.length > LODGING_MAX,
   });
   return (
-    <SectionFrame state={state} audience={audience} empty={!state.draft.content.text.trim()}>
+    <SectionFrame
+      state={state}
+      audience={audience}
+      empty={!state.draft.content.text.trim()}
+      action={
+        <TextTemplateAction
+          site={site}
+          sectionType="lodging"
+          onText={(value) => state.replaceContent({ text: value })}
+        />
+      }
+    >
       <TextWithCounter
         label={t('section.text')}
         value={state.draft.content.text}
@@ -205,7 +236,7 @@ export function LodgingSection({ weddingId, section, audience }: SectionProps) {
 }
 
 /** Dress code (RN09): título, texto até 2.000 e a foto de referência opcional. */
-export function DressCodeSection({ weddingId, section, audience }: SectionProps) {
+export function DressCodeSection({ weddingId, site, section, audience }: SectionProps) {
   const { t } = useTranslation('site');
   const state = useSiteSection<{ text: string; image: ImageValue }>({
     weddingId,
@@ -219,10 +250,22 @@ export function DressCodeSection({ weddingId, section, audience }: SectionProps)
     },
     toBody: (content) => ({ text: content.text, imageId: content.image?.id ?? null }),
     validate: () => ({}),
+    blocked: (content) => content.text.length > DRESS_MAX,
   });
   const { content } = state.draft;
   return (
-    <SectionFrame state={state} audience={audience} empty={!content.text.trim() && !content.image}>
+    <SectionFrame
+      state={state}
+      audience={audience}
+      empty={!content.text.trim() && !content.image}
+      action={
+        <TextTemplateAction
+          site={site}
+          sectionType="dress_code"
+          onText={(value) => state.setContent((current) => ({ ...current, text: value }))}
+        />
+      }
+    >
       <TextWithCounter
         label={t('section.text')}
         value={content.text}
@@ -284,7 +327,20 @@ export function FaqSection({ weddingId, section, audience }: SectionProps) {
     state.setContent((current) => moveItem(current, index, by));
 
   return (
-    <SectionFrame state={state} audience={audience} empty={items.length === 0}>
+    <SectionFrame
+      state={state}
+      audience={audience}
+      empty={items.length === 0}
+      action={
+        <FaqTemplateAction
+          onQuestions={(questions) =>
+            state.replaceContent(
+              questions.slice(0, FAQ_MAX).map((item) => ({ key: nextKey(), ...item })),
+            )
+          }
+        />
+      }
+    >
       <ol className="kore-site-faq">
         {items.map((item, index) => {
           const n = index + 1;

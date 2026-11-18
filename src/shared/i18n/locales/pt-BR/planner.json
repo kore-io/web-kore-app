@@ -238,6 +238,9 @@
     "nameOf": "Nome {{n}} de 2",
     "eventDate": "Data do casamento",
     "optional": "(opcional)",
+    "template": "Começar de um modelo",
+    "templateNone": "Sem modelo",
+    "templateHint": "As fontes, as cores e o fundo do modelo entram na Aparência. Dá para mudar depois.",
     "noDate": "O casal ainda não sabe a data",
     "slugPrefix": "kore.com.br/",
     "slugAvailable": "Endereço disponível. Dá para mudar até publicar.",
@@ -396,6 +399,23 @@
       "confirm": "Excluir modelo",
       "cancel": "Cancelar"
     },
-    "createdOn": "Criado em {{date}}"
+    "createdOn": "Criado em {{date}}",
+    "apply": {
+      "open": "Aplicar modelo",
+      "title": "Aplicar modelo",
+      "empty": "Você ainda não tem modelos para esta seção.",
+      "create": "Criar modelo",
+      "cancel": "Cancelar",
+      "confirmTitle": "Aplicar \"{{name}}\"?",
+      "confirm": {
+        "section_content": "O texto atual da seção {{section}} é substituído no editor. Ele só vai ao ar quando você salvar.",
+        "faq": "As perguntas atuais do FAQ são substituídas no editor. Elas só vão ao ar quando você salvar.",
+        "appearance": "As fontes, as cores e o fundo atuais são substituídos no editor. Eles só vão ao ar quando você salvar."
+      },
+      "confirmButton": "Aplicar",
+      "applied": "Modelo aplicado. Revise e salve.",
+      "appliedNoDate": "Modelo aplicado. Este casamento ainda não tem data, então {data} ficou no texto. Revise e salve.",
+      "overLimit": "O texto passa de {{max}} caracteres. Encurte antes de salvar."
+    }
   }
 }
