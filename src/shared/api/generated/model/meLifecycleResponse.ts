@@ -20,6 +20,12 @@ export interface MeLifecycleResponse {
   graceUntil: string | null;
   /** @nullable */
   expiredAt: string | null;
+  /**
+   * Até onde está pago (o paidThrough): com ele depois de hoje, a faixa e o
+   * Dashboard do caso B, também para a colaboradora (decisões 293(5) e 296(2)).
+   * @nullable
+   */
+  paidThrough: string | null;
   /** @nullable */
   deletionScheduledFor: string | null;
   /** Bloqueado pelo suporte (Casamento bloqueado RN07): a faixa substitui as outras. */
