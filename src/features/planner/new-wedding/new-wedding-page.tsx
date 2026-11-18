@@ -116,7 +116,7 @@ function CreateFlow() {
                 disabled={wedding.submitting || !appearance.canSave}
                 aria-busy={wedding.submitting || undefined}
               >
-                {t('newWedding.continue')}
+                {t('newWedding.create')}
               </Button>
             </div>
           </form>
@@ -185,7 +185,7 @@ function Stepper({ current }: { current: Step }) {
   const { t } = useTranslation('planner');
   const index = STEPS.indexOf(current);
   return (
-    <ol className="kore-new-wedding__steps" aria-label={t('newWedding.title')}>
+    <ol className="kore-new-wedding__steps" aria-label={t('newWedding.stepsLabel')}>
       {STEPS.map((step, position) => {
         const label = t(`newWedding.steps.${step}`);
         const done = position < index;

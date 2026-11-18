@@ -45,8 +45,8 @@ async function createWedding({ page }: { page: Page }): Promise<string> {
   });
   // Os nomes com letras únicas, para o endereço sugerido não colidir com rodadas anteriores.
   const first = `Isabela${letters()}`;
-  await page.getByRole('textbox', { name: 'Nomes do casal, 1' }).fill(first);
-  await page.getByRole('textbox', { name: 'Nomes do casal, 2' }).fill('André');
+  await page.getByRole('textbox', { name: 'Nome 1 de 2' }).fill(first);
+  await page.getByRole('textbox', { name: 'Nome 2 de 2' }).fill('André');
   await page.getByRole('textbox', { name: 'Cidade' }).fill('Americana');
   await page.getByRole('combobox', { name: 'UF' }).selectOption('SP');
   await page
@@ -55,13 +55,13 @@ async function createWedding({ page }: { page: Page }): Promise<string> {
   await expect(page.getByRole('textbox', { name: 'Endereço do site' })).toHaveValue(
     `${first.toLowerCase()}-e-andre`,
   );
-  await expect(
-    page.getByText('Endereço disponível. O casal pode mudar até publicar.'),
-  ).toBeVisible();
+  await expect(page.getByText('Endereço disponível. Dá para mudar até publicar.')).toBeVisible();
   await page.getByRole('button', { name: 'Continuar' }).click();
 
   await expect(
-    page.getByText('Passo 2 de 4 · Escolha um ponto de partida. O casal pode mudar tudo depois.'),
+    page.getByText(
+      'Passo 2 de 4 · Escolha um ponto de partida. Dá para mudar tudo depois, no Editor do site.',
+    ),
   ).toBeVisible();
   // As fontes do Editor (loadEditorFonts) mudam o layout ao chegar: espera por elas e clica
   // no rótulo do cartão, já que o rádio é sr-only.
@@ -71,10 +71,14 @@ async function createWedding({ page }: { page: Page }): Promise<string> {
   const salvia = page.getByRole('radio', { name: /Sálvia/ });
   await page.locator('label.kore-site-appearance__palette').filter({ has: salvia }).click();
   await expect(salvia).toBeChecked();
-  await page.getByRole('button', { name: 'Continuar' }).click();
+  await page.getByRole('button', { name: 'Criar casamento' }).click();
 
   // O casamento nasce aqui, e a rota passa a ter o ?casamento={id}, sem o Toast (decisão 281).
-  await expect(page.getByText('Passo 3 de 4 · Convidar o casal')).toBeVisible();
+  await expect(
+    page.getByText(
+      'Passo 3 de 4 · O casamento já está criado como rascunho. Convide o casal agora ou deixe para depois.',
+    ),
+  ).toBeVisible();
   await expect(page).toHaveURL(/\/cerimonialista\/casamentos\/novo\?casamento=/);
   return first;
 }
@@ -96,7 +100,11 @@ test('a cerimonialista cria um casamento e gera o link do casal (RN02 a RN06)', 
 
   await expect(page.getByRole('heading', { name: 'Casamento criado.' })).toBeVisible();
   await expect(page.getByText('Aguardando o casal')).toBeVisible();
-  await expect(page.getByText(`${first} e André · Americana (SP)`)).toBeVisible();
+  await expect(page.getByText(`${first} e André · Data a definir · Americana (SP)`)).toBeVisible();
+  await expect(page.getByText('Passo 4 de 4 · Pronto')).toBeVisible();
+  await expect(
+    page.getByText('Acompanhar em Meus casamentos quando o casal aceitar'),
+  ).toBeVisible();
   const block = page.getByRole('region', { name: 'Link para o casal' });
   await expect(block.getByRole('textbox', { name: 'Link para o casal' })).toHaveValue(
     /\/convite\//,
@@ -127,7 +135,11 @@ test('Convidar depois, e o Convidar o casal do detalhe volta ao passo 3 com o en
   await page.goto(`/cerimonialista?casamento=${weddingId}`);
   const dialog = page.getByRole('dialog', { name: `${first} e André` });
   await dialog.getByRole('button', { name: 'Convidar o casal' }).click();
-  await expect(page.getByText('Passo 3 de 4 · Convidar o casal')).toBeVisible();
+  await expect(
+    page.getByText(
+      'Passo 3 de 4 · O casamento já está criado como rascunho. Convide o casal agora ou deixe para depois.',
+    ),
+  ).toBeVisible();
   const couple = `isabela-${unique()}@exemplo.com`;
   await page
     .getByRole('textbox', { name: 'E-⁠mail do casal (opcional)', exact: true })

@@ -20,7 +20,8 @@ import { ApiError, apiErrorCode } from '../../../shared/api/http-client';
 import { FormField } from '../../../shared/components/form-field';
 import { isValidEmail } from '../../access/email';
 import { CoupleLinkBlock } from '../my-weddings/couple-link-block';
-import { coupleName, shortDate } from '../my-weddings/my-weddings-filters';
+import { formatWeddingDate } from '../../access/profile-texts';
+import { coupleName } from '../my-weddings/my-weddings-filters';
 import { useCoupleLinkActions } from '../my-weddings/use-couple-link-actions';
 import { coupleInvitations } from '../my-weddings/wedding-detail-texts';
 import { WeddingStatusBadge } from '../my-weddings/wedding-status-badge';
@@ -227,7 +228,9 @@ export function DoneStep({
   const site = areaPaths(plannerWeddingBase({ weddingId })).site;
   const line = [
     coupleName(detail),
-    detail.eventDate ? shortDate({ date: detail.eventDate }) : '',
+    detail.eventDate
+      ? formatWeddingDate({ isoDate: detail.eventDate })
+      : t('newWedding.done.noDate'),
     `${detail.city} (${detail.state})`,
   ]
     .filter(Boolean)

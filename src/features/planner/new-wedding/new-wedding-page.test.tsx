@@ -171,8 +171,8 @@ const OTHER_EMAIL = 'Outro e-\u2060mail do casal (opcional)';
 const wj = (text: string) => text.replace(/([eE])-mail/g, '$1-\u2060mail');
 
 async function fillData(user: ReturnType<typeof userEvent.setup>) {
-  await user.type(await screen.findByRole('textbox', { name: 'Nomes do casal, 1' }), 'Isabela');
-  await user.type(screen.getByRole('textbox', { name: 'Nomes do casal, 2' }), 'André');
+  await user.type(await screen.findByRole('textbox', { name: 'Nome 1 de 2' }), 'Isabela');
+  await user.type(screen.getByRole('textbox', { name: 'Nome 2 de 2' }), 'André');
   await user.type(screen.getByRole('textbox', { name: 'Cidade' }), 'Americana');
   await user.selectOptions(screen.getByRole('combobox', { name: 'UF' }), 'SP');
 }
@@ -188,7 +188,7 @@ describe('Novo casamento › passos 1 e 2 (Novo casamento RN01 a RN04; D6a)', ()
         'Passo 1 de 4 · O casamento nasce como rascunho. Você monta o site e convida o casal quando quiser.',
       ),
     ).toBeInTheDocument();
-    const steps = screen.getByRole('list', { name: 'Novo casamento' });
+    const steps = screen.getByRole('list', { name: 'Passos do novo casamento' });
     expect(within(steps).getAllByRole('listitem')).toHaveLength(4);
     expect(within(steps).getByText('Dados do casamento').closest('li')).toHaveAttribute(
       'aria-current',
@@ -196,10 +196,10 @@ describe('Novo casamento › passos 1 e 2 (Novo casamento RN01 a RN04; D6a)', ()
     );
     await expectNoA11yViolations({ container });
     await user.click(screen.getByRole('button', { name: 'Continuar' }));
-    expect(screen.getByRole('textbox', { name: 'Nomes do casal, 1' })).toHaveAccessibleDescription(
+    expect(screen.getByRole('textbox', { name: 'Nome 1 de 2' })).toHaveAccessibleDescription(
       'Informe o nome.',
     );
-    expect(screen.getByRole('textbox', { name: 'Nomes do casal, 2' })).toHaveAccessibleDescription(
+    expect(screen.getByRole('textbox', { name: 'Nome 2 de 2' })).toHaveAccessibleDescription(
       'Informe o nome.',
     );
     expect(screen.getByRole('textbox', { name: 'Cidade' })).toHaveAccessibleDescription(
@@ -233,12 +233,12 @@ describe('Novo casamento › passos 1 e 2 (Novo casamento RN01 a RN04; D6a)', ()
     await fillData(user);
     await user.click(screen.getByRole('checkbox', { name: 'O casal ainda não sabe a data' }));
     expect(
-      await screen.findByText('Endereço disponível. O casal pode mudar até publicar.'),
+      await screen.findByText('Endereço disponível. Dá para mudar até publicar.'),
     ).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Continuar' }));
     expect(
       await screen.findByText(
-        'Passo 2 de 4 · Escolha um ponto de partida. O casal pode mudar tudo depois.',
+        'Passo 2 de 4 · Escolha um ponto de partida. Dá para mudar tudo depois, no Editor do site.',
       ),
     ).toBeInTheDocument();
     expect(screen.getByText('Dados do casamento, concluído')).toBeInTheDocument();
@@ -247,10 +247,14 @@ describe('Novo casamento › passos 1 e 2 (Novo casamento RN01 a RN04; D6a)', ()
         'Isabela & André',
       ),
     ).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Continuar' }));
+    await user.click(screen.getByRole('button', { name: 'Criar casamento' }));
     await waitFor(() => expect(router.state.location.search).toBe('?casamento=w9'));
     expect(router.state.location.pathname).toBe(ROUTE);
-    expect(await screen.findByText('Passo 3 de 4 · Convidar o casal')).toBeInTheDocument();
+    expect(
+      await screen.findByText(
+        'Passo 3 de 4 · O casamento já está criado como rascunho. Convide o casal agora ou deixe para depois.',
+      ),
+    ).toBeInTheDocument();
     expect(screen.queryByText('Casamento criado.')).toBeNull();
     expect(calls).toEqual([
       {
@@ -285,10 +289,10 @@ describe('Novo casamento › passos 1 e 2 (Novo casamento RN01 a RN04; D6a)', ()
     });
     renderRoute({ url: ROUTE });
     await fillData(user);
-    await screen.findByText('Endereço disponível. O casal pode mudar até publicar.');
+    await screen.findByText('Endereço disponível. Dá para mudar até publicar.');
     await user.click(screen.getByRole('button', { name: 'Continuar' }));
     await screen.findByText('Passo 2 de 4', { exact: false });
-    await user.click(screen.getByRole('button', { name: 'Continuar' }));
+    await user.click(screen.getByRole('button', { name: 'Criar casamento' }));
     expect(
       await screen.findByText('Esse endereço já está em uso. Tente isabela-e-andre-2.'),
     ).toBeInTheDocument();
@@ -303,13 +307,13 @@ describe('Novo casamento › passos 1 e 2 (Novo casamento RN01 a RN04; D6a)', ()
     });
     renderRoute({ url: ROUTE });
     await fillData(user);
-    await screen.findByText('Endereço disponível. O casal pode mudar até publicar.');
+    await screen.findByText('Endereço disponível. Dá para mudar até publicar.');
     await user.click(screen.getByRole('button', { name: 'Continuar' }));
     await screen.findByText('Passo 2 de 4', { exact: false });
-    await user.click(screen.getByRole('button', { name: 'Continuar' }));
+    await user.click(screen.getByRole('button', { name: 'Criar casamento' }));
     expect(await screen.findByRole('alert')).toBeInTheDocument();
     expect(screen.getByText('Passo 2 de 4', { exact: false })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Continuar' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Criar casamento' })).toBeDisabled();
   });
 
   it('Cancelar volta a Meus casamentos sem criar nada', async () => {
@@ -325,7 +329,7 @@ describe('Novo casamento › passos 1 e 2 (Novo casamento RN01 a RN04; D6a)', ()
     const user = userEvent.setup();
     api();
     renderRoute({ url: ROUTE });
-    const name = await screen.findByRole('textbox', { name: 'Nomes do casal, 1' });
+    const name = await screen.findByRole('textbox', { name: 'Nome 1 de 2' });
     await user.click(name);
     await user.paste('a'.repeat(81));
     const city = screen.getByRole('textbox', { name: 'Cidade' });
@@ -345,7 +349,7 @@ describe('Novo casamento › passos 1 e 2 (Novo casamento RN01 a RN04; D6a)', ()
     expect(screen.getByRole('button', { name: 'Continuar' })).toHaveAttribute('aria-busy', 'true');
     await user.click(screen.getByRole('button', { name: 'Continuar' }));
     expect(screen.getByText('Passo 1 de 4', { exact: false })).toBeInTheDocument();
-    await screen.findByText('Endereço disponível. O casal pode mudar até publicar.');
+    await screen.findByText('Endereço disponível. Dá para mudar até publicar.');
     expect(screen.getByRole('button', { name: 'Continuar' })).not.toHaveAttribute('aria-busy');
     await user.click(screen.getByRole('button', { name: 'Continuar' }));
     expect(await screen.findByText('Passo 2 de 4', { exact: false })).toBeInTheDocument();
@@ -356,10 +360,10 @@ describe('Novo casamento › passos 1 e 2 (Novo casamento RN01 a RN04; D6a)', ()
     api({ create: () => apiError({ status: 503, body: { error: 'UNAVAILABLE' } }) });
     renderRoute({ url: ROUTE });
     await fillData(user);
-    await screen.findByText('Endereço disponível. O casal pode mudar até publicar.');
+    await screen.findByText('Endereço disponível. Dá para mudar até publicar.');
     await user.click(screen.getByRole('button', { name: 'Continuar' }));
     await screen.findByText('Passo 2 de 4', { exact: false });
-    await user.click(screen.getByRole('button', { name: 'Continuar' }));
+    await user.click(screen.getByRole('button', { name: 'Criar casamento' }));
     expect(
       await screen.findByText('Não foi possível continuar. Confira sua conexão e tente de novo.', {
         exact: false,
@@ -374,8 +378,12 @@ describe('Novo casamento › passos 3 e 4 (Novo casamento RN05 a RN07; D6b; deci
     api();
     const { container } = renderRoute({ url: INVITE });
     expect(await screen.findByRole('textbox', { name: EMAIL })).toBeInTheDocument();
-    expect(screen.getByText('Passo 3 de 4 · Convidar o casal')).toBeInTheDocument();
-    const steps = screen.getByRole('list', { name: 'Novo casamento' });
+    expect(
+      screen.getByText(
+        'Passo 3 de 4 · O casamento já está criado como rascunho. Convide o casal agora ou deixe para depois.',
+      ),
+    ).toBeInTheDocument();
+    const steps = screen.getByRole('list', { name: 'Passos do novo casamento' });
     expect(within(steps).getByText('Convidar o casal').closest('li')).toHaveAttribute(
       'aria-current',
       'step',
@@ -414,14 +422,16 @@ describe('Novo casamento › passos 3 e 4 (Novo casamento RN05 a RN07; D6b; deci
     );
     await user.click(screen.getByRole('button', { name: 'Enviar convite' }));
     expect(await screen.findByRole('heading', { name: 'Casamento criado.' })).toBeInTheDocument();
-    expect(screen.getByText('Passo 4 de 4')).toBeInTheDocument();
+    expect(screen.getByText('Passo 4 de 4 · Pronto')).toBeInTheDocument();
     expect(
       screen.getByText(
         'Enviamos o convite para isabela@exemplo.com e andre@exemplo.com. Enquanto o casal não aceita, você já pode montar o site e a lista de convidados.',
       ),
     ).toBeInTheDocument();
     expect(await screen.findByText('Aguardando o casal')).toBeInTheDocument();
-    expect(screen.getByText('Isabela e André · 08/05/2027 · Americana (SP)')).toBeInTheDocument();
+    expect(
+      screen.getByText('Isabela e André · sáb., 8 de mai. de 2027 · Americana (SP)'),
+    ).toBeInTheDocument();
     const next = screen.getByRole('region', { name: 'Próximos passos' });
     expect(
       within(next)
@@ -430,7 +440,7 @@ describe('Novo casamento › passos 3 e 4 (Novo casamento RN05 a RN07; D6b; deci
     ).toEqual([
       'Montar o site: seções, fotos e lista de presentes',
       'Cadastrar os convidados, à mão ou pela planilha',
-      'Acompanhar a resposta do casal em Meus casamentos',
+      'Acompanhar em Meus casamentos quando o casal aceitar',
     ]);
     expect(calls.at(-1)).toEqual({
       method: 'POST',
@@ -492,7 +502,11 @@ describe('Novo casamento › passos 3 e 4 (Novo casamento RN05 a RN07; D6b; deci
     expect(screen.queryByRole('button', { name: 'Ir para Meus casamentos' })).toBeNull();
     expect(calls).toEqual([]);
     await user.click(screen.getByRole('button', { name: 'Convidar o casal' }));
-    expect(await screen.findByText('Passo 3 de 4 · Convidar o casal')).toBeInTheDocument();
+    expect(
+      await screen.findByText(
+        'Passo 3 de 4 · O casamento já está criado como rascunho. Convide o casal agora ou deixe para depois.',
+      ),
+    ).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Convidar depois' }));
     await user.click(await screen.findByRole('button', { name: 'Montar o site' }));
     await waitFor(() =>
@@ -531,7 +545,11 @@ describe('Novo casamento › passos 3 e 4 (Novo casamento RN05 a RN07; D6b; deci
         wj('Este é o e-mail da sua conta. Use o e-mail do casal.'),
       ),
     );
-    expect(screen.getByText('Passo 3 de 4 · Convidar o casal')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Passo 3 de 4 · O casamento já está criado como rascunho. Convide o casal agora ou deixe para depois.',
+      ),
+    ).toBeInTheDocument();
   });
 
   it.each([
