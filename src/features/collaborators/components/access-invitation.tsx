@@ -23,7 +23,7 @@ const ONLINE = new Set(['published', 'post_event', 'grace']);
 
 export type InvitationKind = 'planner' | 'partner';
 
-/** Os textos de cada convite: o da cerimonialista (276/277) e o do parceiro (decisão 279). */
+/** Os textos de cada convite: o da cerimonialista (276/277) e o da outra pessoa do casal (decisões 279 e 284). */
 function useInviteTexts({ kind }: { kind: InvitationKind }) {
   const { t } = useTranslation('collaborators');
   return kind === 'planner'
@@ -76,7 +76,7 @@ export function InvitePlanner({ weddingId }: { weddingId: string }) {
 }
 
 /**
- * O botão que abre o Dialog do convite. O Convidar parceiro (decisão 279; Navegação da Área
+ * O botão que abre o Dialog do convite. O Convidar a outra pessoa (decisões 279 e 284; Navegação da Área
  * do Casal) aparece no cartão Casal enquanto há menos de 2 donos e nenhum convite pendente.
  */
 export function InviteButton({ kind, weddingId }: { kind: InvitationKind; weddingId: string }) {
@@ -214,7 +214,7 @@ function InviteDialog({
 }
 
 /**
- * O convite pendente, da cerimonialista ou do parceiro (decisões 276(3), 277 e 279): o e-mail, "vale até {dd/mm}"
+ * O convite pendente, da cerimonialista ou da outra pessoa do casal (decisões 276(3), 277 e 279): o e-mail, "vale até {dd/mm}"
  * (com o ano quando não é o atual) ou "O convite venceu.", com Reenviar convite e Cancelar
  * convite (sem confirmação: cancelar não tira ninguém de dentro).
  */

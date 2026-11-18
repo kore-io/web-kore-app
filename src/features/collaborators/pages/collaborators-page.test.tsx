@@ -409,15 +409,15 @@ describe('Colaboradores › Convidar cerimonialista do casal (Convites de acesso
   });
 });
 
-describe('Colaboradores › Convidar parceiro (Navegação da Área do Casal; decisão 279)', () => {
+describe('Colaboradores › Convidar a outra pessoa (Navegação da Área do Casal; decisões 279 e 284)', () => {
   const emailBox = (dialog: HTMLElement) =>
-    within(dialog).getByRole('textbox', { name: /^E-⁠?mail$/ });
+    within(dialog).getByRole('textbox', { name: /^E-⁠?mail da outra pessoa$/ });
 
-  it('com os dois donos, sem o Convidar parceiro', async () => {
+  it('com os dois donos, sem o Convidar a outra pessoa', async () => {
     api({ me: coupleMe, meId: 'm1' });
     renderRoute({ url: '/app/colaboradores' });
     const couple = await screen.findByRole('region', { name: 'Casal' });
-    expect(within(couple).queryByRole('button', { name: 'Convidar parceiro' })).toBeNull();
+    expect(within(couple).queryByRole('button', { name: 'Convidar a outra pessoa' })).toBeNull();
   });
 
   it('com um dono só: o Dialog, o próprio e-mail, o POST com kind partner e o Toast', async () => {
@@ -426,8 +426,13 @@ describe('Colaboradores › Convidar parceiro (Navegação da Área do Casal; de
     const { container } = renderRoute({ url: '/app/colaboradores' });
     const couple = await screen.findByRole('region', { name: 'Casal' });
     await expectNoA11yViolations({ container });
-    await user.click(within(couple).getByRole('button', { name: 'Convidar parceiro' }));
-    const dialog = screen.getByRole('dialog', { name: 'Convidar parceiro' });
+    // Com um dono só, o rodapé fala com quem lê (decisão 284(1)).
+    expect(
+      within(couple).getByText('Você pode publicar, pagar e trocar a chave Pix.'),
+    ).toBeInTheDocument();
+    expect(within(couple).queryByText(/Vocês têm as mesmas permissões/)).toBeNull();
+    await user.click(within(couple).getByRole('button', { name: 'Convidar a outra pessoa' }));
+    const dialog = screen.getByRole('dialog', { name: 'Convidar a outra pessoa do casal' });
     expect(dialog).toHaveAccessibleDescription(
       'A outra pessoa do casal vai ter o próprio login, com as mesmas permissões que você. O convite vale por 30 dias.',
     );
@@ -460,8 +465,8 @@ describe('Colaboradores › Convidar parceiro (Navegação da Área do Casal; de
       send: () => apiError({ status: 409, body: { error: 'OWNERS_FULL' } }),
     });
     renderRoute({ url: '/app/colaboradores' });
-    await user.click(await screen.findByRole('button', { name: 'Convidar parceiro' }));
-    const dialog = screen.getByRole('dialog', { name: 'Convidar parceiro' });
+    await user.click(await screen.findByRole('button', { name: 'Convidar a outra pessoa' }));
+    const dialog = screen.getByRole('dialog', { name: 'Convidar a outra pessoa do casal' });
     await user.type(emailBox(dialog), 'marcos@exemplo.com');
     await user.click(within(dialog).getByRole('button', { name: 'Enviar convite' }));
     expect(
@@ -469,10 +474,10 @@ describe('Colaboradores › Convidar parceiro (Navegação da Área do Casal; de
         'Este casamento já tem as duas pessoas do casal. Atualize a tela para ver quem tem acesso.',
       ),
     ).toBeInTheDocument();
-    expect(screen.queryByRole('dialog', { name: 'Convidar parceiro' })).toBeNull();
+    expect(screen.queryByRole('dialog', { name: 'Convidar a outra pessoa do casal' })).toBeNull();
   });
 
-  it('o convite do parceiro pendente no cartão Casal: "vale até", Reenviar e Cancelar', async () => {
+  it('o convite da outra pessoa pendente no cartão Casal: "vale até", Reenviar e Cancelar', async () => {
     const user = userEvent.setup();
     const calls = api({
       me: coupleMe,
@@ -491,7 +496,7 @@ describe('Colaboradores › Convidar parceiro (Navegação da Área do Casal; de
     const couple = await screen.findByRole('region', { name: 'Casal' });
     expect(await within(couple).findByText('marcos@exemplo.com')).toBeInTheDocument();
     expect(within(couple).getByText('Convite enviado · vale até 16/12')).toBeInTheDocument();
-    expect(within(couple).queryByRole('button', { name: 'Convidar parceiro' })).toBeNull();
+    expect(within(couple).queryByRole('button', { name: 'Convidar a outra pessoa' })).toBeNull();
     await user.click(within(couple).getByRole('button', { name: 'Reenviar convite' }));
     expect(
       await screen.findByText('Convite reenviado para marcos@exemplo.com.'),

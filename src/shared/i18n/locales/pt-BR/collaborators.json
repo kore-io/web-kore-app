@@ -6,6 +6,7 @@
     "ownersTitle": "Casal",
     "plannersTitle": "Cerimonialista",
     "ownersHelp": "Vocês têm as mesmas permissões: publicar, pagar e trocar a chave Pix.",
+    "ownerHelp": "Você pode publicar, pagar e trocar a chave Pix.",
     "plannersHelp": "Quem faz o cerimonial monta o site e cuida da lista. Publicar, pagar e a chave Pix são do casal.",
     "remove": "Remover",
     "removeName": "Remover {{name}}",
@@ -45,11 +46,11 @@
       "notPending": "Este convite já não está pendente. Atualize a tela para ver como ficou."
     },
     "invitePartner": {
-      "open": "Convidar parceiro",
+      "open": "Convidar a outra pessoa",
       "dialog": {
-        "title": "Convidar parceiro",
+        "title": "Convidar a outra pessoa do casal",
         "description": "A outra pessoa do casal vai ter o próprio login, com as mesmas permissões que você. O convite vale por 30 dias.",
-        "email": "E-mail",
+        "email": "E-mail da outra pessoa",
         "placeholder": "nome@email.com",
         "submit": "Enviar convite",
         "cancel": "Cancelar"

@@ -172,7 +172,7 @@ test.describe('Colaboradores', () => {
     await expect(planners.getByText('Este casamento ainda não tem cerimonialista.')).toBeVisible();
   });
 
-  test('com um dono só, o casal convida o parceiro, vê o pendente e cancela (decisão 279)', async ({
+  test('com um dono só, o casal convida a outra pessoa, vê o pendente e cancela (decisões 279 e 284)', async ({
     page,
   }) => {
     const coupleEmail = newEmail({ label: `casal-${unique()}` });
@@ -190,9 +190,10 @@ test.describe('Colaboradores', () => {
 
     await page.goto('/app/colaboradores');
     const couple = page.getByRole('region', { name: 'Casal' });
-    await couple.getByRole('button', { name: 'Convidar parceiro' }).click();
-    const dialog = page.getByRole('dialog', { name: 'Convidar parceiro' });
-    const partnerEmail = newEmail({ label: `parceiro-${unique()}` });
+    await expect(couple.getByText('Você pode publicar, pagar e trocar a chave Pix.')).toBeVisible();
+    await couple.getByRole('button', { name: 'Convidar a outra pessoa' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Convidar a outra pessoa do casal' });
+    const partnerEmail = newEmail({ label: `outra-pessoa-${unique()}` });
     const since = new Date(Date.now() - 1000);
     await dialog.getByRole('textbox').fill(partnerEmail);
     await dialog.getByRole('button', { name: 'Enviar convite' }).click();
@@ -202,9 +203,9 @@ test.describe('Colaboradores', () => {
     );
 
     await expect(couple.getByText(partnerEmail)).toBeVisible();
-    await expect(couple.getByRole('button', { name: 'Convidar parceiro' })).toBeHidden();
+    await expect(couple.getByRole('button', { name: 'Convidar a outra pessoa' })).toBeHidden();
     await couple.getByRole('button', { name: 'Cancelar convite' }).click();
     await expect(toast({ page, text: 'Convite cancelado.' })).toBeVisible();
-    await expect(couple.getByRole('button', { name: 'Convidar parceiro' })).toBeVisible();
+    await expect(couple.getByRole('button', { name: 'Convidar a outra pessoa' })).toBeVisible();
   });
 });
