@@ -817,7 +817,25 @@
       },
       "get": {
         "operationId": "MyWeddingsController_list_v1",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "awaiting_couple",
+                "draft",
+                "published",
+                "post_event",
+                "grace",
+                "expired",
+                "awaiting_payment"
+              ]
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -828,6 +846,16 @@
                 }
               }
             }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": ""
           },
           "401": {
             "content": {
@@ -1100,58 +1128,6 @@
         ]
       }
     },
-    "/v1/me/referrer": {
-      "get": {
-        "operationId": "PlannerController_referrer_v1",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MyReferrerResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SessionExpiredErrorBody"
-                }
-              }
-            },
-            "description": ""
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProfileNotOwnedErrorBody"
-                }
-              }
-            },
-            "description": ""
-          },
-          "429": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RateLimitedErrorBody"
-                }
-              }
-            },
-            "description": ""
-          }
-        },
-        "summary": "O link de indicação e o desconto do casal (Link de indicação RN01 e RN02).",
-        "tags": [
-          "me"
-        ]
-      }
-    },
     "/v1/referrals/{code}": {
       "get": {
         "operationId": "ReferralController_referral_v1",
@@ -1240,6 +1216,12 @@
                     },
                     {
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
                     },
                     {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
@@ -1544,6 +1526,12 @@
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
                     },
                     {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
+                    },
+                    {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
                     }
                   ]
@@ -1657,6 +1645,12 @@
                     },
                     {
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
                     },
                     {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
@@ -1837,7 +1831,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/OriginNotAllowedErrorBody"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/OriginNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/WeddingBlockedErrorBody"
+                    }
+                  ]
                 }
               }
             },
@@ -1871,6 +1872,9 @@
                     },
                     {
                       "$ref": "#/components/schemas/PlannerProfileExistsErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/WeddingDeletionScheduledErrorBody"
                     }
                   ]
                 }
@@ -2003,6 +2007,16 @@
             },
             "description": ""
           },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                }
+              }
+            }
+          },
           "404": {
             "content": {
               "application/json": {
@@ -2075,6 +2089,12 @@
                     },
                     {
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
                     },
                     {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
@@ -2360,7 +2380,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PixKeyChangePendingErrorBody"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/PixKeyChangePendingErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/RecentAccessChangeErrorBody"
+                    }
+                  ]
                 }
               }
             },
@@ -2809,6 +2836,12 @@
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
                     },
                     {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
+                    },
+                    {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
                     }
                   ]
@@ -2911,6 +2944,12 @@
                       "$ref": "#/components/schemas/AlreadyRespondedErrorBody"
                     },
                     {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
+                    },
+                    {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
                     }
                   ]
@@ -3002,6 +3041,16 @@
               }
             },
             "description": ""
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                }
+              }
+            }
           },
           "404": {
             "content": {
@@ -3107,6 +3156,12 @@
                     },
                     {
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
                     },
                     {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
@@ -3318,6 +3373,16 @@
             },
             "description": ""
           },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                }
+              }
+            }
+          },
           "404": {
             "content": {
               "application/json": {
@@ -3407,6 +3472,12 @@
                     },
                     {
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
                     },
                     {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
@@ -3506,6 +3577,12 @@
                     },
                     {
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
                     },
                     {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
@@ -3615,6 +3692,12 @@
                     },
                     {
                       "$ref": "#/components/schemas/AlreadyRespondedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
                     },
                     {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
@@ -3753,6 +3836,12 @@
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
                     },
                     {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
+                    },
+                    {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
                     }
                   ]
@@ -3867,6 +3956,12 @@
                     },
                     {
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
                     },
                     {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
@@ -3993,6 +4088,12 @@
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
                     },
                     {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
+                    },
+                    {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
                     }
                   ]
@@ -4086,6 +4187,16 @@
             },
             "description": ""
           },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                }
+              }
+            }
+          },
           "404": {
             "content": {
               "application/json": {
@@ -4175,6 +4286,12 @@
                     },
                     {
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
                     },
                     {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
@@ -4306,6 +4423,12 @@
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
                     },
                     {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
+                    },
+                    {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
                     }
                   ]
@@ -4391,6 +4514,16 @@
               }
             },
             "description": ""
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                }
+              }
+            }
           },
           "404": {
             "content": {
@@ -4483,6 +4616,12 @@
                     },
                     {
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
                     },
                     {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
@@ -4611,6 +4750,12 @@
                     },
                     {
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
                     },
                     {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
@@ -4742,6 +4887,12 @@
                     },
                     {
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
                     },
                     {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
@@ -4882,6 +5033,12 @@
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
                     },
                     {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
+                    },
+                    {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
                     }
                   ]
@@ -5001,6 +5158,12 @@
                     },
                     {
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
                     },
                     {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
@@ -5163,6 +5326,16 @@
             },
             "description": ""
           },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                }
+              }
+            }
+          },
           "404": {
             "content": {
               "application/json": {
@@ -5274,6 +5447,12 @@
                     },
                     {
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
                     },
                     {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
@@ -5414,6 +5593,12 @@
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
                     },
                     {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
+                    },
+                    {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
                     }
                   ]
@@ -5530,6 +5715,12 @@
                     },
                     {
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
                     },
                     {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
@@ -5659,6 +5850,12 @@
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
                     },
                     {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
+                    },
+                    {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
                     }
                   ]
@@ -5777,6 +5974,12 @@
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
                     },
                     {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
+                    },
+                    {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
                     }
                   ]
@@ -5870,7 +6073,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    }
+                  ]
                 }
               }
             },
@@ -5968,6 +6178,12 @@
                     },
                     {
                       "$ref": "#/components/schemas/SiteFieldNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
                     },
                     {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
@@ -6327,6 +6543,26 @@
             },
             "description": ""
           },
+          "410": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteExpiredErrorBody"
+                }
+              }
+            },
+            "description": ""
+          },
+          "423": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteUnavailableErrorBody"
+                }
+              }
+            },
+            "description": ""
+          },
           "429": {
             "content": {
               "application/json": {
@@ -6489,6 +6725,26 @@
             },
             "description": ""
           },
+          "410": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteExpiredErrorBody"
+                }
+              }
+            },
+            "description": ""
+          },
+          "423": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteUnavailableErrorBody"
+                }
+              }
+            },
+            "description": ""
+          },
           "429": {
             "content": {
               "application/json": {
@@ -6570,6 +6826,12 @@
                     },
                     {
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
                     }
                   ]
                 }
@@ -6925,6 +7187,12 @@
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
                     },
                     {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
+                    },
+                    {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
                     }
                   ]
@@ -7061,6 +7329,12 @@
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
                     },
                     {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
+                    },
+                    {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
                     }
                   ]
@@ -7158,7 +7432,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    }
+                  ]
                 }
               }
             },
@@ -7268,6 +7549,12 @@
                     },
                     {
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
                     },
                     {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
@@ -7397,7 +7684,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    }
+                  ]
                 }
               }
             },
@@ -7511,6 +7805,12 @@
                     },
                     {
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
                     },
                     {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
@@ -7658,6 +7958,12 @@
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
                     },
                     {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
+                    },
+                    {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
                     }
                   ]
@@ -7778,7 +8084,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    }
+                  ]
                 }
               }
             },
@@ -7857,7 +8170,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    }
+                  ]
                 }
               }
             },
@@ -7940,6 +8260,16 @@
               }
             },
             "description": ""
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                }
+              }
+            }
           },
           "404": {
             "content": {
@@ -8652,6 +8982,57 @@
         ]
       }
     },
+    "/v1/me/referrer": {
+      "get": {
+        "operationId": "MyReferrerController_referrer_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyReferrerResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionExpiredErrorBody"
+                }
+              }
+            },
+            "description": ""
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileNotOwnedErrorBody"
+                }
+              }
+            },
+            "description": ""
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RateLimitedErrorBody"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "tags": [
+          "planner"
+        ]
+      }
+    },
     "/v1/me/weddings/{id}": {
       "get": {
         "operationId": "MyWeddingsController_detail_v1",
@@ -9142,7 +9523,31 @@
     "/v1/me/referrer/commissions": {
       "get": {
         "operationId": "ReferrerCommissionsController_list_v1",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "view",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": "payment",
+              "type": "string",
+              "enum": [
+                "payment",
+                "wedding"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -9153,6 +9558,16 @@
                 }
               }
             }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": ""
           },
           "401": {
             "content": {
@@ -9185,7 +9600,7 @@
             "description": ""
           }
         },
-        "summary": "A tela Comissões (Comissões do indicador RN02, RN07 e RN10).",
+        "summary": "A tela Comissões (Comissões do indicador RN02, RN07 e RN10; Contrato de API).",
         "tags": [
           "planner"
         ]
@@ -9392,7 +9807,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    }
+                  ]
                 }
               }
             },
@@ -9524,6 +9946,12 @@
                     },
                     {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
                     }
                   ]
                 }
@@ -9667,6 +10095,12 @@
                     },
                     {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
                     }
                   ]
                 }
@@ -9823,6 +10257,12 @@
                     },
                     {
                       "$ref": "#/components/schemas/WeddingBlockedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
                     }
                   ]
                 }
@@ -9956,6 +10396,16 @@
             },
             "description": ""
           },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                }
+              }
+            }
+          },
           "404": {
             "content": {
               "application/json": {
@@ -10053,6 +10503,12 @@
                     },
                     {
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
                     }
                   ]
                 }
@@ -10167,6 +10623,12 @@
                     },
                     {
                       "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportSessionEndedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SupportReadOnlyErrorBody"
                     }
                   ]
                 }
@@ -10556,7 +11018,7 @@
           }
         },
         "responses": {
-          "200": {
+          "202": {
             "description": "",
             "content": {
               "application/json": {
@@ -10791,7 +11253,7 @@
           }
         },
         "responses": {
-          "200": {
+          "202": {
             "description": "",
             "content": {
               "application/json": {
@@ -11030,7 +11492,7 @@
           }
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "",
             "content": {
               "application/json": {
@@ -11572,7 +12034,7 @@
           }
         },
         "responses": {
-          "200": {
+          "201": {
             "description": "",
             "content": {
               "application/json": {
@@ -12632,7 +13094,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StaffOnlyErrorBody"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/StaffOnlyErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/ActionNotAllowedErrorBody"
+                    }
+                  ]
                 }
               }
             },
@@ -14153,7 +14622,7 @@
             "name": "hasPayout",
             "required": false,
             "in": "query",
-            "description": "Com (true) ou sem (false) um repasse solicitado ou retido; só o Admin (decisão 69).",
+            "description": "Com (true) ou sem (false) um repasse solicitado (o retido não conta; decisão 273(2)); só o Admin (decisão 69).",
             "schema": {
               "type": "string",
               "enum": [
@@ -15983,49 +16452,6 @@
           }
         }
       },
-      "MyReferrerResponse": {
-        "type": "object",
-        "properties": {
-          "referralCode": {
-            "type": "string",
-            "example": "juliana-prado"
-          },
-          "link": {
-            "type": "string",
-            "example": "https://kore.com.br/i/juliana-prado"
-          },
-          "discountPercent": {
-            "type": "number",
-            "nullable": true,
-            "description": "Nulo com o desconto de indicação desligado. Sem o percentual da comissão (D4).",
-            "example": 10
-          },
-          "taxIdMasked": {
-            "type": "string",
-            "nullable": true,
-            "description": "\"***.982.247-**\"; nulo antes do primeiro recebimento (Repasse RN02).",
-            "example": "***.982.247-**"
-          },
-          "pixKeyMasked": {
-            "type": "string",
-            "nullable": true,
-            "description": "A chave ativa mascarada; nula sem chave confirmada (Repasse RN03).",
-            "example": "jul***@pradoassessoria.com.br"
-          },
-          "payoutDataComplete": {
-            "type": "boolean",
-            "description": "CPF ou CNPJ e chave ativa: pode receber (\"Cadastre seu CPF ou CNPJ e sua chave Pix…\")."
-          }
-        },
-        "required": [
-          "referralCode",
-          "link",
-          "discountPercent",
-          "taxIdMasked",
-          "pixKeyMasked",
-          "payoutDataComplete"
-        ]
-      },
       "ReferralNotFoundErrorBody": {
         "type": "object",
         "properties": {
@@ -16869,6 +17295,56 @@
             "type": "string",
             "enum": [
               "ALREADY_MEMBER"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "statusCode",
+          "error",
+          "message"
+        ]
+      },
+      "WeddingBlockedErrorBody": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "number",
+            "enum": [
+              403
+            ]
+          },
+          "error": {
+            "type": "string",
+            "enum": [
+              "WEDDING_BLOCKED"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "statusCode",
+          "error",
+          "message"
+        ]
+      },
+      "WeddingDeletionScheduledErrorBody": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "number",
+            "enum": [
+              409
+            ]
+          },
+          "error": {
+            "type": "string",
+            "enum": [
+              "WEDDING_DELETION_SCHEDULED"
             ]
           },
           "message": {
@@ -21144,6 +21620,56 @@
           "message"
         ]
       },
+      "SiteExpiredErrorBody": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "number",
+            "enum": [
+              410
+            ]
+          },
+          "error": {
+            "type": "string",
+            "enum": [
+              "SITE_EXPIRED"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "statusCode",
+          "error",
+          "message"
+        ]
+      },
+      "SiteUnavailableErrorBody": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "number",
+            "enum": [
+              423
+            ]
+          },
+          "error": {
+            "type": "string",
+            "enum": [
+              "SITE_UNAVAILABLE"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "statusCode",
+          "error",
+          "message"
+        ]
+      },
       "PublicAppearanceResponse": {
         "type": "object",
         "properties": {
@@ -21425,56 +21951,6 @@
             "type": "string",
             "enum": [
               "LINK_INVALID"
-            ]
-          },
-          "message": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "statusCode",
-          "error",
-          "message"
-        ]
-      },
-      "SiteExpiredErrorBody": {
-        "type": "object",
-        "properties": {
-          "statusCode": {
-            "type": "number",
-            "enum": [
-              410
-            ]
-          },
-          "error": {
-            "type": "string",
-            "enum": [
-              "SITE_EXPIRED"
-            ]
-          },
-          "message": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "statusCode",
-          "error",
-          "message"
-        ]
-      },
-      "SiteUnavailableErrorBody": {
-        "type": "object",
-        "properties": {
-          "statusCode": {
-            "type": "number",
-            "enum": [
-              423
-            ]
-          },
-          "error": {
-            "type": "string",
-            "enum": [
-              "SITE_UNAVAILABLE"
             ]
           },
           "message": {
@@ -23422,6 +23898,81 @@
           "endpoint"
         ]
       },
+      "MyReferrerBalancesResponse": {
+        "type": "object",
+        "properties": {
+          "availableCents": {
+            "type": "number",
+            "example": 6742
+          },
+          "pendingCents": {
+            "type": "number",
+            "example": 1740
+          },
+          "receivedCents": {
+            "type": "number",
+            "example": 0
+          },
+          "inPayoutCents": {
+            "type": "number",
+            "example": 0
+          }
+        },
+        "required": [
+          "availableCents",
+          "pendingCents",
+          "receivedCents",
+          "inPayoutCents"
+        ]
+      },
+      "MyReferrerResponse": {
+        "type": "object",
+        "properties": {
+          "referralCode": {
+            "type": "string",
+            "example": "juliana-prado"
+          },
+          "link": {
+            "type": "string",
+            "example": "https://kore.com.br/i/juliana-prado"
+          },
+          "discountPercent": {
+            "type": "number",
+            "nullable": true,
+            "example": 10
+          },
+          "ratePercent": {
+            "type": "number",
+            "example": 20
+          },
+          "balances": {
+            "$ref": "#/components/schemas/MyReferrerBalancesResponse"
+          },
+          "taxIdMasked": {
+            "type": "string",
+            "nullable": true,
+            "example": "***.982.247-**"
+          },
+          "pixKeyMasked": {
+            "type": "string",
+            "nullable": true,
+            "example": "jul***@pradoassessoria.com.br"
+          },
+          "payoutDataComplete": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "referralCode",
+          "link",
+          "discountPercent",
+          "ratePercent",
+          "balances",
+          "taxIdMasked",
+          "pixKeyMasked",
+          "payoutDataComplete"
+        ]
+      },
       "MyWeddingsSummaryResponse": {
         "type": "object",
         "properties": {
@@ -23804,21 +24355,44 @@
           "awaitingPayment"
         ]
       },
-      "ReferredWeddingCommissionResponse": {
+      "ReferredWeddingCommissionStatusResponse": {
         "type": "object",
         "properties": {
-          "availableCents": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "pending",
+              "paid"
+            ]
+          },
+          "amountCents": {
             "type": "number",
             "example": 6742
-          },
-          "pendingCents": {
-            "type": "number",
-            "example": 1740
           }
         },
         "required": [
-          "availableCents",
-          "pendingCents"
+          "status",
+          "amountCents"
+        ]
+      },
+      "ReferredWeddingCommissionResponse": {
+        "type": "object",
+        "properties": {
+          "totalCents": {
+            "type": "number",
+            "example": 8482
+          },
+          "byStatus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReferredWeddingCommissionStatusResponse"
+            }
+          }
+        },
+        "required": [
+          "totalCents",
+          "byStatus"
         ]
       },
       "ReferredWeddingResponse": {
@@ -23849,6 +24423,10 @@
               "expired"
             ]
           },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
           "commission": {
             "nullable": true,
             "type": "object",
@@ -23857,13 +24435,18 @@
                 "$ref": "#/components/schemas/ReferredWeddingCommissionResponse"
               }
             ]
+          },
+          "clickable": {
+            "type": "boolean"
           }
         },
         "required": [
           "weddingId",
           "partnerNames",
           "status",
-          "commission"
+          "createdAt",
+          "commission",
+          "clickable"
         ]
       },
       "PlannerTemplateResponse": {
@@ -24022,37 +24605,16 @@
           }
         }
       },
-      "CommissionBalancesResponse": {
+      "CommissionLineResponse": {
         "type": "object",
         "properties": {
-          "availableCents": {
-            "type": "number",
-            "example": 6742
+          "kind": {
+            "type": "string",
+            "enum": [
+              "commission"
+            ]
           },
-          "pendingCents": {
-            "type": "number",
-            "example": 1740
-          },
-          "receivedCents": {
-            "type": "number",
-            "example": 0
-          },
-          "inPayoutCents": {
-            "type": "number",
-            "example": 0
-          }
-        },
-        "required": [
-          "availableCents",
-          "pendingCents",
-          "receivedCents",
-          "inPayoutCents"
-        ]
-      },
-      "CommissionItemResponse": {
-        "type": "object",
-        "properties": {
-          "id": {
+          "commissionId": {
             "type": "string",
             "format": "uuid"
           },
@@ -24060,16 +24622,16 @@
             "type": "string",
             "nullable": true
           },
-          "partnerNames": {
+          "coupleNames": {
+            "type": "string",
             "nullable": true,
-            "example": [
-              "Ana",
-              "Marcos"
-            ],
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "example": "Ana & Marcos"
+          },
+          "weddingPurged": {
+            "type": "boolean"
+          },
+          "clickable": {
+            "type": "boolean"
           },
           "paymentKind": {
             "type": "string",
@@ -24101,6 +24663,16 @@
               "held"
             ]
           },
+          "blockReason": {
+            "type": "string",
+            "enum": [
+              "self_referral",
+              "referrer_blocked",
+              "admin",
+              "wedding_blocked"
+            ],
+            "nullable": true
+          },
           "availableAt": {
             "type": "string",
             "format": "date-time"
@@ -24116,17 +24688,71 @@
           }
         },
         "required": [
-          "id",
+          "kind",
+          "commissionId",
           "weddingId",
-          "partnerNames",
+          "coupleNames",
+          "weddingPurged",
+          "clickable",
           "paymentKind",
           "baseAmountCents",
           "amountCents",
           "ratePercent",
           "status",
+          "blockReason",
           "availableAt",
           "paidAt",
           "createdAt"
+        ]
+      },
+      "AdjustmentLineResponse": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "adjustment"
+            ]
+          },
+          "adjustmentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amountCents": {
+            "type": "number",
+            "example": -6742
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "refund",
+              "chargeback",
+              "manual"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "payoutStatus": {
+            "type": "string",
+            "enum": [
+              "requested",
+              "held",
+              "processing",
+              "paid",
+              "rejected"
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "kind",
+          "adjustmentId",
+          "amountCents",
+          "reason",
+          "createdAt",
+          "payoutStatus"
         ]
       },
       "WeddingCommissionsResponse": {
@@ -24136,16 +24762,16 @@
             "type": "string",
             "nullable": true
           },
-          "partnerNames": {
+          "coupleNames": {
+            "type": "string",
             "nullable": true,
-            "example": [
-              "Ana",
-              "Marcos"
-            ],
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "example": "Ana & Marcos"
+          },
+          "weddingPurged": {
+            "type": "boolean"
+          },
+          "clickable": {
+            "type": "boolean"
           },
           "availableCents": {
             "type": "number",
@@ -24165,10 +24791,39 @@
         },
         "required": [
           "weddingId",
-          "partnerNames",
+          "coupleNames",
+          "weddingPurged",
+          "clickable",
           "availableCents",
           "pendingCents",
           "releaseDates"
+        ]
+      },
+      "CommissionBalancesResponse": {
+        "type": "object",
+        "properties": {
+          "availableCents": {
+            "type": "number",
+            "example": 6742
+          },
+          "pendingCents": {
+            "type": "number",
+            "example": 1740
+          },
+          "receivedCents": {
+            "type": "number",
+            "example": 0
+          },
+          "inPayoutCents": {
+            "type": "number",
+            "example": 0
+          }
+        },
+        "required": [
+          "availableCents",
+          "pendingCents",
+          "receivedCents",
+          "inPayoutCents"
         ]
       },
       "ReferrerCommissionsResponse": {
@@ -24177,23 +24832,49 @@
           "balances": {
             "$ref": "#/components/schemas/CommissionBalancesResponse"
           },
+          "view": {
+            "type": "string",
+            "enum": [
+              "payment",
+              "wedding"
+            ]
+          },
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/CommissionItemResponse"
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/CommissionLineResponse"
+                },
+                {
+                  "$ref": "#/components/schemas/AdjustmentLineResponse"
+                },
+                {
+                  "$ref": "#/components/schemas/WeddingCommissionsResponse"
+                }
+              ]
             }
           },
-          "byWedding": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/WeddingCommissionsResponse"
-            }
+          "page": {
+            "type": "number",
+            "example": 1
+          },
+          "pageSize": {
+            "type": "number",
+            "example": 50
+          },
+          "total": {
+            "type": "number",
+            "example": 2
           }
         },
         "required": [
           "balances",
+          "view",
           "items",
-          "byWedding"
+          "page",
+          "pageSize",
+          "total"
         ]
       },
       "MalformedWebhookErrorBody": {
@@ -24619,56 +25300,6 @@
           "endDateMax",
           "canExtend",
           "cannotExtendReason"
-        ]
-      },
-      "WeddingBlockedErrorBody": {
-        "type": "object",
-        "properties": {
-          "statusCode": {
-            "type": "number",
-            "enum": [
-              403
-            ]
-          },
-          "error": {
-            "type": "string",
-            "enum": [
-              "WEDDING_BLOCKED"
-            ]
-          },
-          "message": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "statusCode",
-          "error",
-          "message"
-        ]
-      },
-      "WeddingDeletionScheduledErrorBody": {
-        "type": "object",
-        "properties": {
-          "statusCode": {
-            "type": "number",
-            "enum": [
-              409
-            ]
-          },
-          "error": {
-            "type": "string",
-            "enum": [
-              "WEDDING_DELETION_SCHEDULED"
-            ]
-          },
-          "message": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "statusCode",
-          "error",
-          "message"
         ]
       },
       "EndDateBeyondPaidErrorBody": {
@@ -26581,10 +27212,15 @@
               "available"
             ],
             "type": "string"
+          },
+          "weddingBlocked": {
+            "type": "boolean",
+            "description": "O casamento da comissão segue bloqueado: \"O casamento continua bloqueado.\" (decisão 284(3))."
           }
         },
         "required": [
-          "status"
+          "status",
+          "weddingBlocked"
         ]
       },
       "AdminPayoutReferrerResponse": {
@@ -26627,6 +27263,17 @@
               "blocked"
             ]
           },
+          "blockReason": {
+            "type": "string",
+            "nullable": true,
+            "description": "Só na bloqueada; `wedding_blocked` é \"Comissão bloqueada: casamento de {casal} bloqueado\".",
+            "enum": [
+              "self_referral",
+              "referrer_blocked",
+              "admin",
+              "wedding_blocked"
+            ]
+          },
           "amountCents": {
             "type": "number"
           }
@@ -26634,6 +27281,7 @@
         "required": [
           "coupleNames",
           "status",
+          "blockReason",
           "amountCents"
         ]
       },
@@ -29228,7 +29876,8 @@
             "enum": [
               "self_referral",
               "referrer_blocked",
-              "admin"
+              "admin",
+              "wedding_blocked"
             ]
           },
           "availableAt": {
@@ -29841,6 +30490,64 @@
           "42cd6ed77302f384ab3ab3d8c92c4d0ef1c0f7441831f3ce31b4f37fad57601b"
         ],
         "description": "O sha256 (hex) da appearance-contrast.fixture.json da API. A cópia do web precisa ter o mesmo (Aparência RN01)."
+      },
+      "SupportReadOnlyErrorBody": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "number",
+            "enum": [
+              403
+            ]
+          },
+          "error": {
+            "type": "string",
+            "enum": [
+              "SUPPORT_READ_ONLY"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "statusCode",
+          "error",
+          "message"
+        ]
+      },
+      "SupportSessionEndedErrorBody": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "number",
+            "enum": [
+              403
+            ]
+          },
+          "error": {
+            "type": "string",
+            "enum": [
+              "SUPPORT_SESSION_ENDED"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "idle",
+              "max_duration"
+            ]
+          }
+        },
+        "required": [
+          "statusCode",
+          "error",
+          "message",
+          "reason"
+        ]
       }
     }
   }

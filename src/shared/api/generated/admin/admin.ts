@@ -3347,6 +3347,7 @@ export const getAdminWeddingsControllerDetailV1QueryOptions = <
     | ValidationErrorBody
     | SessionExpiredErrorBody
     | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
     | WeddingNotFoundErrorBody
     | RateLimitedErrorBody
   >,
@@ -3387,6 +3388,7 @@ export type AdminWeddingsControllerDetailV1QueryError = ErrorType<
   | ValidationErrorBody
   | SessionExpiredErrorBody
   | StaffOnlyErrorBody
+  | ActionNotAllowedErrorBody
   | WeddingNotFoundErrorBody
   | RateLimitedErrorBody
 >;
@@ -3397,6 +3399,7 @@ export function useAdminWeddingsControllerDetailV1<
     | ValidationErrorBody
     | SessionExpiredErrorBody
     | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
     | WeddingNotFoundErrorBody
     | RateLimitedErrorBody
   >,
@@ -3425,6 +3428,7 @@ export function useAdminWeddingsControllerDetailV1<
     | ValidationErrorBody
     | SessionExpiredErrorBody
     | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
     | WeddingNotFoundErrorBody
     | RateLimitedErrorBody
   >,
@@ -3453,6 +3457,7 @@ export function useAdminWeddingsControllerDetailV1<
     | ValidationErrorBody
     | SessionExpiredErrorBody
     | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
     | WeddingNotFoundErrorBody
     | RateLimitedErrorBody
   >,
@@ -3474,6 +3479,7 @@ export function useAdminWeddingsControllerDetailV1<
     | ValidationErrorBody
     | SessionExpiredErrorBody
     | StaffOnlyErrorBody
+    | ActionNotAllowedErrorBody
     | WeddingNotFoundErrorBody
     | RateLimitedErrorBody
   >,

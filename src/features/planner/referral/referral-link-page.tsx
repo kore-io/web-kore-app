@@ -4,9 +4,11 @@ import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router';
 import { paths } from '../../../app/paths';
-import { usePlannerControllerReferrerV1 } from '../../../shared/api/generated/me/me';
 import type { ReferredWeddingResponse } from '../../../shared/api/generated/model';
-import { useReferredWeddingsControllerListV1 } from '../../../shared/api/generated/planner/planner';
+import {
+  useMyReferrerControllerReferrerV1,
+  useReferredWeddingsControllerListV1,
+} from '../../../shared/api/generated/planner/planner';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { coupleName } from '../my-weddings/my-weddings-filters';
 import { WeddingStatusBadge } from '../my-weddings/wedding-status-badge';
@@ -15,13 +17,9 @@ import { WeddingStatusBadge } from '../my-weddings/wedding-status-badge';
 const weddingPath = (weddingId: string) =>
   `${paths.plannerArea}?casamento=${encodeURIComponent(weddingId)}`;
 
-/**
- * A linha abre o detalhe só quando ela colabora no casamento (RN05). O `clickable` ainda não
- * está no contrato; enquanto isso, vale o `weddingId`, que vem nulo sem vínculo (decisão 288).
- */
+/** A linha abre o detalhe só quando ela colabora no casamento: o `clickable` do servidor (RN05). */
 function detailId(wedding: ReferredWeddingResponse): string | null {
-  const { clickable } = wedding as ReferredWeddingResponse & { clickable?: boolean };
-  return (clickable ?? wedding.weddingId !== null) ? wedding.weddingId : null;
+  return wedding.clickable ? wedding.weddingId : null;
 }
 
 /**
@@ -34,7 +32,7 @@ export function ReferralLinkPage() {
   const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
   const listTitleId = useId();
-  const referrer = usePlannerControllerReferrerV1();
+  const referrer = useMyReferrerControllerReferrerV1();
   const weddings = useReferredWeddingsControllerListV1();
 
   if (referrer.isError || weddings.isError) {

@@ -16,4 +16,5 @@ export const AdminReferrerStatementEntryResponseBlockReason = {
   self_referral: 'self_referral',
   referrer_blocked: 'referrer_blocked',
   admin: 'admin',
+  wedding_blocked: 'wedding_blocked',
 } as const;

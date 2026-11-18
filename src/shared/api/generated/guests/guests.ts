@@ -33,6 +33,8 @@ import type {
   OriginNotAllowedErrorBody,
   RateLimitedErrorBody,
   SessionExpiredErrorBody,
+  SupportReadOnlyErrorBody,
+  SupportSessionEndedErrorBody,
   TrashedGuestResponse,
   ValidationErrorBody,
   WeddingBlockedErrorBody,
@@ -86,6 +88,8 @@ export const getGuestsControllerTrashV1MutationOptions = <
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
     | AlreadyRespondedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | GuestNotFoundErrorBody
@@ -137,6 +141,8 @@ export type GuestsControllerTrashV1MutationError = ErrorType<
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
   | AlreadyRespondedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | GuestNotFoundErrorBody
@@ -156,6 +162,8 @@ export const useGuestsControllerTrashV1 = <
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
     | AlreadyRespondedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | GuestNotFoundErrorBody
@@ -232,6 +240,8 @@ export const getGuestsControllerMoveV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | GuestNotFoundErrorBody
@@ -283,6 +293,8 @@ export type GuestsControllerMoveV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | GuestNotFoundErrorBody
@@ -306,6 +318,8 @@ export const useGuestsControllerMoveV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | GuestNotFoundErrorBody
@@ -379,6 +393,7 @@ export const getExportControllerExportV1QueryOptions = <
   TError = ErrorType<
     | ValidationErrorBody
     | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | NothingToExportErrorBody
     | RateLimitedErrorBody
@@ -417,6 +432,7 @@ export type ExportControllerExportV1QueryResult = NonNullable<
 export type ExportControllerExportV1QueryError = ErrorType<
   | ValidationErrorBody
   | SessionExpiredErrorBody
+  | SupportSessionEndedErrorBody
   | WeddingNotFoundErrorBody
   | NothingToExportErrorBody
   | RateLimitedErrorBody
@@ -427,6 +443,7 @@ export function useExportControllerExportV1<
   TError = ErrorType<
     | ValidationErrorBody
     | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | NothingToExportErrorBody
     | RateLimitedErrorBody
@@ -455,6 +472,7 @@ export function useExportControllerExportV1<
   TError = ErrorType<
     | ValidationErrorBody
     | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | NothingToExportErrorBody
     | RateLimitedErrorBody
@@ -483,6 +501,7 @@ export function useExportControllerExportV1<
   TError = ErrorType<
     | ValidationErrorBody
     | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | NothingToExportErrorBody
     | RateLimitedErrorBody
@@ -507,6 +526,7 @@ export function useExportControllerExportV1<
   TError = ErrorType<
     | ValidationErrorBody
     | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | NothingToExportErrorBody
     | RateLimitedErrorBody

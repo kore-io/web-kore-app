@@ -37,6 +37,8 @@ import type {
   RateLimitedErrorBody,
   RegeneratePartyLinkResponse,
   SessionExpiredErrorBody,
+  SupportReadOnlyErrorBody,
+  SupportSessionEndedErrorBody,
   TrashPartiesBody,
   TrashPartiesResponse,
   TrashedPartyResponse,
@@ -115,6 +117,8 @@ export const getPartiesControllerTrashManyV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | WeddingDeletionScheduledErrorBody
@@ -163,6 +167,8 @@ export type PartiesControllerTrashManyV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | WeddingDeletionScheduledErrorBody
@@ -182,6 +188,8 @@ export const usePartiesControllerTrashManyV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | WeddingDeletionScheduledErrorBody
@@ -233,6 +241,8 @@ export const getPartiesControllerTrashV1MutationOptions = <
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
     | AlreadyRespondedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | PartyNotFoundErrorBody
@@ -282,6 +292,8 @@ export type PartiesControllerTrashV1MutationError = ErrorType<
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
   | AlreadyRespondedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | PartyNotFoundErrorBody
@@ -299,6 +311,8 @@ export const usePartiesControllerTrashV1 = <
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
     | AlreadyRespondedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | PartyNotFoundErrorBody
@@ -351,6 +365,7 @@ export const getPartiesControllerGetV1QueryOptions = <
   TData = Awaited<ReturnType<typeof partiesControllerGetV1>>,
   TError = ErrorType<
     | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | PartyNotFoundErrorBody
     | RateLimitedErrorBody
@@ -387,13 +402,18 @@ export type PartiesControllerGetV1QueryResult = NonNullable<
   Awaited<ReturnType<typeof partiesControllerGetV1>>
 >;
 export type PartiesControllerGetV1QueryError = ErrorType<
-  SessionExpiredErrorBody | WeddingNotFoundErrorBody | PartyNotFoundErrorBody | RateLimitedErrorBody
+  | SessionExpiredErrorBody
+  | SupportSessionEndedErrorBody
+  | WeddingNotFoundErrorBody
+  | PartyNotFoundErrorBody
+  | RateLimitedErrorBody
 >;
 
 export function usePartiesControllerGetV1<
   TData = Awaited<ReturnType<typeof partiesControllerGetV1>>,
   TError = ErrorType<
     | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | PartyNotFoundErrorBody
     | RateLimitedErrorBody
@@ -421,6 +441,7 @@ export function usePartiesControllerGetV1<
   TData = Awaited<ReturnType<typeof partiesControllerGetV1>>,
   TError = ErrorType<
     | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | PartyNotFoundErrorBody
     | RateLimitedErrorBody
@@ -448,6 +469,7 @@ export function usePartiesControllerGetV1<
   TData = Awaited<ReturnType<typeof partiesControllerGetV1>>,
   TError = ErrorType<
     | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | PartyNotFoundErrorBody
     | RateLimitedErrorBody
@@ -471,6 +493,7 @@ export function usePartiesControllerGetV1<
   TData = Awaited<ReturnType<typeof partiesControllerGetV1>>,
   TError = ErrorType<
     | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | PartyNotFoundErrorBody
     | RateLimitedErrorBody
@@ -543,6 +566,8 @@ export const getPartiesControllerUpdateV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | PartyNotFoundErrorBody
@@ -593,6 +618,8 @@ export type PartiesControllerUpdateV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | PartyNotFoundErrorBody
@@ -615,6 +642,8 @@ export const usePartiesControllerUpdateV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | PartyNotFoundErrorBody
@@ -695,7 +724,11 @@ export const getPartiesControllerListV1InfiniteQueryOptions = <
     PartiesControllerListV1Params['cursor']
   >,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
   weddingId: string,
@@ -747,7 +780,11 @@ export type PartiesControllerListV1InfiniteQueryResult = NonNullable<
   Awaited<ReturnType<typeof partiesControllerListV1>>
 >;
 export type PartiesControllerListV1InfiniteQueryError = ErrorType<
-  ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | SupportSessionEndedErrorBody
+  | WeddingNotFoundErrorBody
+  | RateLimitedErrorBody
 >;
 
 export function usePartiesControllerListV1Infinite<
@@ -756,7 +793,11 @@ export function usePartiesControllerListV1Infinite<
     PartiesControllerListV1Params['cursor']
   >,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
   weddingId: string,
@@ -790,7 +831,11 @@ export function usePartiesControllerListV1Infinite<
     PartiesControllerListV1Params['cursor']
   >,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
   weddingId: string,
@@ -824,7 +869,11 @@ export function usePartiesControllerListV1Infinite<
     PartiesControllerListV1Params['cursor']
   >,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
   weddingId: string,
@@ -853,7 +902,11 @@ export function usePartiesControllerListV1Infinite<
     PartiesControllerListV1Params['cursor']
   >,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
   weddingId: string,
@@ -885,7 +938,11 @@ export function usePartiesControllerListV1Infinite<
 export const getPartiesControllerListV1QueryOptions = <
   TData = Awaited<ReturnType<typeof partiesControllerListV1>>,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
   weddingId: string,
@@ -919,13 +976,21 @@ export type PartiesControllerListV1QueryResult = NonNullable<
   Awaited<ReturnType<typeof partiesControllerListV1>>
 >;
 export type PartiesControllerListV1QueryError = ErrorType<
-  ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+  | ValidationErrorBody
+  | SessionExpiredErrorBody
+  | SupportSessionEndedErrorBody
+  | WeddingNotFoundErrorBody
+  | RateLimitedErrorBody
 >;
 
 export function usePartiesControllerListV1<
   TData = Awaited<ReturnType<typeof partiesControllerListV1>>,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
   weddingId: string,
@@ -949,7 +1014,11 @@ export function usePartiesControllerListV1<
 export function usePartiesControllerListV1<
   TData = Awaited<ReturnType<typeof partiesControllerListV1>>,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
   weddingId: string,
@@ -973,7 +1042,11 @@ export function usePartiesControllerListV1<
 export function usePartiesControllerListV1<
   TData = Awaited<ReturnType<typeof partiesControllerListV1>>,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
   weddingId: string,
@@ -993,7 +1066,11 @@ export function usePartiesControllerListV1<
 export function usePartiesControllerListV1<
   TData = Awaited<ReturnType<typeof partiesControllerListV1>>,
   TError = ErrorType<
-    ValidationErrorBody | SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+    | ValidationErrorBody
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
   >,
 >(
   weddingId: string,
@@ -1062,6 +1139,8 @@ export const getPartiesControllerCreateV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | WeddingDeletionScheduledErrorBody
@@ -1110,6 +1189,8 @@ export type PartiesControllerCreateV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | WeddingDeletionScheduledErrorBody
@@ -1129,6 +1210,8 @@ export const usePartiesControllerCreateV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | WeddingDeletionScheduledErrorBody
@@ -1183,6 +1266,8 @@ export const getPartiesControllerRegenerateV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | PartyNotFoundErrorBody
@@ -1231,6 +1316,8 @@ export type PartiesControllerRegenerateV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | PartyNotFoundErrorBody
@@ -1247,6 +1334,8 @@ export const usePartiesControllerRegenerateV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | PartyNotFoundErrorBody

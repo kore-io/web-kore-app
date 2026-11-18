@@ -12,6 +12,8 @@ export interface ReferredWeddingResponse {
   weddingId: string | null;
   partnerNames: string[];
   status: ReferredWeddingResponseStatus;
+  createdAt: string;
   /** @nullable */
   commission: ReferredWeddingCommissionResponse | null;
+  clickable: boolean;
 }

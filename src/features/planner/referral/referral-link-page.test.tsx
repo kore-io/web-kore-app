@@ -30,14 +30,30 @@ const me = {
 
 // A ordem é a do servidor, do cadastro mais recente (RN03); só Ana e Marcos é colaboração (RN05).
 const referred = [
-  { weddingId: null, partnerNames: ['Tatiane', 'Leandro'], status: 'draft', commission: null },
+  {
+    weddingId: null,
+    partnerNames: ['Tatiane', 'Leandro'],
+    status: 'draft',
+    createdAt: '2026-11-18T12:00:00Z',
+    clickable: false,
+    commission: null,
+  },
   {
     weddingId: null,
     partnerNames: ['Bianca', 'Henrique'],
     status: 'published',
+    createdAt: '2026-11-10T12:00:00Z',
+    clickable: false,
     commission: { totalCents: 4422, byStatus: [{ status: 'pending', amountCents: 4422 }] },
   },
-  { weddingId: 'w1', partnerNames: ['Ana', 'Marcos'], status: 'published', commission: null },
+  {
+    weddingId: 'w1',
+    partnerNames: ['Ana', 'Marcos'],
+    status: 'published',
+    createdAt: '2026-11-01T12:00:00Z',
+    clickable: true,
+    commission: null,
+  },
 ];
 
 function api({
@@ -118,7 +134,7 @@ describe('Link de indicação (Link de indicação RN01 a RN06; Penpot 09; decis
     await waitFor(() => expect(router.state.location.pathname).toBe('/cerimonialista'));
   });
 
-  it('o clickable do servidor vale sobre o weddingId, quando vier (decisão 288)', async () => {
+  it('sem o clickable do servidor, a linha não abre, mesmo com o weddingId (RN05)', async () => {
     api({
       weddings: [
         { ...referred[2], clickable: false },

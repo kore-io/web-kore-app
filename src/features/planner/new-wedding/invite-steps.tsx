@@ -7,10 +7,7 @@ import { useNavigate } from 'react-router';
 import { areaPaths, plannerWeddingBase } from '../../../app/area';
 import { paths } from '../../../app/paths';
 import { useAccessInvitationsControllerSendV1 } from '../../../shared/api/generated/access-invitations/access-invitations';
-import {
-  useMeControllerMeV1,
-  usePlannerControllerReferrerV1,
-} from '../../../shared/api/generated/me/me';
+import { useMeControllerMeV1 } from '../../../shared/api/generated/me/me';
 import type {
   CoupleInvitationResponse,
   MyWeddingDetailResponse,
@@ -18,6 +15,7 @@ import type {
 import {
   getMyWeddingsControllerDetailV1QueryKey,
   getMyWeddingsControllerListV1QueryKey,
+  useMyReferrerControllerReferrerV1,
 } from '../../../shared/api/generated/planner/planner';
 import { ApiError, apiErrorCode } from '../../../shared/api/http-client';
 import { FormField } from '../../../shared/components/form-field';
@@ -58,7 +56,7 @@ export function InviteStep({
   const { showToast } = useToast();
   const queryClient = useQueryClient();
   const me = useMeControllerMeV1();
-  const referrer = usePlannerControllerReferrerV1({ query: { retry: false } });
+  const referrer = useMyReferrerControllerReferrerV1({ query: { retry: false } });
   const send = useAccessInvitationsControllerSendV1();
   const [values, setValues] = useState<Record<InviteField, string>>({
     email: '',

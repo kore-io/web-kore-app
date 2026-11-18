@@ -44,6 +44,8 @@ import type {
   SendAccessInvitationsBody,
   SendAccessInvitationsResponse,
   SessionExpiredErrorBody,
+  SupportReadOnlyErrorBody,
+  SupportSessionEndedErrorBody,
   ValidationErrorBody,
   WeddingBlockedErrorBody,
   WeddingDeletionScheduledErrorBody,
@@ -121,6 +123,8 @@ export const getAccessInvitationsControllerSendV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | OwnersFullErrorBody
@@ -173,6 +177,8 @@ export type AccessInvitationsControllerSendV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | OwnersFullErrorBody
@@ -196,6 +202,8 @@ export const useAccessInvitationsControllerSendV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | OwnersFullErrorBody
@@ -251,6 +259,8 @@ export const getAccessInvitationsControllerCancelV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | InvitationNotFoundErrorBody
@@ -300,6 +310,8 @@ export type AccessInvitationsControllerCancelV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | InvitationNotFoundErrorBody
@@ -320,6 +332,8 @@ export const useAccessInvitationsControllerCancelV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | InvitationNotFoundErrorBody
@@ -558,6 +572,7 @@ export const getInvitationAcceptanceControllerAcceptV1MutationOptions = <
     | ValidationErrorBody
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | EmailMismatchErrorBody
     | AlreadyOwnerErrorBody
     | AlreadyMemberErrorBody
@@ -566,6 +581,7 @@ export const getInvitationAcceptanceControllerAcceptV1MutationOptions = <
     | SellerCannotBePlannerErrorBody
     | SelfReferralErrorBody
     | PlannerProfileExistsErrorBody
+    | WeddingDeletionScheduledErrorBody
     | InvitationInvalidErrorBody
     | RateLimitedErrorBody
   >,
@@ -611,6 +627,7 @@ export type InvitationAcceptanceControllerAcceptV1MutationError = ErrorType<
   | ValidationErrorBody
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
+  | WeddingBlockedErrorBody
   | EmailMismatchErrorBody
   | AlreadyOwnerErrorBody
   | AlreadyMemberErrorBody
@@ -619,6 +636,7 @@ export type InvitationAcceptanceControllerAcceptV1MutationError = ErrorType<
   | SellerCannotBePlannerErrorBody
   | SelfReferralErrorBody
   | PlannerProfileExistsErrorBody
+  | WeddingDeletionScheduledErrorBody
   | InvitationInvalidErrorBody
   | RateLimitedErrorBody
 >;
@@ -635,6 +653,7 @@ export const useInvitationAcceptanceControllerAcceptV1 = <
     | ValidationErrorBody
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
+    | WeddingBlockedErrorBody
     | EmailMismatchErrorBody
     | AlreadyOwnerErrorBody
     | AlreadyMemberErrorBody
@@ -643,6 +662,7 @@ export const useInvitationAcceptanceControllerAcceptV1 = <
     | SellerCannotBePlannerErrorBody
     | SelfReferralErrorBody
     | PlannerProfileExistsErrorBody
+    | WeddingDeletionScheduledErrorBody
     | InvitationInvalidErrorBody
     | RateLimitedErrorBody
   >,

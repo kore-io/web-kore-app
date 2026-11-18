@@ -4,6 +4,7 @@
  * Kore API
  * OpenAPI spec version: 1
  */
+import type { AdminHeldCommissionResponseBlockReason } from './adminHeldCommissionResponseBlockReason';
 import type { AdminHeldCommissionResponseStatus } from './adminHeldCommissionResponseStatus';
 
 export interface AdminHeldCommissionResponse {
@@ -13,5 +14,10 @@ export interface AdminHeldCommissionResponse {
    */
   coupleNames: string | null;
   status: AdminHeldCommissionResponseStatus;
+  /**
+   * Só na bloqueada; `wedding_blocked` é "Comissão bloqueada: casamento de {casal} bloqueado".
+   * @nullable
+   */
+  blockReason: AdminHeldCommissionResponseBlockReason;
   amountCents: number;
 }

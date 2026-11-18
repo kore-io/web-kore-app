@@ -4,8 +4,9 @@
  * Kore API
  * OpenAPI spec version: 1
  */
+import type { ReferredWeddingCommissionStatusResponse } from './referredWeddingCommissionStatusResponse';
 
 export interface ReferredWeddingCommissionResponse {
-  availableCents: number;
-  pendingCents: number;
+  totalCents: number;
+  byStatus: ReferredWeddingCommissionStatusResponse[];
 }
