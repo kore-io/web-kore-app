@@ -157,6 +157,12 @@ function api({
         { status: 201 },
       );
     }
+    if (method === 'DELETE' && path === '/v1/weddings/w9/access-invitations/i2') {
+      calls.push({ method, path, body });
+      // A API não volta o status a rascunho ao cancelar o link (fica aguardando o casal).
+      current = { ...current, coupleInvitations: [] };
+      return new Response(null, { status: 204 });
+    }
     if (method !== 'GET') calls.push({ method, path, body });
     return apiError({ status: 404, body: { error: 'NOT_FOUND' } });
   });
@@ -482,6 +488,59 @@ describe('Novo casamento › passos 3 e 4 (Novo casamento RN05 a RN07; D6b; deci
       path: '/v1/weddings/w9/access-invitations',
       body: { kind: 'couple' },
     });
+  });
+
+  it('o Pronto mostra o link da resposta do POST, sem esperar a releitura do detalhe (sugestão do Crivo)', async () => {
+    const user = userEvent.setup();
+    // O detalhe relido continua sem o link (a releitura atrasada ou com falha).
+    api({
+      invite: () =>
+        Response.json(
+          {
+            invitations: [
+              {
+                id: 'i2',
+                email: null,
+                kind: 'couple',
+                expiresAt: LINK.expiresAt,
+                resent: false,
+                url: LINK.url,
+              },
+            ],
+          },
+          { status: 201 },
+        ),
+    });
+    renderRoute({ url: INVITE });
+    await user.click(await screen.findByRole('button', { name: 'Gerar link' }));
+    const block = await screen.findByRole('region', { name: 'Link para o casal' });
+    expect(within(block).getByRole('textbox', { name: 'Link para o casal' })).toHaveValue(
+      'kore.com.br/convite/8f3k2m',
+    );
+  });
+
+  it('Cancelar o link no Pronto deixa o Pronto como o sem convite, com o Convidar o casal (sugestão do Crivo)', async () => {
+    const user = userEvent.setup();
+    const calls = api();
+    renderRoute({ url: INVITE });
+    await user.click(await screen.findByRole('button', { name: 'Gerar link' }));
+    const block = await screen.findByRole('region', { name: 'Link para o casal' });
+    await user.click(within(block).getByRole('button', { name: 'Cancelar link' }));
+    const dialog = await screen.findByRole('alertdialog', { name: 'Cancelar o link do casal?' });
+    await user.click(within(dialog).getByRole('button', { name: 'Cancelar link' }));
+    expect(
+      await screen.findByText(
+        'O convite para o casal fica para depois. Envie quando quiser, no detalhe do casamento.',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Link para o casal' })).toBeNull();
+    expect(screen.queryByText('Acompanhar em Meus casamentos quando o casal aceitar')).toBeNull();
+    expect(calls.at(-1)).toMatchObject({
+      method: 'DELETE',
+      path: '/v1/weddings/w9/access-invitations/i2',
+    });
+    await user.click(screen.getByRole('button', { name: 'Convidar o casal' }));
+    expect(await screen.findByRole('button', { name: 'Gerar link' })).toBeInTheDocument();
   });
 
   it('Convidar depois: o Pronto em Rascunho, e Convidar o casal volta ao passo 3 (RN06)', async () => {

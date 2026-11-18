@@ -11,7 +11,10 @@ import {
   useMeControllerMeV1,
   usePlannerControllerReferrerV1,
 } from '../../../shared/api/generated/me/me';
-import type { MyWeddingDetailResponse } from '../../../shared/api/generated/model';
+import type {
+  CoupleInvitationResponse,
+  MyWeddingDetailResponse,
+} from '../../../shared/api/generated/model';
 import {
   getMyWeddingsControllerDetailV1QueryKey,
   getMyWeddingsControllerListV1QueryKey,
@@ -30,7 +33,10 @@ const MESSAGE_MAX = 500;
 
 /** Como o passo 3 terminou: o convite por e-mail, o link ou o Convidar depois (RN06). */
 export type InviteOutcome =
-  { kind: 'email'; emails: string[] } | { kind: 'link' } | { kind: 'later' };
+  | { kind: 'email'; emails: string[] }
+  // O link vem da resposta do POST, para o Pronto não esperar a releitura do detalhe.
+  | { kind: 'link'; link?: CoupleInvitationResponse }
+  | { kind: 'later' };
 
 type InviteField = 'email' | 'otherEmail' | 'message';
 
@@ -102,12 +108,28 @@ export function InviteStep({
         },
       },
       {
-        onSuccess: () => {
+        onSuccess: ({ invitations }) => {
           void queryClient.invalidateQueries({
             queryKey: getMyWeddingsControllerDetailV1QueryKey(weddingId),
           });
           void queryClient.invalidateQueries({ queryKey: getMyWeddingsControllerListV1QueryKey() });
-          onDone(withEmail ? { kind: 'email', emails } : { kind: 'link' });
+          const sent = invitations.find((invitation) => invitation.url);
+          onDone(
+            withEmail
+              ? { kind: 'email', emails }
+              : {
+                  kind: 'link',
+                  ...(sent?.url && {
+                    link: {
+                      type: 'link',
+                      id: sent.id,
+                      url: sent.url,
+                      expiresAt: sent.expiresAt,
+                      state: 'active',
+                    },
+                  }),
+                },
+          );
         },
         onError: (error) => {
           // Um e-mail de outra forma de entrar da conta dela (RN05, ajuda de tela).
@@ -214,16 +236,21 @@ export function DoneStep({
   detail,
   outcome,
   onInvite,
+  onLinkCanceled,
 }: {
   detail: MyWeddingDetailResponse;
   outcome: InviteOutcome;
   onInvite: () => void;
+  /** Cancelar o link no Pronto deixa o casamento sem convite: o Pronto vira o "sem convite". */
+  onLinkCanceled: () => void;
 }) {
   const { t } = useTranslation('planner');
   const navigate = useNavigate();
   const { weddingId } = detail;
   const linkActions = useCoupleLinkActions({ weddingId });
-  const { link } = coupleInvitations({ detail });
+  // O do detalhe vale assim que a releitura chega (ele muda no Gerar novo link).
+  const link =
+    coupleInvitations({ detail }).link ?? (outcome.kind === 'link' ? outcome.link : undefined);
   const invited = outcome.kind !== 'later';
   const site = areaPaths(plannerWeddingBase({ weddingId })).site;
   const line = [
@@ -265,7 +292,7 @@ export function DoneStep({
           link={link}
           busy={linkActions.busy}
           onRegenerate={linkActions.regenerate}
-          onCancel={() => linkActions.cancelLink({ id: link.id })}
+          onCancel={() => linkActions.cancelLink({ id: link.id, onCanceled: onLinkCanceled })}
         />
       )}
 

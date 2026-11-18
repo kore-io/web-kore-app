@@ -41,12 +41,13 @@ export function useCoupleLinkActions({ weddingId }: { weddingId: string }) {
     );
   }
 
-  function cancelLink({ id }: { id: string }) {
+  function cancelLink({ id, onCanceled }: { id: string; onCanceled?: () => void }) {
     cancel.mutate(
       { weddingId, id },
       {
         onSuccess: () => {
           void refresh();
+          onCanceled?.();
           showToast({ tone: 'success', message: t('myWeddings.detail.link.canceled') });
         },
         onError: genericError,
