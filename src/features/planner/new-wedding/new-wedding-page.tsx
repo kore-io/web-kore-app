@@ -162,7 +162,12 @@ function InviteFlow({ weddingId }: { weddingId: string }) {
           </div>
         )
       ) : outcome ? (
-        <DoneStep detail={data} outcome={outcome} onInvite={() => setOutcome(undefined)} />
+        <DoneStep
+          detail={data}
+          outcome={outcome}
+          onInvite={() => setOutcome(undefined)}
+          onLinkCanceled={() => setOutcome({ kind: 'later' })}
+        />
       ) : (
         <InviteStep weddingId={weddingId} onDone={setOutcome} />
       )}
