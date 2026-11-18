@@ -271,6 +271,10 @@ button.kore-planner-wedding__awaiting-link {
   @apply mt-2 flex flex-wrap items-center gap-3;
 }
 
+.kore-wedding-switcher {
+  @apply block;
+}
+
 .kore-wedding-switcher__button {
   @apply type-heading inline-flex min-h-11 max-w-full cursor-pointer items-center gap-2 border-0 bg-transparent p-0 text-ink;
 }
