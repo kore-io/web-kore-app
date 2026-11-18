@@ -32,7 +32,7 @@ import { availableAtText, initials, memberGroups, cardDate } from '../collaborat
  * - **colaboradora** (Área do Cerimonialista 17): a lista em leitura, Convidar e Remover
  *   desabilitados com o motivo e o Sair deste casamento (o mesmo do detalhe, RN10).
  * O vendedor não aparece (271(4)). Sem cerimonialista, o casal convida uma, ou acompanha
- * o convite pendente (D5c; decisão 276); com um dono só, convida o parceiro ou acompanha
+ * o convite pendente (D5c; decisão 276); com um dono só, convida a outra pessoa do casal ou acompanha
  * o convite dele (D5d; decisão 279).
  */
 export function CollaboratorsPage() {
@@ -140,7 +140,7 @@ function CoupleCollaborators({ weddingId }: { weddingId: string }) {
   const pendingPlanner = members.data?.pendingInvitations.find(
     (invitation) => invitation.kind === 'planner',
   );
-  // O convite do parceiro pendente, enquanto o casal tem menos de 2 donos (decisão 279).
+  // O convite da outra pessoa do casal pendente, enquanto o casal tem menos de 2 donos (decisão 279).
   const pendingPartner = members.data?.pendingInvitations.find(
     (invitation) => invitation.kind === 'partner',
   );
@@ -168,7 +168,10 @@ function CoupleCollaborators({ weddingId }: { weddingId: string }) {
               ) : (
                 <InviteButton kind="partner" weddingId={weddingId} />
               ))}
-            <p className="kore-collaborators__help">{t('couple.ownersHelp')}</p>
+            {/* Com um dono só, o rodapé fala com quem lê (decisão 284(1)). */}
+            <p className="kore-collaborators__help">
+              {t(owners.length < 2 ? 'couple.ownerHelp' : 'couple.ownersHelp')}
+            </p>
           </section>
           <section className="kore-collaborators__card" aria-labelledby={plannersId}>
             <h2 id={plannersId} className="kore-collaborators__overline">
