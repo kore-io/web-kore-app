@@ -168,7 +168,7 @@
         "copy": "Copiar link",
         "copied": "Link copiado.",
         "whatsapp": "Compartilhar no WhatsApp",
-        "whatsappMessage": "Oi! Olha como fica o site de vocês: {{link}}",
+        "whatsappMessage": "Oi! Montei o site de vocês e já dá para começar a lista de convidados: {{link}}",
         "regenerate": "Gerar novo link",
         "regenerated": "Novo link gerado. O anterior deixou de funcionar.",
         "cancel": "Cancelar link",
@@ -230,15 +230,17 @@
     "stepCurrent": "{{step}}, passo atual",
     "subtitle": {
       "data": "Passo 1 de 4 · O casamento nasce como rascunho. Você monta o site e convida o casal quando quiser.",
-      "appearance": "Passo 2 de 4 · Escolha um ponto de partida. O casal pode mudar tudo depois."
+      "appearance": "Passo 2 de 4 · Escolha um ponto de partida. Dá para mudar tudo depois, no Editor do site.",
+      "invite": "Passo 3 de 4 · O casamento já está criado como rascunho. Convide o casal agora ou deixe para depois.",
+      "done": "Passo 4 de 4 · Pronto"
     },
     "names": "Nomes do casal",
-    "nameOf": "Nomes do casal, {{n}}",
+    "nameOf": "Nome {{n}} de 2",
     "eventDate": "Data do casamento",
     "optional": "(opcional)",
     "noDate": "O casal ainda não sabe a data",
     "slugPrefix": "kore.com.br/",
-    "slugAvailable": "Endereço disponível. O casal pode mudar até publicar.",
+    "slugAvailable": "Endereço disponível. Dá para mudar até publicar.",
     "slugTaken": "Esse endereço já está em uso. Tente {{suggestion}}.",
     "errors": {
       "name": "Informe o nome.",
@@ -248,7 +250,37 @@
     "cancel": "Cancelar",
     "back": "Voltar",
     "continue": "Continuar",
+    "create": "Criar casamento",
+    "stepsLabel": "Passos do novo casamento",
     "previewTitle": "Prévia do site",
-    "created": "Casamento criado."
+    "invite": {
+      "email": "E-mail do casal",
+      "emailHint": "Sem e-mail: você manda o link ao casal pelo WhatsApp.",
+      "otherEmail": "Outro e-mail do casal",
+      "message": "Mensagem",
+      "discount": "O casal ganha {{percent}}% de desconto na ativação.",
+      "later": "Convidar depois",
+      "send": "Enviar convite",
+      "generateLink": "Gerar link",
+      "errors": {
+        "email": "Informe um e-mail válido.",
+        "ownEmail": "Este é o e-mail da sua conta. Use o e-mail do casal.",
+        "messageTooLong": "A mensagem passa de 500 caracteres."
+      }
+    },
+    "done": {
+      "title": "Casamento criado.",
+      "sentOne": "Enviamos o convite para {{email}}. Enquanto o casal não aceita, você já pode montar o site e a lista de convidados.",
+      "sentTwo": "Enviamos o convite para {{first}} e {{second}}. Enquanto o casal não aceita, você já pode montar o site e a lista de convidados.",
+      "later": "O convite para o casal fica para depois. Envie quando quiser, no detalhe do casamento.",
+      "nextSteps": "Próximos passos",
+      "nextBuildSite": "Montar o site: seções, fotos e lista de presentes",
+      "nextGuests": "Cadastrar os convidados, à mão ou pela planilha",
+      "nextFollow": "Acompanhar em Meus casamentos quando o casal aceitar",
+      "noDate": "Data a definir",
+      "toMyWeddings": "Ir para Meus casamentos",
+      "buildSite": "Montar o site",
+      "inviteCouple": "Convidar o casal"
+    }
   }
 }

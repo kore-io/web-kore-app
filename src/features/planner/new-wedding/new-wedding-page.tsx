@@ -1,9 +1,21 @@
-import { Button, Checkbox, DateField, Input, PageHeader, Select, useToast } from '@kore-io/design';
+import {
+  Button,
+  Checkbox,
+  DateField,
+  Input,
+  PageHeader,
+  Select,
+  Spinner,
+  useToast,
+} from '@kore-io/design';
 import { Check } from 'lucide-react';
 import { Fragment, useEffect, useId, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 import { paths } from '../../../app/paths';
+import { useMyWeddingsControllerDetailV1 } from '../../../shared/api/generated/planner/planner';
+import { ApiError } from '../../../shared/api/http-client';
+import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { BRAZIL_STATES } from '../../../shared/brazil-states';
 import { FormField } from '../../../shared/components/form-field';
 import { SitePreviewCard } from '../../access/components/site-preview-card';
@@ -12,19 +24,27 @@ import { checkAppearance } from '../../site/appearance';
 import { AppearanceFields, useAppearanceDraft } from '../../site/components/appearance-fields';
 import { loadEditorFonts } from '../../site/site-fonts';
 import { SITE_BACKGROUND_NAMES } from '../../../site/theme';
+import { DoneStep, InviteStep, type InviteOutcome } from './invite-steps';
 import { DEFAULT_APPEARANCE, useNewWedding, type NewWeddingField } from './use-new-wedding';
 
 const STEPS = ['data', 'appearance', 'invite', 'done'] as const;
 type Step = (typeof STEPS)[number];
 
 /**
- * Novo casamento da cerimonialista (D6a da F6; Novo casamento RN01 a RN04; Penpot 05;
- * decisões 280 e a divisão do D6), em /cerimonialista/casamentos/novo:
- * - o passo 1 (Dados) e o passo 2 (Aparência, com a prévia);
- * - o casamento nasce no Continuar do passo 2 (POST /v1/me/weddings).
- * Os passos 3 e 4 chegam no D6b; até lá, o Continuar leva ao detalhe em Meus casamentos.
+ * Novo casamento da cerimonialista (Novo casamento RN01 a RN07; Penpot 05; decisões 280 e
+ * 281), em /cerimonialista/casamentos/novo:
+ * - o passo 1 (Dados) e o passo 2 (Aparência, com a prévia); o casamento nasce no Continuar
+ *   do passo 2 (POST /v1/me/weddings), e a rota passa a ter o `?casamento={id}`;
+ * - com o `?casamento={id}`, o passo 3 (Convidar o casal) e o 4 (Pronto). É também por ela
+ *   que o Convidar o casal do detalhe chega (RN07).
  */
 export function NewWeddingPage() {
+  const [params] = useSearchParams();
+  const weddingId = params.get('casamento');
+  return weddingId ? <InviteFlow key={weddingId} weddingId={weddingId} /> : <CreateFlow />;
+}
+
+function CreateFlow() {
   const { t } = useTranslation('planner');
   const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
@@ -41,8 +61,13 @@ export function NewWeddingPage() {
     if (!appearance.canSave) return;
     const result = await wedding.submit({ appearance: appearance.body });
     if (result.ok) {
-      showToast({ tone: 'success', message: t('newWedding.created') });
-      void navigate(`${paths.plannerArea}?casamento=${encodeURIComponent(result.weddingId)}`);
+      // O passo 3 sobre o casamento criado; o Pronto diz "Casamento criado." (decisão 281(2)).
+      void navigate(
+        `${paths.plannerNewWedding}?casamento=${encodeURIComponent(result.weddingId)}`,
+        {
+          replace: true,
+        },
+      );
       return;
     }
     if (result.reason === 'slug') {
@@ -62,8 +87,7 @@ export function NewWeddingPage() {
 
   return (
     <div className="kore-new-wedding">
-      <PageHeader title={t('newWedding.title')} description={t(`newWedding.subtitle.${step}`)} />
-      <Stepper current={step} />
+      <Header step={step} />
       {step === 'data' ? (
         <DataStep wedding={wedding} onContinue={() => setStep('appearance')} />
       ) : (
@@ -92,7 +116,7 @@ export function NewWeddingPage() {
                 disabled={wedding.submitting || !appearance.canSave}
                 aria-busy={wedding.submitting || undefined}
               >
-                {t('newWedding.continue')}
+                {t('newWedding.create')}
               </Button>
             </div>
           </form>
@@ -103,12 +127,65 @@ export function NewWeddingPage() {
   );
 }
 
+/**
+ * Os passos 3 e 4 sobre um casamento criado (RN05 a RN07). Só para o rascunho sem dono e sem
+ * convite que ela criou; com convite pendente ou dono, a rota leva ao detalhe (decisão 281(3)).
+ */
+function InviteFlow({ weddingId }: { weddingId: string }) {
+  const { t } = useTranslation('planner');
+  const navigate = useNavigate();
+  const detail = useMyWeddingsControllerDetailV1(weddingId, { query: { retry: false } });
+  const [outcome, setOutcome] = useState<InviteOutcome>();
+  const step: Step = outcome ? 'done' : 'invite';
+  const toDetail = `${paths.plannerArea}?casamento=${encodeURIComponent(weddingId)}`;
+  const notFound = detail.error instanceof ApiError && detail.error.status === 404;
+  const data = detail.data;
+  const canInvite =
+    data !== undefined && data.createdByMe && !data.hasOwner && data.status === 'draft';
+  // Confere só na chegada: depois do envio, o casamento passa a aguardar o casal.
+  const [eligible, setEligible] = useState<boolean>();
+  if (eligible === undefined && (data !== undefined || notFound)) setEligible(canInvite);
+
+  useEffect(() => {
+    if (eligible === false) void navigate(toDetail, { replace: true });
+  }, [eligible, navigate, toDetail]);
+
+  return (
+    <div className="kore-new-wedding">
+      <Header step={step} />
+      {!eligible || !data ? (
+        detail.isError && !notFound ? (
+          <LoadErrorNotice onRetry={() => void detail.refetch()} />
+        ) : (
+          <div className="kore-new-wedding__loading">
+            <Spinner label={t('myWeddings.detail.loading')} />
+          </div>
+        )
+      ) : outcome ? (
+        <DoneStep detail={data} outcome={outcome} onInvite={() => setOutcome(undefined)} />
+      ) : (
+        <InviteStep weddingId={weddingId} onDone={setOutcome} />
+      )}
+    </div>
+  );
+}
+
+function Header({ step }: { step: Step }) {
+  const { t } = useTranslation('planner');
+  return (
+    <>
+      <PageHeader title={t('newWedding.title')} description={t(`newWedding.subtitle.${step}`)} />
+      <Stepper current={step} />
+    </>
+  );
+}
+
 /** "1 Dados do casamento — 2 Aparência — 3 Convidar o casal — 4 Pronto" (Penpot 05). */
 function Stepper({ current }: { current: Step }) {
   const { t } = useTranslation('planner');
   const index = STEPS.indexOf(current);
   return (
-    <ol className="kore-new-wedding__steps" aria-label={t('newWedding.title')}>
+    <ol className="kore-new-wedding__steps" aria-label={t('newWedding.stepsLabel')}>
       {STEPS.map((step, position) => {
         const label = t(`newWedding.steps.${step}`);
         const done = position < index;
@@ -283,7 +360,10 @@ function DataStep({
         <Button type="button" variant="ghost" onClick={() => void navigate(paths.plannerArea)}>
           {t('newWedding.cancel')}
         </Button>
-        <Button type="submit">{t('newWedding.continue')}</Button>
+        {/* Enquanto a disponibilidade do endereço responde, o Continuar espera (sugestão do Crivo). */}
+        <Button type="submit" aria-busy={wedding.slugChecking || undefined}>
+          {t('newWedding.continue')}
+        </Button>
       </div>
     </form>
   );
