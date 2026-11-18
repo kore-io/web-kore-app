@@ -17,11 +17,13 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { paths } from '../../../app/paths';
 import {
-  plannerControllerReferrerV1,
   useMeControllerMeV1,
   usePlannerControllerProfileV1,
 } from '../../../shared/api/generated/me/me';
-import { useMyWeddingsControllerListV1 } from '../../../shared/api/generated/planner/planner';
+import {
+  myReferrerControllerReferrerV1,
+  useMyWeddingsControllerListV1,
+} from '../../../shared/api/generated/planner/planner';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import {
   filterWeddings,
@@ -251,7 +253,7 @@ function EmptyWeddings() {
       message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
     });
   const copyLink = () =>
-    void plannerControllerReferrerV1()
+    void myReferrerControllerReferrerV1()
       .then(({ link }) => navigator.clipboard.writeText(link))
       .then(() => showToast({ tone: 'success', message: t('myWeddings.empty.copied') }))
       .catch(genericError);

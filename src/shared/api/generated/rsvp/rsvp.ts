@@ -51,6 +51,8 @@ import type {
   SongQuestionDisabledErrorBody,
   SongSuggestionsControllerPageV1Params,
   SongSuggestionsResponse,
+  SupportReadOnlyErrorBody,
+  SupportSessionEndedErrorBody,
   ValidationErrorBody,
   WeddingBlockedErrorBody,
   WeddingDeletionScheduledErrorBody,
@@ -125,6 +127,8 @@ export const getCoupleResponsesControllerDeadlineV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | WeddingDeletionScheduledErrorBody
@@ -175,6 +179,8 @@ export type CoupleResponsesControllerDeadlineV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | WeddingDeletionScheduledErrorBody
@@ -196,6 +202,8 @@ export const useCoupleResponsesControllerDeadlineV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | WeddingDeletionScheduledErrorBody
@@ -275,6 +283,8 @@ export const getCoupleResponsesControllerResponseV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | GuestNotFoundErrorBody
@@ -325,6 +335,8 @@ export type CoupleResponsesControllerResponseV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | GuestNotFoundErrorBody
@@ -347,6 +359,8 @@ export const useCoupleResponsesControllerResponseV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | GuestNotFoundErrorBody
@@ -400,6 +414,7 @@ export const getMessageTemplatesControllerAllV1QueryOptions = <
   TError = ErrorType<
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | RateLimitedErrorBody
   >,
@@ -438,6 +453,7 @@ export type MessageTemplatesControllerAllV1QueryResult = NonNullable<
 export type MessageTemplatesControllerAllV1QueryError = ErrorType<
   | SessionExpiredErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
   | WeddingNotFoundErrorBody
   | RateLimitedErrorBody
 >;
@@ -447,6 +463,7 @@ export function useMessageTemplatesControllerAllV1<
   TError = ErrorType<
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | RateLimitedErrorBody
   >,
@@ -473,6 +490,7 @@ export function useMessageTemplatesControllerAllV1<
   TError = ErrorType<
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | RateLimitedErrorBody
   >,
@@ -499,6 +517,7 @@ export function useMessageTemplatesControllerAllV1<
   TError = ErrorType<
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | RateLimitedErrorBody
   >,
@@ -521,6 +540,7 @@ export function useMessageTemplatesControllerAllV1<
   TError = ErrorType<
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | RateLimitedErrorBody
   >,
@@ -598,6 +618,8 @@ export const getMessageTemplatesControllerPutV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | WeddingDeletionScheduledErrorBody
@@ -647,6 +669,8 @@ export type MessageTemplatesControllerPutV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | WeddingDeletionScheduledErrorBody
@@ -668,6 +692,8 @@ export const useMessageTemplatesControllerPutV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | WeddingDeletionScheduledErrorBody
@@ -743,6 +769,7 @@ export const getDeliveriesControllerGetQueueV1QueryOptions = <
     | ValidationErrorBody
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | DeliveriesClosedErrorBody
     | SiteExpiredConflictErrorBody
@@ -786,6 +813,7 @@ export type DeliveriesControllerGetQueueV1QueryError = ErrorType<
   | ValidationErrorBody
   | SessionExpiredErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
   | WeddingNotFoundErrorBody
   | DeliveriesClosedErrorBody
   | SiteExpiredConflictErrorBody
@@ -798,6 +826,7 @@ export function useDeliveriesControllerGetQueueV1<
     | ValidationErrorBody
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | DeliveriesClosedErrorBody
     | SiteExpiredConflictErrorBody
@@ -828,6 +857,7 @@ export function useDeliveriesControllerGetQueueV1<
     | ValidationErrorBody
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | DeliveriesClosedErrorBody
     | SiteExpiredConflictErrorBody
@@ -858,6 +888,7 @@ export function useDeliveriesControllerGetQueueV1<
     | ValidationErrorBody
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | DeliveriesClosedErrorBody
     | SiteExpiredConflictErrorBody
@@ -884,6 +915,7 @@ export function useDeliveriesControllerGetQueueV1<
     | ValidationErrorBody
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | DeliveriesClosedErrorBody
     | SiteExpiredConflictErrorBody
@@ -957,6 +989,8 @@ export const getDeliveriesControllerMarkV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | DeliveryPartyNotFoundErrorBody
@@ -1009,6 +1043,8 @@ export type DeliveriesControllerMarkV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | DeliveryPartyNotFoundErrorBody
@@ -1032,6 +1068,8 @@ export const useDeliveriesControllerMarkV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | DeliveryPartyNotFoundErrorBody
@@ -1109,6 +1147,8 @@ export const getQrCodesControllerCreateV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | DeliveryPartyNotFoundErrorBody
@@ -1160,6 +1200,8 @@ export type QrCodesControllerCreateV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | DeliveryPartyNotFoundErrorBody
@@ -1180,6 +1222,8 @@ export const useQrCodesControllerCreateV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | DeliveryPartyNotFoundErrorBody
@@ -1257,6 +1301,7 @@ export const getSongSuggestionsControllerPageV1QueryOptions = <
     | ValidationErrorBody
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | SongQuestionDisabledErrorBody
     | RateLimitedErrorBody
@@ -1299,6 +1344,7 @@ export type SongSuggestionsControllerPageV1QueryError = ErrorType<
   | ValidationErrorBody
   | SessionExpiredErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
   | WeddingNotFoundErrorBody
   | SongQuestionDisabledErrorBody
   | RateLimitedErrorBody
@@ -1310,6 +1356,7 @@ export function useSongSuggestionsControllerPageV1<
     | ValidationErrorBody
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | SongQuestionDisabledErrorBody
     | RateLimitedErrorBody
@@ -1339,6 +1386,7 @@ export function useSongSuggestionsControllerPageV1<
     | ValidationErrorBody
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | SongQuestionDisabledErrorBody
     | RateLimitedErrorBody
@@ -1368,6 +1416,7 @@ export function useSongSuggestionsControllerPageV1<
     | ValidationErrorBody
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | SongQuestionDisabledErrorBody
     | RateLimitedErrorBody
@@ -1393,6 +1442,7 @@ export function useSongSuggestionsControllerPageV1<
     | ValidationErrorBody
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | SongQuestionDisabledErrorBody
     | RateLimitedErrorBody
@@ -1443,6 +1493,7 @@ export const getSongSuggestionsControllerExportV1QueryOptions = <
   TError = ErrorType<
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | SongQuestionDisabledErrorBody
     | NothingToExportErrorBody
@@ -1484,6 +1535,7 @@ export type SongSuggestionsControllerExportV1QueryResult = NonNullable<
 export type SongSuggestionsControllerExportV1QueryError = ErrorType<
   | SessionExpiredErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
   | WeddingNotFoundErrorBody
   | SongQuestionDisabledErrorBody
   | NothingToExportErrorBody
@@ -1495,6 +1547,7 @@ export function useSongSuggestionsControllerExportV1<
   TError = ErrorType<
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | SongQuestionDisabledErrorBody
     | NothingToExportErrorBody
@@ -1523,6 +1576,7 @@ export function useSongSuggestionsControllerExportV1<
   TError = ErrorType<
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | SongQuestionDisabledErrorBody
     | NothingToExportErrorBody
@@ -1551,6 +1605,7 @@ export function useSongSuggestionsControllerExportV1<
   TError = ErrorType<
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | SongQuestionDisabledErrorBody
     | NothingToExportErrorBody
@@ -1575,6 +1630,7 @@ export function useSongSuggestionsControllerExportV1<
   TError = ErrorType<
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | SongQuestionDisabledErrorBody
     | NothingToExportErrorBody
@@ -1622,7 +1678,12 @@ export const getDashboardControllerGetV1QueryKey = (weddingId: string) => {
 
 export const getDashboardControllerGetV1QueryOptions = <
   TData = Awaited<ReturnType<typeof dashboardControllerGetV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options?: {
@@ -1654,12 +1715,20 @@ export type DashboardControllerGetV1QueryResult = NonNullable<
   Awaited<ReturnType<typeof dashboardControllerGetV1>>
 >;
 export type DashboardControllerGetV1QueryError = ErrorType<
-  SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+  | SessionExpiredErrorBody
+  | SupportSessionEndedErrorBody
+  | WeddingNotFoundErrorBody
+  | RateLimitedErrorBody
 >;
 
 export function useDashboardControllerGetV1<
   TData = Awaited<ReturnType<typeof dashboardControllerGetV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options: {
@@ -1680,7 +1749,12 @@ export function useDashboardControllerGetV1<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useDashboardControllerGetV1<
   TData = Awaited<ReturnType<typeof dashboardControllerGetV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options?: {
@@ -1701,7 +1775,12 @@ export function useDashboardControllerGetV1<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useDashboardControllerGetV1<
   TData = Awaited<ReturnType<typeof dashboardControllerGetV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options?: {
@@ -1718,7 +1797,12 @@ export function useDashboardControllerGetV1<
 
 export function useDashboardControllerGetV1<
   TData = Awaited<ReturnType<typeof dashboardControllerGetV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options?: {

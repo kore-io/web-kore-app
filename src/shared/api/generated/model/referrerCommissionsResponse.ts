@@ -4,12 +4,17 @@
  * Kore API
  * OpenAPI spec version: 1
  */
+import type { AdjustmentLineResponse } from './adjustmentLineResponse';
 import type { CommissionBalancesResponse } from './commissionBalancesResponse';
-import type { CommissionItemResponse } from './commissionItemResponse';
+import type { CommissionLineResponse } from './commissionLineResponse';
+import type { ReferrerCommissionsResponseView } from './referrerCommissionsResponseView';
 import type { WeddingCommissionsResponse } from './weddingCommissionsResponse';
 
 export interface ReferrerCommissionsResponse {
   balances: CommissionBalancesResponse;
-  items: CommissionItemResponse[];
-  byWedding: WeddingCommissionsResponse[];
+  view: ReferrerCommissionsResponseView;
+  items: (CommissionLineResponse | AdjustmentLineResponse | WeddingCommissionsResponse)[];
+  page: number;
+  pageSize: number;
+  total: number;
 }

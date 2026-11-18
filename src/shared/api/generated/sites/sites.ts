@@ -538,7 +538,13 @@ export const getPublicSiteControllerGetV1QueryKey = (slug: string) => {
 
 export const getPublicSiteControllerGetV1QueryOptions = <
   TData = Awaited<ReturnType<typeof publicSiteControllerGetV1>>,
-  TError = ErrorType<SiteNotFoundErrorBody | SiteDraftErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SiteNotFoundErrorBody
+    | SiteDraftErrorBody
+    | SiteExpiredErrorBody
+    | SiteUnavailableErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   slug: string,
   options?: {
@@ -570,12 +576,22 @@ export type PublicSiteControllerGetV1QueryResult = NonNullable<
   Awaited<ReturnType<typeof publicSiteControllerGetV1>>
 >;
 export type PublicSiteControllerGetV1QueryError = ErrorType<
-  SiteNotFoundErrorBody | SiteDraftErrorBody | RateLimitedErrorBody
+  | SiteNotFoundErrorBody
+  | SiteDraftErrorBody
+  | SiteExpiredErrorBody
+  | SiteUnavailableErrorBody
+  | RateLimitedErrorBody
 >;
 
 export function usePublicSiteControllerGetV1<
   TData = Awaited<ReturnType<typeof publicSiteControllerGetV1>>,
-  TError = ErrorType<SiteNotFoundErrorBody | SiteDraftErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SiteNotFoundErrorBody
+    | SiteDraftErrorBody
+    | SiteExpiredErrorBody
+    | SiteUnavailableErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   slug: string,
   options: {
@@ -596,7 +612,13 @@ export function usePublicSiteControllerGetV1<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function usePublicSiteControllerGetV1<
   TData = Awaited<ReturnType<typeof publicSiteControllerGetV1>>,
-  TError = ErrorType<SiteNotFoundErrorBody | SiteDraftErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SiteNotFoundErrorBody
+    | SiteDraftErrorBody
+    | SiteExpiredErrorBody
+    | SiteUnavailableErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   slug: string,
   options?: {
@@ -617,7 +639,13 @@ export function usePublicSiteControllerGetV1<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function usePublicSiteControllerGetV1<
   TData = Awaited<ReturnType<typeof publicSiteControllerGetV1>>,
-  TError = ErrorType<SiteNotFoundErrorBody | SiteDraftErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SiteNotFoundErrorBody
+    | SiteDraftErrorBody
+    | SiteExpiredErrorBody
+    | SiteUnavailableErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   slug: string,
   options?: {
@@ -635,7 +663,13 @@ pode guardar a resposta: a de um grupo não pode chegar a um visitante (RN03).
 
 export function usePublicSiteControllerGetV1<
   TData = Awaited<ReturnType<typeof publicSiteControllerGetV1>>,
-  TError = ErrorType<SiteNotFoundErrorBody | SiteDraftErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SiteNotFoundErrorBody
+    | SiteDraftErrorBody
+    | SiteExpiredErrorBody
+    | SiteUnavailableErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   slug: string,
   options?: {
@@ -822,7 +856,9 @@ export const getSiteLinkPreviewControllerPreviewV1QueryKey = (slug: string) => {
 
 export const getSiteLinkPreviewControllerPreviewV1QueryOptions = <
   TData = Awaited<ReturnType<typeof siteLinkPreviewControllerPreviewV1>>,
-  TError = ErrorType<ValidationErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    ValidationErrorBody | SiteExpiredErrorBody | SiteUnavailableErrorBody | RateLimitedErrorBody
+  >,
 >(
   slug: string,
   options?: {
@@ -856,12 +892,14 @@ export type SiteLinkPreviewControllerPreviewV1QueryResult = NonNullable<
   Awaited<ReturnType<typeof siteLinkPreviewControllerPreviewV1>>
 >;
 export type SiteLinkPreviewControllerPreviewV1QueryError = ErrorType<
-  ValidationErrorBody | RateLimitedErrorBody
+  ValidationErrorBody | SiteExpiredErrorBody | SiteUnavailableErrorBody | RateLimitedErrorBody
 >;
 
 export function useSiteLinkPreviewControllerPreviewV1<
   TData = Awaited<ReturnType<typeof siteLinkPreviewControllerPreviewV1>>,
-  TError = ErrorType<ValidationErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    ValidationErrorBody | SiteExpiredErrorBody | SiteUnavailableErrorBody | RateLimitedErrorBody
+  >,
 >(
   slug: string,
   options: {
@@ -882,7 +920,9 @@ export function useSiteLinkPreviewControllerPreviewV1<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useSiteLinkPreviewControllerPreviewV1<
   TData = Awaited<ReturnType<typeof siteLinkPreviewControllerPreviewV1>>,
-  TError = ErrorType<ValidationErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    ValidationErrorBody | SiteExpiredErrorBody | SiteUnavailableErrorBody | RateLimitedErrorBody
+  >,
 >(
   slug: string,
   options?: {
@@ -903,7 +943,9 @@ export function useSiteLinkPreviewControllerPreviewV1<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useSiteLinkPreviewControllerPreviewV1<
   TData = Awaited<ReturnType<typeof siteLinkPreviewControllerPreviewV1>>,
-  TError = ErrorType<ValidationErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    ValidationErrorBody | SiteExpiredErrorBody | SiteUnavailableErrorBody | RateLimitedErrorBody
+  >,
 >(
   slug: string,
   options?: {
@@ -920,7 +962,9 @@ export function useSiteLinkPreviewControllerPreviewV1<
 
 export function useSiteLinkPreviewControllerPreviewV1<
   TData = Awaited<ReturnType<typeof siteLinkPreviewControllerPreviewV1>>,
-  TError = ErrorType<ValidationErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    ValidationErrorBody | SiteExpiredErrorBody | SiteUnavailableErrorBody | RateLimitedErrorBody
+  >,
 >(
   slug: string,
   options?: {

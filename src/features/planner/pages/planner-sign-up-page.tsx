@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
 import { paths } from '../../../app/paths';
-import { usePlannerControllerReferrerV1 } from '../../../shared/api/generated/me/me';
+import { useMyReferrerControllerReferrerV1 } from '../../../shared/api/generated/planner/planner';
 import { redirectTo } from '../../../shared/browser/redirect';
 import { LoadError } from '../../../shared/components/load-error';
 import { KORE_URL } from '../../../site/links';
@@ -177,7 +177,7 @@ function PlannerDetailsStep({ signUp }: { signUp: ReturnType<typeof usePlannerSi
 function ReferralReady({ onContinue }: { onContinue: () => void }) {
   const { t } = useTranslation('access');
   const { showToast } = useToast();
-  const referrer = usePlannerControllerReferrerV1();
+  const referrer = useMyReferrerControllerReferrerV1();
   // Sem o link, o Como funciona segue: ele também fica em Link de indicação (a nota).
   useEffect(() => {
     if (referrer.isError) onContinue();

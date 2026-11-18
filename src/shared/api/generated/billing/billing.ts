@@ -61,6 +61,8 @@ import type {
   RefundWindowOpenErrorBody,
   SessionExpiredErrorBody,
   SiteSlugMissingErrorBody,
+  SupportReadOnlyErrorBody,
+  SupportSessionEndedErrorBody,
   UnknownGatewayErrorBody,
   ValidationErrorBody,
   WebhookReceivedResponse,
@@ -362,6 +364,7 @@ export const getBillingQuoteControllerGetQuoteV1QueryOptions = <
     | InstallmentsOutOfRangeErrorBody
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | NotDraftErrorBody
     | NotPublishedErrorBody
@@ -409,6 +412,7 @@ export type BillingQuoteControllerGetQuoteV1QueryError = ErrorType<
   | InstallmentsOutOfRangeErrorBody
   | SessionExpiredErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
   | WeddingNotFoundErrorBody
   | NotDraftErrorBody
   | NotPublishedErrorBody
@@ -425,6 +429,7 @@ export function useBillingQuoteControllerGetQuoteV1<
     | InstallmentsOutOfRangeErrorBody
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | NotDraftErrorBody
     | NotPublishedErrorBody
@@ -459,6 +464,7 @@ export function useBillingQuoteControllerGetQuoteV1<
     | InstallmentsOutOfRangeErrorBody
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | NotDraftErrorBody
     | NotPublishedErrorBody
@@ -493,6 +499,7 @@ export function useBillingQuoteControllerGetQuoteV1<
     | InstallmentsOutOfRangeErrorBody
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | NotDraftErrorBody
     | NotPublishedErrorBody
@@ -520,6 +527,7 @@ export function useBillingQuoteControllerGetQuoteV1<
     | InstallmentsOutOfRangeErrorBody
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | NotDraftErrorBody
     | NotPublishedErrorBody
@@ -598,6 +606,8 @@ export const getPaymentsControllerEndDateV1MutationOptions = <
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
     | WeddingBlockedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingNotFoundErrorBody
     | NotPublishedErrorBody
     | WeddingDeletionScheduledErrorBody
@@ -649,6 +659,8 @@ export type PaymentsControllerEndDateV1MutationError = ErrorType<
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
   | WeddingBlockedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingNotFoundErrorBody
   | NotPublishedErrorBody
   | WeddingDeletionScheduledErrorBody
@@ -672,6 +684,8 @@ export const usePaymentsControllerEndDateV1 = <
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
     | WeddingBlockedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingNotFoundErrorBody
     | NotPublishedErrorBody
     | WeddingDeletionScheduledErrorBody
@@ -753,6 +767,8 @@ export const getPaymentsControllerRefundV1MutationOptions = <
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
     | WeddingBlockedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingNotFoundErrorBody
     | PaymentNotFoundErrorBody
     | RefundWindowClosedErrorBody
@@ -807,6 +823,8 @@ export type PaymentsControllerRefundV1MutationError = ErrorType<
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
   | WeddingBlockedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingNotFoundErrorBody
   | PaymentNotFoundErrorBody
   | RefundWindowClosedErrorBody
@@ -834,6 +852,8 @@ export const usePaymentsControllerRefundV1 = <
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
     | WeddingBlockedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingNotFoundErrorBody
     | PaymentNotFoundErrorBody
     | RefundWindowClosedErrorBody
@@ -916,6 +936,8 @@ export const getPaymentsControllerPayV1MutationOptions = <
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
     | WeddingBlockedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingNotFoundErrorBody
     | NotDraftErrorBody
     | SiteSlugMissingErrorBody
@@ -977,6 +999,8 @@ export type PaymentsControllerPayV1MutationError = ErrorType<
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
   | WeddingBlockedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingNotFoundErrorBody
   | NotDraftErrorBody
   | SiteSlugMissingErrorBody
@@ -1011,6 +1035,8 @@ export const usePaymentsControllerPayV1 = <
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
     | WeddingBlockedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingNotFoundErrorBody
     | NotDraftErrorBody
     | SiteSlugMissingErrorBody
@@ -1069,7 +1095,12 @@ export const getPaymentsControllerBillingV1QueryKey = (weddingId: string) => {
 
 export const getPaymentsControllerBillingV1QueryOptions = <
   TData = Awaited<ReturnType<typeof paymentsControllerBillingV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options?: {
@@ -1101,12 +1132,20 @@ export type PaymentsControllerBillingV1QueryResult = NonNullable<
   Awaited<ReturnType<typeof paymentsControllerBillingV1>>
 >;
 export type PaymentsControllerBillingV1QueryError = ErrorType<
-  SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+  | SessionExpiredErrorBody
+  | SupportSessionEndedErrorBody
+  | WeddingNotFoundErrorBody
+  | RateLimitedErrorBody
 >;
 
 export function usePaymentsControllerBillingV1<
   TData = Awaited<ReturnType<typeof paymentsControllerBillingV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options: {
@@ -1127,7 +1166,12 @@ export function usePaymentsControllerBillingV1<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function usePaymentsControllerBillingV1<
   TData = Awaited<ReturnType<typeof paymentsControllerBillingV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options?: {
@@ -1148,7 +1192,12 @@ export function usePaymentsControllerBillingV1<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function usePaymentsControllerBillingV1<
   TData = Awaited<ReturnType<typeof paymentsControllerBillingV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options?: {
@@ -1165,7 +1214,12 @@ export function usePaymentsControllerBillingV1<
 
 export function usePaymentsControllerBillingV1<
   TData = Awaited<ReturnType<typeof paymentsControllerBillingV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options?: {
@@ -1238,6 +1292,8 @@ export const getWeddingDeletionControllerRequestV1MutationOptions = <
     | ReauthRequiredErrorBody
     | WeddingBlockedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingNotFoundErrorBody
     | RefundWindowOpenErrorBody
     | RefundInProgressErrorBody
@@ -1291,6 +1347,8 @@ export type WeddingDeletionControllerRequestV1MutationError = ErrorType<
   | ReauthRequiredErrorBody
   | WeddingBlockedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingNotFoundErrorBody
   | RefundWindowOpenErrorBody
   | RefundInProgressErrorBody
@@ -1315,6 +1373,8 @@ export const useWeddingDeletionControllerRequestV1 = <
     | ReauthRequiredErrorBody
     | WeddingBlockedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingNotFoundErrorBody
     | RefundWindowOpenErrorBody
     | RefundInProgressErrorBody
@@ -1372,6 +1432,8 @@ export const getWeddingDeletionControllerCancelV1MutationOptions = <
     | OriginNotAllowedErrorBody
     | WeddingBlockedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingNotFoundErrorBody
     | NoDeletionScheduledErrorBody
     | WeddingDeletionScheduledErrorBody
@@ -1420,6 +1482,8 @@ export type WeddingDeletionControllerCancelV1MutationError = ErrorType<
   | OriginNotAllowedErrorBody
   | WeddingBlockedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingNotFoundErrorBody
   | NoDeletionScheduledErrorBody
   | WeddingDeletionScheduledErrorBody
@@ -1436,6 +1500,8 @@ export const useWeddingDeletionControllerCancelV1 = <
     | OriginNotAllowedErrorBody
     | WeddingBlockedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingNotFoundErrorBody
     | NoDeletionScheduledErrorBody
     | WeddingDeletionScheduledErrorBody

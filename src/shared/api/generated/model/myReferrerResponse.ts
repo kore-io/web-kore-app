@@ -4,25 +4,18 @@
  * Kore API
  * OpenAPI spec version: 1
  */
+import type { MyReferrerBalancesResponse } from './myReferrerBalancesResponse';
 
 export interface MyReferrerResponse {
   referralCode: string;
   link: string;
-  /**
-   * Nulo com o desconto de indicação desligado. Sem o percentual da comissão (D4).
-   * @nullable
-   */
+  /** @nullable */
   discountPercent: number | null;
-  /**
-   * "***.982.247-**"; nulo antes do primeiro recebimento (Repasse RN02).
-   * @nullable
-   */
+  ratePercent: number;
+  balances: MyReferrerBalancesResponse;
+  /** @nullable */
   taxIdMasked: string | null;
-  /**
-   * A chave ativa mascarada; nula sem chave confirmada (Repasse RN03).
-   * @nullable
-   */
+  /** @nullable */
   pixKeyMasked: string | null;
-  /** CPF ou CNPJ e chave ativa: pode receber ("Cadastre seu CPF ou CNPJ e sua chave Pix…"). */
   payoutDataComplete: boolean;
 }

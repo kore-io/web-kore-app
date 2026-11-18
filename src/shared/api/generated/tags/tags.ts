@@ -28,6 +28,8 @@ import type {
   OriginNotAllowedErrorBody,
   RateLimitedErrorBody,
   SessionExpiredErrorBody,
+  SupportReadOnlyErrorBody,
+  SupportSessionEndedErrorBody,
   TagLimitReachedErrorBody,
   TagListResponse,
   TagNameTakenErrorBody,
@@ -86,6 +88,8 @@ export const getTagsControllerTrashV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | TagNotFoundErrorBody
@@ -134,6 +138,8 @@ export type TagsControllerTrashV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | TagNotFoundErrorBody
@@ -150,6 +156,8 @@ export const useTagsControllerTrashV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | TagNotFoundErrorBody
@@ -224,6 +232,8 @@ export const getTagsControllerUpdateV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | TagNotFoundErrorBody
@@ -274,6 +284,8 @@ export type TagsControllerUpdateV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | TagNotFoundErrorBody
@@ -296,6 +308,8 @@ export const useTagsControllerUpdateV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | TagNotFoundErrorBody
@@ -346,7 +360,12 @@ export const getTagsControllerListV1QueryKey = (weddingId: string) => {
 
 export const getTagsControllerListV1QueryOptions = <
   TData = Awaited<ReturnType<typeof tagsControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options?: {
@@ -377,12 +396,20 @@ export type TagsControllerListV1QueryResult = NonNullable<
   Awaited<ReturnType<typeof tagsControllerListV1>>
 >;
 export type TagsControllerListV1QueryError = ErrorType<
-  SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+  | SessionExpiredErrorBody
+  | SupportSessionEndedErrorBody
+  | WeddingNotFoundErrorBody
+  | RateLimitedErrorBody
 >;
 
 export function useTagsControllerListV1<
   TData = Awaited<ReturnType<typeof tagsControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options: {
@@ -403,7 +430,12 @@ export function useTagsControllerListV1<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useTagsControllerListV1<
   TData = Awaited<ReturnType<typeof tagsControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options?: {
@@ -424,7 +456,12 @@ export function useTagsControllerListV1<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useTagsControllerListV1<
   TData = Awaited<ReturnType<typeof tagsControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options?: {
@@ -441,7 +478,12 @@ export function useTagsControllerListV1<
 
 export function useTagsControllerListV1<
   TData = Awaited<ReturnType<typeof tagsControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options?: {
@@ -508,6 +550,8 @@ export const getTagsControllerCreateV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | TagLimitReachedErrorBody
@@ -558,6 +602,8 @@ export type TagsControllerCreateV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | TagLimitReachedErrorBody
@@ -576,6 +622,8 @@ export const useTagsControllerCreateV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | TagLimitReachedErrorBody
@@ -651,6 +699,8 @@ export const getTagsControllerApplyV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | TagNotFoundErrorBody
@@ -700,6 +750,8 @@ export type TagsControllerApplyV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | TagNotFoundErrorBody
@@ -721,6 +773,8 @@ export const useTagsControllerApplyV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | TagNotFoundErrorBody

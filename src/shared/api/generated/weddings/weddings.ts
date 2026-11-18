@@ -31,6 +31,8 @@ import type {
   SessionExpiredErrorBody,
   SlugAvailabilityResponse,
   SlugUnavailableErrorBody,
+  SupportReadOnlyErrorBody,
+  SupportSessionEndedErrorBody,
   TermsVersionOutdatedErrorBody,
   ValidationErrorBody,
   WeddingBlockedErrorBody,
@@ -87,6 +89,8 @@ export const getWeddingsControllerRemoveV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | WeddingHasOwnerErrorBody
@@ -135,6 +139,8 @@ export type WeddingsControllerRemoveV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | WeddingHasOwnerErrorBody
@@ -153,6 +159,8 @@ export const useWeddingsControllerRemoveV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | WeddingHasOwnerErrorBody

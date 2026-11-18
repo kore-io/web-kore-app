@@ -27,6 +27,8 @@ import type {
   RestoreTrashItemBody,
   RestoreTrashItemResponse,
   SessionExpiredErrorBody,
+  SupportReadOnlyErrorBody,
+  SupportSessionEndedErrorBody,
   TagLimitReachedErrorBody,
   TagNameTakenErrorBody,
   TrashItemNotFoundErrorBody,
@@ -80,7 +82,12 @@ export const getTrashControllerListV1QueryKey = (weddingId: string) => {
 
 export const getTrashControllerListV1QueryOptions = <
   TData = Awaited<ReturnType<typeof trashControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options?: {
@@ -111,12 +118,20 @@ export type TrashControllerListV1QueryResult = NonNullable<
   Awaited<ReturnType<typeof trashControllerListV1>>
 >;
 export type TrashControllerListV1QueryError = ErrorType<
-  SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+  | SessionExpiredErrorBody
+  | SupportSessionEndedErrorBody
+  | WeddingNotFoundErrorBody
+  | RateLimitedErrorBody
 >;
 
 export function useTrashControllerListV1<
   TData = Awaited<ReturnType<typeof trashControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options: {
@@ -137,7 +152,12 @@ export function useTrashControllerListV1<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useTrashControllerListV1<
   TData = Awaited<ReturnType<typeof trashControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options?: {
@@ -158,7 +178,12 @@ export function useTrashControllerListV1<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useTrashControllerListV1<
   TData = Awaited<ReturnType<typeof trashControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options?: {
@@ -175,7 +200,12 @@ export function useTrashControllerListV1<
 
 export function useTrashControllerListV1<
   TData = Awaited<ReturnType<typeof trashControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options?: {
@@ -242,6 +272,8 @@ export const getTrashControllerRestoreV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | TrashItemNotFoundErrorBody
@@ -293,6 +325,8 @@ export type TrashControllerRestoreV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | TrashItemNotFoundErrorBody
@@ -315,6 +349,8 @@ export const useTrashControllerRestoreV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | TrashItemNotFoundErrorBody

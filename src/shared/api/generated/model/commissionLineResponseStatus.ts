@@ -5,10 +5,10 @@
  * OpenAPI spec version: 1
  */
 
-export type CommissionItemResponseStatus =
-  (typeof CommissionItemResponseStatus)[keyof typeof CommissionItemResponseStatus];
+export type CommissionLineResponseStatus =
+  (typeof CommissionLineResponseStatus)[keyof typeof CommissionLineResponseStatus];
 
-export const CommissionItemResponseStatus = {
+export const CommissionLineResponseStatus = {
   pending: 'pending',
   available: 'available',
   paid: 'paid',

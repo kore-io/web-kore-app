@@ -18,7 +18,7 @@ export type AdminReferrersReadControllerListV1Params = {
   /** Só `planner` no lançamento (os vendedores ficam fora; decisão 230, D17). */
   kind?: AdminReferrersReadControllerListV1Kind;
   status?: AdminReferrersReadControllerListV1Status;
-  /** Com (true) ou sem (false) um repasse solicitado ou retido; só o Admin (decisão 69). */
+  /** Com (true) ou sem (false) um repasse solicitado (o retido não conta; decisão 273(2)); só o Admin (decisão 69). */
   hasPayout?: AdminReferrersReadControllerListV1HasPayout;
   /**
    * Uma das cidades do perfil, sem diferenciar maiúsculas.

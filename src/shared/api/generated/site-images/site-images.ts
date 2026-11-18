@@ -26,6 +26,8 @@ import type {
   SiteImageUploadAuthorizationBody,
   SiteImageUploadAuthorizationResponse,
   SiteImageUploadMissingErrorBody,
+  SupportReadOnlyErrorBody,
+  SupportSessionEndedErrorBody,
   ValidationErrorBody,
   WeddingBlockedErrorBody,
   WeddingDeletionScheduledErrorBody,
@@ -87,6 +89,8 @@ export const getSiteImagesControllerConfirmV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | SiteImageNotFoundErrorBody
@@ -139,6 +143,8 @@ export type SiteImagesControllerConfirmV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | SiteImageNotFoundErrorBody
@@ -164,6 +170,8 @@ export const useSiteImagesControllerConfirmV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | SiteImageNotFoundErrorBody
@@ -244,6 +252,8 @@ export const getSiteImagesControllerAuthorizeV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | SiteImageLimitErrorBody
@@ -293,6 +303,8 @@ export type SiteImagesControllerAuthorizeV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | SiteImageLimitErrorBody
@@ -313,6 +325,8 @@ export const useSiteImagesControllerAuthorizeV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | SiteImageLimitErrorBody

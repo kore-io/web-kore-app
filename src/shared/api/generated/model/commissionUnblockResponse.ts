@@ -8,4 +8,6 @@ import type { CommissionUnblockResponseStatus } from './commissionUnblockRespons
 
 export interface CommissionUnblockResponse {
   status: CommissionUnblockResponseStatus;
+  /** O casamento da comissão segue bloqueado: "O casamento continua bloqueado." (decisão 284(3)). */
+  weddingBlocked: boolean;
 }

@@ -42,6 +42,7 @@ import type {
   ProfileNotOwnedErrorBody,
   RateLimitedErrorBody,
   ReauthRequiredErrorBody,
+  RecentAccessChangeErrorBody,
   RequestPayoutBody,
   RequestPixKeyBody,
   SessionExpiredErrorBody,
@@ -382,6 +383,7 @@ export const getPayoutDataControllerRequestPixKeyV1MutationOptions = <
     | ProfileNotOwnedErrorBody
     | ReauthRequiredErrorBody
     | PixKeyChangePendingErrorBody
+    | RecentAccessChangeErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
@@ -429,6 +431,7 @@ export type PayoutDataControllerRequestPixKeyV1MutationError = ErrorType<
   | ProfileNotOwnedErrorBody
   | ReauthRequiredErrorBody
   | PixKeyChangePendingErrorBody
+  | RecentAccessChangeErrorBody
   | RateLimitedErrorBody
 >;
 export type PayoutDataControllerRequestPixKeyV1MutationVariables = { data: RequestPixKeyBody };
@@ -444,6 +447,7 @@ export const usePayoutDataControllerRequestPixKeyV1 = <
     | ProfileNotOwnedErrorBody
     | ReauthRequiredErrorBody
     | PixKeyChangePendingErrorBody
+    | RecentAccessChangeErrorBody
     | RateLimitedErrorBody
   >,
   TContext = unknown,
