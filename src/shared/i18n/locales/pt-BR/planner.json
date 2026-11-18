@@ -299,5 +299,102 @@
       "title": "Nenhum casal se cadastrou pelo seu link ainda.",
       "description": "Compartilhe com os casais que você atende."
     }
+  },
+  "templates": {
+    "title": "Modelos",
+    "description": "Guarde os textos, as perguntas frequentes e as aparências que você usa sempre e aplique no site de cada cliente.",
+    "tabsLabel": "Tipos de modelo",
+    "tabs": {
+      "texts": "Textos",
+      "faq": "FAQ",
+      "appearance": "Aparência"
+    },
+    "create": "Criar modelo",
+    "loading": "Carregando os modelos",
+    "columns": {
+      "name": "Nome",
+      "section": "Seção",
+      "sample": "Amostra",
+      "createdAt": "Criado em"
+    },
+    "edit": "Editar",
+    "delete": "Excluir",
+    "editName": "Editar {{name}}",
+    "deleteName": "Excluir {{name}}",
+    "sections": {
+      "story": "Nossa história",
+      "lodging": "Hospedagem e transporte",
+      "dress_code": "Dress code"
+    },
+    "sample": {
+      "palette": "Fontes {{fonts}} · Cor principal e destaque da paleta {{palette}} · Fundo {{background}}",
+      "custom": "Fontes {{fonts}} · Cor principal, cor personalizada · Destaque, cor personalizada · Fundo {{background}}"
+    },
+    "empty": {
+      "texts": {
+        "title": "Você ainda não tem modelos de texto.",
+        "description": "Salve uma Nossa história ou um texto de hospedagem para usar no site de cada cliente."
+      },
+      "faq": {
+        "title": "Você ainda não tem modelos de FAQ.",
+        "description": "Salve as perguntas que os convidados sempre fazem."
+      },
+      "appearance": {
+        "title": "Você ainda não tem modelos de aparência.",
+        "description": "Salve as combinações de fontes e cores que você mais usa."
+      }
+    },
+    "form": {
+      "titleNew": {
+        "texts": "Novo modelo de texto",
+        "faq": "Novo modelo de FAQ",
+        "appearance": "Novo modelo de aparência"
+      },
+      "titleEdit": "Editar modelo",
+      "name": "Nome do modelo",
+      "namePlaceholder": {
+        "texts": "Ex.: Nossa história, tom acolhedor",
+        "faq": "Ex.: FAQ, cerimônia ao ar livre",
+        "appearance": "Ex.: Romântico, sálvia e creme"
+      },
+      "section": "Seção",
+      "text": "Texto",
+      "textHelp": "Use {casal}, {data} e {cidade}: o Kore troca pelos dados do casal quando você aplicar.",
+      "counter": "{{count}}/{{max}}",
+      "notice": "Use só textos seus, sem nomes nem dados de clientes. O modelo pode ir para o site de qualquer casal em que você aplicar.",
+      "question": "Pergunta",
+      "answer": "Resposta",
+      "item": "Pergunta {{n}}",
+      "addQuestion": "Adicionar pergunta",
+      "remove": "Remover",
+      "removeQuestion": "Remover a pergunta {{n}}",
+      "faqLimit": "Um modelo de FAQ pode ter até 30 perguntas.",
+      "create": "Criar modelo",
+      "save": "Salvar alterações",
+      "cancel": "Cancelar",
+      "questionN": "Pergunta {{n}}",
+      "answerN": "Resposta {{n}}"
+    },
+    "errors": {
+      "nameMissing": "Dê um nome ao modelo.",
+      "nameTooLong": "O nome passa de 80 caracteres.",
+      "textMissing": "Escreva o texto do modelo.",
+      "faqMissing": "Adicione pelo menos uma pergunta com resposta.",
+      "questionMissing": "Escreva a pergunta.",
+      "answerMissing": "Escreva a resposta.",
+      "save": "Não foi possível salvar agora. Verifique sua conexão e tente de novo."
+    },
+    "toast": {
+      "created": "Modelo criado.",
+      "saved": "Alterações salvas.",
+      "deleted": "Modelo excluído."
+    },
+    "deleteDialog": {
+      "title": "Excluir o modelo \"{{name}}\"?",
+      "description": "Os sites em que você já aplicou este modelo não mudam. Não dá para desfazer.",
+      "confirm": "Excluir modelo",
+      "cancel": "Cancelar"
+    },
+    "createdOn": "Criado em {{date}}"
   }
 }
