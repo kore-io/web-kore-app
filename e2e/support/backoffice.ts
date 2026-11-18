@@ -97,6 +97,8 @@ interface WeddingInput {
   owners?: [string | null, string | null];
   collaboratorIds?: string[];
   referrerId?: string;
+  /** Com indicador: criado por ele (padrão) ou o casal que veio pelo link dele. */
+  referralSource?: 'created_by_planner' | 'referral_link';
   /** O fuso IANA do casamento (padrão, America/Sao_Paulo). */
   timezone?: string;
 }
@@ -112,6 +114,7 @@ export async function createWedding({
   owners = [null, null],
   collaboratorIds = [],
   referrerId,
+  referralSource = 'created_by_planner',
   timezone = 'America/Sao_Paulo',
 }: WeddingInput) {
   const weddingId = await insertId({
@@ -127,8 +130,8 @@ export async function createWedding({
       city,
       createdByUserId,
       referrerId ?? null,
-      referrerId ? 'created_by_planner' : null,
-      referrerId ? 'planner' : 'direct',
+      referrerId ? referralSource : null,
+      referrerId ? (referralSource === 'referral_link' ? 'referral_link' : 'planner') : 'direct',
       timezone,
     ],
   });

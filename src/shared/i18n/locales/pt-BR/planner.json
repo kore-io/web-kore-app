@@ -282,5 +282,22 @@
       "buildSite": "Montar o site",
       "inviteCouple": "Convidar o casal"
     }
+  },
+  "referral": {
+    "title": "Link de indicação",
+    "descriptionDiscount": "Quem se cadastrar por este link ganha {{percent}}% de desconto na ativação.",
+    "loading": "Carregando o link de indicação",
+    "copy": "Copiar link",
+    "copied": "Link copiado.",
+    "whatsapp": "Compartilhar no WhatsApp",
+    "listTitle": "Casais que vieram pelo seu link",
+    "columns": {
+      "couple": "Casal",
+      "status": "Status"
+    },
+    "empty": {
+      "title": "Nenhum casal se cadastrou pelo seu link ainda.",
+      "description": "Compartilhe com os casais que você atende."
+    }
   }
 }
