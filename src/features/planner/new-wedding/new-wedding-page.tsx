@@ -21,9 +21,14 @@ import { FormField } from '../../../shared/components/form-field';
 import { SitePreviewCard } from '../../access/components/site-preview-card';
 import { formatLongDate } from '../../access/profile-texts';
 import { checkAppearance } from '../../site/appearance';
-import { AppearanceFields, useAppearanceDraft } from '../../site/components/appearance-fields';
+import {
+  AppearanceFields,
+  draftFrom,
+  useAppearanceDraft,
+} from '../../site/components/appearance-fields';
 import { loadEditorFonts } from '../../site/site-fonts';
 import { SITE_BACKGROUND_NAMES } from '../../../site/theme';
+import { StartFromTemplate } from '../templates/apply-template';
 import { DoneStep, InviteStep, type InviteOutcome } from './invite-steps';
 import { DEFAULT_APPEARANCE, useNewWedding, type NewWeddingField } from './use-new-wedding';
 
@@ -100,6 +105,10 @@ function CreateFlow() {
               void create();
             }}
           >
+            <StartFromTemplate
+              defaultAppearance={draftFrom(DEFAULT_APPEARANCE)}
+              onAppearance={appearance.update}
+            />
             <AppearanceFields
               state={appearance}
               sampleNames={[wedding.values.partner1Name, wedding.values.partner2Name]

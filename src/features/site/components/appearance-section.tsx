@@ -16,6 +16,7 @@ import { matchingPalette, type ContrastBlock } from '../appearance';
 import { usePreviewAppearance } from '../preview-appearance';
 import { useSectionForm } from '../section-form';
 import { loadEditorFonts } from '../site-fonts';
+import { AppearanceTemplateAction } from '../../planner/templates/apply-template';
 import { AppearanceFields, draftFrom, useAppearanceDraft } from './appearance-fields';
 
 /** Aparência (S2): fontes, paleta, cor principal e destaque com o contraste, e o fundo. */
@@ -34,7 +35,8 @@ export function AppearanceSection({
   const queryClient = useQueryClient();
   const put = useSiteControllerAppearanceV1();
   const state = useAppearanceDraft({ initial: site.appearance });
-  const { draft, setDraft, setServerBlock, starterPaletteKey, lastValid, canSave, body } = state;
+  const { draft, setDraft, update, setServerBlock, starterPaletteKey, lastValid, canSave, body } =
+    state;
   const [original, setOriginal] = useState(() => draftFrom(site.appearance));
 
   useEffect(() => {
@@ -100,10 +102,13 @@ export function AppearanceSection({
   });
 
   return (
-    <AppearanceFields
-      state={state}
-      sampleNames={site.partners.map((partner) => partner.name.split(' ')[0]).join(' & ')}
-      audience={audience}
-    />
+    <>
+      <AppearanceTemplateAction onAppearance={update} />
+      <AppearanceFields
+        state={state}
+        sampleNames={site.partners.map((partner) => partner.name.split(' ')[0]).join(' & ')}
+        audience={audience}
+      />
+    </>
   );
 }

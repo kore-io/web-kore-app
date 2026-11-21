@@ -6,6 +6,7 @@ import type { SiteEditorResponse, SiteSectionResponse } from '../../../shared/ap
 import type { Audience } from '../../guests/hooks/use-active-wedding';
 import type { ImageValue } from '../components/image-field';
 import { IMAGE_ACCEPT, useSiteImageUpload } from '../images/use-site-image-upload';
+import { TextTemplateAction } from '../../planner/templates/apply-template';
 import { SectionFrame, TextWithCounter } from './section-forms';
 import { useSiteSection } from './use-site-section';
 
@@ -27,6 +28,7 @@ interface StoryContent {
  */
 export function StorySection({
   weddingId,
+  site,
   section,
   audience,
 }: {
@@ -56,6 +58,7 @@ export function StorySection({
     }),
     validate: () => ({}),
     canSave: sending.length === 0,
+    blocked: (content) => content.text.length > STORY_TEXT_MAX,
   });
   const labelId = useId();
   const { text, photos } = state.draft.content;
@@ -88,7 +91,18 @@ export function StorySection({
   const current = sending.findIndex((fraction) => fraction < 1);
 
   return (
-    <SectionFrame state={state} audience={audience} empty={!text.trim() && photos.length === 0}>
+    <SectionFrame
+      state={state}
+      audience={audience}
+      empty={!text.trim() && photos.length === 0}
+      action={
+        <TextTemplateAction
+          site={site}
+          sectionType="story"
+          onText={(value) => state.setContent((content) => ({ ...content, text: value }))}
+        />
+      }
+    >
       <TextWithCounter
         label={t('section.text')}
         value={text}
