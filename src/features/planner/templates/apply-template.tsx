@@ -11,6 +11,7 @@ import type {
   SiteEditorResponse,
 } from '../../../shared/api/generated/model';
 import { draftFrom, type AppearanceDraft } from '../../site/components/appearance-fields';
+import type { SectionTemplateActions } from '../../site/sections/template-actions';
 import { usePlannerTemplatesControllerListV1 } from '../../../shared/api/generated/planner/planner';
 import { applyMarkers } from './markers';
 import { AppearanceSample } from './templates-list';
@@ -293,3 +294,10 @@ export function StartFromTemplate({
     </FormField>
   );
 }
+
+/** As ações de modelo da cerimonialista para o Editor (o ponto de extensão do `site`). */
+export const PLANNER_TEMPLATE_ACTIONS: SectionTemplateActions = {
+  Text: TextTemplateAction,
+  Faq: FaqTemplateAction,
+  Appearance: AppearanceTemplateAction,
+};

@@ -10,7 +10,7 @@ import { ImageField, type ImageValue } from '../components/image-field';
 import { FIRST_SECTION_SLUG } from '../sections';
 import { useSiteSection, type SectionErrors } from './use-site-section';
 import { useAreaPaths } from '../../../app/area';
-import { FaqTemplateAction, TextTemplateAction } from '../../planner/templates/apply-template';
+import { useSectionTemplateActions } from './template-actions';
 
 const NUMBER = new Intl.NumberFormat('pt-BR');
 const TITLE_MAX = 80;
@@ -203,6 +203,7 @@ export function CountdownSection({ weddingId, site, section, audience }: Section
 /** Hospedagem e transporte (RN08): título e texto até 5.000. */
 export function LodgingSection({ weddingId, site, section, audience }: SectionProps) {
   const { t } = useTranslation('site');
+  const actions = useSectionTemplateActions();
   const state = useSiteSection({
     weddingId,
     section,
@@ -217,11 +218,13 @@ export function LodgingSection({ weddingId, site, section, audience }: SectionPr
       audience={audience}
       empty={!state.draft.content.text.trim()}
       action={
-        <TextTemplateAction
-          site={site}
-          sectionType="lodging"
-          onText={(value) => state.replaceContent({ text: value })}
-        />
+        actions?.Text && (
+          <actions.Text
+            site={site}
+            sectionType="lodging"
+            onText={(value) => state.replaceContent({ text: value })}
+          />
+        )
       }
     >
       <TextWithCounter
@@ -238,6 +241,7 @@ export function LodgingSection({ weddingId, site, section, audience }: SectionPr
 /** Dress code (RN09): título, texto até 2.000 e a foto de referência opcional. */
 export function DressCodeSection({ weddingId, site, section, audience }: SectionProps) {
   const { t } = useTranslation('site');
+  const actions = useSectionTemplateActions();
   const state = useSiteSection<{ text: string; image: ImageValue }>({
     weddingId,
     section,
@@ -259,11 +263,13 @@ export function DressCodeSection({ weddingId, site, section, audience }: Section
       audience={audience}
       empty={!content.text.trim() && !content.image}
       action={
-        <TextTemplateAction
-          site={site}
-          sectionType="dress_code"
-          onText={(value) => state.setContent((current) => ({ ...current, text: value }))}
-        />
+        actions?.Text && (
+          <actions.Text
+            site={site}
+            sectionType="dress_code"
+            onText={(value) => state.setContent((current) => ({ ...current, text: value }))}
+          />
+        )
       }
     >
       <TextWithCounter
@@ -299,6 +305,7 @@ const nextKey = () => {
 /** FAQ (RN10): até 30 perguntas, cada uma com Pergunta e Resposta obrigatórias. */
 export function FaqSection({ weddingId, section, audience }: SectionProps) {
   const { t } = useTranslation('site');
+  const actions = useSectionTemplateActions();
   const state = useSiteSection<FaqItem[]>({
     weddingId,
     section,
@@ -332,13 +339,15 @@ export function FaqSection({ weddingId, section, audience }: SectionProps) {
       audience={audience}
       empty={items.length === 0}
       action={
-        <FaqTemplateAction
-          onQuestions={(questions) =>
-            state.replaceContent(
-              questions.slice(0, FAQ_MAX).map((item) => ({ key: nextKey(), ...item })),
-            )
-          }
-        />
+        actions?.Faq && (
+          <actions.Faq
+            onQuestions={(questions) =>
+              state.replaceContent(
+                questions.slice(0, FAQ_MAX).map((item) => ({ key: nextKey(), ...item })),
+              )
+            }
+          />
+        )
       }
     >
       <ol className="kore-site-faq">
