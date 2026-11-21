@@ -134,16 +134,28 @@ export function TextWithCounter({
           })}
     >
       {({ id, describedBy, invalid }) => (
-        <Textarea
-          id={id}
-          aria-describedby={describedBy}
-          invalid={invalid}
-          rows={6}
-          maxLength={max}
-          {...(placeholder !== undefined && { placeholder })}
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-        />
+        <>
+          <Textarea
+            id={id}
+            aria-describedby={describedBy}
+            invalid={invalid}
+            rows={6}
+            maxLength={max}
+            {...(placeholder !== undefined && { placeholder })}
+            value={value}
+            onChange={(event) => onChange(event.target.value)}
+          />
+          {/* Acima do limite, o contador fica à vista, em perigo, para mostrar quanto cortar;
+              o leitor de tela lê só o erro (decisão 302(6); como no Dialog do modelo). */}
+          {over && (
+            <span className="kore-site-section__counter-over" aria-hidden="true">
+              {t('section.counter', {
+                count: NUMBER.format(value.length),
+                max: NUMBER.format(max),
+              })}
+            </span>
+          )}
+        </>
       )}
     </FormField>
   );

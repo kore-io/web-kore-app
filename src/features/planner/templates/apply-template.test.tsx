@@ -189,6 +189,9 @@ describe('Aplicar modelo no Editor (Modelos RN07, RN08)', () => {
       'O texto passa de 2.000 caracteres. Encurte antes de salvar.',
     );
     expect(text).toBeInvalid();
+    // O contador continua à vista, fora do que o leitor de tela lê (decisão 302(6)).
+    const counter = screen.getByText('2.001/2.000');
+    expect(counter).toHaveAttribute('aria-hidden', 'true');
     expect(screen.getByRole('button', { name: 'Salvar' })).toBeDisabled();
     const end = (text as HTMLTextAreaElement).value.length;
     await user.type(text, '{Backspace}', {
