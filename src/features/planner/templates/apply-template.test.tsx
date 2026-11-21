@@ -199,8 +199,7 @@ describe('Aplicar modelo no Editor (Modelos RN07, RN08)', () => {
     expect(screen.getByRole('button', { name: 'Salvar' })).toBeEnabled();
   });
 
-  it('sem modelos: o vazio e o Criar modelo abre Modelos numa aba nova (RN08)', async () => {
-    const open = vi.spyOn(window, 'open').mockImplementation(() => null);
+  it('sem modelos: o vazio e o Criar modelo, um link para Modelos numa aba nova (RN08)', async () => {
     asPlanner({ templates: () => [] });
     renderAreaScreen({ url: '/app/site/faq' });
     const user = userEvent.setup();
@@ -209,9 +208,10 @@ describe('Aplicar modelo no Editor (Modelos RN07, RN08)', () => {
     expect(
       await within(picker).findByText('Você ainda não tem modelos para esta seção.'),
     ).toBeInTheDocument();
-    await user.click(within(picker).getByRole('button', { name: 'Criar modelo' }));
-    expect(open).toHaveBeenCalledWith('/cerimonialista/modelos?aba=faq', '_blank', 'noopener');
-    open.mockRestore();
+    const create = within(picker).getByRole('link', { name: 'Criar modelo' });
+    expect(create).toHaveAttribute('href', '/cerimonialista/modelos?aba=faq');
+    expect(create).toHaveAttribute('target', '_blank');
+    expect(create).toHaveAttribute('rel', 'noopener');
   });
 
   it('a falha ao ler os modelos: o aviso de carregamento e o Tentar de novo (RN08)', async () => {

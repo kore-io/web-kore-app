@@ -110,14 +110,15 @@ export function ApplyTemplate({
         ) : list.data.length === 0 ? (
           <div className="kore-apply-template__empty">
             <p className="kore-apply-template__empty-text">{t('templates.apply.empty')}</p>
-            <Button
-              type="button"
-              onClick={() =>
-                window.open(`${paths.plannerTemplates}${TAB_QUERY[kind]}`, '_blank', 'noopener')
-              }
+            {/* Um link para a aba nova: o leitor de tela anuncia que abre outra aba. */}
+            <a
+              className="kore-button kore-button--primary kore-button--md"
+              href={`${paths.plannerTemplates}${TAB_QUERY[kind]}`}
+              target="_blank"
+              rel="noopener"
             >
               {t('templates.apply.create')}
-            </Button>
+            </a>
           </div>
         ) : (
           <ul className="kore-apply-template__list">
