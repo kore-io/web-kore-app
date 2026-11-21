@@ -243,6 +243,25 @@ describe('Convite do casal (RN09; decisões 172(1), 173 e 174)', () => {
     });
   });
 
+  it('a prévia do site mostra a assinatura da assessoria (Assinatura RN04)', async () => {
+    api({
+      session: me('ana.moreira@gmail.com', null),
+      invitation: { ...coupleInvite, plannerCredit: { name: 'Prado Assessoria' } },
+    });
+    renderRoute({ url: '/convite/tk1' });
+    expect(await screen.findByText('Assessoria: Prado Assessoria')).toBeInTheDocument();
+  });
+
+  it('sem assinatura, a prévia não tem a linha', async () => {
+    api({
+      session: me('ana.moreira@gmail.com', null),
+      invitation: { ...coupleInvite, plannerCredit: null },
+    });
+    renderRoute({ url: '/convite/tk1' });
+    await screen.findByRole('button', { name: 'Aceitar e virar dono' });
+    expect(screen.queryByText(/^Assessoria:/)).toBeNull();
+  });
+
   it('sem sessão: Aceitar leva ao Entrar com a origem do convite, e o aceite continua', async () => {
     const user = userEvent.setup();
     api({ session: null, invitation: coupleInvite });

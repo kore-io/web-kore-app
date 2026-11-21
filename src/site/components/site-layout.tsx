@@ -16,7 +16,8 @@ export function sectionAnchor(type: string): string {
  * O layout do site do casal (Site público RN10 e RN11; Penpot, Início): "Pular para o
  * conteúdo", a Topbar com os nomes (voltam ao topo) e o menu com o título de cada seção
  * ligada e com conteúdo; abaixo de 1024 px, o menu abre por um botão. No rodapé, os
- * nomes, a data e a cidade, "Feito com Kore", Termos, Privacidade e a linha da empresa.
+ * nomes, a data e a cidade, a assinatura da assessoria, "Feito com Kore", Termos,
+ * Privacidade e a linha da empresa.
  */
 export function SiteLayout({
   site,
@@ -102,6 +103,13 @@ export function SiteLayout({
         <p className="kore-site__footer-names">{site.names}</p>
         {dateLine && <p className="kore-site__footer-line">{dateLine}</p>}
         <Contact contact={site.contact} />
+        {/* A assinatura da assessoria, em texto simples, acima do Feito com Kore (Assinatura
+            RN01); o servidor resolve quando ela aparece (RN02, RN03). */}
+        {site.plannerCredit && (
+          <p className="kore-site__planner-credit">
+            {t('footer.plannerCredit', { name: site.plannerCredit.name })}
+          </p>
+        )}
         <p className="kore-site__footer-links">
           <a className="kore-site__made-with" href={madeWithKoreHref()}>
             {t('footer.madeWith')}

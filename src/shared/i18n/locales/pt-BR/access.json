@@ -202,7 +202,8 @@
     "rsvp": "Confirmar presença",
     "accept": "Aceitar e virar dono",
     "viewSite": "Ver o site completo",
-    "emailNote": "Vocês entram com o Google ou com um código no e-mail {{email}}."
+    "emailNote": "Vocês entram com o Google ou com um código no e-mail {{email}}.",
+    "plannerCredit": "Assessoria: {{name}}"
   },
   "plannerInvite": {
     "title": "{{couple}} convidaram você como cerimonialista",

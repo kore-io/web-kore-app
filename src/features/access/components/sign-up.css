@@ -103,6 +103,10 @@
   @apply font-site-body text-body-md font-normal text-site-foreground;
 }
 
+.kore-site-preview__credit {
+  @apply m-0 mt-2 font-site-body text-caption text-site-foreground;
+}
+
 .kore-site-preview__rsvp {
   @apply font-site-body text-label rounded-full bg-site-primary px-5 py-2.5 font-bold text-site-primary-foreground;
 }
