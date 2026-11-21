@@ -29,6 +29,8 @@ import { NotificationSettingsPage } from '../features/notifications/pages/notifi
 import { NotificationsPage } from '../features/notifications/pages/notifications-page';
 import { PlannerNotificationSettingsPage } from '../features/planner/notifications/planner-notification-settings-page';
 import { PlannerNotificationsPage } from '../features/planner/notifications/planner-notifications-page';
+import { PLANNER_TEMPLATE_ACTIONS } from '../features/planner/templates/apply-template';
+import { SectionTemplateActionsProvider } from '../features/site/sections/template-actions';
 import { ImportPage } from '../features/guests/pages/import-page';
 import { EditPartyPage, NewPartyPage } from '../features/guests/pages/party-form-page';
 import { PartyPanelPage } from '../features/guests/pages/party-panel-page';
@@ -66,7 +68,17 @@ function areaRoutes({ prefix }: { prefix: 'couple' | 'planner' }): RouteObject[]
       path: 'site',
       element: <Navigate to={FIRST_SECTION_SLUG} replace />,
     },
-    { id: 'site-editor', path: 'site/:section', element: <SiteEditorPage /> },
+    {
+      id: 'site-editor',
+      path: 'site/:section',
+      // O Editor recebe as ações de modelo da cerimonialista por aqui (Modelos RN08), sem
+      // depender da feature dela; cada ação decide se aparece.
+      element: (
+        <SectionTemplateActionsProvider actions={PLANNER_TEMPLATE_ACTIONS}>
+          <SiteEditorPage />
+        </SectionTemplateActionsProvider>
+      ),
+    },
     { id: 'songs', path: 'musicas', element: <SongsPage /> },
     { id: 'collaborators', path: 'colaboradores', element: <CollaboratorsPage /> },
     // Dentro do casamento, as notificações da colaboradora são as dela, de todos os casamentos

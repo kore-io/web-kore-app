@@ -402,3 +402,8 @@
 .kore-site-basics__credit-note {
   @apply m-0 type-caption text-gray-700;
 }
+
+/* O contador acima do limite, à direita e em perigo (decisão 302(6)). */
+.kore-site-section__counter-over {
+  @apply type-caption self-end text-danger-text;
+}

@@ -11,6 +11,7 @@ import type {
   SiteEditorResponse,
 } from '../../../shared/api/generated/model';
 import { draftFrom, type AppearanceDraft } from '../../site/components/appearance-fields';
+import type { SectionTemplateActions } from '../../site/sections/template-actions';
 import { usePlannerTemplatesControllerListV1 } from '../../../shared/api/generated/planner/planner';
 import { applyMarkers } from './markers';
 import { AppearanceSample } from './templates-list';
@@ -109,14 +110,15 @@ export function ApplyTemplate({
         ) : list.data.length === 0 ? (
           <div className="kore-apply-template__empty">
             <p className="kore-apply-template__empty-text">{t('templates.apply.empty')}</p>
-            <Button
-              type="button"
-              onClick={() =>
-                window.open(`${paths.plannerTemplates}${TAB_QUERY[kind]}`, '_blank', 'noopener')
-              }
+            {/* Um link para a aba nova: o leitor de tela anuncia que abre outra aba. */}
+            <a
+              className="kore-button kore-button--primary kore-button--md"
+              href={`${paths.plannerTemplates}${TAB_QUERY[kind]}`}
+              target="_blank"
+              rel="noopener"
             >
               {t('templates.apply.create')}
-            </Button>
+            </a>
           </div>
         ) : (
           <ul className="kore-apply-template__list">
@@ -293,3 +295,10 @@ export function StartFromTemplate({
     </FormField>
   );
 }
+
+/** As ações de modelo da cerimonialista para o Editor (o ponto de extensão do `site`). */
+export const PLANNER_TEMPLATE_ACTIONS: SectionTemplateActions = {
+  Text: TextTemplateAction,
+  Faq: FaqTemplateAction,
+  Appearance: AppearanceTemplateAction,
+};

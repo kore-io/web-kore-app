@@ -248,7 +248,12 @@ test('a jornada da cerimonialista: do cadastro ao Sair, com a resposta na centra
   // 10. O grupo que respondeu não vai para a lixeira por ela (RN03).
   await page.goto(`${base}/convidados`);
   await page.getByRole('button', { name: 'Ações de Família Nunes' }).click();
-  await expect(page.getByRole('menuitem', { name: 'Mover para a lixeira' })).toBeDisabled();
+  const trash = page.getByRole('menuitem', { name: 'Mover para a lixeira' });
+  await expect(trash).toBeDisabled();
+  // O motivo, para quem lê e para o leitor de tela (sugestão do Crivo no D11).
+  await expect(trash).toHaveAccessibleDescription(
+    'Só o casal pode excluir um grupo que já respondeu.',
+  );
   await page.keyboard.press('Escape');
 
   // 11. O envio do convite pela fila, por Copiar link (Envios RN03, RN05 a RN07).
@@ -359,6 +364,10 @@ test('dois casamentos em duas abas: o grupo entra no casamento da aba (RN01)', a
   const name = `Primos ${letters()}`;
   await newGroup({ page: second, name, guest: 'Lucas Alves' });
   await expect.poll(() => partyWedding(name)).toBe(fernanda);
+  // E a primeira aba segue no casamento dela (sugestão do Crivo no D11).
+  const other = `Vizinhos ${letters()}`;
+  await newGroup({ page: first, name: other, guest: 'Clara Souza' });
+  await expect.poll(() => partyWedding(other)).toBe(ana);
 });
 
 test('o casal remove a cerimonialista: o salvar seguinte volta a Meus casamentos, e a central tem o aviso (RN07)', async ({
