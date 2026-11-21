@@ -22,6 +22,13 @@ export interface BillingEntryResponse {
   expiredAt?: string;
   /** @nullable */
   renewUntil?: string | null;
+  /**
+   * Expirado, versão B (Data de saída do ar RN03; decisão 293(7)): o
+   * paidThrough quando é depois do expiredAt ("Vocês já pagaram até 14 de
+   * fev.: voltem o site ao ar, sem custo"); nulo ou ausente na versão A.
+   * @nullable
+   */
+  paidThrough?: string | null;
   /** purge_soon (Retenção e expurgo RN02): o dia em que os dados são apagados, AAAA-MM-DD. */
   purgeAt?: string;
   /** A data de saída do ar paga, AAAA-MM-DD (só no payment_confirmed). */

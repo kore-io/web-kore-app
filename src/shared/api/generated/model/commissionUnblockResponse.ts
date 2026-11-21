@@ -7,6 +7,7 @@
 import type { CommissionUnblockResponseStatus } from './commissionUnblockResponseStatus';
 
 export interface CommissionUnblockResponse {
+  /** `held` com o pagamento em disputa ou em estorno: segue o desfecho (decisão 290(4)). */
   status: CommissionUnblockResponseStatus;
   /** O casamento da comissão segue bloqueado: "O casamento continua bloqueado." (decisão 284(3)). */
   weddingBlocked: boolean;

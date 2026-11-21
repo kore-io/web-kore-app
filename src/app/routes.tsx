@@ -14,6 +14,7 @@ import { PlannerProfilePage } from '../features/planner/pages/planner-profile-pa
 import { PlannerSettingsLayout } from '../features/planner/pages/planner-settings-layout';
 import { PlannerSignUpPage } from '../features/planner/pages/planner-sign-up-page';
 import { ReferralLinkPage } from '../features/planner/referral/referral-link-page';
+import { TemplatesPage } from '../features/planner/templates/templates-page';
 import { CollaboratorsPage } from '../features/collaborators/pages/collaborators-page';
 import { DashboardPage } from '../features/dashboard/pages/dashboard-page';
 import { DeadlinePage } from '../features/deliveries/pages/deadline-page';
@@ -135,7 +136,7 @@ export const routes: RouteObject[] = [
           { id: 'planner-area-my-weddings', index: true, element: <MyWeddingsPage /> },
           { id: 'planner-area-new-wedding', path: 'casamentos/novo', element: <NewWeddingPage /> },
           { id: 'planner-area-referral', path: 'link-de-indicacao', element: <ReferralLinkPage /> },
-          { id: 'planner-area-templates', path: 'modelos', element: null },
+          { id: 'planner-area-templates', path: 'modelos', element: <TemplatesPage /> },
           { id: 'planner-area-notifications', path: 'notificacoes', element: null },
           { id: 'planner-area-profile', path: 'perfil', element: <PlannerProfilePage /> },
           {

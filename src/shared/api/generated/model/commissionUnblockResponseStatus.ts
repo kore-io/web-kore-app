@@ -5,10 +5,14 @@
  * OpenAPI spec version: 1
  */
 
+/**
+ * `held` com o pagamento em disputa ou em estorno: segue o desfecho (decisão 290(4)).
+ */
 export type CommissionUnblockResponseStatus =
   (typeof CommissionUnblockResponseStatus)[keyof typeof CommissionUnblockResponseStatus];
 
 export const CommissionUnblockResponseStatus = {
   pending: 'pending',
   available: 'available',
+  held: 'held',
 } as const;
