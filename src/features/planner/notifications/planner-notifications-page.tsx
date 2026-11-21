@@ -5,8 +5,8 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { paths } from '../../../app/paths';
-import { useMeControllerMeV1 } from '../../../shared/api/generated/me/me';
-import type { NotificationResponse } from '../../../shared/api/generated/model';
+import { getMeControllerMeV1QueryKey, meControllerMeV1 } from '../../../shared/api/generated/me/me';
+import type { MeResponse, NotificationResponse } from '../../../shared/api/generated/model';
 import {
   getNotificationsControllerListV1QueryKey,
   getNotificationsControllerUnreadV1QueryKey,
@@ -74,8 +74,9 @@ export function PlannerNotificationsPage() {
   });
   const items = (list.data?.pages.flatMap((page) => page.items) ?? []).filter(isPlannerItem);
   const hasUnread = items.some((item) => item.readAt === null);
-  // A vazia de verdade (sem filtro) não mostra o filtro nem o Marcar todas (Penpot 13).
-  const empty = !list.isPending && !list.isError && items.length === 0 && !filter;
+  // O filtro e o Marcar todas só com itens ou com um filtro escolhido: a vazia de verdade não
+  // os mostra (Penpot 13), e a central não pisca com eles enquanto carrega (sugestão do Crivo).
+  const empty = items.length === 0 && !filter;
 
   return (
     <div className="kore-notifications">
@@ -163,22 +164,35 @@ function PlannerNotificationItem({ item }: { item: NotificationResponse }) {
   const { t: tDashboard } = useTranslation('dashboard');
   const navigate = useNavigate();
   const markRead = useMarkNotificationRead();
-  const { data: me } = useMeControllerMeV1();
+  const queryClient = useQueryClient();
   const type = item.type as PlannerType;
   const Icon = ICONS[type];
   const unread = item.readAt === null;
-  const collaborating = Boolean(
-    me?.memberships.some(
-      (membership) => membership.weddingId === item.weddingId && membership.role === 'collaborator',
-    ),
-  );
   const detail = `${paths.plannerArea}?casamento=${encodeURIComponent(item.weddingId)}`;
-  const target =
-    type === 'membership_removed'
-      ? paths.plannerArea
-      : type === 'wedding_published' && !collaborating
-        ? paths.plannerReferral
-        : detail;
+
+  /**
+   * O destino na hora do toque. No publicado, "ainda colabora" pede o /me novo (o vínculo pode
+   * ter acabado desde a última leitura; sugestão do Crivo); se a leitura falhar, vale a que
+   * está em cache.
+   */
+  async function target(): Promise<string> {
+    if (type === 'membership_removed') return paths.plannerArea;
+    if (type !== 'wedding_published') return detail;
+    const me = await queryClient
+      .fetchQuery({
+        queryKey: getMeControllerMeV1QueryKey(),
+        queryFn: ({ signal }) => meControllerMeV1({ signal }),
+        staleTime: 0,
+      })
+      .catch(() => queryClient.getQueryData<MeResponse>(getMeControllerMeV1QueryKey()));
+    const collaborating = Boolean(
+      me?.memberships.some(
+        (membership) =>
+          membership.weddingId === item.weddingId && membership.role === 'collaborator',
+      ),
+    );
+    return collaborating ? detail : paths.plannerReferral;
+  }
   const date = activityDate({ t: tDashboard, at: item.updatedAt, now: new Date() });
   return (
     <li>
@@ -188,7 +202,7 @@ function PlannerNotificationItem({ item }: { item: NotificationResponse }) {
         data-unread={unread || undefined}
         onClick={() => {
           if (unread) markRead({ id: item.id });
-          void navigate(target);
+          void target().then((to) => navigate(to));
         }}
       >
         <span className="kore-notifications__icon" aria-hidden="true">

@@ -251,6 +251,57 @@ describe('Notificações da cerimonialista (RN05; decisão 300; Penpot 13)', () 
     },
   );
 
+  it('enquanto carrega, sem o filtro nem o Marcar todas (não piscam na vazia; sugestão do Crivo)', async () => {
+    let release: () => void = () => undefined;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    mockApi(async ({ path }) => {
+      if (path === '/v1/me') return Response.json(me);
+      if (path.startsWith('/v1/me/notifications/unread-count')) {
+        return Response.json({ unreadCount: 0 });
+      }
+      if (path.startsWith('/v1/me/notifications?')) {
+        await gate;
+        return Response.json({ items: [], nextCursor: null });
+      }
+      return apiError({ status: 404, body: { error: 'NOT_FOUND' } });
+    });
+    renderRoute({ url: PAGE });
+    expect(await screen.findByText('Carregando as notificações')).toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: 'Tipo' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Marcar todas como lidas' })).toBeNull();
+    release();
+    expect(await screen.findByText('Você ainda não tem notificações.')).toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: 'Tipo' })).toBeNull();
+  });
+
+  it('o publicado relê o /me ao abrir: se ela saiu do casamento, vai ao Link de indicação (sugestão do Crivo)', async () => {
+    const user = userEvent.setup();
+    let reads = 0;
+    mockApi(({ method, path }) => {
+      if (path === '/v1/me') {
+        reads += 1;
+        // A 1ª leitura ainda tem o vínculo de w1; a do toque, não.
+        return Response.json(reads === 1 ? me : { ...me, memberships: [] });
+      }
+      if (path.startsWith('/v1/me/notifications/unread-count')) {
+        return Response.json({ unreadCount: 1 });
+      }
+      if (path.startsWith('/v1/me/notifications?')) {
+        return Response.json({ items: [PUBLISHED_COLLABORATING], nextCursor: null });
+      }
+      if (method === 'POST') return new Response(null, { status: 204 });
+      return apiError({ status: 404, body: { error: 'NOT_FOUND' } });
+    });
+    const { router } = renderRoute({ url: PAGE });
+    await user.click(await screen.findByRole('button', { name: /^Site de Ana e Marcos/ }));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/cerimonialista/link-de-indicacao'),
+    );
+    expect(reads).toBeGreaterThan(1);
+  });
+
   it('o sino da Área mostra as não lidas do escopo dela e abre a central (RN05)', async () => {
     const user = userEvent.setup();
     const calls = api({ unread: 3 });
