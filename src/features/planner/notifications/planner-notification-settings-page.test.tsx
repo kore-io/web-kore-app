@@ -90,28 +90,40 @@ describe('Configurações › Notificações da cerimonialista (RN06; decisões 
     expect(calls[0]?.path).toBe('/v1/me/notification-preferences');
 
     const rsvp = row('Novas respostas');
-    expect(within(rsvp).getByRole('switch', { name: 'Central' })).toBeChecked();
-    expect(within(rsvp).getByRole('switch', { name: 'Central' })).toBeDisabled();
-    const rsvpEmail = within(rsvp).getByRole('combobox', { name: 'E-⁠mail' });
+    expect(within(rsvp).getByRole('switch', { name: 'Novas respostas, Central' })).toBeChecked();
+    expect(within(rsvp).getByRole('switch', { name: 'Novas respostas, Central' })).toBeDisabled();
+    // O motivo da Central, só para o leitor de tela (decisão 302(1)).
+    expect(
+      within(rsvp).getByRole('switch', { name: 'Novas respostas, Central' }),
+    ).toHaveAccessibleDescription('A central sempre recebe este aviso.');
+    const rsvpEmail = within(rsvp).getByRole('combobox', { name: 'Novas respostas, E-⁠mail' });
     expect(rsvpEmail).toBeEnabled();
     expect(rsvpEmail).toHaveDisplayValue('Resumo diário às 20h');
-    expect(within(rsvp).getByRole('switch', { name: 'Push' })).toBeEnabled();
+    expect(within(rsvp).getByRole('switch', { name: 'Novas respostas, Push' })).toBeEnabled();
 
     const published = row('Casamento publicado');
-    const publishedEmail = within(published).getByRole('combobox', { name: 'E-⁠mail' });
+    const publishedEmail = within(published).getByRole('combobox', {
+      name: 'Casamento publicado, E-⁠mail',
+    });
     expect(publishedEmail).toBeDisabled();
     expect(publishedEmail).toHaveDisplayValue('Resumo diário às 20h');
-    expect(publishedEmail).toHaveAccessibleDescription('Entra no resumo diário.');
-    const publishedPush = within(published).getByRole('switch', { name: 'Push' });
+    expect(publishedEmail).toHaveAccessibleDescription('Este aviso chega só no resumo diário.');
+    const publishedPush = within(published).getByRole('switch', {
+      name: 'Casamento publicado, Push',
+    });
     expect(publishedPush).toBeDisabled();
     expect(publishedPush).toHaveAccessibleDescription('Este aviso não chega por push.');
 
     const removed = row('Colaboração encerrada');
-    const removedEmail = within(removed).getByRole('combobox', { name: 'E-⁠mail' });
+    const removedEmail = within(removed).getByRole('combobox', {
+      name: 'Colaboração encerrada, E-⁠mail',
+    });
     expect(removedEmail).toBeDisabled();
     expect(removedEmail).toHaveDisplayValue('Desligado');
     expect(removedEmail).toHaveAccessibleDescription('Este aviso aparece só na central.');
-    const removedPush = within(removed).getByRole('switch', { name: 'Push' });
+    const removedPush = within(removed).getByRole('switch', {
+      name: 'Colaboração encerrada, Push',
+    });
     expect(removedPush).toBeDisabled();
     expect(removedPush).toHaveAccessibleDescription('Este aviso aparece só na central.');
     // O motivo comum aparece uma vez.
@@ -129,7 +141,7 @@ describe('Configurações › Notificações da cerimonialista (RN06; decisões 
     renderRoute({ url: PAGE });
     await screen.findByText('Escolha como você quer receber cada aviso.');
     await user.selectOptions(
-      within(row('Novas respostas')).getByRole('combobox', { name: 'E-⁠mail' }),
+      within(row('Novas respostas')).getByRole('combobox', { name: 'Novas respostas, E-⁠mail' }),
       'immediate',
     );
     expect(await screen.findByText('Preferências salvas.')).toBeInTheDocument();
@@ -148,10 +160,27 @@ describe('Configurações › Notificações da cerimonialista (RN06; decisões 
     api({ save: 'fail' });
     renderRoute({ url: PAGE });
     await screen.findByText('Escolha como você quer receber cada aviso.');
-    const email = within(row('Novas respostas')).getByRole('combobox', { name: 'E-⁠mail' });
+    const email = within(row('Novas respostas')).getByRole('combobox', {
+      name: 'Novas respostas, E-⁠mail',
+    });
     await user.selectOptions(email, 'off');
     expect(await screen.findByText(/Não foi possível continuar/)).toBeInTheDocument();
     await waitFor(() => expect(email).toHaveDisplayValue('Resumo diário às 20h'));
+  });
+
+  it('o navegador bloqueando: o aviso de liberar embaixo, como o do casal (decisão 302(1))', async () => {
+    stubPush();
+    vi.stubGlobal('Notification', { permission: 'denied', requestPermission: vi.fn() });
+    api();
+    renderRoute({ url: PAGE });
+    expect(
+      await screen.findByText(
+        'O navegador bloqueou as notificações do Kore. Libere nas configurações do navegador ou do aparelho.',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      within(row('Novas respostas')).getByRole('switch', { name: 'Novas respostas, Push' }),
+    ).toBeDisabled();
   });
 
   it('sem push no navegador: o Push desabilitado e o aviso de instalar embaixo (Penpot 15)', async () => {
@@ -161,6 +190,8 @@ describe('Configurações › Notificações da cerimonialista (RN06; decisões 
     expect(
       await screen.findByText('Para receber push, instale o Kore no seu celular.'),
     ).toBeInTheDocument();
-    expect(within(row('Novas respostas')).getByRole('switch', { name: 'Push' })).toBeDisabled();
+    expect(
+      within(row('Novas respostas')).getByRole('switch', { name: 'Novas respostas, Push' }),
+    ).toBeDisabled();
   });
 });

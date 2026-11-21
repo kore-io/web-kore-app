@@ -137,7 +137,7 @@ export function PlannerNotificationSettingsPage() {
               push={{
                 checked: availability === 'ready' && push.subscribed === true,
                 disabled: pushBusy || availability !== 'ready' || vapidPublicKey === null,
-                reason: availability === 'denied' ? tNotifications('settings.pushDenied') : null,
+                reason: null,
                 onChange: (on) => {
                   if (vapidPublicKey) void togglePush({ on, vapidPublicKey });
                 },
@@ -158,8 +158,13 @@ export function PlannerNotificationSettingsPage() {
           ),
         )}
       </div>
-      {availability === 'install' && (
-        <Alert tone="info">{tNotifications('settings.pushInstall')}</Alert>
+      {/* Sem push no navegador ou com ele bloqueando, o aviso embaixo (Penpot 15; 302(1)). */}
+      {availability !== 'ready' && (
+        <Alert tone="info">
+          {tNotifications(
+            availability === 'install' ? 'settings.pushInstall' : 'settings.pushDenied',
+          )}
+        </Alert>
       )}
     </div>
   );
@@ -192,6 +197,14 @@ function PreferenceRow({
   const { t } = useTranslation('planner');
   const { t: tNotifications } = useTranslation('notifications');
   const id = useId();
+  const typeName = t(`notifications.types.${type}`);
+  // O nome de cada controle é "{tipo}, {canal}" (o cabeçalho da coluna só existe na tela).
+  const prefix = (
+    <>
+      <span className="kore-planner-prefs__sr">{`${typeName},`}</span>{' '}
+    </>
+  );
+  const centralId = `${id}-central`;
   const nameId = `${id}-name`;
   const emailId = `${id}-email`;
   const emailReasonId = `${id}-email-reason`;
@@ -199,16 +212,27 @@ function PreferenceRow({
   return (
     <div className="kore-planner-prefs__row" role="group" aria-labelledby={nameId}>
       <p id={nameId} className="kore-planner-prefs__type">
-        {t(`notifications.types.${type}`)}
+        {typeName}
       </p>
       <div className="kore-planner-prefs__cell">
-        <Switch checked disabled className="kore-planner-prefs__switch">
+        <Switch
+          checked
+          disabled
+          className="kore-planner-prefs__switch"
+          aria-describedby={centralId}
+        >
+          {prefix}
           <span className="kore-planner-prefs__label">{t('notificationSettings.central')}</span>
         </Switch>
+        {/* O motivo do Switch sempre ligado, só para o leitor de tela (decisão 302(1)). */}
+        <p id={centralId} className="kore-planner-prefs__sr">
+          {t('notificationSettings.centralAlways')}
+        </p>
       </div>
       <div className="kore-planner-prefs__cell kore-planner-prefs__cell--email">
-        <label htmlFor={emailId} className="kore-planner-prefs__label">
-          {t('notificationSettings.email')}
+        <label htmlFor={emailId}>
+          {prefix}
+          <span className="kore-planner-prefs__label">{t('notificationSettings.email')}</span>
         </label>
         <div className="kore-planner-prefs__control">
           <Select
@@ -240,6 +264,7 @@ function PreferenceRow({
             {...(push.reason && { 'aria-describedby': pushReasonId })}
             onChange={(event) => push.onChange?.(event.target.checked)}
           >
+            {prefix}
             <span className="kore-planner-prefs__label">{t('notificationSettings.push')}</span>
           </Switch>
           {push.reason && pushReasonId !== emailReasonId && (

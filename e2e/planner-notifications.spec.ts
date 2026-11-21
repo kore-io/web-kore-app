@@ -159,15 +159,17 @@ test('a central de todos os casamentos, o sino, os destinos, Marcar todas e as p
   // As preferências gerais (sem weddingId): o e-mail de Novas respostas grava e fica.
   await page.goto('/cerimonialista/configuracoes/notificacoes');
   const rsvp = page.getByRole('group', { name: 'Novas respostas' });
-  await rsvp.getByRole('combobox', { name: 'E-⁠mail' }).selectOption('immediate');
+  await rsvp.getByRole('combobox', { name: 'Novas respostas, E-⁠mail' }).selectOption('immediate');
   await expect(toast({ page, text: 'Preferências salvas.' })).toBeVisible();
   await page.reload();
   await expect(
-    page.getByRole('group', { name: 'Novas respostas' }).getByRole('combobox', { name: 'E-⁠mail' }),
+    page
+      .getByRole('group', { name: 'Novas respostas' })
+      .getByRole('combobox', { name: 'Novas respostas, E-⁠mail' }),
   ).toHaveValue('immediate');
   await expect(
     page
       .getByRole('group', { name: 'Colaboração encerrada' })
-      .getByRole('combobox', { name: 'E-⁠mail' }),
+      .getByRole('combobox', { name: 'Colaboração encerrada, E-⁠mail' }),
   ).toBeDisabled();
 });

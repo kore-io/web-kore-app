@@ -109,3 +109,8 @@
 .kore-planner-prefs__cell--email .kore-planner-prefs__reason {
   @apply text-right md:text-left;
 }
+
+/* Só para o leitor de tela: o tipo no nome de cada controle e o motivo da Central (302(1)). */
+.kore-planner-prefs__sr {
+  @apply sr-only;
+}

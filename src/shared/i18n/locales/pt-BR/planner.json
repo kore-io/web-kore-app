@@ -442,8 +442,9 @@
     "central": "Central",
     "email": "E-mail",
     "push": "Push",
+    "centralAlways": "A central sempre recebe este aviso.",
     "reasons": {
-      "digest": "Entra no resumo diário.",
+      "digest": "Este aviso chega só no resumo diário.",
       "noPush": "Este aviso não chega por push.",
       "centralOnly": "Este aviso aparece só na central."
     }
