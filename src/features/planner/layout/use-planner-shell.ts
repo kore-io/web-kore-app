@@ -3,19 +3,32 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { paths } from '../../../app/paths';
 import type { MeResponse } from '../../../shared/api/generated/model';
+import { useNotificationsControllerUnreadV1 } from '../../../shared/api/generated/notifications/notifications';
 import { useSignOut } from '../../access/hooks/use-sign-out';
 import { menuUser } from '../../access/session-user';
 
 /**
  * A parte da Topbar que é a mesma na Área do cerimonialista e dentro do casamento
  * (Colaboradora RN02): a pessoa, "Cerimonialista · {assessoria}", o menu (Meu perfil,
- * Configurações, Trocar de perfil ou Criar outro perfil, Sair; RN08) e o sino dela, sem
- * contador até o D9 (decisão 254(2)).
+ * Configurações, Trocar de perfil ou Criar outro perfil, Sair; RN08) e o sino dela, com as
+ * não lidas de todos os casamentos dela (`scope=planner`; Notificações da cerimonialista RN05
+ * e RN08), lido ao abrir, ao voltar à aba e a cada 60 s com a aba visível, como o do casal.
  */
 export function usePlannerShell({ me }: { me: MeResponse | undefined }) {
   const { t } = useTranslation('planner');
   const signOut = useSignOut();
   const navigate = useNavigate();
+  const unread = useNotificationsControllerUnreadV1(
+    { scope: 'planner' },
+    {
+      query: {
+        enabled: Boolean(me?.planner),
+        refetchInterval: 60_000,
+        refetchIntervalInBackground: false,
+        refetchOnWindowFocus: true,
+      },
+    },
+  );
   const organization = me?.planner?.organization ?? '';
   const couple = me?.memberships.find((membership) => membership.role === 'owner')?.weddingName;
   const profiles = me?.profiles ?? [];
@@ -63,6 +76,9 @@ export function usePlannerShell({ me }: { me: MeResponse | undefined }) {
       ],
       [{ id: 'sign-out', label: t('menu.signOut'), onSelect: signOut }],
     ],
-    notifications: { unread: 0, onOpen: () => void navigate(paths.plannerNotifications) },
+    notifications: {
+      unread: unread.data?.unreadCount ?? 0,
+      onOpen: () => void navigate(paths.plannerNotifications),
+    },
   };
 }

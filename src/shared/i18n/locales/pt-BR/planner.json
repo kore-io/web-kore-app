@@ -417,5 +417,35 @@
       "appliedNoDate": "Modelo aplicado. Este casamento ainda não tem data, então {data} ficou no texto. Revise e salve.",
       "overLimit": "O texto passa de {{max}} caracteres. Encurte antes de salvar."
     }
+  },
+  "notifications": {
+    "subtitle": "O que aconteceu nos seus casamentos.",
+    "types": {
+      "rsvp": "Novas respostas",
+      "wedding_published": "Casamento publicado",
+      "membership_removed": "Colaboração encerrada"
+    },
+    "empty": {
+      "title": "Você ainda não tem notificações.",
+      "description": "Elas aparecem aqui quando os convidados responderem ou um casal publicar o site."
+    },
+    "items": {
+      "rsvpOne": "{{name}} respondeu em {{couple}}",
+      "rsvpRemovedGroup": "Um grupo removido respondeu em {{couple}}",
+      "rsvpMany_one": "{{count}} grupo respondeu em {{couple}}",
+      "rsvpMany_other": "{{count}} grupos responderam em {{couple}}",
+      "published": "Site de {{couple}} foi publicado",
+      "removed": "Sua colaboração em {{couple}} foi encerrada"
+    }
+  },
+  "notificationSettings": {
+    "central": "Central",
+    "email": "E-mail",
+    "push": "Push",
+    "reasons": {
+      "digest": "Entra no resumo diário.",
+      "noPush": "Este aviso não chega por push.",
+      "centralOnly": "Este aviso aparece só na central."
+    }
   }
 }

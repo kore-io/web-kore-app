@@ -27,6 +27,8 @@ import { SiteEditorPage } from '../features/site/pages/site-editor-page';
 import { SongsPage } from '../features/songs/pages/songs-page';
 import { NotificationSettingsPage } from '../features/notifications/pages/notification-settings-page';
 import { NotificationsPage } from '../features/notifications/pages/notifications-page';
+import { PlannerNotificationSettingsPage } from '../features/planner/notifications/planner-notification-settings-page';
+import { PlannerNotificationsPage } from '../features/planner/notifications/planner-notifications-page';
 import { ImportPage } from '../features/guests/pages/import-page';
 import { EditPartyPage, NewPartyPage } from '../features/guests/pages/party-form-page';
 import { PartyPanelPage } from '../features/guests/pages/party-panel-page';
@@ -67,11 +69,27 @@ function areaRoutes({ prefix }: { prefix: 'couple' | 'planner' }): RouteObject[]
     { id: 'site-editor', path: 'site/:section', element: <SiteEditorPage /> },
     { id: 'songs', path: 'musicas', element: <SongsPage /> },
     { id: 'collaborators', path: 'colaboradores', element: <CollaboratorsPage /> },
-    { id: 'notifications', path: 'notificacoes', element: <NotificationsPage /> },
+    // Dentro do casamento, as notificações da colaboradora são as dela, de todos os casamentos
+    // (Notificações da cerimonialista RN08; decisão 300(6)).
+    {
+      id: 'notifications',
+      path: 'notificacoes',
+      element:
+        prefix === 'couple' ? (
+          <NotificationsPage />
+        ) : (
+          <Navigate to={paths.plannerNotifications} replace />
+        ),
+    },
     {
       id: 'settings-notifications',
       path: 'configuracoes/notificacoes',
-      element: <NotificationSettingsPage />,
+      element:
+        prefix === 'couple' ? (
+          <NotificationSettingsPage />
+        ) : (
+          <Navigate to={paths.plannerSettingsNotifications} replace />
+        ),
     },
     {
       path: 'envios',
@@ -137,7 +155,11 @@ export const routes: RouteObject[] = [
           { id: 'planner-area-new-wedding', path: 'casamentos/novo', element: <NewWeddingPage /> },
           { id: 'planner-area-referral', path: 'link-de-indicacao', element: <ReferralLinkPage /> },
           { id: 'planner-area-templates', path: 'modelos', element: <TemplatesPage /> },
-          { id: 'planner-area-notifications', path: 'notificacoes', element: null },
+          {
+            id: 'planner-area-notifications',
+            path: 'notificacoes',
+            element: <PlannerNotificationsPage />,
+          },
           { id: 'planner-area-profile', path: 'perfil', element: <PlannerProfilePage /> },
           {
             id: 'planner-area-settings',
@@ -150,7 +172,11 @@ export const routes: RouteObject[] = [
                 path: 'acesso',
                 element: <PlannerAccessSettingsPage />,
               },
-              { id: 'planner-area-settings-notifications', path: 'notificacoes', element: null },
+              {
+                id: 'planner-area-settings-notifications',
+                path: 'notificacoes',
+                element: <PlannerNotificationSettingsPage />,
+              },
             ],
           },
         ],

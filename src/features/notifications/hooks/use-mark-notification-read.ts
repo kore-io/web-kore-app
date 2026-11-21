@@ -11,9 +11,10 @@ import { getDashboardControllerGetV1QueryKey } from '../../../shared/api/generat
  * Abrir uma notificação marca como lida (Central RN05; decisão 27): o POST sai com
  * `keepalive` e sem esperar, porque a tela já navega ao destino; depois, o sino, a central
  * e a Atividade recente do Dashboard são lidos de novo. A falha não incomoda: a notificação
- * fica não lida e a pessoa pode abrir de novo.
+ * fica não lida e a pessoa pode abrir de novo. A central da cerimonialista junta vários
+ * casamentos e passa sem o `weddingId` (sem a Atividade de um Dashboard para reler).
  */
-export function useMarkNotificationRead({ weddingId }: { weddingId: string }) {
+export function useMarkNotificationRead({ weddingId }: { weddingId?: string } = {}) {
   const queryClient = useQueryClient();
   return useCallback(
     ({ id }: { id: string }) => {
@@ -26,9 +27,10 @@ export function useMarkNotificationRead({ weddingId }: { weddingId: string }) {
             queryClient.invalidateQueries({
               queryKey: getNotificationsControllerListV1QueryKey(),
             }),
-            queryClient.invalidateQueries({
-              queryKey: getDashboardControllerGetV1QueryKey(weddingId),
-            }),
+            weddingId &&
+              queryClient.invalidateQueries({
+                queryKey: getDashboardControllerGetV1QueryKey(weddingId),
+              }),
           ]),
         )
         .catch(() => undefined);
