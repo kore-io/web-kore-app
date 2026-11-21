@@ -19,7 +19,7 @@ import { useWeddingsControllerRemoveV1 } from '../../../shared/api/generated/wed
 import { ApiError, apiErrorCode } from '../../../shared/api/http-client';
 import { FormField } from '../../../shared/components/form-field';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
-import { formatRsvpPercent } from '../../../shared/rsvp-percent';
+import { formatRsvpPercent, wholeRsvpPercent } from '../../../shared/rsvp-percent';
 import { isValidEmail } from '../../access/email';
 import { CoupleLinkBlock } from './couple-link-block';
 import { coupleName } from './my-weddings-filters';
@@ -246,8 +246,11 @@ function DetailContent({
             <dd>
               <span className="kore-wedding-detail__line">
                 {t('myWeddings.detail.guestsSummary', {
-                  count: stats.guestsTotal,
-                  percent: formatRsvpPercent({ percent: detail.rsvpPercent }),
+                  guests: t('myWeddings.detail.guestsCount', { count: stats.guestsTotal }),
+                  responded: t('myWeddings.detail.responded', {
+                    count: wholeRsvpPercent({ percent: detail.rsvpPercent }),
+                    percent: formatRsvpPercent({ percent: detail.rsvpPercent }),
+                  }),
                 })}
               </span>
               <span className="kore-wedding-detail__line">

@@ -82,7 +82,7 @@ describe('Meus casamentos: os nomes, as datas e os filtros (RN02)', () => {
     ).toEqual(['w1']);
   });
 
-  it('"Escolher período" sem datas não filtra nem conta como filtro', () => {
+  it('"Entre duas datas" sem datas não filtra nem conta como filtro', () => {
     const filters = { ...NO_FILTERS, dateMode: 'period' as const };
     expect(filterWeddings({ weddings: list, filters })).toHaveLength(3);
     expect(hasFilters({ filters })).toBe(false);

@@ -7,15 +7,18 @@ const PERCENT = new Intl.NumberFormat('pt-BR', { style: 'percent', maximumFracti
  * 99,01 a 99,99 vira 99%.
  */
 export function formatRsvpPercent({ percent }: { percent: number }): string {
-  const whole =
-    percent <= 0
-      ? 0
-      : percent >= 100
-        ? 100
-        : percent < 1
-          ? 1
-          : percent > 99
-            ? 99
-            : Math.round(percent);
-  return PERCENT.format(whole / 100);
+  return PERCENT.format(wholeRsvpPercent({ percent }) / 100);
+}
+
+/** O inteiro que a {@link formatRsvpPercent} mostra (para o singular de "1% respondeu"). */
+export function wholeRsvpPercent({ percent }: { percent: number }): number {
+  return percent <= 0
+    ? 0
+    : percent >= 100
+      ? 100
+      : percent < 1
+        ? 1
+        : percent > 99
+          ? 99
+          : Math.round(percent);
 }

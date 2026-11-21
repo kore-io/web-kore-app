@@ -131,7 +131,7 @@ describe('Meus casamentos (RN01 a RN07, RN12, RN13; Penpot 03, sem a F3)', () =>
     const { container } = renderRoute({ url: URL });
     expect(await screen.findByRole('table')).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 1, name: 'Meus casamentos' })).toBeInTheDocument();
-    expect(screen.getByText('3 casamentos da Prado Assessoria · 2 ativos')).toBeInTheDocument();
+    expect(screen.getByText('Prado Assessoria · 3 casamentos · 2 ativos')).toBeInTheDocument();
     expect(screen.getByText('de 3 casamentos')).toBeInTheDocument();
     expect(screen.getByText('convite enviado, sem resposta')).toBeInTheDocument();
     // Sem a F3: nem Aguardando pagamento nem Comissão disponível.
@@ -206,14 +206,35 @@ describe('Meus casamentos (RN01 a RN07, RN12, RN13; Penpot 03, sem a F3)', () =>
     expect(rowNames()).toEqual(['Fernanda e João']);
   });
 
-  it('Escolher período mostra De e Até, e filtra pela data (decisão 257(2))', async () => {
+  it('Entre duas datas mostra De e Até, e filtra pela data (decisões 257(2) e 264(A))', async () => {
     const user = userEvent.setup();
     api();
     renderRoute({ url: URL });
     await screen.findByRole('table');
-    await user.selectOptions(screen.getByRole('combobox', { name: 'Data' }), 'period');
+    const date = screen.getByRole('combobox', { name: 'Data do casamento' });
+    expect(
+      within(date)
+        .getAllByRole('option')
+        .map((option) => option.textContent),
+    ).toEqual(['Qualquer data', 'Entre duas datas']);
+    await user.selectOptions(date, 'period');
     await user.type(screen.getByLabelText('De'), '2026-04-01');
     expect(rowNames()).toEqual(['Ana e Marcos']);
+    expect(screen.queryByText('Escolha uma data depois da inicial.')).toBeNull();
+  });
+
+  it('o Até antes do De mostra o erro no Até (decisão 264(A))', async () => {
+    const user = userEvent.setup();
+    api();
+    renderRoute({ url: URL });
+    await screen.findByRole('table');
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Data do casamento' }), 'period');
+    await user.type(screen.getByLabelText('De'), '2026-04-01');
+    await user.type(screen.getByLabelText('Até'), '2026-03-01');
+    const to = screen.getByLabelText('Até');
+    expect(to).toHaveAttribute('aria-invalid', 'true');
+    expect(to).toHaveAccessibleDescription('Escolha uma data depois da inicial.');
+    expect(screen.getByText('Nenhum dos 3 casamentos')).toBeInTheDocument();
   });
 
   it('sem resultado: o vazio do filtro e o Limpar filtros, que volta a lista (decisão 257(3))', async () => {
@@ -223,6 +244,7 @@ describe('Meus casamentos (RN01 a RN07, RN12, RN13; Penpot 03, sem a F3)', () =>
     await screen.findByRole('table');
     await user.type(screen.getByRole('searchbox', { name: 'Buscar pelo nome do casal' }), 'zzz');
     expect(screen.getByText('Nenhum casamento com esses filtros.')).toBeInTheDocument();
+    expect(screen.getByText('Nenhum dos 3 casamentos')).toBeInTheDocument();
     const clear = screen.getAllByRole('button', { name: 'Limpar filtros' });
     expect(clear).toHaveLength(2);
     await user.click(clear[1] as HTMLElement);
