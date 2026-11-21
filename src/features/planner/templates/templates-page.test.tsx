@@ -209,7 +209,14 @@ describe('Modelos (Modelos do cerimonialista RN01 a RN06; Voz, Modelos)', () => 
     expect(text).toHaveAccessibleDescription(
       'O texto passa de 2.000 caracteres. Encurte antes de salvar.',
     );
+    expect(text).toBeInvalid();
     expect(calls).toEqual([]);
+    // Trocar a Seção limpa o erro do texto (sugestão do Crivo no D8a).
+    await user.selectOptions(within(dialog).getByRole('combobox', { name: 'Seção' }), 'story');
+    expect(text).not.toHaveAccessibleDescription(
+      'O texto passa de 2.000 caracteres. Encurte antes de salvar.',
+    );
+    expect(text).toBeValid();
   });
 
   it('Editar: os dados do modelo, a seção fixa e o PATCH com o Toast "Alterações salvas."', async () => {
