@@ -216,6 +216,26 @@ describe('Site do casal › layout (Site público RN10, RN11)', () => {
     );
   });
 
+  it('a assinatura da assessoria no rodapé, acima do Feito com Kore, em texto simples (Assinatura RN01)', async () => {
+    mockSite(() => Response.json({ ...site, plannerCredit: { name: '<b>Prado</b> Assessoria' } }));
+    render(<SiteApp pathname="/ana-e-marcos" />);
+    const footer = await screen.findByRole('contentinfo');
+    const credit = within(footer).getByText('Assessoria: <b>Prado</b> Assessoria');
+    expect(credit.querySelector('b')).toBeNull();
+    expect(within(credit).queryByRole('link')).toBeNull();
+    const madeWith = within(footer).getByRole('link', { name: 'Feito com Kore' });
+    expect(
+      credit.compareDocumentPosition(madeWith) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
+  it('sem assinatura (plannerCredit nulo), o rodapé não tem a linha (Assinatura RN02)', async () => {
+    mockSite(() => Response.json({ ...site, plannerCredit: null }));
+    render(<SiteApp pathname="/ana-e-marcos" />);
+    const footer = await screen.findByRole('contentinfo');
+    expect(within(footer).queryByText(/^Assessoria:/)).toBeNull();
+  });
+
   it('sem data e sem a contagem: o Hero com a cidade e a UF, sem contagem', async () => {
     mockSite(() =>
       Response.json({

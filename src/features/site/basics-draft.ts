@@ -16,6 +16,8 @@ export interface BasicsDraft {
   email: string;
   /** A capa: a imagem pronta ou nenhuma (Remover foto). */
   cover: Pick<SiteImageRefResponse, 'id' | 'url' | 'thumbUrl'> | null;
+  /** Mostrar a assinatura da assessoria no rodapé (Assinatura RN05); padrão, ligado. */
+  showPlannerCredit: boolean;
 }
 
 export type BasicsField =
@@ -52,6 +54,7 @@ export function draftFromSite(site: SiteEditorResponse): BasicsDraft {
     cover: site.cover
       ? { id: site.cover.id, url: site.cover.url, thumbUrl: site.cover.thumbUrl }
       : null,
+    showPlannerCredit: site.plannerCredit?.showPlannerCredit ?? true,
   };
 }
 
@@ -103,6 +106,10 @@ export function toPatchBody({
   if (now.whatsapp !== before.whatsapp) body.contactWhatsapp = now.whatsapp || null;
   if (now.email !== before.email) body.contactEmail = now.email || null;
   if (now.cover !== before.cover) body.coverImageId = now.cover;
+  // Só quando muda: o valor igual não é erro, mas a colaboradora nem chega a mandar (RN05).
+  if (now.showPlannerCredit !== before.showPlannerCredit) {
+    body.showPlannerCredit = now.showPlannerCredit;
+  }
   return body;
 }
 

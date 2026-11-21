@@ -14,18 +14,22 @@ export interface SitePreviewCardProps {
   theme?: { fonts?: SiteFontsName; colors?: SiteColorsName; background?: SiteBackgroundName };
   /** Cor própria (o Outra cor do Simule): as variáveis por cima da paleta do tema. */
   customColors?: { primary: string; primaryForeground: string; accent: string };
+  /** O nome da assessoria no pé da prévia do convite do casal (Assinatura RN04). */
+  plannerCredit?: string;
 }
 
 /**
  * Prévia do site no Convite do casal (Penpot): cartão no tema do site do casal (tokens
  * --site-* trocados pelos atributos data-site-* do DS), com os nomes, a data e a pílula
- * de confirmar presença, só ilustrativa.
+ * de confirmar presença, só ilustrativa; no convite do casal, a assinatura da assessoria no
+ * pé, como no rodapé do site (Assinatura RN04; B3).
  */
 export function SitePreviewCard({
   couple,
   details,
   theme = {},
   customColors,
+  plannerCredit,
 }: SitePreviewCardProps) {
   const { t } = useTranslation('access');
   return (
@@ -48,6 +52,11 @@ export function SitePreviewCard({
       <span className="kore-site-preview__rsvp" aria-hidden="true">
         {t('coupleInvite.rsvp')}
       </span>
+      {plannerCredit && (
+        <p className="kore-site-preview__credit">
+          {t('coupleInvite.plannerCredit', { name: plannerCredit })}
+        </p>
+      )}
     </div>
   );
 }

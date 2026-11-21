@@ -389,3 +389,16 @@
 .kore-site-editor__preview-help {
   @apply m-0 w-full text-end type-caption text-gray-700;
 }
+
+/* A assinatura da assessoria no fim de Dados básicos (Assinatura RN05 e RN06; B1). */
+.kore-site-basics__credit {
+  @apply flex flex-col gap-1.5;
+}
+
+.kore-site-basics__credit-help {
+  @apply m-0 type-caption text-gray-700;
+}
+
+.kore-site-basics__credit-note {
+  @apply m-0 type-caption text-gray-700;
+}

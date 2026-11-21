@@ -110,7 +110,16 @@
       "eventDateAfterEndDate": "A data do casamento precisa ser antes de {{limit}}, quando o site sai do ar."
     },
     "cover": "Foto de capa",
-    "coverHelp": "A foto de capa aparece no topo do site e junto do link quando ele é compartilhado no WhatsApp e nas redes. Quem tiver o endereço vê esta foto."
+    "coverHelp": "A foto de capa aparece no topo do site e junto do link quando ele é compartilhado no WhatsApp e nas redes. Quem tiver o endereço vê esta foto.",
+    "plannerCredit": {
+      "label": "Mostrar a assinatura da assessoria no rodapé",
+      "help": "Aparece no rodapé do site como \"Assessoria: {{name}}\".",
+      "ownerOnly": "Só o casal pode mostrar ou ocultar a assinatura.",
+      "hidden": {
+        "couple": "O Kore ocultou a assinatura da assessoria. Para saber mais, escrevam para suporte@kore.com.br.",
+        "planner": "O Kore ocultou a sua assinatura. Para saber mais, escreva para suporte@kore.com.br."
+      }
+    }
   },
   "images": {
     "drop": {

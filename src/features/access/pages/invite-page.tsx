@@ -116,7 +116,11 @@ export function InvitePage() {
         <CoupleInviteStep
           inviterName={invitation.invitedBy.name}
           fromSeller={invitation.invitedBy.role === 'seller'}
-          preview={{ couple: invitation.wedding.names, details: previewDetails(invitation) }}
+          preview={{
+            couple: invitation.wedding.names,
+            details: previewDetails(invitation),
+            ...(invitation.plannerCredit && { plannerCredit: invitation.plannerCredit.name }),
+          }}
           {...(invitation.referrer?.discountPercent != null && {
             discountPercent: invitation.referrer.discountPercent,
           })}
