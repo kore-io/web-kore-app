@@ -290,7 +290,7 @@ describe('Novo casamento › passos 1 e 2 (Novo casamento RN01 a RN04; D6a)', ()
     ]);
   });
 
-  it('Começar de um modelo: o Select com Sem modelo de partida; escolher preenche a Aparência, sem confirmação (Modelos RN09; decisão 298)', async () => {
+  it('Começar de um modelo: o Select com Sem modelo de partida; toda escolha preenche a Aparência, sem confirmação (Modelos RN09; decisões 298 e 299)', async () => {
     const user = userEvent.setup();
     const calls = api({
       templates: [
@@ -350,6 +350,21 @@ describe('Novo casamento › passos 1 e 2 (Novo casamento RN01 a RN04; D6a)', ()
     expect(screen.queryByRole('alertdialog')).toBeNull();
     expect(screen.getByRole('radio', { name: 'Sálvia' })).toBeChecked();
     expect(screen.getByRole('radio', { name: 'Claro' })).toBeChecked();
+    // O "Sem modelo" devolve o padrão, sem confirmação (decisão 299).
+    await user.selectOptions(select, 'Sem modelo');
+    expect(screen.queryByRole('alertdialog')).toBeNull();
+    expect(screen.getByRole('radio', { name: 'Terracota' })).toBeChecked();
+    expect(screen.getByRole('radio', { name: 'Creme' })).toBeChecked();
+    expect(
+      within(screen.getByRole('group', { name: 'Tipografia' })).getByRole('radio', {
+        name: /Romântico/,
+      }),
+    ).toBeChecked();
+    // Mudar à mão não mexe no Select: ele mostra o ponto de partida (decisão 299).
+    await user.selectOptions(select, 'Marinho clássico');
+    await user.click(screen.getByRole('radio', { name: 'Sálvia' }));
+    expect(select).toHaveDisplayValue('Marinho clássico');
+    await user.selectOptions(select, 'Padrão Prado Assessoria');
     await user.click(screen.getByRole('button', { name: 'Criar casamento' }));
     await waitFor(() => expect(calls).toHaveLength(1));
     expect(calls[0]?.body).toMatchObject({

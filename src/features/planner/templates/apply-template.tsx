@@ -1,6 +1,7 @@
 import { Button, Dialog, Select, Spinner, useToast } from '@kore-io/design';
 import { useState } from 'react';
 import { FormField } from '../../../shared/components/form-field';
+import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { useTranslation } from 'react-i18next';
 import { paths } from '../../../app/paths';
 import { useActiveWedding } from '../../guests/hooks/use-active-wedding';
@@ -69,7 +70,8 @@ export function ApplyTemplate({
   const [chosen, setChosen] = useState<PlannerTemplateResponse | null>(null);
   const list = usePlannerTemplatesControllerListV1(
     { kind, ...(sectionType && { sectionType }) },
-    { query: { enabled: open } },
+    // Relê ao voltar à aba: o Criar modelo do vazio abre Modelos numa aba nova.
+    { query: { enabled: open, refetchOnWindowFocus: true } },
   );
 
   function apply() {
@@ -98,7 +100,9 @@ export function ApplyTemplate({
           </Button>
         }
       >
-        {!list.data ? (
+        {list.isError ? (
+          <LoadErrorNotice onRetry={() => void list.refetch()} />
+        ) : !list.data ? (
           <div className="kore-apply-template__loading">
             <Spinner label={t('templates.loading')} />
           </div>
@@ -247,8 +251,11 @@ export function AppearanceTemplateAction({
  * opção "Sem modelo" de partida e cada modelo só pelo nome, na ordem da API (do mais novo).
  */
 export function StartFromTemplate({
+  defaultAppearance,
   onAppearance,
 }: {
+  /** A Aparência padrão do passo 2, que o "Sem modelo" devolve (decisão 299). */
+  defaultAppearance: AppearanceDraft;
   onAppearance: (draft: AppearanceDraft) => void;
 }) {
   const { t } = useTranslation('planner');
@@ -268,8 +275,10 @@ export function StartFromTemplate({
           value={chosen}
           onChange={(event) => {
             setChosen(event.target.value);
+            // Toda escolha preenche a Aparência; o "Sem modelo" devolve o padrão. Mudar a
+            // Aparência à mão não mexe no Select: ele mostra o ponto de partida (decisão 299).
             const template = templates.find((item) => item.id === event.target.value);
-            if (template) onAppearance(appearanceDraftOf(template));
+            onAppearance(template ? appearanceDraftOf(template) : defaultAppearance);
           }}
           {...(describedBy !== undefined && { 'aria-describedby': describedBy })}
         >

@@ -73,7 +73,18 @@ describe('Aplicar modelo no Editor (Modelos RN07, RN08)', () => {
         sections: withSection({
           type: 'story',
           title: 'Como tudo começou',
-          content: { text: 'Texto antigo.', images: [] },
+          content: {
+            text: 'Texto antigo.',
+            images: [
+              {
+                id: 'img1',
+                url: 'https://cdn/img1/display.jpg',
+                thumbUrl: 'https://cdn/img1/thumb.jpg',
+                width: 2560,
+                height: 1707,
+              },
+            ],
+          },
           enabled: true,
           empty: false,
         }),
@@ -111,6 +122,8 @@ describe('Aplicar modelo no Editor (Modelos RN07, RN08)', () => {
       title: 'Como tudo começou',
       content: {
         text: 'Ana e Marcos se conheceram em Campinas, e casam em 14 de novembro de 2026.',
+        // A foto da seção fica (D17).
+        imageIds: ['img1'],
       },
     });
   });
@@ -199,6 +212,25 @@ describe('Aplicar modelo no Editor (Modelos RN07, RN08)', () => {
     await user.click(within(picker).getByRole('button', { name: 'Criar modelo' }));
     expect(open).toHaveBeenCalledWith('/cerimonialista/modelos?aba=faq', '_blank', 'noopener');
     open.mockRestore();
+  });
+
+  it('a falha ao ler os modelos: o aviso de carregamento e o Tentar de novo (RN08)', async () => {
+    let fail = true;
+    asPlanner({
+      templates: () => (fail ? Response.json({ statusCode: 500 }, { status: 500 }) : [STORY]),
+    });
+    renderAreaScreen({ url: '/app/site/nossa-historia' });
+    const user = userEvent.setup();
+    await user.click(await applyButton());
+    const picker = await screen.findByRole('dialog', { name: 'Aplicar modelo' });
+    expect(await within(picker).findByText('Não foi possível continuar')).toBeInTheDocument();
+    expect(within(picker).getByText('Confira sua conexão e tente de novo.')).toBeInTheDocument();
+    expect(within(picker).queryByText('Carregando os modelos')).not.toBeInTheDocument();
+    fail = false;
+    await user.click(within(picker).getByRole('button', { name: 'Tentar de novo' }));
+    expect(
+      await within(picker).findByRole('button', { name: /Nossa história: tom acolhedor/ }),
+    ).toBeInTheDocument();
   });
 
   it('FAQ: troca a lista de perguntas; o título fica, e o Salvar manda os items (RN08)', async () => {
