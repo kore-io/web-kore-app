@@ -10,6 +10,31 @@ export type PlannerType = (typeof PLANNER_TYPES)[number];
 /** O nome que a API grava no lugar do grupo apagado a pedido do titular (decisão 253(3)). */
 export const REMOVED_PARTY_NAME = 'Grupo removido';
 
+/**
+ * A data do item (RN05; decisão 302(1)), sempre numérica, no fuso do aparelho: "26/09 às
+ * 9h12", "21/06 às 9h" na hora cheia e o ano só quando não é o corrente, "26/09/2025 às
+ * 9h12". Sem "hoje" nem "ontem" (padrão das listas densas da Voz).
+ */
+export function plannerNotificationDate({
+  t,
+  at,
+  now,
+}: {
+  t: TFunction<'dashboard'>;
+  at: string;
+  now: Date;
+}): string {
+  const date = new Date(at);
+  const two = (value: number) => String(value).padStart(2, '0');
+  const time =
+    date.getMinutes() === 0
+      ? `${date.getHours()}h`
+      : `${date.getHours()}h${two(date.getMinutes())}`;
+  const day = `${two(date.getDate())}/${two(date.getMonth() + 1)}`;
+  const year = date.getFullYear() === now.getFullYear() ? '' : `/${date.getFullYear()}`;
+  return t('activity.on', { date: `${day}${year}`, time });
+}
+
 export function isPlannerType(type: string): type is PlannerType {
   return (PLANNER_TYPES as readonly string[]).includes(type);
 }

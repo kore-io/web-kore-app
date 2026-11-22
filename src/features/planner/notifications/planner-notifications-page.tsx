@@ -14,11 +14,11 @@ import {
   notificationsControllerReadAllV1,
 } from '../../../shared/api/generated/notifications/notifications';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
-import { activityDate } from '../../dashboard/dashboard-texts';
 import { useMarkNotificationRead } from '../../notifications/hooks/use-mark-notification-read';
 import {
   isPlannerItem,
   PLANNER_TYPES,
+  plannerNotificationDate,
   plannerNotificationTitle,
   type PlannerType,
 } from './planner-notification-texts';
@@ -193,7 +193,7 @@ function PlannerNotificationItem({ item }: { item: NotificationResponse }) {
     );
     return collaborating ? detail : paths.plannerReferral;
   }
-  const date = activityDate({ t: tDashboard, at: item.updatedAt, now: new Date() });
+  const date = plannerNotificationDate({ t: tDashboard, at: item.updatedAt, now: new Date() });
   return (
     <li>
       <button
