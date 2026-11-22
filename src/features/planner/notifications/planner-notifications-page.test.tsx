@@ -314,6 +314,17 @@ describe('Notificações da cerimonialista (RN05; decisão 300; Penpot 13)', () 
     await waitFor(() => expect(router.state.location.pathname).toBe(PAGE));
   });
 
+  it('o item de hoje traz a data numérica, sem "hoje às" (RN05; decisão 302(1))', async () => {
+    const at = new Date();
+    at.setMinutes(12, 0, 0);
+    api({ items: [{ ...ONE, updatedAt: at.toISOString() }] });
+    renderRoute({ url: PAGE });
+    const two = (value: number) => String(value).padStart(2, '0');
+    const expected = `Novas respostas · ${two(at.getDate())}/${two(at.getMonth() + 1)} às ${at.getHours()}h12`;
+    expect(await screen.findByText(expected)).toBeInTheDocument();
+    expect(screen.queryByText(/hoje às/)).toBeNull();
+  });
+
   it('dentro do casamento, as Notificações levam à central dela (RN08)', async () => {
     api();
     const { router } = renderRoute({ url: '/cerimonialista/casamentos/w1/notificacoes' });
