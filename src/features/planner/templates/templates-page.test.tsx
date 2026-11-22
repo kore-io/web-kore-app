@@ -140,6 +140,20 @@ describe('Modelos (Modelos do cerimonialista RN01 a RN06; Voz, Modelos)', () => 
     ).toBeInTheDocument();
   });
 
+  it('a amostra sem paleta de partida diz "cor personalizada", nunca o hexadecimal (RN06)', async () => {
+    api({
+      templates: [
+        { ...LOOK, name: 'Cores minhas', content: { ...LOOK.content, starterPaletteKey: null } },
+      ],
+    });
+    renderRoute({ url: `${PAGE}?aba=aparencia` });
+    const table = await screen.findByRole('table');
+    const sample = within(table).getByRole('img', {
+      name: 'Fontes Romântico · Cor principal, cor personalizada · Destaque, cor personalizada · Fundo creme',
+    });
+    expect(sample.getAttribute('aria-label') ?? '').not.toMatch(/#/);
+  });
+
   it.each([
     ['', 'Você ainda não tem modelos de texto.'],
     ['?aba=faq', 'Você ainda não tem modelos de FAQ.'],
@@ -211,12 +225,34 @@ describe('Modelos (Modelos do cerimonialista RN01 a RN06; Voz, Modelos)', () => 
     );
     expect(text).toBeInvalid();
     expect(calls).toEqual([]);
+    // O contador acima do limite em cor de perigo, como no Editor (RN08; decisão 302(6)).
+    const counter = within(dialog).getByText('2.500/2.000');
+    expect(counter).toHaveAttribute('aria-hidden', 'true');
+    expect(counter).toHaveClass('kore-template-form__counter--over');
     // Trocar a Seção limpa o erro do texto (sugestão do Crivo no D8a).
     await user.selectOptions(within(dialog).getByRole('combobox', { name: 'Seção' }), 'story');
     expect(text).not.toHaveAccessibleDescription(
       'O texto passa de 2.000 caracteres. Encurte antes de salvar.',
     );
     expect(text).toBeValid();
+    expect(within(dialog).getByText('2.500/5.000')).not.toHaveClass(
+      'kore-template-form__counter--over',
+    );
+  });
+
+  it('o nome com 81 caracteres: "O nome passa de 80 caracteres." e nada sai (RN04)', async () => {
+    const user = userEvent.setup();
+    const calls = api({ templates: [] });
+    renderRoute({ url: PAGE });
+    await clickCreate(user);
+    const dialog = screen.getByRole('dialog', { name: 'Novo modelo de texto' });
+    const name = within(dialog).getByRole('textbox', { name: 'Nome do modelo' });
+    await user.type(name, 'a'.repeat(81));
+    await user.type(within(dialog).getByRole('textbox', { name: 'Texto' }), 'Olá');
+    await user.click(within(dialog).getByRole('button', { name: 'Criar modelo' }));
+    expect(name).toHaveAccessibleDescription('O nome passa de 80 caracteres.');
+    expect(name).toBeInvalid();
+    expect(calls).toEqual([]);
   });
 
   it('Editar: os dados do modelo, a seção fixa e o PATCH com o Toast "Alterações salvas."', async () => {
@@ -274,6 +310,21 @@ describe('Modelos (Modelos do cerimonialista RN01 a RN06; Voz, Modelos)', () => 
       name: 'FAQ',
       content: { questions: [{ question: 'Pode levar criança?', answer: 'Pode.' }] },
     });
+  });
+
+  it('FAQ: a linha só com a resposta pede "Escreva a pergunta." (RN04)', async () => {
+    const user = userEvent.setup();
+    const calls = api({ templates: [] });
+    renderRoute({ url: `${PAGE}?aba=faq` });
+    await clickCreate(user);
+    const dialog = screen.getByRole('dialog', { name: 'Novo modelo de FAQ' });
+    await user.type(within(dialog).getByRole('textbox', { name: 'Nome do modelo' }), 'FAQ');
+    await user.type(within(dialog).getByRole('textbox', { name: 'Resposta 1' }), 'Pode.');
+    await user.click(within(dialog).getByRole('button', { name: 'Criar modelo' }));
+    const question = within(dialog).getByRole('textbox', { name: 'Pergunta 1' });
+    expect(question).toHaveAccessibleDescription('Escreva a pergunta.');
+    expect(question).toBeInvalid();
+    expect(calls).toEqual([]);
   });
 
   it('FAQ com 30 perguntas: o Adicionar pergunta desabilitado com o motivo', async () => {

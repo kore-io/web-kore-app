@@ -87,6 +87,11 @@
   @apply type-caption self-end text-gray-700;
 }
 
+/* O contador acima do limite, em perigo (RN08; decisão 302(6)). */
+.kore-template-form__counter--over {
+  @apply text-danger-text;
+}
+
 .kore-template-form__questions {
   @apply m-0 flex list-none flex-col gap-4 p-0;
 }

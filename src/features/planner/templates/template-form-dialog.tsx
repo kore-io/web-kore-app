@@ -276,7 +276,15 @@ function TextForm({ template, formId, save }: FormProps) {
               }}
               {...(describedBy !== undefined && { 'aria-describedby': describedBy })}
             />
-            <span className="kore-template-form__counter" aria-hidden="true">
+            {/* Acima do limite, em cor de perigo, como no Editor (RN08; decisão 302(6)). */}
+            <span
+              className={
+                text.length > max
+                  ? 'kore-template-form__counter kore-template-form__counter--over'
+                  : 'kore-template-form__counter'
+              }
+              aria-hidden="true"
+            >
               {t('templates.form.counter', {
                 count: NUMBER.format(text.length),
                 max: NUMBER.format(max),
