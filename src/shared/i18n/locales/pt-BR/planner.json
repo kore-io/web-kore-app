@@ -58,7 +58,8 @@
     "subtitle": "{{weddings}} · {{active}}",
     "filtered_one": "{{shown}} de {{count}} casamento",
     "filtered_other": "{{shown}} de {{count}} casamentos",
-    "filteredNone": "Nenhum dos {{count}} casamentos",
+    "filteredNone_one": "Nenhum casamento",
+    "filteredNone_other": "Nenhum dos {{count}} casamentos",
     "newWedding": "Novo casamento",
     "summary": {
       "active": "Ativos",

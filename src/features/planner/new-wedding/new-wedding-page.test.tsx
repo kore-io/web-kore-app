@@ -178,7 +178,8 @@ function api({
 const ROUTE = '/cerimonialista/casamentos/novo';
 const INVITE = `${ROUTE}?casamento=w9`;
 // O i18n põe um WORD JOINER depois do hífen de "e-mail".
-const EMAIL = 'E-\u2060mail do casal (opcional)';
+// "E-mail do casal" sem "(opcional)"; o outro segue com a marca (Voz; decisão 312(1)).
+const EMAIL = 'E-\u2060mail do casal';
 const OTHER_EMAIL = 'Outro e-\u2060mail do casal (opcional)';
 const wj = (text: string) => text.replace(/([eE])-mail/g, '$1-\u2060mail');
 

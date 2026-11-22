@@ -189,9 +189,7 @@ test('Convidar depois, e o Convidar o casal do detalhe volta ao passo 3 com o en
     ),
   ).toBeVisible();
   const couple = `isabela-${unique()}@exemplo.com`;
-  await page
-    .getByRole('textbox', { name: 'E-⁠mail do casal (opcional)', exact: true })
-    .fill(couple);
+  await page.getByRole('textbox', { name: 'E-⁠mail do casal', exact: true }).fill(couple);
   await page.getByRole('button', { name: 'Enviar convite' }).click();
   await expect(page.getByRole('heading', { name: 'Casamento criado.' })).toBeVisible();
   await expect(

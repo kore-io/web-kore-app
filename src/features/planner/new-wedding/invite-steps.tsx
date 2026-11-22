@@ -154,8 +154,8 @@ export function InviteStep({
   return (
     <form className="kore-new-wedding__card" noValidate onSubmit={submit}>
       <FormField
+        // Sem "(opcional)": a legenda já diz que pode ficar vazio (Voz; decisão 312(1)).
         label={t('newWedding.invite.email')}
-        optionalText={t('newWedding.optional')}
         {...(errors.email !== undefined
           ? fieldError('email')
           : { hint: t('newWedding.invite.emailHint') })}

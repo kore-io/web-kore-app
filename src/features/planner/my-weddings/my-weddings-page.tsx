@@ -99,7 +99,8 @@ export function MyWeddingsPage() {
     active: t('myWeddings.active', { count: summary.active }),
   });
   // Decisão 264(A): "{assessoria} · {n} casamentos · {a} ativos"; filtrando, "{m} de {n}
-  // casamentos", e "Nenhum dos {n} casamentos" quando nada passa.
+  // casamentos", e "Nenhum dos {n} casamentos" quando nada passa ("Nenhum casamento" com
+  // n = 1; decisão 312(3)).
   const description = filtering
     ? filtered.length === 0
       ? t('myWeddings.filteredNone', { count: weddings.length })

@@ -237,6 +237,22 @@ describe('Meus casamentos (RN01 a RN07, RN12, RN13; Penpot 03, sem a F3)', () =>
     expect(screen.getByText('Nenhum dos 3 casamentos')).toBeInTheDocument();
   });
 
+  it('com um casamento só e sem resultado: "Nenhum casamento" (decisão 312(3))', async () => {
+    const user = userEvent.setup();
+    api({
+      list: {
+        summary: { active: 1, awaitingCouple: 0, awaitingPayment: 0, commissionAvailableCents: 0 },
+        alerts: { pendingResponses: [], invitationsNotSent: [] },
+        weddings: [item({})],
+      },
+    });
+    renderRoute({ url: URL });
+    await screen.findByRole('table');
+    await user.type(screen.getByRole('searchbox', { name: 'Buscar pelo nome do casal' }), 'zzz');
+    expect(screen.getByText('Nenhum casamento')).toBeInTheDocument();
+    expect(screen.queryByText(/Nenhum dos/)).toBeNull();
+  });
+
   it('sem resultado: o vazio do filtro e o Limpar filtros, que volta a lista (decisão 257(3))', async () => {
     const user = userEvent.setup();
     api();
