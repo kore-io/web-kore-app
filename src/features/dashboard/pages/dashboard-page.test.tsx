@@ -380,6 +380,34 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     );
   });
 
+  it('a colaboradora com o casamento aguardando o casal: o aviso no Status do site (Colaboradora RN04)', async () => {
+    profileUnderTest.current = 'planner';
+    mockDashboard({
+      data: dashboard({
+        role: 'collaborator',
+        site: { slug: 'ana-e-marcos', publishedAt: null, endDate: null, status: 'awaiting_couple' },
+      }),
+    });
+    renderAreaScreen({ url: '/app' });
+    await screen.findByText('Você colabora neste casamento.');
+    expect(
+      within(card('Status do site')).getByText('O casal ainda não aceitou o convite.'),
+    ).toBeInTheDocument();
+  });
+
+  it('o site em rascunho: sem o aviso do casal (Colaboradora RN04)', async () => {
+    profileUnderTest.current = 'planner';
+    mockDashboard({
+      data: dashboard({
+        role: 'collaborator',
+        site: { slug: 'ana-e-marcos', publishedAt: null, endDate: null, status: 'draft' },
+      }),
+    });
+    renderAreaScreen({ url: '/app' });
+    await screen.findByText('Você colabora neste casamento.');
+    expect(screen.queryByText('O casal ainda não aceitou o convite.')).toBeNull();
+  });
+
   it('sem convidados: o vazio com Adicionar convidados; o Status e o Checklist continuam (RN06)', async () => {
     const user = userEvent.setup();
     mockDashboard({

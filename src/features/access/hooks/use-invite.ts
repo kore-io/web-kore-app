@@ -86,8 +86,13 @@ export function useInvite({ token }: { token: string }) {
   useEffect(() => saveInviteToken({ token }), [token]);
 
   const invitation = invitationQuery.data;
+  /**
+   * Vencido etc. (410), ou o convite do próprio casamento que a pessoa criou (409
+   * SELF_REFERRAL; Novo casamento RN05): os dois dão o Convite inválido.
+   */
   const invitationGone =
-    invitationQuery.error instanceof ApiError && invitationQuery.error.status === 410;
+    (invitationQuery.error instanceof ApiError && invitationQuery.error.status === 410) ||
+    apiErrorCode({ error: invitationQuery.error }) === 'SELF_REFERRAL';
   const signedIn = viewer !== undefined;
 
   /**
@@ -141,7 +146,8 @@ export function useInvite({ token }: { token: string }) {
             code === 'INVITATION_INVALID' ||
             code === 'OWNERS_FULL' ||
             code === 'PLANNER_ALREADY' ||
-            code === 'SELLER_CANNOT_BE_PLANNER'
+            code === 'SELLER_CANNOT_BE_PLANNER' ||
+            code === 'SELF_REFERRAL'
           ) {
             setOutcome('invalid');
           } else if (error instanceof ApiError && error.status === 400 && invitation.needsName) {

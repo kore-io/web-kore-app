@@ -393,6 +393,35 @@ describe('Convite que não vale e erros (RN12)', () => {
     expect(screen.queryByText('Ana & Marcos')).toBeNull();
   });
 
+  it('409 SELF_REFERRAL no GET: Convite inválido, sem o Tentar de novo (Novo casamento RN05)', async () => {
+    api({
+      session: me('lucas@kore.com.br', 'Lucas Mendes'),
+      invitation: apiError({ status: 409, body: { error: 'SELF_REFERRAL' } }),
+    });
+    renderRoute({ url: '/convite/tk1' });
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Este convite não vale mais' }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Tentar de novo' })).toBeNull();
+  });
+
+  it('409 SELF_REFERRAL no aceite: Convite inválido, sem o aviso genérico (Novo casamento RN05)', async () => {
+    const user = userEvent.setup();
+    api({
+      session: me(),
+      invitation: partnerInvite,
+      answer: ({ path }) =>
+        path.endsWith('/accept')
+          ? apiError({ status: 409, body: { error: 'SELF_REFERRAL' } })
+          : undefined,
+    });
+    renderRoute({ url: '/convite/tk1' });
+    await user.click(await screen.findByRole('button', { name: 'Aceitar convite' }));
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Este convite não vale mais' }),
+    ).toBeInTheDocument();
+  });
+
   it('o casamento já tem 2 donos no aceite: Convite inválido (decisão 174(4))', async () => {
     const user = userEvent.setup();
     api({

@@ -165,8 +165,8 @@ function api({
     }
     if (method === 'DELETE' && path === '/v1/weddings/w9/access-invitations/i2') {
       calls.push({ method, path, body });
-      // A API não volta o status a rascunho ao cancelar o link (fica aguardando o casal).
-      current = { ...current, coupleInvitations: [] };
+      // Cancelar o último convite de dono volta o casamento a rascunho (decisão 297).
+      current = { ...current, status: 'draft', coupleInvitations: [] };
       return new Response(null, { status: 204 });
     }
     if (method !== 'GET') calls.push({ method, path, body });
@@ -625,7 +625,7 @@ describe('Novo casamento › passos 3 e 4 (Novo casamento RN05 a RN07; D6b; deci
     );
   });
 
-  it('Cancelar o link no Pronto deixa o Pronto como o sem convite, com o Convidar o casal (sugestão do Crivo)', async () => {
+  it('Cancelar o link no Pronto deixa o Pronto como o sem convite, em Rascunho e com o Convidar o casal (decisão 297)', async () => {
     const user = userEvent.setup();
     const calls = api();
     renderRoute({ url: INVITE });
@@ -640,6 +640,8 @@ describe('Novo casamento › passos 3 e 4 (Novo casamento RN05 a RN07; D6b; deci
       ),
     ).toBeInTheDocument();
     expect(screen.queryByRole('region', { name: 'Link para o casal' })).toBeNull();
+    expect(await screen.findByText('Rascunho')).toBeInTheDocument();
+    expect(screen.queryByText('Aguardando o casal')).toBeNull();
     expect(screen.queryByText('Acompanhar em Meus casamentos quando o casal aceitar')).toBeNull();
     expect(calls.at(-1)).toMatchObject({
       method: 'DELETE',
