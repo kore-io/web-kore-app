@@ -31,6 +31,7 @@ const me = (overrides: Record<string, unknown> = {}) => ({
   lastProfileOnDevice: 'couple',
   planner: null,
   referrer: null,
+  plannerSignupEnabled: true,
   ...overrides,
 });
 
@@ -70,6 +71,19 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
     await user.click(await screen.findByRole('button', { name: 'Menu do usuário' }));
     await user.click(await screen.findByRole('menuitem', { name: /Criar outro perfil/ }));
     await waitFor(() => expect(router.state.location.pathname).toBe('/cerimonialista/cadastro'));
+  });
+
+  it('com o cadastro de cerimonialista fechado, sem o Criar outro perfil (RN08; decisão 308(1))', async () => {
+    const user = userEvent.setup();
+    mockApi(({ path }) => meOnly(path, me({ plannerSignupEnabled: false })));
+    renderRoute({ url: '/app' });
+    await user.click(await screen.findByRole('button', { name: 'Menu do usuário' }));
+    const menu = await screen.findByRole('menu');
+    expect(
+      within(menu)
+        .getAllByRole('menuitem')
+        .map((item) => item.textContent),
+    ).toEqual(['Configurações', 'Sair']);
   });
 
   it('com os dois perfis, só o Trocar de perfil, com a assessoria (RN08; Voz)', async () => {
