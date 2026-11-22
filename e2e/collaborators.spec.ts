@@ -172,6 +172,45 @@ test.describe('Colaboradores', () => {
     await expect(planners.getByText('Este casamento ainda não tem cerimonialista.')).toBeVisible();
   });
 
+  test('o aviso da assinatura no Convidar cerimonialista segue a preferência do casal (C7-6; decisão 277(A))', async ({
+    page,
+  }) => {
+    const coupleEmail = newEmail({ label: `casal-${unique()}` });
+    const ownerId = await createUser({ db, email: coupleEmail, name: 'Ana Beatriz Moreira' });
+    const weddingId = await createWedding({
+      db,
+      partners: ['Ana Beatriz', 'Marcos Lima'],
+      eventDate: '2027-01-30',
+      city: 'Campinas',
+      status: 'published',
+      createdByUserId: ownerId,
+      owners: [ownerId, null],
+    });
+    // O casal desligou a assinatura e está sem cerimonialista.
+    await db.query('update weddings set show_planner_credit = false where id = $1', [weddingId]);
+    await signIn({ page, email: coupleEmail });
+
+    const notice =
+      'O site já está no ar. Quando a cerimonialista aceitar, a assinatura da assessoria aparece no rodapé. Para ocultar, vão em Site › Editor › Dados básicos.';
+    await page.goto('/app/colaboradores');
+    const planners = page.getByRole('region', { name: 'Cerimonialista' });
+    await planners.getByRole('button', { name: 'Convidar cerimonialista' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Convidar cerimonialista' });
+    await expect(dialog.getByRole('textbox')).toBeVisible();
+    await page.waitForLoadState('networkidle');
+    await expect(dialog.getByText(notice)).toHaveCount(0);
+
+    await db.query('update weddings set show_planner_credit = true where id = $1', [weddingId]);
+    await page.reload();
+    await page
+      .getByRole('region', { name: 'Cerimonialista' })
+      .getByRole('button', { name: 'Convidar cerimonialista' })
+      .click();
+    await expect(
+      page.getByRole('dialog', { name: 'Convidar cerimonialista' }).getByText(notice),
+    ).toBeVisible();
+  });
+
   test('com um dono só, o casal convida a outra pessoa, vê o pendente e cancela (decisões 279 e 284)', async ({
     page,
   }) => {
