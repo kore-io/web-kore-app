@@ -81,7 +81,9 @@ test.describe('Detalhe do casamento (/cerimonialista?casamento={id})', () => {
     await page.getByRole('link', { name: new RegExp(`^${couple}`) }).click();
     const detail = page.getByRole('dialog', { name: couple });
     await expect(detail.getByText('O casal ainda não aceitou o convite.')).toBeVisible();
-    await expect(detail.getByText(`Enviado para ${coupleEmail} em`)).toBeVisible();
+    await expect(detail.getByText(`para ${coupleEmail}.`, { exact: false })).toHaveText(
+      /^Convite enviado em \d{2}\/\d{2} para /,
+    );
 
     const since = new Date(Date.now() - 1000);
     await detail.getByRole('button', { name: 'Reenviar convite' }).click();

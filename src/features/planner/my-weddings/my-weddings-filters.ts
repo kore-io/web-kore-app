@@ -26,7 +26,7 @@ export type StatusFilter = (typeof STATUS_FILTERS)[number] | 'all';
 export interface MyWeddingsFilters {
   search: string;
   status: StatusFilter;
-  /** De e Até (aaaa-mm-dd), só com "Escolher período" (decisão 257(2)). */
+  /** De e Até (aaaa-mm-dd), só com "Entre duas datas" (decisões 257(2) e 264(A)). */
   dateMode: 'any' | 'period';
   from: string;
   to: string;

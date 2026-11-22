@@ -91,7 +91,7 @@ test.describe('Meus casamentos (/cerimonialista)', () => {
 
     await signIn({ page, email });
     await expect(page.getByRole('heading', { level: 1, name: 'Meus casamentos' })).toBeVisible();
-    await expect(page.getByText(`2 casamentos da ${creditName} · 2 ativos`)).toBeVisible();
+    await expect(page.getByText(`${creditName} · 2 casamentos · 2 ativos`)).toBeVisible();
     await expect(card({ page, couple: `${fernanda} e João` })).toContainText(
       '30/01/2027 · Vinhedo (SP)',
     );

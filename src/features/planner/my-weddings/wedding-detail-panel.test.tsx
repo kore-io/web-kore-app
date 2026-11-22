@@ -136,6 +136,33 @@ const URL = '/cerimonialista?casamento=w1';
 const panel = () => screen.getByRole('dialog', { name: /e/ });
 
 describe('Detalhe do casamento (Meus casamentos RN08 a RN11; decisão 260)', () => {
+  it.each([
+    {
+      stats: { guestsTotal: 150, confirmed: 1, declined: 0, pending: 149 },
+      rsvpPercent: 0.67,
+      first: '150 convidados · 1% respondeu',
+      second: '1 confirmado · 0 recusados · 149 pendentes',
+    },
+    {
+      stats: { guestsTotal: 1, confirmed: 0, declined: 1, pending: 0 },
+      rsvpPercent: 100,
+      first: '1 convidado · 100% responderam',
+      second: '0 confirmados · 1 recusado · 0 pendentes',
+    },
+    {
+      stats: { guestsTotal: 2, confirmed: 0, declined: 0, pending: 2 },
+      rsvpPercent: 0,
+      first: '2 convidados · 0% responderam',
+      second: '0 confirmados · 0 recusados · 2 pendentes',
+    },
+  ])('Convidados e RSVP no singular e com zero: $first (decisão 264(A))', async (row) => {
+    api({ detail: { ...published, stats: row.stats, rsvpPercent: row.rsvpPercent } });
+    renderRoute({ url: URL });
+    const dialog = await screen.findByRole('dialog', { name: 'Ana e Marcos' });
+    expect(within(dialog).getByText(row.first)).toBeInTheDocument();
+    expect(within(dialog).getByText(row.second)).toBeInTheDocument();
+  });
+
   it('com dono: os fatos, Convidados e RSVP, Editar o site e Sair deste casamento', async () => {
     api();
     const { container, router } = renderRoute({ url: URL });
@@ -203,9 +230,7 @@ describe('Detalhe do casamento (Meus casamentos RN08 a RN11; decisão 260)', () 
     renderRoute({ url: URL });
     const dialog = await screen.findByRole('dialog', { name: 'Fernanda e João' });
     expect(
-      within(dialog).getByText(
-        'Enviado para fernanda.alves@gmail.com em 19/09, ainda sem resposta',
-      ),
+      within(dialog).getByText('Convite enviado em 19/09 para fernanda.alves@gmail.com.'),
     ).toBeInTheDocument();
     expect(within(dialog).getByText('O casal ainda não aceitou o convite.')).toBeInTheDocument();
     expect(within(dialog).getByText('kore.com.br/fernanda-e-joao · rascunho')).toBeInTheDocument();

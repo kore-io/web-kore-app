@@ -94,15 +94,19 @@ export function MyWeddingsPage() {
   const organization = me.data?.planner?.organization ?? '';
   const filtered = filterWeddings({ weddings, filters });
   const filtering = hasFilters({ filters });
-  const total = t('myWeddings.weddings', { count: weddings.length });
+  const counts = t('myWeddings.subtitle', {
+    weddings: t('myWeddings.weddings', { count: weddings.length }),
+    active: t('myWeddings.active', { count: summary.active }),
+  });
+  // Decisão 264(A): "{assessoria} · {n} casamentos · {a} ativos"; filtrando, "{m} de {n}
+  // casamentos", e "Nenhum dos {n} casamentos" quando nada passa.
   const description = filtering
-    ? t('myWeddings.filtered', { shown: filtered.length, count: weddings.length })
-    : t('myWeddings.subtitle', {
-        weddings: organization
-          ? t('myWeddings.ofOrganization', { weddings: total, organization })
-          : total,
-        active: t('myWeddings.active', { count: summary.active }),
-      });
+    ? filtered.length === 0
+      ? t('myWeddings.filteredNone', { count: weddings.length })
+      : t('myWeddings.filtered', { shown: filtered.length, count: weddings.length })
+    : organization
+      ? t('myWeddings.ofOrganization', { organization, rest: counts })
+      : counts;
   const minimalProfile = profile.data?.profileComplete === false;
 
   return (
@@ -177,6 +181,8 @@ function WeddingsFilters({
   const { t } = useTranslation('planner');
   const fromId = useId();
   const toId = useId();
+  const toErrorId = useId();
+  const toBeforeFrom = filters.from !== '' && filters.to !== '' && filters.to < filters.from;
   const set = (patch: Partial<MyWeddingsFilters>) => onChange({ ...filters, ...patch });
   return (
     <div className="kore-my-weddings__filters">
@@ -227,8 +233,15 @@ function WeddingsFilters({
             <DateField
               id={toId}
               value={filters.to}
+              invalid={toBeforeFrom}
+              {...(toBeforeFrom && { 'aria-describedby': toErrorId })}
               onChange={(event) => set({ to: event.target.value })}
             />
+            {toBeforeFrom && (
+              <p id={toErrorId} className="kore-my-weddings__period-error">
+                {t('myWeddings.filters.toBeforeFrom')}
+              </p>
+            )}
           </div>
         </div>
       )}

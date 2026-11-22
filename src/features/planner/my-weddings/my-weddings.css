@@ -20,12 +20,17 @@
 }
 
 .kore-my-weddings__alert-list {
-  @apply m-0 mt-1 flex list-none flex-col gap-1 p-0;
+  @apply m-0 mt-1 flex list-none flex-col p-0;
 }
 
 .kore-my-weddings__alert-link,
 .kore-my-weddings__alert-toggle {
   @apply type-body-md text-primary underline;
+}
+
+/* O alvo de toque de 44 px (DoD) também nos nomes do alerta aberto. */
+.kore-my-weddings__alert-link {
+  @apply inline-flex min-h-11 items-center;
 }
 
 .kore-my-weddings__alert-toggle {
@@ -66,6 +71,10 @@
 
 .kore-my-weddings__period-field {
   @apply flex flex-col gap-1.5;
+}
+
+.kore-my-weddings__period-error {
+  @apply type-caption m-0 text-danger-text;
 }
 
 .kore-my-weddings__no-results {
