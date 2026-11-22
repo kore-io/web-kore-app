@@ -211,12 +211,19 @@ describe('Modelos (Modelos do cerimonialista RN01 a RN06; Voz, Modelos)', () => 
     );
     expect(text).toBeInvalid();
     expect(calls).toEqual([]);
+    // O contador acima do limite em cor de perigo, como no Editor (RN08; decisão 302(6)).
+    const counter = within(dialog).getByText('2.500/2.000');
+    expect(counter).toHaveAttribute('aria-hidden', 'true');
+    expect(counter).toHaveClass('kore-template-form__counter--over');
     // Trocar a Seção limpa o erro do texto (sugestão do Crivo no D8a).
     await user.selectOptions(within(dialog).getByRole('combobox', { name: 'Seção' }), 'story');
     expect(text).not.toHaveAccessibleDescription(
       'O texto passa de 2.000 caracteres. Encurte antes de salvar.',
     );
     expect(text).toBeValid();
+    expect(within(dialog).getByText('2.500/5.000')).not.toHaveClass(
+      'kore-template-form__counter--over',
+    );
   });
 
   it('Editar: os dados do modelo, a seção fixa e o PATCH com o Toast "Alterações salvas."', async () => {
