@@ -56,7 +56,8 @@ export function CoupleAreaLayout() {
 
   const couple = me.memberships.find((membership) => membership.role === 'owner')?.weddingName;
   // Trocar de perfil com mais de um perfil; Criar outro perfil quando falta o de
-  // cerimonialista e a conta não é de vendas (Cadastro e perfil RN08; decisão 85).
+  // cerimonialista, a conta não é de vendas e o cadastro de cerimonialista está aberto
+  // (Cadastro e perfil RN08; decisões 85 e 308(1)).
   const profileItems = [
     ...(me.profiles.length > 1
       ? [
@@ -71,7 +72,9 @@ export function CoupleAreaLayout() {
           },
         ]
       : []),
-    ...(!me.profiles.includes('planner') && !me.profiles.includes('seller')
+    ...(me.plannerSignupEnabled &&
+    !me.profiles.includes('planner') &&
+    !me.profiles.includes('seller')
       ? [
           {
             id: 'create-profile',
