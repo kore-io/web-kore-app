@@ -137,6 +137,11 @@ test('a central de todos os casamentos, o sino, os destinos, Marcar todas e as p
   await expect(
     page.getByRole('button', { name: /^2 grupos responderam em Ana e Marcos ?, não lida/ }),
   ).toBeVisible();
+  // A data do item sempre numérica, mesmo de hoje: "{dd/mm} às {h}" (RN05; decisão 302(1)).
+  await expect(
+    page.getByText(/^Novas respostas · \d{2}\/\d{2} às \d{1,2}h(\d{2})?$/),
+  ).toBeVisible();
+  await expect(page.getByText(/hoje às/)).toHaveCount(0);
 
   // Só indicadora: o publicado leva ao Link de indicação e marca como lida.
   await page.getByRole('button', { name: /^Site de Bianca e Henrique foi publicado/ }).click();

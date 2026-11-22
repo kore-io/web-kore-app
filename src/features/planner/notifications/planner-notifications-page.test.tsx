@@ -325,6 +325,21 @@ describe('Notificações da cerimonialista (RN05; decisão 300; Penpot 13)', () 
     expect(screen.queryByText(/hoje às/)).toBeNull();
   });
 
+  it('o sino de dentro do casamento é o dela: as não lidas do escopo e a central (RN08)', async () => {
+    const user = userEvent.setup();
+    const calls = api({ unread: 3 });
+    const { router } = renderRoute({ url: '/cerimonialista/casamentos/w1/convidados' });
+    const bell = await screen.findByRole('button', { name: 'Notificações, 3 não lidas' });
+    expect(calls.map((call) => call.path)).toContain(
+      '/v1/me/notifications/unread-count?scope=planner',
+    );
+    expect(calls.map((call) => call.path)).not.toContain(
+      expect.stringMatching(/unread-count\?weddingId=/),
+    );
+    await user.click(bell);
+    await waitFor(() => expect(router.state.location.pathname).toBe(PAGE));
+  });
+
   it('dentro do casamento, as Notificações levam à central dela (RN08)', async () => {
     api();
     const { router } = renderRoute({ url: '/cerimonialista/casamentos/w1/notificacoes' });
