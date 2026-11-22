@@ -116,6 +116,26 @@ test('a cerimonialista cria um casamento e gera o link do casal (RN02 a RN06)', 
   ).toBeVisible();
 });
 
+test('a cerimonialista abre o link do casal que ela gerou: Convite inválido (RN05, 409 SELF_REFERRAL)', async ({
+  page,
+}) => {
+  await signInPlanner({ page });
+  await createWedding({ page });
+  await page.getByRole('button', { name: 'Gerar link' }).click();
+  const link = await page
+    .getByRole('region', { name: 'Link para o casal' })
+    .getByRole('textbox', { name: 'Link para o casal' })
+    .inputValue();
+  const token = /\/convite\/([^/?#]+)/.exec(link)?.[1] ?? '';
+  expect(token).not.toBe('');
+
+  await page.goto(`/convite/${token}`);
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Este convite não vale mais' }),
+  ).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Tentar de novo' })).toHaveCount(0);
+});
+
 test('Convidar depois, e o Convidar o casal do detalhe volta ao passo 3 com o envio por e-mail (RN06, RN07)', async ({
   page,
 }) => {
