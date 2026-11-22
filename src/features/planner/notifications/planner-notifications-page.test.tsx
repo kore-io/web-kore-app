@@ -333,9 +333,8 @@ describe('Notificações da cerimonialista (RN05; decisão 300; Penpot 13)', () 
     expect(calls.map((call) => call.path)).toContain(
       '/v1/me/notifications/unread-count?scope=planner',
     );
-    expect(calls.map((call) => call.path)).not.toContain(
-      expect.stringMatching(/unread-count\?weddingId=/),
-    );
+    // Nenhuma leitura do contador por casamento (o sino do casal); só a do escopo dela.
+    expect(calls.some((call) => /\/unread-count\?(.*&)?weddingId=/.test(call.path))).toBe(false);
     await user.click(bell);
     await waitFor(() => expect(router.state.location.pathname).toBe(PAGE));
   });

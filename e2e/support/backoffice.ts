@@ -91,7 +91,8 @@ interface WeddingInput {
   partners: [string, string];
   eventDate: string;
   city: string;
-  status: 'draft' | 'awaiting_couple';
+  /** Publicado só para o que lê o status (ex.: o aviso C7-6); sem pagamento nem prazo. */
+  status: 'draft' | 'awaiting_couple' | 'published';
   createdByUserId: string;
   /** Dono (casal que já entrou) com o noivo de cada posição; nulo se ainda sem login. */
   owners?: [string | null, string | null];

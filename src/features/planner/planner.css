@@ -71,8 +71,10 @@
   @apply type-label mb-1.5 p-0 text-ink;
 }
 
+/* Abaixo de 768 px, Cidade e UF na 1ª linha e o Adicionar embaixo, com a largura toda
+   (decisão 311); do tablet em diante, os três lado a lado. */
 .kore-city-list__inputs {
-  @apply flex items-end gap-3;
+  @apply flex flex-wrap items-end gap-3 md:flex-nowrap;
 }
 
 .kore-city-list__city {
@@ -85,7 +87,7 @@
 
 /* O Adicionar na altura do campo ao lado (48 px; 40 px no desktop), acima do alvo de 44 px. */
 .kore-city-list__add {
-  @apply h-12 shrink-0 lg:h-10;
+  @apply h-12 w-full shrink-0 md:w-auto lg:h-10;
 }
 
 .kore-city-list__hint {

@@ -49,4 +49,9 @@ export interface SiteEditorResponse {
    */
   plannerCredit: SitePlannerCreditResponse | null;
   status: string;
+  /**
+   * A preferência do casamento, também sem colaboradora (Assinatura RN05): o
+   * aviso C7-6 do Convidar cerimonialista (decisão 277(A)).
+   */
+  showPlannerCredit: boolean;
 }
