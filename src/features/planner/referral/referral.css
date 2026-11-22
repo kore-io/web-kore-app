@@ -1,0 +1,88 @@
+/*
+ * Link de indicação (Penpot 09, "sem o percentual"): o cartão do link (a caixa em
+ * primary-tint, Copiar link e Compartilhar no WhatsApp; no celular, empilhados com o WhatsApp
+ * em cima), a tabela Casal · Status no desktop e os cartões no tablet e no celular.
+ */
+.kore-referral-link {
+  @apply flex flex-col gap-6;
+}
+
+.kore-referral-link__loading {
+  @apply flex justify-center py-10;
+}
+
+.kore-referral-link__card {
+  @apply flex flex-col gap-3 rounded-lg border border-gray-300 bg-white p-4 md:flex-row md:items-center md:p-5;
+}
+
+.kore-referral-link__link {
+  @apply m-0 flex min-w-0 items-center gap-3 rounded-md bg-primary-tint p-4 text-primary md:flex-1;
+}
+
+.kore-referral-link__link-icon {
+  @apply size-6 shrink-0;
+}
+
+.kore-referral-link__link-text {
+  @apply type-label-lg min-w-0 break-all;
+}
+
+.kore-referral-link__actions {
+  @apply flex flex-col-reverse gap-3 md:flex-row;
+}
+
+.kore-referral-link__list {
+  @apply flex flex-col gap-4;
+}
+
+.kore-referral-link__list-title {
+  @apply type-heading m-0 text-ink;
+}
+
+/* A tabela, só no desktop. */
+.kore-referral-link__table {
+  @apply hidden w-full border-separate border-spacing-0 overflow-hidden rounded-lg border border-gray-300 bg-white lg:table;
+}
+
+.kore-referral-link__table thead th,
+.kore-referral-link__table thead td {
+  @apply type-overline bg-gray-100 px-5 py-3 text-left text-gray-700;
+}
+
+.kore-referral-link__table tbody th,
+.kore-referral-link__table tbody td {
+  @apply type-body-md border-t border-gray-300 px-5 py-3 text-left font-normal text-ink;
+}
+
+.kore-referral-link__row--link {
+  @apply cursor-pointer hover:bg-background;
+}
+
+.kore-referral-link__couple {
+  @apply text-ink no-underline hover:underline focus-visible:underline;
+}
+
+.kore-referral-link__chevron-cell {
+  @apply w-12;
+}
+
+.kore-referral-link__chevron {
+  @apply size-5 shrink-0 text-gray-700;
+}
+
+/* Os cartões, no tablet e no celular. */
+.kore-referral-link__cards {
+  @apply m-0 flex list-none flex-col gap-3 p-0 lg:hidden;
+}
+
+.kore-referral-link__card-couple {
+  @apply type-body-md min-w-0;
+}
+
+.kore-referral-link__card-end {
+  @apply flex shrink-0 items-center gap-2;
+}
+
+.kore-referral-link__item {
+  @apply flex min-h-11 items-center justify-between gap-3 rounded-lg border border-gray-300 bg-white p-4 text-ink no-underline;
+}

@@ -6,6 +6,16 @@ import { SignInConfirmPage } from '../features/access/pages/sign-in-confirm-page
 import { SignInGooglePage } from '../features/access/pages/sign-in-google-page';
 import { SignInPage } from '../features/access/pages/sign-in-page';
 import { SignUpPage } from '../features/access/pages/sign-up-page';
+import { PlannerAreaLayout } from '../features/planner/layout/planner-area-layout';
+import { NewWeddingPage } from '../features/planner/new-wedding/new-wedding-page';
+import { MyWeddingsPage } from '../features/planner/my-weddings/my-weddings-page';
+import { PlannerAccessSettingsPage } from '../features/planner/pages/planner-access-settings-page';
+import { PlannerProfilePage } from '../features/planner/pages/planner-profile-page';
+import { PlannerSettingsLayout } from '../features/planner/pages/planner-settings-layout';
+import { PlannerSignUpPage } from '../features/planner/pages/planner-sign-up-page';
+import { ReferralLinkPage } from '../features/planner/referral/referral-link-page';
+import { TemplatesPage } from '../features/planner/templates/templates-page';
+import { CollaboratorsPage } from '../features/collaborators/pages/collaborators-page';
 import { DashboardPage } from '../features/dashboard/pages/dashboard-page';
 import { DeadlinePage } from '../features/deliveries/pages/deadline-page';
 import { DeliveriesLayout } from '../features/deliveries/pages/deliveries-layout';
@@ -17,6 +27,10 @@ import { SiteEditorPage } from '../features/site/pages/site-editor-page';
 import { SongsPage } from '../features/songs/pages/songs-page';
 import { NotificationSettingsPage } from '../features/notifications/pages/notification-settings-page';
 import { NotificationsPage } from '../features/notifications/pages/notifications-page';
+import { PlannerNotificationSettingsPage } from '../features/planner/notifications/planner-notification-settings-page';
+import { PlannerNotificationsPage } from '../features/planner/notifications/planner-notifications-page';
+import { PLANNER_TEMPLATE_ACTIONS } from '../features/planner/templates/apply-template';
+import { SectionTemplateActionsProvider } from '../features/site/sections/template-actions';
 import { ImportPage } from '../features/guests/pages/import-page';
 import { EditPartyPage, NewPartyPage } from '../features/guests/pages/party-form-page';
 import { PartyPanelPage } from '../features/guests/pages/party-panel-page';
@@ -25,7 +39,109 @@ import { TrashPage } from '../features/guests/pages/trash-page';
 import { AppRoot } from './app-root';
 import { CoupleAreaLayout } from './layout/couple-area-layout';
 import { FIRST_SECTION_SLUG } from '../features/site/sections';
-import { paths, siteSectionPath } from './paths';
+import { PlannerWeddingArea } from './layout/planner-wedding-area';
+import { paths } from './paths';
+
+/**
+ * As telas do casamento, com caminhos relativos ao caminho-base da área (Colaboradora
+ * RN09): montadas em `/app` (o casal) e em `/cerimonialista/casamentos/:weddingId` (a
+ * colaboradora). O `prefix` deixa os ids das rotas únicos.
+ */
+function areaRoutes({ prefix }: { prefix: 'couple' | 'planner' }): RouteObject[] {
+  const routes: RouteObject[] = [
+    { id: 'dashboard', index: true, element: <DashboardPage /> },
+    {
+      path: 'convidados',
+      element: <GuestsLayout />,
+      children: [
+        { id: 'guests', index: true, element: <GuestsPage /> },
+        { id: 'guest-import', path: 'importar', element: <ImportPage /> },
+        { id: 'guest-export', path: 'exportar', element: <ExportPage /> },
+        { id: 'guest-tags', path: 'tags', element: <TagsPage /> },
+        { id: 'guest-trash', path: 'lixeira', element: <TrashPage /> },
+      ],
+    },
+    { id: 'guest-party', path: 'convidados/grupos/:partyId', element: <PartyPanelPage /> },
+    { id: 'guest-new', path: 'convidados/novo', element: <NewPartyPage /> },
+    {
+      id: 'site',
+      path: 'site',
+      element: <Navigate to={FIRST_SECTION_SLUG} replace />,
+    },
+    {
+      id: 'site-editor',
+      path: 'site/:section',
+      // O Editor recebe as ações de modelo da cerimonialista por aqui (Modelos RN08), sem
+      // depender da feature dela; cada ação decide se aparece.
+      element: (
+        <SectionTemplateActionsProvider actions={PLANNER_TEMPLATE_ACTIONS}>
+          <SiteEditorPage />
+        </SectionTemplateActionsProvider>
+      ),
+    },
+    { id: 'songs', path: 'musicas', element: <SongsPage /> },
+    { id: 'collaborators', path: 'colaboradores', element: <CollaboratorsPage /> },
+    // Dentro do casamento, as notificações da colaboradora são as dela, de todos os casamentos
+    // (Notificações da cerimonialista RN08; decisão 300(6)).
+    {
+      id: 'notifications',
+      path: 'notificacoes',
+      element:
+        prefix === 'couple' ? (
+          <NotificationsPage />
+        ) : (
+          <Navigate to={paths.plannerNotifications} replace />
+        ),
+    },
+    {
+      id: 'settings-notifications',
+      path: 'configuracoes/notificacoes',
+      element:
+        prefix === 'couple' ? (
+          <NotificationSettingsPage />
+        ) : (
+          <Navigate to={paths.plannerSettingsNotifications} replace />
+        ),
+    },
+    {
+      path: 'envios',
+      element: <DeliveriesLayout />,
+      children: [
+        // Envios abre em Enviar convites (decisão 235).
+        { index: true, element: <Navigate to="convites" replace /> },
+        { id: 'delivery-invites', path: 'convites', element: <SendPage kind="invite" /> },
+        {
+          id: 'delivery-save-the-date',
+          path: 'save-the-date',
+          element: <SendPage kind="save_the_date" />,
+        },
+        { id: 'delivery-reminder', path: 'lembrete', element: <SendPage kind="reminder" /> },
+        { id: 'delivery-deadline', path: 'prazo', element: <DeadlinePage /> },
+      ],
+    },
+    {
+      id: 'guest-party-edit',
+      path: 'convidados/grupos/:partyId/editar',
+      element: <EditPartyPage />,
+    },
+  ];
+  return prefix === 'couple' ? routes : withIdPrefix({ routes, prefix });
+}
+
+/** Os ids da área da colaboradora levam o prefixo (os do casal ficam como eram). */
+function withIdPrefix({
+  routes,
+  prefix,
+}: {
+  routes: RouteObject[];
+  prefix: string;
+}): RouteObject[] {
+  return routes.map((route) => ({
+    ...route,
+    ...(route.id && { id: `${prefix}-${route.id}` }),
+    ...(route.children && { children: withIdPrefix({ routes: route.children, prefix }) }),
+  })) as RouteObject[];
+}
 
 export const routes: RouteObject[] = [
   {
@@ -38,61 +154,59 @@ export const routes: RouteObject[] = [
       { id: 'invite', path: paths.invite, element: <InvitePage /> },
       { id: 'profiles', path: paths.profiles, element: <ProfilesPage /> },
       { id: 'sign-up', path: paths.signUp, element: <SignUpPage /> },
+      { id: 'planner-sign-up', path: paths.plannerSignUp, element: <PlannerSignUpPage /> },
+      {
+        // A Área do cerimonialista (Cadastro e perfil RN07): a moldura, o Meu perfil e as
+        // Configurações (D3). As outras telas chegam nos PRs seguintes; até lá, ficam em
+        // branco dentro da moldura (decisões 250(d) e 254).
+        id: 'planner-area',
+        path: paths.plannerArea,
+        element: <PlannerAreaLayout />,
+        children: [
+          { id: 'planner-area-my-weddings', index: true, element: <MyWeddingsPage /> },
+          { id: 'planner-area-new-wedding', path: 'casamentos/novo', element: <NewWeddingPage /> },
+          { id: 'planner-area-referral', path: 'link-de-indicacao', element: <ReferralLinkPage /> },
+          { id: 'planner-area-templates', path: 'modelos', element: <TemplatesPage /> },
+          {
+            id: 'planner-area-notifications',
+            path: 'notificacoes',
+            element: <PlannerNotificationsPage />,
+          },
+          { id: 'planner-area-profile', path: 'perfil', element: <PlannerProfilePage /> },
+          {
+            id: 'planner-area-settings',
+            path: 'configuracoes',
+            element: <PlannerSettingsLayout />,
+            children: [
+              { index: true, element: <Navigate to="acesso" replace /> },
+              {
+                id: 'planner-area-settings-access',
+                path: 'acesso',
+                element: <PlannerAccessSettingsPage />,
+              },
+              {
+                id: 'planner-area-settings-notifications',
+                path: 'notificacoes',
+                element: <PlannerNotificationSettingsPage />,
+              },
+            ],
+          },
+        ],
+      },
       { id: 'session-expired', path: paths.sessionExpired, element: <SessionExpiredPage /> },
       {
         id: 'couple-area',
         path: paths.coupleArea,
         element: <CoupleAreaLayout />,
-        children: [
-          { id: 'dashboard', index: true, element: <DashboardPage /> },
-          {
-            path: 'convidados',
-            element: <GuestsLayout />,
-            children: [
-              { id: 'guests', index: true, element: <GuestsPage /> },
-              { id: 'guest-import', path: 'importar', element: <ImportPage /> },
-              { id: 'guest-export', path: 'exportar', element: <ExportPage /> },
-              { id: 'guest-tags', path: 'tags', element: <TagsPage /> },
-              { id: 'guest-trash', path: 'lixeira', element: <TrashPage /> },
-            ],
-          },
-          { id: 'guest-party', path: 'convidados/grupos/:partyId', element: <PartyPanelPage /> },
-          { id: 'guest-new', path: 'convidados/novo', element: <NewPartyPage /> },
-          {
-            id: 'site',
-            path: 'site',
-            element: <Navigate to={siteSectionPath({ section: FIRST_SECTION_SLUG })} replace />,
-          },
-          { id: 'site-editor', path: 'site/:section', element: <SiteEditorPage /> },
-          { id: 'songs', path: 'musicas', element: <SongsPage /> },
-          { id: 'notifications', path: 'notificacoes', element: <NotificationsPage /> },
-          {
-            id: 'settings-notifications',
-            path: 'configuracoes/notificacoes',
-            element: <NotificationSettingsPage />,
-          },
-          {
-            path: 'envios',
-            element: <DeliveriesLayout />,
-            children: [
-              // Envios abre em Enviar convites (decisão 235).
-              { index: true, element: <Navigate to={paths.deliveryInvites} replace /> },
-              { id: 'delivery-invites', path: 'convites', element: <SendPage kind="invite" /> },
-              {
-                id: 'delivery-save-the-date',
-                path: 'save-the-date',
-                element: <SendPage kind="save_the_date" />,
-              },
-              { id: 'delivery-reminder', path: 'lembrete', element: <SendPage kind="reminder" /> },
-              { id: 'delivery-deadline', path: 'prazo', element: <DeadlinePage /> },
-            ],
-          },
-          {
-            id: 'guest-party-edit',
-            path: 'convidados/grupos/:partyId/editar',
-            element: <EditPartyPage />,
-          },
-        ],
+        children: areaRoutes({ prefix: 'couple' }),
+      },
+      {
+        // A colaboradora dentro do casamento (Colaboradora RN01, RN09): as mesmas telas,
+        // com o casamento da rota. A moldura dela (faixa, seletor, Voltar) vem no D5.
+        id: 'planner-wedding',
+        path: paths.plannerWedding,
+        element: <PlannerWeddingArea />,
+        children: areaRoutes({ prefix: 'planner' }),
       },
       // Sem página de "não encontrado" no DS: o caminho desconhecido volta para a área.
       { path: '*', element: <Navigate to={paths.coupleArea} replace /> },

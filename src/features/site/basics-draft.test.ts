@@ -18,9 +18,21 @@ const original: BasicsDraft = {
   whatsapp: '(19) 99876-4521',
   email: 'ana.moreira@gmail.com',
   cover: null,
+  showPlannerCredit: true,
 };
 
 describe('rascunho dos Dados básicos (RN02 a RN08)', () => {
+  it('a assinatura da assessoria vai no PATCH só quando muda (Assinatura RN05)', () => {
+    expect(toPatchBody({ draft: original, original, partnerIds: ['pa', 'pm'] })).toEqual({});
+    expect(
+      toPatchBody({
+        draft: { ...original, showPlannerCredit: false },
+        original,
+        partnerIds: ['pa', 'pm'],
+      }),
+    ).toEqual({ showPlannerCredit: false });
+  });
+
   it('o PATCH leva só o que mudou, com os nulos que apagam (RN04)', () => {
     const draft = {
       ...original,
@@ -116,6 +128,8 @@ describe('rascunho dos Dados básicos (RN02 a RN08)', () => {
       whatsapp: '',
       email: '',
       cover: null,
+      // Sem cerimonialista (plannerCredit ausente), o padrão: ligado.
+      showPlannerCredit: true,
     });
   });
 });

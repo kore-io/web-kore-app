@@ -4,7 +4,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router';
-import { guestPartyEditPath } from '../../../app/paths';
 import type { DeliveryQueueItemResponse } from '../../../shared/api/generated/model';
 import {
   deliveriesControllerMarkV1,
@@ -14,10 +13,12 @@ import {
 import { getPartiesControllerListV1InfiniteQueryKey } from '../../../shared/api/generated/parties/parties';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import type { Audience } from '../../guests/hooks/use-active-wedding';
+import { useWeddingTimezone } from '../../../shared/use-wedding-timezone';
 import { deliveryStatusText, sentAtOf, type DeliveryKind } from '../delivery-texts';
 import { DELIVERY_LIMIT, useDeliverySelection } from '../hooks/use-delivery-selection';
 import { QrStep } from './qr-step';
 import type { Closed } from './send-page';
+import { useAreaPaths } from '../../../app/area';
 
 type Sent = Record<string, { at: string; channel: 'whatsapp' | 'email' | 'link' }>;
 
@@ -53,6 +54,7 @@ function ChannelQueue({
   kind: DeliveryKind;
   closed: Closed;
 }) {
+  const area = useAreaPaths();
   const { t } = useTranslation('deliveries');
   const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
@@ -60,6 +62,8 @@ function ChannelQueue({
   const [, setSearch] = useSearchParams();
   const navigate = useNavigate();
   const selection = useDeliverySelection({ weddingId, kind, visibleIds: [] });
+  // A hora do envio no fuso do casamento (decisão 248).
+  const timezone = useWeddingTimezone({ weddingId });
   const channel = selection.channel === 'qr' ? 'whatsapp' : selection.channel;
   const ids = selection.ids.slice(0, DELIVERY_LIMIT);
   const queue = useDeliveriesControllerGetQueueV1(
@@ -148,6 +152,7 @@ function ChannelQueue({
             at: local?.at ?? sentAtOf({ kind, item }),
             channel: local?.channel ?? item.lastChannel,
             now: new Date(),
+            timezone,
           });
           const done = Boolean(local ?? sentAtOf({ kind, item }));
           const missing =
@@ -180,7 +185,7 @@ function ChannelQueue({
                   <Button
                     variant="secondary"
                     size="sm"
-                    onClick={() => void navigate(guestPartyEditPath({ partyId: item.id }))}
+                    onClick={() => void navigate(area.guestPartyEdit({ partyId: item.id }))}
                   >
                     {t('queue.editParty')}
                   </Button>

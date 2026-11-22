@@ -13,6 +13,7 @@
   },
   "footer": {
     "madeWith": "Feito com Kore",
+    "plannerCredit": "Assessoria: {{name}}",
     "terms": "Termos",
     "privacy": "Privacidade",
     "contactWhatsapp": "Dúvidas? Fale com o casal pelo WhatsApp {{number}}",

@@ -27,7 +27,10 @@ import type {
   MembershipNotFoundErrorBody,
   OriginNotAllowedErrorBody,
   RateLimitedErrorBody,
+  RecentAccessChangeErrorBody,
   SessionExpiredErrorBody,
+  SupportReadOnlyErrorBody,
+  SupportSessionEndedErrorBody,
   WeddingBlockedErrorBody,
   WeddingDeletionScheduledErrorBody,
   WeddingHasNoOwnerErrorBody,
@@ -78,7 +81,12 @@ export const getWeddingMembersControllerListV1QueryKey = (weddingId: string) => 
 
 export const getWeddingMembersControllerListV1QueryOptions = <
   TData = Awaited<ReturnType<typeof weddingMembersControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options?: {
@@ -112,12 +120,20 @@ export type WeddingMembersControllerListV1QueryResult = NonNullable<
   Awaited<ReturnType<typeof weddingMembersControllerListV1>>
 >;
 export type WeddingMembersControllerListV1QueryError = ErrorType<
-  SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody
+  | SessionExpiredErrorBody
+  | SupportSessionEndedErrorBody
+  | WeddingNotFoundErrorBody
+  | RateLimitedErrorBody
 >;
 
 export function useWeddingMembersControllerListV1<
   TData = Awaited<ReturnType<typeof weddingMembersControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options: {
@@ -138,7 +154,12 @@ export function useWeddingMembersControllerListV1<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useWeddingMembersControllerListV1<
   TData = Awaited<ReturnType<typeof weddingMembersControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options?: {
@@ -159,7 +180,12 @@ export function useWeddingMembersControllerListV1<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useWeddingMembersControllerListV1<
   TData = Awaited<ReturnType<typeof weddingMembersControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options?: {
@@ -176,7 +202,12 @@ export function useWeddingMembersControllerListV1<
 
 export function useWeddingMembersControllerListV1<
   TData = Awaited<ReturnType<typeof weddingMembersControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | WeddingNotFoundErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    | SessionExpiredErrorBody
+    | SupportSessionEndedErrorBody
+    | WeddingNotFoundErrorBody
+    | RateLimitedErrorBody
+  >,
 >(
   weddingId: string,
   options?: {
@@ -222,12 +253,15 @@ export const getWeddingMembersControllerRemoveV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | MembershipNotFoundErrorBody
     | CannotRemoveOwnerErrorBody
     | LastOwnerErrorBody
     | WeddingHasNoOwnerErrorBody
+    | RecentAccessChangeErrorBody
     | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,
@@ -273,12 +307,15 @@ export type WeddingMembersControllerRemoveV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | MembershipNotFoundErrorBody
   | CannotRemoveOwnerErrorBody
   | LastOwnerErrorBody
   | WeddingHasNoOwnerErrorBody
+  | RecentAccessChangeErrorBody
   | WeddingDeletionScheduledErrorBody
   | RateLimitedErrorBody
 >;
@@ -292,12 +329,15 @@ export const useWeddingMembersControllerRemoveV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | MembershipNotFoundErrorBody
     | CannotRemoveOwnerErrorBody
     | LastOwnerErrorBody
     | WeddingHasNoOwnerErrorBody
+    | RecentAccessChangeErrorBody
     | WeddingDeletionScheduledErrorBody
     | RateLimitedErrorBody
   >,

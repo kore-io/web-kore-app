@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
-import { externalUrls, paths } from '../../../app/paths';
+import { paths } from '../../../app/paths';
 import { LoadError } from '../../../shared/components/load-error';
 import { AlreadyOwner } from '../components/already-owner';
 import { InvitePartnerStep } from '../components/invite-partner-step';
@@ -60,7 +60,7 @@ export function SignUpPage() {
           submitting={signIn.submitting}
           // Com o rascunho, quem já tem conta entra e volta ao cadastro (Cadastro RN12).
           signInHref={draft ? `${paths.signIn}?next=couple_signup` : paths.signIn}
-          plannerHref={externalUrls.plannerPartnership}
+          plannerHref={paths.plannerSignUp}
         />
       ) : (
         <SignInCodeStep

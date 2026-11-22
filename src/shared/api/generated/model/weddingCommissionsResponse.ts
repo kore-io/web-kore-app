@@ -9,7 +9,9 @@ export interface WeddingCommissionsResponse {
   /** @nullable */
   weddingId: string | null;
   /** @nullable */
-  partnerNames: string[] | null;
+  coupleNames: string | null;
+  weddingPurged: boolean;
+  clickable: boolean;
   availableCents: number;
   pendingCents: number;
   releaseDates: string[];

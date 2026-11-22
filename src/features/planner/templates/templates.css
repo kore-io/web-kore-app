@@ -1,0 +1,162 @@
+/*
+ * Modelos (Navegação, Modelos; ajustar ao Penpot 11): as abas, a tabela num cartão branco
+ * com o cabeçalho em gray.100 no desktop e os cartões no tablet e no celular; o Dialog de
+ * criar e editar, em tela cheia no celular.
+ */
+.kore-templates {
+  @apply flex flex-col gap-6;
+}
+
+.kore-templates__loading {
+  @apply flex justify-center py-10;
+}
+
+.kore-templates__table {
+  @apply hidden w-full border-separate border-spacing-0 overflow-hidden rounded-lg border border-gray-300 bg-white lg:table;
+}
+
+.kore-templates__table thead th,
+.kore-templates__table thead td {
+  @apply type-overline bg-gray-100 px-5 py-3 text-left text-gray-700;
+}
+
+.kore-templates__table tbody th,
+.kore-templates__table tbody td {
+  @apply type-body-md border-t border-gray-300 px-5 py-3 text-left align-middle font-normal text-ink;
+}
+
+.kore-templates__actions-cell {
+  @apply w-0 whitespace-nowrap;
+}
+
+.kore-templates__actions {
+  @apply flex flex-wrap items-center gap-2;
+}
+
+/* Na tabela, Editar e Excluir lado a lado (Penpot 11). */
+.kore-templates__actions-cell .kore-templates__actions {
+  @apply flex-nowrap justify-end;
+}
+
+.kore-templates__cards {
+  @apply m-0 flex list-none flex-col gap-3 p-0 lg:hidden;
+}
+
+.kore-templates__card {
+  @apply flex flex-col gap-2 rounded-lg border border-gray-300 bg-white p-4;
+}
+
+.kore-templates__card .kore-templates__actions {
+  @apply self-end;
+}
+
+.kore-templates__card-name {
+  @apply type-label-lg text-ink;
+}
+
+.kore-templates__card-meta {
+  @apply type-caption text-gray-700;
+}
+
+.kore-templates__card-preview {
+  @apply type-body-md line-clamp-2 whitespace-pre-line text-ink;
+}
+
+.kore-templates__sample {
+  @apply inline-flex items-center gap-2;
+}
+
+.kore-templates__sample-fonts {
+  @apply inline-flex h-8 min-w-10 items-center justify-center rounded-md border border-gray-300 px-2 type-heading;
+}
+
+.kore-templates__swatch {
+  @apply inline-block size-5 rounded-full border border-gray-300;
+}
+
+/* O Criar e o Editar: no celular, a tela inteira (Navegação, Modelos). */
+.kore-template-dialog {
+  @apply max-md:inset-0 max-md:h-dvh max-md:max-h-none max-md:w-full max-md:max-w-none max-md:translate-x-0 max-md:translate-y-0 max-md:rounded-none max-md:overflow-y-auto;
+}
+
+.kore-template-form {
+  @apply flex flex-col gap-4;
+}
+
+.kore-template-form__counter {
+  @apply type-caption self-end text-gray-700;
+}
+
+/* O contador acima do limite, em perigo (RN08; decisão 302(6)). */
+.kore-template-form__counter--over {
+  @apply text-danger-text;
+}
+
+.kore-template-form__questions {
+  @apply m-0 flex list-none flex-col gap-4 p-0;
+}
+
+.kore-template-form__fieldset {
+  @apply m-0 flex min-w-0 flex-col gap-3 rounded-lg border border-gray-300 p-4;
+}
+
+.kore-template-form__remove {
+  @apply self-end;
+}
+
+/* O nome "Pergunta N" é só do leitor de tela (Penpot 11). */
+.kore-template-form__legend {
+  @apply sr-only;
+}
+
+.kore-template-form__add {
+  @apply flex flex-col items-start gap-2;
+}
+
+.kore-template-form__limit {
+  @apply type-caption m-0 text-gray-700;
+}
+
+/*
+ * O Aplicar modelo no Site › Editor (RN08): o botão na linha do título da seção, à direita
+ * (Penpot 17, também no celular); o título deixa o espaço do botão e quebra antes dele.
+ */
+.kore-site-editor__panel:has(.kore-apply-template) {
+  @apply relative;
+}
+
+.kore-site-editor__panel:has(.kore-apply-template) .kore-site-editor__panel-title {
+  @apply flex min-h-11 items-center pr-40;
+}
+
+.kore-apply-template {
+  @apply absolute top-5 right-5;
+}
+
+.kore-apply-template__loading {
+  @apply flex justify-center py-6;
+}
+
+.kore-apply-template__empty {
+  @apply flex flex-col items-start gap-4;
+}
+
+.kore-apply-template__empty-text {
+  @apply type-body-md m-0 text-gray-700;
+}
+
+.kore-apply-template__list {
+  @apply m-0 flex list-none flex-col gap-2 p-0;
+}
+
+.kore-apply-template__item {
+  @apply flex min-h-11 w-full cursor-pointer flex-col items-start gap-1 rounded-lg border border-gray-300 bg-white p-4 text-left hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary;
+}
+
+.kore-apply-template__name {
+  @apply type-label-lg text-ink;
+}
+
+.kore-apply-template__preview {
+  @apply type-body-md line-clamp-2 whitespace-pre-line text-gray-700;
+}

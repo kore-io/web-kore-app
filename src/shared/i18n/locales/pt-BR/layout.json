@@ -11,11 +11,17 @@
     "guests": "Convidados",
     "deliveries": "Envios",
     "site": "Site",
-    "songs": "Músicas"
+    "songs": "Músicas",
+    "collaborators": "Colaboradores"
   },
   "activeProfileCouple": "Perfil ativo: Casal",
   "activeProfileCoupleWedding": "Perfil ativo: Casal · {{couple}}",
   "signOut": "Sair",
   "notificationsUnreadMany": "Notificações, mais de 9 não lidas",
-  "settings": "Configurações"
+  "settings": "Configurações",
+  "switchProfile": "Trocar de perfil",
+  "switchProfilePlanner": "Cerimonialista · {{organization}}",
+  "createProfile": "Criar outro perfil",
+  "createProfilePlanner": "Cerimonialista",
+  "switchProfileSeller": "Vendas · Kore"
 }

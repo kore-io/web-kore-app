@@ -18,61 +18,32 @@ export const paths = {
   sessionExpired: '/sessao-expirada',
   /** Área do casal; o Dashboard é a raiz. */
   coupleArea: '/app',
-  /** Convidados › Grupos e convidados (decisão 198); busca e filtros na query. */
-  guests: '/app/convidados',
-  /** Convidados › Tags (decisão 198). */
-  /** Convidados › Importar (decisão 198). */
-  guestImport: '/app/convidados/importar',
-  /** Convidados › Exportar (decisão 198). */
-  guestExport: '/app/convidados/exportar',
-  guestTags: '/app/convidados/tags',
-  /** Convidados › Lixeira (decisão 198). */
-  guestTrash: '/app/convidados/lixeira',
-  /** Painel do grupo (decisão 198): link próprio, para compartilhar e para o voltar. */
-  guestParty: '/app/convidados/grupos/:partyId',
-  /** Novo grupo e Editar grupo (decisão 213(9)). */
-  guestNew: '/app/convidados/novo',
-  guestPartyEdit: '/app/convidados/grupos/:partyId/editar',
-  /** Envios (IA da Área do Casal; decisão 235): abre em Enviar convites. */
-  deliveries: '/app/envios',
   /**
-   * Envios › Enviar convites, Save the date e Lembrar pendentes (decisão 235): as etapas
-   * (Grupos → Canal e mensagem → Fila) no mesmo caminho, com ?etapa=canal e ?etapa=fila.
+   * A colaboradora dentro de um casamento (Colaboradora RN01; decisão 223 D2): as mesmas
+   * telas da Área do Casal, com o casamento da rota. Os caminhos das telas vêm do
+   * `areaPaths` (src/app/area.tsx), a partir do caminho-base da área.
    */
-  deliveryInvites: '/app/envios/convites',
-  deliverySaveTheDate: '/app/envios/save-the-date',
-  deliveryReminder: '/app/envios/lembrete',
-  /** Envios › Prazo de resposta (Prazo e respostas RN02; decisão 217(13)). */
-  deliveryDeadline: '/app/envios/prazo',
+  plannerWedding: '/cerimonialista/casamentos/:weddingId',
   /**
-   * Músicas (Música RN05): só com a pergunta de música ligada; desligada, leva ao Editor ›
-   * Pergunta de música (RN03).
+   * Área do cerimonialista (Cadastro e perfil RN07): Meus casamentos é a raiz. A moldura
+   * chegou no D3 da F6; as telas de cada item chegam nos PRs seguintes (D4 a D9) e, até lá,
+   * a rota fica em branco dentro da moldura (decisões 250(d) e 254).
    */
-  songs: '/app/musicas',
-  /** Notificações (Central RN06; decisão 217(13)): o sino da Topbar leva aqui. */
-  notifications: '/app/notificacoes',
-  /** Configurações › Notificações (Central RN07; decisão 221). */
-  settingsNotifications: '/app/configuracoes/notificacoes',
-  /** Site › Editor (decisão 214): /app/site abre os Dados básicos. */
-  site: '/app/site',
-  siteSection: '/app/site/:section',
+  plannerArea: '/cerimonialista',
+  /** Novo casamento (D6); o caminho estático vale sobre o `:weddingId`. */
+  plannerNewWedding: '/cerimonialista/casamentos/novo',
+  /** Link de indicação (D7). */
+  plannerReferral: '/cerimonialista/link-de-indicacao',
+  /** Modelos (D8). */
+  plannerTemplates: '/cerimonialista/modelos',
+  /** Notificações da cerimonialista, pelo sino (D9; decisão 254(2)). */
+  plannerNotifications: '/cerimonialista/notificacoes',
+  /** Meu perfil (Cadastro e perfil RN09). */
+  plannerProfile: '/cerimonialista/perfil',
+  /** Configurações (RN11): abre em Acesso; a aba Notificações liga no D9 (254(3)). */
+  plannerSettings: '/cerimonialista/configuracoes',
+  plannerSettingsAccess: '/cerimonialista/configuracoes/acesso',
+  plannerSettingsNotifications: '/cerimonialista/configuracoes/notificacoes',
+  /** Cadastro do cerimonialista (Cadastro e perfil RN01): o Fazer parceria do app. */
+  plannerSignUp: '/cerimonialista/cadastro',
 } as const;
-
-/** Caminho do Painel de um grupo. */
-export function guestPartyPath({ partyId }: { partyId: string }) {
-  return paths.guestParty.replace(':partyId', encodeURIComponent(partyId));
-}
-
-export function guestPartyEditPath({ partyId }: { partyId: string }) {
-  return paths.guestPartyEdit.replace(':partyId', encodeURIComponent(partyId));
-}
-
-/** Endereços fora do app. */
-export const externalUrls = {
-  /** "Fazer parceria" na F0 (decisões 150(4) e 157(4)); na F6, o cadastro do cerimonialista. */
-  plannerPartnership: 'https://kore.com.br/cerimonialistas',
-} as const;
-
-export function siteSectionPath({ section }: { section: string }) {
-  return paths.siteSection.replace(':section', encodeURIComponent(section));
-}

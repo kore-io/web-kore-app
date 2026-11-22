@@ -40,9 +40,11 @@ describe('destino depois do login (RN06; decisões 142 e 157(4))', () => {
       kind: 'route',
       path: '/cadastro',
     });
+    // Na F6, o cadastro do cerimonialista no app (Cadastro e perfil RN01).
     expect(destinationAfterLogin({ next: 'planner_signup' })).toEqual({
-      kind: 'external',
-      url: 'https://kore.com.br/cerimonialistas',
+      kind: 'route',
+      path: '/cerimonialista/cadastro',
+      state: { afterLogin: true },
     });
   });
 

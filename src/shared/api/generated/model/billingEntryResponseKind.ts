@@ -17,4 +17,6 @@ export const BillingEntryResponseKind = {
   end_date_soon: 'end_date_soon',
   grace: 'grace',
   expired: 'expired',
+  purge_soon: 'purge_soon',
+  courtesy: 'courtesy',
 } as const;

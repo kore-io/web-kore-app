@@ -3,7 +3,6 @@ import { useQueryClient, type Query } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { paths } from '../../../app/paths';
 import {
   useGuestImportsControllerSpreadsheetPreviewV1,
   useGuestImportsControllerSpreadsheetV1,
@@ -12,6 +11,7 @@ import type { SpreadsheetPreviewResponse } from '../../../shared/api/generated/m
 import { getTagsControllerListV1QueryKey } from '../../../shared/api/generated/tags/tags';
 import { apiErrorCode } from '../../../shared/api/http-client';
 import type { Audience } from './use-active-wedding';
+import { useAreaPaths } from '../../../app/area';
 
 /** Recusas do arquivo inteiro, com o texto na Importação RN03 e na decisão 209. */
 const REFUSALS = ['TEMPLATE_MISMATCH', 'TOO_MANY_ROWS', 'NOT_XLSX', 'FILE_TOO_LARGE'] as const;
@@ -31,6 +31,7 @@ export function useSpreadsheetImport({
   weddingId: string;
   audience: Audience;
 }) {
+  const area = useAreaPaths();
   const { t } = useTranslation('guests');
   const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
@@ -98,7 +99,7 @@ export function useSpreadsheetImport({
               queryKey: getTagsControllerListV1QueryKey(weddingId),
             });
             showToast({ tone: 'success', message: t('importSheet.imported', { count: parties }) });
-            void navigate(paths.guests);
+            void navigate(area.guests);
           },
           onError: (error) => {
             const code = apiErrorCode({ error });

@@ -1,7 +1,7 @@
-import { DateField, Input, Select, useToast } from '@kore-io/design';
+import { DateField, Input, Select, Switch, useToast } from '@kore-io/design';
 import { useQueryClient } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getMeControllerMeV1QueryKey } from '../../../shared/api/generated/me/me';
 import type { SiteEditorResponse } from '../../../shared/api/generated/model';
@@ -350,6 +350,15 @@ export function BasicsSection({
         alt={site.partners.map((partner) => partner.name.split(' ')[0]).join(' & ')}
         onChange={(cover) => set('cover', cover)}
       />
+
+      {site.plannerCredit && (
+        <PlannerCreditField
+          credit={site.plannerCredit}
+          audience={audience}
+          checked={draft.showPlannerCredit}
+          onChange={(show) => set('showPlannerCredit', show)}
+        />
+      )}
     </div>
   );
 
@@ -447,4 +456,58 @@ export function basicsErrorText({
     default:
       return undefined;
   }
+}
+
+/**
+ * A assinatura da assessoria (Assinatura RN05 e RN06; penpot-f6 B1), no fim de Dados
+ * básicos, só quando o casamento tem cerimonialista colaboradora (`plannerCredit` não nulo):
+ * o Switch, que grava com o Salvar da seção, e o apoio com o nome como sai no rodapé. Só o
+ * dono muda: quem colabora vê o Switch desabilitado com o motivo. Ocultada pelo Kore, o
+ * Switch dá lugar ao aviso.
+ */
+function PlannerCreditField({
+  credit,
+  audience,
+  checked,
+  onChange,
+}: {
+  credit: NonNullable<SiteEditorResponse['plannerCredit']>;
+  audience: Audience;
+  checked: boolean;
+  onChange: (show: boolean) => void;
+}) {
+  const { t } = useTranslation('site');
+  const id = useId();
+  if (credit.hiddenByKore) {
+    return (
+      <p className="kore-site-basics__credit-note">
+        {t(`basics.plannerCredit.hidden.${audience}`)}
+      </p>
+    );
+  }
+  // Quem colabora lê só o motivo (Penpot, B1); o dono, o nome como sai no rodapé.
+  const help = !credit.canChange
+    ? [t('basics.plannerCredit.ownerOnly')]
+    : credit.name !== null
+      ? [t('basics.plannerCredit.help', { name: credit.name })]
+      : [];
+  return (
+    <div className="kore-site-basics__credit">
+      <Switch
+        checked={checked}
+        disabled={!credit.canChange}
+        {...(help.length > 0 && {
+          'aria-describedby': help.map((_, index) => `${id}-${index}`).join(' '),
+        })}
+        onChange={(event) => onChange(event.target.checked)}
+      >
+        {t('basics.plannerCredit.label')}
+      </Switch>
+      {help.map((line, index) => (
+        <p key={line} id={`${id}-${index}`} className="kore-site-basics__credit-help">
+          {line}
+        </p>
+      ))}
+    </div>
+  );
 }

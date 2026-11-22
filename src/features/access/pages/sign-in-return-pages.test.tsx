@@ -1,7 +1,6 @@
 import { screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { apiError, mockApi, renderRoute } from '../../../../tests/render-route';
-import { redirectTo } from '../../../shared/browser/redirect';
 
 vi.mock('../../../shared/browser/redirect', () => ({ redirectTo: vi.fn() }));
 
@@ -57,11 +56,9 @@ describe('Volta do Google (/entrar/google, decisão 147)', () => {
     await waitFor(() => expect(router.state.location.pathname).toBe('/convite/tok123'));
   });
 
-  it('planner_signup vai à página de parceria na F0 (decisão 157(4))', async () => {
-    renderRoute({ url: '/entrar/google?step=planner_signup' });
-    await waitFor(() =>
-      expect(redirectTo).toHaveBeenCalledWith({ url: 'https://kore.com.br/cerimonialistas' }),
-    );
+  it('planner_signup volta ao cadastro do cerimonialista (Cadastro e perfil RN01)', async () => {
+    const { router } = renderRoute({ url: '/entrar/google?step=planner_signup' });
+    await waitFor(() => expect(router.state.location.pathname).toBe('/cerimonialista/cadastro'));
   });
 
   it('sem step válido, volta ao Entrar com o erro do Google', async () => {

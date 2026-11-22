@@ -1,0 +1,465 @@
+{
+  "nav": {
+    "myWeddings": "Meus casamentos",
+    "newWedding": "Novo casamento",
+    "referral": "Link de indicação",
+    "templates": "Modelos"
+  },
+  "menu": {
+    "activeProfile": "Cerimonialista · {{organization}}",
+    "profile": "Meu perfil",
+    "settings": "Configurações",
+    "switchProfile": "Trocar de perfil",
+    "switchProfileCouple": "Casal · {{couple}}",
+    "createProfile": "Criar outro perfil",
+    "createProfileCouple": "Casal",
+    "signOut": "Sair"
+  },
+  "profile": {
+    "title": "Meu perfil",
+    "description": "Como você aparece para os casais e no rodapé dos sites.",
+    "loading": "Carregando o perfil",
+    "email": "E-mail da conta",
+    "emailHint": "Para mudar o e-mail, escreva para suporte@kore.com.br.",
+    "creditNameHint": "Aparece no rodapé dos sites que você monta. O casal pode ocultar. Se você atende sem empresa, use o seu nome.",
+    "creditHidden": "O Kore ocultou a sua assinatura. Para saber mais, escreva para suporte@kore.com.br.",
+    "termsRequired": "Aceite os termos para salvar.",
+    "save": "Salvar alterações",
+    "cancel": "Cancelar",
+    "saved": "Alterações salvas."
+  },
+  "settings": {
+    "title": "Configurações",
+    "tabs": "Configurações",
+    "access": "Acesso",
+    "notifications": "Notificações",
+    "signInMethods": "Formas de entrar",
+    "providers": {
+      "google": "Google",
+      "email": "E-mail com código"
+    },
+    "connected": "Conectado",
+    "signOutAll": "Sair de todos os aparelhos",
+    "signOutAllTitle": "Sair de todos os aparelhos?",
+    "signOutAllDescription": "Você vai precisar entrar de novo em cada aparelho, inclusive neste.",
+    "signOutAllConfirm": "Sair de todos",
+    "cancel": "Cancelar"
+  },
+  "myWeddings": {
+    "title": "Meus casamentos",
+    "loading": "Carregando os casamentos",
+    "weddings_zero": "{{count}} casamentos",
+    "weddings_one": "{{count}} casamento",
+    "weddings_other": "{{count}} casamentos",
+    "ofOrganization": "{{organization}} · {{rest}}",
+    "active_zero": "{{count}} ativos",
+    "active_one": "{{count}} ativo",
+    "active_other": "{{count}} ativos",
+    "subtitle": "{{weddings}} · {{active}}",
+    "filtered_one": "{{shown}} de {{count}} casamento",
+    "filtered_other": "{{shown}} de {{count}} casamentos",
+    "filteredNone_one": "Nenhum casamento",
+    "filteredNone_other": "Nenhum dos {{count}} casamentos",
+    "newWedding": "Novo casamento",
+    "summary": {
+      "active": "Ativos",
+      "activeDetail_zero": "de {{count}} casamentos",
+      "activeDetail_one": "de {{count}} casamento",
+      "activeDetail_other": "de {{count}} casamentos",
+      "awaitingCouple": "Aguardando o casal",
+      "awaitingCoupleDetail": "convite enviado, sem resposta",
+      "awaitingCoupleDetailShort": "sem resposta"
+    },
+    "filters": {
+      "search": "Buscar pelo nome do casal",
+      "status": "Status",
+      "allStatuses": "Todos os status",
+      "date": "Data do casamento",
+      "anyDate": "Qualquer data",
+      "period": "Entre duas datas",
+      "from": "De",
+      "to": "Até",
+      "toBeforeFrom": "Escolha uma data depois da inicial.",
+      "clear": "Limpar filtros",
+      "noResults": "Nenhum casamento com esses filtros."
+    },
+    "columns": {
+      "couple": "Casal",
+      "date": "Data",
+      "status": "Status",
+      "responses": "Respostas",
+      "origin": "Origem"
+    },
+    "noDate": "Data a definir",
+    "responses": "Respostas {{percent}}",
+    "status": {
+      "awaiting_couple": "Aguardando o casal",
+      "draft": "Rascunho",
+      "published": "Publicado",
+      "post_event": "Pós-evento",
+      "grace": "Em carência",
+      "expired": "Expirado"
+    },
+    "origin": {
+      "created_by_me": "Criado por você",
+      "referral_link": "Pelo seu link",
+      "couple_invite": "Convite do casal"
+    },
+    "alerts": {
+      "pendingResponses_one": "{{count}} casamento com muitas respostas pendentes e prazo em até 7 dias.",
+      "pendingResponses_other": "{{count}} casamentos com muitas respostas pendentes e prazo em até 7 dias.",
+      "invitationsNotSent_one": "{{count}} casamento com convites ainda não enviados, a menos de 90 dias da data.",
+      "invitationsNotSent_other": "{{count}} casamentos com convites ainda não enviados, a menos de 90 dias da data.",
+      "show": "Ver casamentos",
+      "hide": "Ocultar casamentos",
+      "more": "e mais {{count}}"
+    },
+    "minimalProfile": {
+      "title": "Completar os dados profissionais",
+      "description": "Confira o nome da sua assessoria e adicione as cidades onde você atende. O nome aparece no rodapé dos sites que você monta.",
+      "link": "Abrir Meu perfil"
+    },
+    "empty": {
+      "title": "Você ainda não tem casamentos.",
+      "description": "Os casamentos que você criar ou em que colaborar aparecem aqui.",
+      "create": "Criar casamento",
+      "copyLink": "Copiar link de indicação",
+      "copied": "Link copiado."
+    },
+    "detail": {
+      "loading": "Carregando o casamento",
+      "close": "Fechar",
+      "dateCity": "Data e cidade",
+      "site": "Site",
+      "siteValue": "kore.com.br/{{slug}} · {{status}}",
+      "invitation": "Convite para o casal",
+      "invitationSent": "Convite enviado em {{date}} para {{email}}.",
+      "guests": "Convidados e RSVP",
+      "guestsSummary": "{{guests}} · {{responded}}",
+      "guestsCount_one": "{{count}} convidado",
+      "guestsCount_other": "{{count}} convidados",
+      "responded_zero": "{{percent}} responderam",
+      "responded_one": "{{percent}} respondeu",
+      "responded_other": "{{percent}} responderam",
+      "confirmed_zero": "{{count}} confirmados",
+      "confirmed_one": "{{count}} confirmado",
+      "confirmed_other": "{{count}} confirmados",
+      "declined_zero": "{{count}} recusados",
+      "declined_one": "{{count}} recusado",
+      "declined_other": "{{count}} recusados",
+      "pending_zero": "{{count}} pendentes",
+      "pending_one": "{{count}} pendente",
+      "pending_other": "{{count}} pendentes",
+      "noGuests": "Ainda não há convidados.",
+      "awaitingCouple": "O casal ainda não aceitou o convite.",
+      "noInvitation": "Você ainda não convidou o casal.",
+      "identity": "Dados básicos",
+      "identityText": "Você pode mudar a data, a UF e o endereço até o casal aceitar o convite.",
+      "editIdentity": "Editar dados básicos",
+      "buildSite": "Montar o site",
+      "editSite": "Editar o site",
+      "inviteCouple": "Convidar o casal",
+      "resend": "Reenviar convite",
+      "resent": "Convite reenviado para {{email}}.",
+      "resendError": "Não foi possível reenviar agora. Verifique sua conexão e tente de novo.",
+      "inviteAnother": "Convidar outro e-mail",
+      "delete": "Excluir este casamento",
+      "leave": "Sair deste casamento",
+      "unavailable": "Este casamento não está mais disponível.",
+      "inviteDialog": {
+        "title": "Convidar outro e-mail",
+        "description": "O convite enviado para {{email}} deixa de funcionar.",
+        "email": "E-mail do casal",
+        "submit": "Enviar convite",
+        "cancel": "Cancelar",
+        "sent": "Convite enviado para {{email}}."
+      },
+      "link": {
+        "title": "Link para o casal",
+        "description": "Mande este link ao casal. Ele vale por 30 dias e serve para um aceite só.",
+        "field": "Link para o casal",
+        "copy": "Copiar link",
+        "copied": "Link copiado.",
+        "whatsapp": "Compartilhar no WhatsApp",
+        "whatsappMessage": "Oi! Montei o site de vocês e já dá para começar a lista de convidados: {{link}}",
+        "regenerate": "Gerar novo link",
+        "regenerated": "Novo link gerado. O anterior deixou de funcionar.",
+        "cancel": "Cancelar link",
+        "canceled": "Link cancelado.",
+        "expired": "Este link venceu.",
+        "cancelDialog": {
+          "title": "Cancelar o link do casal?",
+          "description": "O link deixa de funcionar. Você pode gerar outro quando quiser.",
+          "confirm": "Cancelar link",
+          "back": "Voltar"
+        }
+      },
+      "leaveDialog": {
+        "title": "Sair de {{couple}}?",
+        "description": "Você perde o acesso a este casamento. O casal vai receber um aviso. Sua comissão continua.",
+        "confirm": "Sair do casamento",
+        "cancel": "Cancelar",
+        "done": "Você saiu do casamento de {{couple}}."
+      },
+      "deleteDialog": {
+        "title": "Excluir o casamento de {{couple}}?",
+        "draft": "Tudo o que você preparou é apagado. Não dá para desfazer.",
+        "link": "O link que você mandou ao casal deixa de funcionar e tudo o que você preparou é apagado. Não dá para desfazer.",
+        "email": "O convite que você enviou ao casal deixa de funcionar e tudo o que você preparou é apagado. Não dá para desfazer.",
+        "confirm": "Excluir casamento",
+        "cancel": "Cancelar",
+        "done": "Casamento de {{couple}} excluído.",
+        "hasOwner": "O casal acabou de aceitar o convite, então o casamento não pode mais ser excluído. Se quiser, saia deste casamento."
+      }
+    }
+  },
+  "weddingArea": {
+    "banner": "Você colabora neste casamento.",
+    "bannerDescription": "Você monta o site e cuida da lista. Publicar, pagar e a chave Pix são do casal.",
+    "backToWeddings": "Voltar a Meus casamentos",
+    "switcher": {
+      "label": "Trocar de casamento",
+      "search": "Buscar casal",
+      "current": "Atual",
+      "noResults": "Nenhum casamento com esse nome.",
+      "noDate": "Data a definir"
+    },
+    "awaiting": {
+      "title": "Aguardando o casal aceitar o convite.",
+      "email": "Enviamos o convite para {{email}} em {{date}}.",
+      "link": "O convite foi por link e vale até {{date}}.",
+      "seeLink": "Ver o link para o casal"
+    }
+  },
+  "newWedding": {
+    "title": "Novo casamento",
+    "steps": {
+      "data": "Dados do casamento",
+      "appearance": "Aparência",
+      "invite": "Convidar o casal",
+      "done": "Pronto"
+    },
+    "stepDone": "{{step}}, concluído",
+    "stepCurrent": "{{step}}, passo atual",
+    "subtitle": {
+      "data": "Passo 1 de 4 · O casamento nasce como rascunho. Você monta o site e convida o casal quando quiser.",
+      "appearance": "Passo 2 de 4 · Escolha um ponto de partida. Dá para mudar tudo depois, no Editor do site.",
+      "invite": "Passo 3 de 4 · O casamento já está criado como rascunho. Convide o casal agora ou deixe para depois.",
+      "done": "Passo 4 de 4 · Pronto"
+    },
+    "names": "Nomes do casal",
+    "nameOf": "Nome {{n}} de 2",
+    "eventDate": "Data do casamento",
+    "optional": "(opcional)",
+    "template": "Começar de um modelo",
+    "templateNone": "Sem modelo",
+    "templateHint": "As fontes, as cores e o fundo do modelo entram na Aparência. Dá para mudar depois.",
+    "noDate": "O casal ainda não sabe a data",
+    "slugPrefix": "kore.com.br/",
+    "slugAvailable": "Endereço disponível. Dá para mudar até publicar.",
+    "slugTaken": "Esse endereço já está em uso. Tente {{suggestion}}.",
+    "errors": {
+      "name": "Informe o nome.",
+      "nameTooLong": "O nome passa de 80 caracteres.",
+      "cityTooLong": "A cidade passa de 80 caracteres."
+    },
+    "cancel": "Cancelar",
+    "back": "Voltar",
+    "continue": "Continuar",
+    "create": "Criar casamento",
+    "stepsLabel": "Passos do novo casamento",
+    "previewTitle": "Prévia do site",
+    "invite": {
+      "email": "E-mail do casal",
+      "emailHint": "Sem e-mail: você manda o link ao casal pelo WhatsApp.",
+      "otherEmail": "Outro e-mail do casal",
+      "message": "Mensagem",
+      "discount": "O casal ganha {{percent}}% de desconto na ativação.",
+      "later": "Convidar depois",
+      "send": "Enviar convite",
+      "generateLink": "Gerar link",
+      "errors": {
+        "email": "Informe um e-mail válido.",
+        "ownEmail": "Este é o e-mail da sua conta. Use o e-mail do casal.",
+        "messageTooLong": "A mensagem passa de 500 caracteres."
+      }
+    },
+    "done": {
+      "title": "Casamento criado.",
+      "sentOne": "Enviamos o convite para {{email}}. Enquanto o casal não aceita, você já pode montar o site e a lista de convidados.",
+      "sentTwo": "Enviamos o convite para {{first}} e {{second}}. Enquanto o casal não aceita, você já pode montar o site e a lista de convidados.",
+      "later": "O convite para o casal fica para depois. Envie quando quiser, no detalhe do casamento.",
+      "nextSteps": "Próximos passos",
+      "nextBuildSite": "Montar o site: seções, fotos e lista de presentes",
+      "nextGuests": "Cadastrar os convidados, à mão ou pela planilha",
+      "nextFollow": "Acompanhar em Meus casamentos quando o casal aceitar",
+      "noDate": "Data a definir",
+      "toMyWeddings": "Ir para Meus casamentos",
+      "buildSite": "Montar o site",
+      "inviteCouple": "Convidar o casal"
+    }
+  },
+  "referral": {
+    "title": "Link de indicação",
+    "descriptionDiscount": "Quem se cadastrar por este link ganha {{percent}}% de desconto na ativação.",
+    "loading": "Carregando o link de indicação",
+    "copy": "Copiar link",
+    "copied": "Link copiado.",
+    "whatsapp": "Compartilhar no WhatsApp",
+    "listTitle": "Casais que vieram pelo seu link",
+    "columns": {
+      "couple": "Casal",
+      "status": "Status"
+    },
+    "empty": {
+      "title": "Nenhum casal se cadastrou pelo seu link ainda.",
+      "description": "Compartilhe com os casais que você atende."
+    }
+  },
+  "templates": {
+    "title": "Modelos",
+    "description": "Guarde os textos, as perguntas frequentes e as aparências que você usa sempre e aplique no site de cada cliente.",
+    "tabsLabel": "Tipos de modelo",
+    "tabs": {
+      "texts": "Textos",
+      "faq": "FAQ",
+      "appearance": "Aparência"
+    },
+    "create": "Criar modelo",
+    "loading": "Carregando os modelos",
+    "columns": {
+      "name": "Nome",
+      "section": "Seção",
+      "sample": "Amostra",
+      "createdAt": "Criado em"
+    },
+    "edit": "Editar",
+    "delete": "Excluir",
+    "editName": "Editar {{name}}",
+    "deleteName": "Excluir {{name}}",
+    "sections": {
+      "story": "Nossa história",
+      "lodging": "Hospedagem e transporte",
+      "dress_code": "Dress code"
+    },
+    "sample": {
+      "palette": "Fontes {{fonts}} · Cor principal e destaque da paleta {{palette}} · Fundo {{background}}",
+      "custom": "Fontes {{fonts}} · Cor principal, cor personalizada · Destaque, cor personalizada · Fundo {{background}}"
+    },
+    "empty": {
+      "texts": {
+        "title": "Você ainda não tem modelos de texto.",
+        "description": "Salve uma Nossa história ou um texto de hospedagem para usar no site de cada cliente."
+      },
+      "faq": {
+        "title": "Você ainda não tem modelos de FAQ.",
+        "description": "Salve as perguntas que os convidados sempre fazem."
+      },
+      "appearance": {
+        "title": "Você ainda não tem modelos de aparência.",
+        "description": "Salve as combinações de fontes e cores que você mais usa."
+      }
+    },
+    "form": {
+      "titleNew": {
+        "texts": "Novo modelo de texto",
+        "faq": "Novo modelo de FAQ",
+        "appearance": "Novo modelo de aparência"
+      },
+      "titleEdit": "Editar modelo",
+      "name": "Nome do modelo",
+      "namePlaceholder": {
+        "texts": "Ex.: Nossa história, tom acolhedor",
+        "faq": "Ex.: FAQ, cerimônia ao ar livre",
+        "appearance": "Ex.: Romântico, sálvia e creme"
+      },
+      "section": "Seção",
+      "text": "Texto",
+      "textHelp": "Use {casal}, {data} e {cidade}: o Kore troca pelos dados do casal quando você aplicar.",
+      "counter": "{{count}}/{{max}}",
+      "notice": "Use só textos seus, sem nomes nem dados de clientes. O modelo pode ir para o site de qualquer casal em que você aplicar.",
+      "question": "Pergunta",
+      "answer": "Resposta",
+      "item": "Pergunta {{n}}",
+      "addQuestion": "Adicionar pergunta",
+      "remove": "Remover",
+      "removeQuestion": "Remover a pergunta {{n}}",
+      "faqLimit": "Um modelo de FAQ pode ter até 30 perguntas.",
+      "create": "Criar modelo",
+      "save": "Salvar alterações",
+      "cancel": "Cancelar",
+      "questionN": "Pergunta {{n}}",
+      "answerN": "Resposta {{n}}"
+    },
+    "errors": {
+      "nameMissing": "Dê um nome ao modelo.",
+      "nameTooLong": "O nome passa de 80 caracteres.",
+      "textMissing": "Escreva o texto do modelo.",
+      "textTooLong": "O texto passa de {{max}} caracteres. Encurte antes de salvar.",
+      "faqMissing": "Adicione pelo menos uma pergunta com resposta.",
+      "questionMissing": "Escreva a pergunta.",
+      "answerMissing": "Escreva a resposta.",
+      "save": "Não foi possível salvar agora. Verifique sua conexão e tente de novo."
+    },
+    "toast": {
+      "created": "Modelo criado.",
+      "saved": "Alterações salvas.",
+      "deleted": "Modelo excluído."
+    },
+    "deleteDialog": {
+      "title": "Excluir o modelo \"{{name}}\"?",
+      "description": "Os sites em que você já aplicou este modelo não mudam. Não dá para desfazer.",
+      "confirm": "Excluir modelo",
+      "cancel": "Cancelar"
+    },
+    "createdOn": "Criado em {{date}}",
+    "apply": {
+      "open": "Aplicar modelo",
+      "title": "Aplicar modelo",
+      "empty": "Você ainda não tem modelos para esta seção.",
+      "create": "Criar modelo",
+      "cancel": "Cancelar",
+      "confirmTitle": "Aplicar \"{{name}}\"?",
+      "confirm": {
+        "section_content": "O texto atual da seção {{section}} é substituído no editor. Ele só vai ao ar quando você salvar.",
+        "faq": "As perguntas atuais do FAQ são substituídas no editor. Elas só vão ao ar quando você salvar.",
+        "appearance": "As fontes, as cores e o fundo atuais são substituídos no editor. Eles só vão ao ar quando você salvar."
+      },
+      "confirmButton": "Aplicar",
+      "applied": "Modelo aplicado. Revise e salve.",
+      "appliedNoDate": "Modelo aplicado. Este casamento ainda não tem data, então {data} ficou no texto. Revise e salve.",
+      "overLimit": "O texto passa de {{max}} caracteres. Encurte antes de salvar."
+    }
+  },
+  "notifications": {
+    "subtitle": "O que aconteceu nos seus casamentos.",
+    "types": {
+      "rsvp": "Novas respostas",
+      "wedding_published": "Casamento publicado",
+      "membership_removed": "Colaboração encerrada"
+    },
+    "empty": {
+      "title": "Você ainda não tem notificações.",
+      "description": "Elas aparecem aqui quando os convidados responderem ou um casal publicar o site."
+    },
+    "items": {
+      "rsvpOne": "{{name}} respondeu em {{couple}}",
+      "rsvpRemovedGroup": "Um grupo removido respondeu em {{couple}}",
+      "rsvpMany_one": "{{count}} grupo respondeu em {{couple}}",
+      "rsvpMany_other": "{{count}} grupos responderam em {{couple}}",
+      "published": "Site de {{couple}} foi publicado",
+      "removed": "Sua colaboração em {{couple}} foi encerrada"
+    }
+  },
+  "notificationSettings": {
+    "central": "Central",
+    "email": "E-mail",
+    "push": "Push",
+    "centralAlways": "A central sempre recebe este aviso.",
+    "reasons": {
+      "digest": "Este aviso chega só no resumo diário.",
+      "noPush": "Este aviso não chega por push.",
+      "centralOnly": "Este aviso aparece só na central."
+    }
+  }
+}

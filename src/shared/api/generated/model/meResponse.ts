@@ -4,12 +4,14 @@
  * Kore API
  * OpenAPI spec version: 1
  */
+import type { MeIdentityResponse } from './meIdentityResponse';
 import type { MeMembershipResponse } from './meMembershipResponse';
 import type { MePlannerResponse } from './mePlannerResponse';
 import type { MeReferrerResponse } from './meReferrerResponse';
 import type { MeResponseActiveProfile } from './meResponseActiveProfile';
 import type { MeResponseLastProfileOnDevice } from './meResponseLastProfileOnDevice';
 import type { MeResponseProfilesItem } from './meResponseProfilesItem';
+import type { MeSupportSessionResponse } from './meSupportSessionResponse';
 import type { MeUserResponse } from './meUserResponse';
 
 export interface MeResponse {
@@ -23,6 +25,10 @@ export interface MeResponse {
   lastProfileOnDevice: MeResponseLastProfileOnDevice;
   /** @nullable */
   referrer: MeReferrerResponse | null;
+  /** As formas de entrar: Google e E-mail com código (Configurações › Acesso; decisão 254). */
+  identities: MeIdentityResponse[];
+  /** @nullable */
+  supportSession: MeSupportSessionResponse | null;
   user: MeUserResponse;
   authenticatedAt: string;
   /** O cadastro próprio de cerimonialista está aberto (Cadastro e perfil RN02). */

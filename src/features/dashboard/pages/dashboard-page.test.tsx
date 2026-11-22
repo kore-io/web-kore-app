@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../../../tests/a11y';
 import { meFor, profileUnderTest } from '../../../../tests/profile';
 import { apiError, mockApi, renderAreaScreen, renderRoute } from '../../../../tests/render-route';
@@ -139,6 +139,12 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
   });
 
   it('a contagem com prazo e data, e o Dashboard marcado na Sidebar', async () => {
+    // O relógio fixo em 2026: o ano aparece porque o casamento e o prazo são de outro ano.
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-11-12T15:00:00Z'));
+    onTestFinished(() => {
+      vi.useRealTimers();
+    });
     mockDashboard({
       data: dashboard({
         daysUntilEvent: 1,
@@ -176,6 +182,12 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
   });
 
   it('o Status do site publicado: o selo, o endereço, "No ar até" e Editar site', async () => {
+    // O relógio fixo em 2026: o ano do "No ar até" (2028) aparece por ser de outro ano.
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-11-12T15:00:00Z'));
+    onTestFinished(() => {
+      vi.useRealTimers();
+    });
     mockDashboard();
     renderRoute({ url: '/app' });
     await screen.findByText('142');
@@ -211,6 +223,16 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
       'href',
       '/app/envios/lembrete',
     );
+  });
+
+  it('a taxa de resposta sai inteira, sem as casas da API (decisão 258)', async () => {
+    mockDashboard({
+      data: dashboard({ stats: { ...dashboard().stats, rsvpPercent: 66.67 } }),
+    });
+    renderRoute({ url: '/app' });
+    await screen.findByText('142');
+    expect(screen.getByText('67%')).toBeInTheDocument();
+    expect(screen.queryByText(/66[.,]67/)).toBeNull();
   });
 
   it('antes de publicar: Enviar convites desabilitado com o motivo, Envios com a frase e o Editor no lugar do Publicar (RN03, RN05; 243)', async () => {
@@ -356,6 +378,34 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     expect(screen.getByRole('button', { name: 'Enviar convites' })).toHaveAccessibleDescription(
       'Os envios começam depois que o casal publicar o site.',
     );
+  });
+
+  it('a colaboradora com o casamento aguardando o casal: o aviso no Status do site (Colaboradora RN04)', async () => {
+    profileUnderTest.current = 'planner';
+    mockDashboard({
+      data: dashboard({
+        role: 'collaborator',
+        site: { slug: 'ana-e-marcos', publishedAt: null, endDate: null, status: 'awaiting_couple' },
+      }),
+    });
+    renderAreaScreen({ url: '/app' });
+    await screen.findByText('Você colabora neste casamento.');
+    expect(
+      within(card('Status do site')).getByText('O casal ainda não aceitou o convite.'),
+    ).toBeInTheDocument();
+  });
+
+  it('o site em rascunho: sem o aviso do casal (Colaboradora RN04)', async () => {
+    profileUnderTest.current = 'planner';
+    mockDashboard({
+      data: dashboard({
+        role: 'collaborator',
+        site: { slug: 'ana-e-marcos', publishedAt: null, endDate: null, status: 'draft' },
+      }),
+    });
+    renderAreaScreen({ url: '/app' });
+    await screen.findByText('Você colabora neste casamento.');
+    expect(screen.queryByText('O casal ainda não aceitou o convite.')).toBeNull();
   });
 
   it('sem convidados: o vazio com Adicionar convidados; o Status e o Checklist continuam (RN06)', async () => {

@@ -70,6 +70,11 @@
   @apply text-site-kore-seal underline;
 }
 
+/* A assinatura da assessoria (Assinatura RN01; Penpot C1): 12 px, acima dos links do Kore. */
+.kore-site__planner-credit {
+  @apply m-0 type-caption text-site-muted-foreground;
+}
+
 .kore-site__company {
   @apply m-0 type-caption text-site-muted-foreground;
 }

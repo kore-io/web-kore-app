@@ -40,6 +40,8 @@ import type {
   SiteSlugMissingErrorBody,
   SiteSlugUnavailableErrorBody,
   SiteSongQuestionResponse,
+  SupportReadOnlyErrorBody,
+  SupportSessionEndedErrorBody,
   UpdateSiteAppearanceBody,
   UpdateSiteBody,
   UpdateSiteSectionBody,
@@ -118,6 +120,8 @@ export const getSiteControllerSongQuestionV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | WeddingDeletionScheduledErrorBody
@@ -166,6 +170,8 @@ export type SiteControllerSongQuestionV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | WeddingDeletionScheduledErrorBody
@@ -185,6 +191,8 @@ export const useSiteControllerSongQuestionV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | WeddingDeletionScheduledErrorBody
@@ -261,6 +269,8 @@ export const getSiteControllerSectionV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | SiteImageNotFoundErrorBody
@@ -310,6 +320,8 @@ export type SiteControllerSectionV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | SiteImageNotFoundErrorBody
@@ -331,6 +343,8 @@ export const useSiteControllerSectionV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | SiteImageNotFoundErrorBody
@@ -405,6 +419,8 @@ export const getSiteControllerAppearanceV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | WeddingDeletionScheduledErrorBody
@@ -454,6 +470,8 @@ export type SiteControllerAppearanceV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | WeddingDeletionScheduledErrorBody
@@ -474,6 +492,8 @@ export const useSiteControllerAppearanceV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | WeddingDeletionScheduledErrorBody
@@ -526,6 +546,7 @@ export const getSiteControllerGetV1QueryOptions = <
   TError = ErrorType<
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | RateLimitedErrorBody
   >,
@@ -561,6 +582,7 @@ export type SiteControllerGetV1QueryResult = NonNullable<
 export type SiteControllerGetV1QueryError = ErrorType<
   | SessionExpiredErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
   | WeddingNotFoundErrorBody
   | RateLimitedErrorBody
 >;
@@ -570,6 +592,7 @@ export function useSiteControllerGetV1<
   TError = ErrorType<
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | RateLimitedErrorBody
   >,
@@ -596,6 +619,7 @@ export function useSiteControllerGetV1<
   TError = ErrorType<
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | RateLimitedErrorBody
   >,
@@ -622,6 +646,7 @@ export function useSiteControllerGetV1<
   TError = ErrorType<
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | RateLimitedErrorBody
   >,
@@ -644,6 +669,7 @@ export function useSiteControllerGetV1<
   TError = ErrorType<
     | SessionExpiredErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
     | WeddingNotFoundErrorBody
     | RateLimitedErrorBody
   >,
@@ -714,6 +740,8 @@ export const getSiteControllerPatchV1MutationOptions = <
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
     | SiteFieldNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | SiteImageNotFoundErrorBody
@@ -768,6 +796,8 @@ export type SiteControllerPatchV1MutationError = ErrorType<
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
   | SiteFieldNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingBlockedErrorBody
   | WeddingNotFoundErrorBody
   | SiteImageNotFoundErrorBody
@@ -790,6 +820,8 @@ export const useSiteControllerPatchV1 = <
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
     | SiteFieldNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingBlockedErrorBody
     | WeddingNotFoundErrorBody
     | SiteImageNotFoundErrorBody
@@ -868,6 +900,8 @@ export const getSitePreviewsControllerCreateV1MutationOptions = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingNotFoundErrorBody
     | SitePartyNotFoundErrorBody
     | SiteSlugMissingErrorBody
@@ -916,6 +950,8 @@ export type SitePreviewsControllerCreateV1MutationError = ErrorType<
   | SessionExpiredErrorBody
   | OriginNotAllowedErrorBody
   | ActionNotAllowedErrorBody
+  | SupportSessionEndedErrorBody
+  | SupportReadOnlyErrorBody
   | WeddingNotFoundErrorBody
   | SitePartyNotFoundErrorBody
   | SiteSlugMissingErrorBody
@@ -935,6 +971,8 @@ export const useSitePreviewsControllerCreateV1 = <
     | SessionExpiredErrorBody
     | OriginNotAllowedErrorBody
     | ActionNotAllowedErrorBody
+    | SupportSessionEndedErrorBody
+    | SupportReadOnlyErrorBody
     | WeddingNotFoundErrorBody
     | SitePartyNotFoundErrorBody
     | SiteSlugMissingErrorBody

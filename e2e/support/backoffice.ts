@@ -91,12 +91,17 @@ interface WeddingInput {
   partners: [string, string];
   eventDate: string;
   city: string;
-  status: 'draft' | 'awaiting_couple';
+  /** Publicado só para o que lê o status (ex.: o aviso C7-6); sem pagamento nem prazo. */
+  status: 'draft' | 'awaiting_couple' | 'published';
   createdByUserId: string;
   /** Dono (casal que já entrou) com o noivo de cada posição; nulo se ainda sem login. */
   owners?: [string | null, string | null];
   collaboratorIds?: string[];
   referrerId?: string;
+  /** Com indicador: criado por ele (padrão) ou o casal que veio pelo link dele. */
+  referralSource?: 'created_by_planner' | 'referral_link';
+  /** O fuso IANA do casamento (padrão, America/Sao_Paulo). */
+  timezone?: string;
 }
 
 /** Casamento com os dois noivos e os vínculos, num endereço único. */
@@ -110,12 +115,14 @@ export async function createWedding({
   owners = [null, null],
   collaboratorIds = [],
   referrerId,
+  referralSource = 'created_by_planner',
+  timezone = 'America/Sao_Paulo',
 }: WeddingInput) {
   const weddingId = await insertId({
     db,
     sql: `insert into weddings (id, slug, status, event_date, timezone, city, state,
             created_by_user_id, referrer_id, referral_source, signup_source, updated_at)
-          values (gen_random_uuid(), $1, $2, $3, 'America/Sao_Paulo', $4, 'SP', $5, $6, $7, $8, now())
+          values (gen_random_uuid(), $1, $2, $3, $9, $4, 'SP', $5, $6, $7, $8, now())
           returning id`,
     params: [
       `e2e-${unique()}`,
@@ -124,8 +131,9 @@ export async function createWedding({
       city,
       createdByUserId,
       referrerId ?? null,
-      referrerId ? 'created_by_planner' : null,
-      referrerId ? 'planner' : 'direct',
+      referrerId ? referralSource : null,
+      referrerId ? (referralSource === 'referral_link' ? 'referral_link' : 'planner') : 'direct',
+      timezone,
     ],
   });
   for (const [index, displayName] of partners.entries()) {
@@ -155,18 +163,22 @@ export async function createInvitation({
   kind,
   email,
   invitedByUserId,
+  createdAt,
 }: {
   db: Db;
   weddingId: string;
   kind: 'partner' | 'couple' | 'planner';
   email: string | null;
   invitedByUserId: string;
+  /** O instante do envio (o sentAt da API); padrão, agora. */
+  createdAt?: string;
 }) {
   const token = randomBytes(32).toString('base64url');
   await db.query(
     `insert into access_invitations (id, wedding_id, kind, email, role, token_hash,
-       invited_by_user_id, expires_at)
-     values (gen_random_uuid(), $1, $2, $3, $4, $5, $6, now() + interval '30 days')`,
+       invited_by_user_id, expires_at, created_at)
+     values (gen_random_uuid(), $1, $2, $3, $4, $5, $6, now() + interval '30 days',
+       coalesce($7::timestamptz, now()))`,
     [
       weddingId,
       kind,
@@ -174,6 +186,7 @@ export async function createInvitation({
       kind === 'planner' ? 'collaborator' : 'owner',
       createHash('sha256').update(token).digest('base64url'),
       invitedByUserId,
+      createdAt ?? null,
     ],
   );
   return token;

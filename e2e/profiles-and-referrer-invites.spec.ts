@@ -101,7 +101,7 @@ test.describe('Convites dos indicadores e Seleção com dois perfis (dados do pr
     await expectCoupleArea({ page, couple: 'Fernanda & João' });
   });
 
-  test('convite do cerimonialista pelo casal: Seu nome e o perfil de cerimonialista (RN10; 168(4), 176(1))', async ({
+  test('convite do cerimonialista pelo casal: Seu nome e o perfil de cerimonialista (RN10; 168(4); Cadastro e perfil RN07)', async ({
     page,
   }) => {
     const run = unique();
@@ -127,12 +127,6 @@ test.describe('Convites dos indicadores e Seleção com dois perfis (dados do pr
       email: plannerEmail,
       invitedByUserId: ownerId,
     });
-    // Na F0, o perfil de cerimonialista vai ao destino do Fazer parceria (176(1)): o site
-    // de fora não é aberto de verdade no teste.
-    await page.route('https://kore.com.br/**', (route) =>
-      route.fulfill({ status: 200, contentType: 'text/html', body: '<p>Fazer parceria</p>' }),
-    );
-
     await page.goto(`/convite/${token}`);
     await expect(
       page.getByRole('heading', {
@@ -153,8 +147,9 @@ test.describe('Convites dos indicadores e Seleção com dois perfis (dados do pr
     const accept = page.waitForResponse((response) => response.url().endsWith('/accept'));
     await page.getByRole('button', { name: 'Aceitar convite' }).click();
     expect((await accept).status()).toBe(200);
-    // O aceite cria o perfil mínimo de cerimonialista (RN10): um perfil só, entra direto.
-    await expect(page).toHaveURL('https://kore.com.br/cerimonialistas');
+    // O aceite cria o perfil mínimo de cerimonialista (RN10): um perfil só, entra direto no
+    // home da API, a Área (Cadastro e perfil RN07, que revê a 176(1); a tela chega no D3).
+    await expect(page).toHaveURL(/\/cerimonialista$/);
   });
 
   test('o /i/ aberto antes não muda a atribuição no aceite do link do casal (RN14)', async ({

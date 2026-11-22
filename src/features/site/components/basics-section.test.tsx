@@ -152,6 +152,79 @@ function mockBasics({
 
 const field = (name: string | RegExp) => screen.getByRole('textbox', { name });
 
+const CREDIT = {
+  name: 'Prado Assessoria',
+  showPlannerCredit: true,
+  hiddenByKore: false,
+  canChange: true,
+};
+const creditSwitch = () =>
+  screen.findByRole('switch', { name: 'Mostrar a assinatura da assessoria no rodapé' });
+
+describe('Site › Dados básicos › a assinatura da assessoria (Assinatura RN05 e RN06)', () => {
+  it('o casal desliga e salva: o PATCH leva só o showPlannerCredit', async () => {
+    const user = userEvent.setup();
+    const calls = mockBasics({ data: site({ plannerCredit: CREDIT }) });
+    const { container } = renderRoute({ url: '/app/site/dados-basicos' });
+    const toggle = await creditSwitch();
+    expect(toggle).toBeChecked();
+    expect(toggle).toBeEnabled();
+    expect(toggle).toHaveAccessibleDescription(
+      'Aparece no rodapé do site como "Assessoria: Prado Assessoria".',
+    );
+    await expectNoA11yViolations({ container });
+    await user.click(toggle);
+    await user.click(screen.getByRole('button', { name: 'Salvar' }));
+    expect(await screen.findByText('Alterações salvas.')).toBeInTheDocument();
+    expect(calls).toEqual([
+      { method: 'PATCH', path: '/v1/weddings/w1/site', body: { showPlannerCredit: false } },
+    ]);
+  });
+
+  it('sem cerimonialista colaboradora, o Switch não aparece', async () => {
+    mockBasics({ data: site({ plannerCredit: null }) });
+    renderRoute({ url: '/app/site/dados-basicos' });
+    await screen.findByRole('textbox', { name: 'Cidade' });
+    expect(screen.queryByRole('switch', { name: /assinatura/ })).not.toBeInTheDocument();
+  });
+
+  it('quem colabora vê o Switch desabilitado, com o motivo', async () => {
+    profileUnderTest.current = 'planner';
+    mockBasics({ data: site({ plannerCredit: { ...CREDIT, canChange: false } }) });
+    renderAreaScreen({ url: '/app/site/dados-basicos' });
+    const toggle = await creditSwitch();
+    expect(toggle).toBeDisabled();
+    expect(toggle).toHaveAccessibleDescription('Só o casal pode mostrar ou ocultar a assinatura.');
+  });
+
+  it('o nome que não passa no predicado: o Switch sem a linha do nome (RN03)', async () => {
+    mockBasics({ data: site({ plannerCredit: { ...CREDIT, name: null } }) });
+    renderRoute({ url: '/app/site/dados-basicos' });
+    expect(await creditSwitch()).not.toHaveAccessibleDescription(/Assessoria:/);
+  });
+
+  it.each([
+    [
+      'couple',
+      'O Kore ocultou a assinatura da assessoria. Para saber mais, escrevam para suporte@kore.com.br.',
+    ],
+    [
+      'planner',
+      'O Kore ocultou a sua assinatura. Para saber mais, escreva para suporte@kore.com.br.',
+    ],
+  ] as const)(
+    'ocultada pelo Kore (%s): o aviso no lugar do Switch (RN06)',
+    async (profile, text) => {
+      profileUnderTest.current = profile;
+      mockBasics({ data: site({ plannerCredit: { ...CREDIT, hiddenByKore: true } }) });
+      if (profile === 'couple') renderRoute({ url: '/app/site/dados-basicos' });
+      else renderAreaScreen({ url: '/app/site/dados-basicos' });
+      expect(await screen.findByText(text)).toBeInTheDocument();
+      expect(screen.queryByRole('switch', { name: /assinatura/ })).not.toBeInTheDocument();
+    },
+  );
+});
+
 describe('Site › Dados básicos (RN02 a RN08, RN10)', () => {
   it('os campos do Penpot, com os rótulos do título e o fuso sem o nome IANA', async () => {
     mockBasics();

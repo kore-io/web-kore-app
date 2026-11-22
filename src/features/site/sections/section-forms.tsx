@@ -3,13 +3,14 @@ import { ChevronDown, ChevronUp, X } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
-import { siteSectionPath } from '../../../app/paths';
 import type { SiteEditorResponse, SiteSectionResponse } from '../../../shared/api/generated/model';
 import { FormField } from '../../../shared/components/form-field';
 import type { Audience } from '../../guests/hooks/use-active-wedding';
 import { ImageField, type ImageValue } from '../components/image-field';
 import { FIRST_SECTION_SLUG } from '../sections';
 import { useSiteSection, type SectionErrors } from './use-site-section';
+import { useAreaPaths } from '../../../app/area';
+import { useSectionTemplateActions } from './template-actions';
 
 const NUMBER = new Intl.NumberFormat('pt-BR');
 const TITLE_MAX = 80;
@@ -49,6 +50,7 @@ export function SectionFrame({
   audience,
   empty,
   notice,
+  action,
   children,
 }: {
   state: Pick<Section, 'draft' | 'errors' | 'setEnabled' | 'setTitle' | 'clearError'>;
@@ -56,11 +58,14 @@ export function SectionFrame({
   empty: boolean;
   /** O aviso fixo da seção, embaixo do título (Penpot 1.4). */
   notice?: ReactNode;
+  /** A ação da seção no topo (o Aplicar modelo da colaboradora, Modelos RN08). */
+  action?: ReactNode;
   children: ReactNode;
 }) {
   const { t } = useTranslation('site');
   return (
     <div className="kore-site-section">
+      {action}
       {state.draft.enabled && empty && <Alert tone="warning">{t('section.empty')}</Alert>}
       <Switch
         checked={state.draft.enabled}
@@ -110,21 +115,47 @@ export function TextWithCounter({
   onChange: (value: string) => void;
 }) {
   const { t } = useTranslation('site');
+  const { t: tPlanner } = useTranslation('planner');
+  // Só um modelo aplicado passa do limite: a digitação já trava no maxLength (Modelos RN08).
+  const over = value.length > max;
   return (
     <FormField
       label={label}
-      hint={t('section.counter', { count: NUMBER.format(value.length), max: NUMBER.format(max) })}
+      {...(over
+        ? {
+            hint: tPlanner('templates.apply.overLimit', { max: NUMBER.format(max) }),
+            hintTone: 'danger' as const,
+          }
+        : {
+            hint: t('section.counter', {
+              count: NUMBER.format(value.length),
+              max: NUMBER.format(max),
+            }),
+          })}
     >
-      {({ id, describedBy }) => (
-        <Textarea
-          id={id}
-          aria-describedby={describedBy}
-          rows={6}
-          maxLength={max}
-          {...(placeholder !== undefined && { placeholder })}
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-        />
+      {({ id, describedBy, invalid }) => (
+        <>
+          <Textarea
+            id={id}
+            aria-describedby={describedBy}
+            invalid={invalid}
+            rows={6}
+            maxLength={max}
+            {...(placeholder !== undefined && { placeholder })}
+            value={value}
+            onChange={(event) => onChange(event.target.value)}
+          />
+          {/* Acima do limite, o contador fica à vista, em perigo, para mostrar quanto cortar;
+              o leitor de tela lê só o erro (decisão 302(6); como no Dialog do modelo). */}
+          {over && (
+            <span className="kore-site-section__counter-over" aria-hidden="true">
+              {t('section.counter', {
+                count: NUMBER.format(value.length),
+                max: NUMBER.format(max),
+              })}
+            </span>
+          )}
+        </>
       )}
     </FormField>
   );
@@ -135,6 +166,7 @@ const text = (content: Record<string, unknown>) =>
 
 /** Contagem regressiva (RN06): só o Switch; sem data, desabilitado com o motivo. */
 export function CountdownSection({ weddingId, site, section, audience }: SectionProps) {
+  const area = useAreaPaths();
   const { t } = useTranslation('site');
   const state = useSiteSection({
     weddingId,
@@ -166,7 +198,7 @@ export function CountdownSection({ weddingId, site, section, audience }: Section
               <>
                 {' '}
                 <Link
-                  to={siteSectionPath({ section: FIRST_SECTION_SLUG })}
+                  to={area.siteSection({ section: FIRST_SECTION_SLUG })}
                   className="kore-site-section__link"
                 >
                   {t('section.countdown.goToBasics')}
@@ -181,17 +213,32 @@ export function CountdownSection({ weddingId, site, section, audience }: Section
 }
 
 /** Hospedagem e transporte (RN08): título e texto até 5.000. */
-export function LodgingSection({ weddingId, section, audience }: SectionProps) {
+export function LodgingSection({ weddingId, site, section, audience }: SectionProps) {
   const { t } = useTranslation('site');
+  const actions = useSectionTemplateActions();
   const state = useSiteSection({
     weddingId,
     section,
     fromResponse: (content) => ({ text: text(content) }),
     toBody: (content) => ({ text: content.text }),
     validate: () => ({}),
+    blocked: (content) => content.text.length > LODGING_MAX,
   });
   return (
-    <SectionFrame state={state} audience={audience} empty={!state.draft.content.text.trim()}>
+    <SectionFrame
+      state={state}
+      audience={audience}
+      empty={!state.draft.content.text.trim()}
+      action={
+        actions?.Text && (
+          <actions.Text
+            site={site}
+            sectionType="lodging"
+            onText={(value) => state.replaceContent({ text: value })}
+          />
+        )
+      }
+    >
       <TextWithCounter
         label={t('section.text')}
         value={state.draft.content.text}
@@ -204,8 +251,9 @@ export function LodgingSection({ weddingId, section, audience }: SectionProps) {
 }
 
 /** Dress code (RN09): título, texto até 2.000 e a foto de referência opcional. */
-export function DressCodeSection({ weddingId, section, audience }: SectionProps) {
+export function DressCodeSection({ weddingId, site, section, audience }: SectionProps) {
   const { t } = useTranslation('site');
+  const actions = useSectionTemplateActions();
   const state = useSiteSection<{ text: string; image: ImageValue }>({
     weddingId,
     section,
@@ -218,10 +266,24 @@ export function DressCodeSection({ weddingId, section, audience }: SectionProps)
     },
     toBody: (content) => ({ text: content.text, imageId: content.image?.id ?? null }),
     validate: () => ({}),
+    blocked: (content) => content.text.length > DRESS_MAX,
   });
   const { content } = state.draft;
   return (
-    <SectionFrame state={state} audience={audience} empty={!content.text.trim() && !content.image}>
+    <SectionFrame
+      state={state}
+      audience={audience}
+      empty={!content.text.trim() && !content.image}
+      action={
+        actions?.Text && (
+          <actions.Text
+            site={site}
+            sectionType="dress_code"
+            onText={(value) => state.setContent((current) => ({ ...current, text: value }))}
+          />
+        )
+      }
+    >
       <TextWithCounter
         label={t('section.text')}
         value={content.text}
@@ -255,6 +317,7 @@ const nextKey = () => {
 /** FAQ (RN10): até 30 perguntas, cada uma com Pergunta e Resposta obrigatórias. */
 export function FaqSection({ weddingId, section, audience }: SectionProps) {
   const { t } = useTranslation('site');
+  const actions = useSectionTemplateActions();
   const state = useSiteSection<FaqItem[]>({
     weddingId,
     section,
@@ -283,7 +346,22 @@ export function FaqSection({ weddingId, section, audience }: SectionProps) {
     state.setContent((current) => moveItem(current, index, by));
 
   return (
-    <SectionFrame state={state} audience={audience} empty={items.length === 0}>
+    <SectionFrame
+      state={state}
+      audience={audience}
+      empty={items.length === 0}
+      action={
+        actions?.Faq && (
+          <actions.Faq
+            onQuestions={(questions) =>
+              state.replaceContent(
+                questions.slice(0, FAQ_MAX).map((item) => ({ key: nextKey(), ...item })),
+              )
+            }
+          />
+        )
+      }
+    >
       <ol className="kore-site-faq">
         {items.map((item, index) => {
           const n = index + 1;

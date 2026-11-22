@@ -6,6 +6,7 @@ import type { SiteEditorResponse, SiteSectionResponse } from '../../../shared/ap
 import type { Audience } from '../../guests/hooks/use-active-wedding';
 import type { ImageValue } from '../components/image-field';
 import { IMAGE_ACCEPT, useSiteImageUpload } from '../images/use-site-image-upload';
+import { useSectionTemplateActions } from './template-actions';
 import { SectionFrame, TextWithCounter } from './section-forms';
 import { useSiteSection } from './use-site-section';
 
@@ -27,6 +28,7 @@ interface StoryContent {
  */
 export function StorySection({
   weddingId,
+  site,
   section,
   audience,
 }: {
@@ -36,6 +38,7 @@ export function StorySection({
   audience: Audience;
 }) {
   const { t } = useTranslation('site');
+  const actions = useSectionTemplateActions();
   const upload = useSiteImageUpload({ weddingId, audience });
   // As fotos que ainda sobem: a fração de cada uma, na ordem da escolha.
   const [sending, setSending] = useState<number[]>([]);
@@ -56,6 +59,7 @@ export function StorySection({
     }),
     validate: () => ({}),
     canSave: sending.length === 0,
+    blocked: (content) => content.text.length > STORY_TEXT_MAX,
   });
   const labelId = useId();
   const { text, photos } = state.draft.content;
@@ -88,7 +92,20 @@ export function StorySection({
   const current = sending.findIndex((fraction) => fraction < 1);
 
   return (
-    <SectionFrame state={state} audience={audience} empty={!text.trim() && photos.length === 0}>
+    <SectionFrame
+      state={state}
+      audience={audience}
+      empty={!text.trim() && photos.length === 0}
+      action={
+        actions?.Text && (
+          <actions.Text
+            site={site}
+            sectionType="story"
+            onText={(value) => state.setContent((content) => ({ ...content, text: value }))}
+          />
+        )
+      }
+    >
       <TextWithCounter
         label={t('section.text')}
         value={text}

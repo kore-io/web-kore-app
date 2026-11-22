@@ -37,6 +37,7 @@ export function useSiteSection<C>({
   toBody,
   validate,
   canSave = true,
+  blocked,
 }: {
   weddingId: string;
   section: SiteSectionResponse;
@@ -45,6 +46,8 @@ export function useSiteSection<C>({
   validate: (content: C) => SectionErrors;
   /** Falso trava o Salvar (ex.: fotos ainda subindo). */
   canSave?: boolean;
+  /** Verdadeiro trava o Salvar pelo conteúdo (ex.: o texto passou do limite, Modelos RN08). */
+  blocked?: (content: C) => boolean;
 }) {
   const { t } = useTranslation('site');
   const { t: tAccess } = useTranslation('access');
@@ -71,7 +74,7 @@ export function useSiteSection<C>({
 
   useSectionForm({
     dirty,
-    canSave,
+    canSave: canSave && !(blocked?.(draft.content) ?? false),
     save: async () => {
       const local: SectionErrors = { ...validate(draft.content) };
       if (hasTitle && !draft.title.trim()) local.title = 'TITLE_MISSING';
@@ -131,6 +134,13 @@ export function useSiteSection<C>({
     setTitle: (title: string) => setDraft((current) => ({ ...current, title })),
     setContent: (update: (content: C) => C) =>
       setDraft((current) => ({ ...current, content: update(current.content) })),
+    /** Troca o conteúdo inteiro (o Aplicar modelo) e limpa os erros do conteúdo antigo. */
+    replaceContent: (content: C) => {
+      setDraft((current) => ({ ...current, content }));
+      setErrors((current) =>
+        Object.fromEntries(Object.entries(current).filter(([key]) => !key.startsWith('content.'))),
+      );
+    },
     clearError: (path: string) =>
       setErrors((current) => {
         if (!(path in current)) return current;

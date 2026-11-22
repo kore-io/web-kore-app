@@ -1,17 +1,19 @@
 import { Divider, PageHeader, Tab, Tabs } from '@kore-io/design';
 import { useTranslation } from 'react-i18next';
 import { Link, Outlet, useMatch } from 'react-router';
-import { paths } from '../../../app/paths';
 import { useDashboardControllerGetV1 } from '../../../shared/api/generated/rsvp/rsvp';
 import { oneDot, shortDayMonth } from '../../../shared/date-texts';
 import { useActiveWedding } from '../../guests/hooks/use-active-wedding';
+import { useAreaPaths, type AreaPaths } from '../../../app/area';
 
-const TABS = [
-  { path: paths.deliveryInvites, long: 'tabs.invites', short: 'tabs.invitesShort' },
-  { path: paths.deliverySaveTheDate, long: 'tabs.saveTheDate', short: 'tabs.saveTheDateShort' },
-  { path: paths.deliveryReminder, long: 'tabs.reminder', short: 'tabs.reminderShort' },
-  { path: paths.deliveryDeadline, long: 'tabs.deadline', short: 'tabs.deadlineShort' },
-] as const;
+/** As abas de Envios, na área da tela. */
+const tabsOf = (area: AreaPaths) =>
+  [
+    { path: area.deliveryInvites, long: 'tabs.invites', short: 'tabs.invitesShort' },
+    { path: area.deliverySaveTheDate, long: 'tabs.saveTheDate', short: 'tabs.saveTheDateShort' },
+    { path: area.deliveryReminder, long: 'tabs.reminder', short: 'tabs.reminderShort' },
+    { path: area.deliveryDeadline, long: 'tabs.deadline', short: 'tabs.deadlineShort' },
+  ] as const;
 
 /**
  * Envios (IA da Área do Casal; Penpot, página 07; decisão 235): o título, o resumo
@@ -21,6 +23,7 @@ const TABS = [
  */
 export function DeliveriesLayout() {
   const { t } = useTranslation('deliveries');
+  const TABS = tabsOf(useAreaPaths());
   const { weddingId } = useActiveWedding();
   const dashboard = useDashboardControllerGetV1(weddingId ?? '', {
     query: { enabled: Boolean(weddingId) },

@@ -17,7 +17,7 @@ export function useGoToDestination() {
     (destination: LoginDestination) => {
       void queryClient.resetQueries({ queryKey: getMeControllerMeV1QueryKey() });
       if (destination.kind === 'external') redirectTo({ url: destination.url });
-      else void navigate(destination.path, { replace: true });
+      else void navigate(destination.path, { replace: true, state: destination.state });
     },
     [navigate, queryClient],
   );

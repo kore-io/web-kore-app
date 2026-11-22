@@ -21,14 +21,17 @@ describe('as datas por extenso curto', () => {
     expect(dayAndTimeIn({ at: '2026-09-13T02:14:00Z', timezone: 'America/Sao_Paulo' })).toEqual({
       date: '12/09',
       time: '23h14',
+      day: '2026-09-12',
     });
     expect(dayAndTimeIn({ at: '2026-09-13T02:00:00Z', timezone: 'America/Manaus' })).toEqual({
       date: '12/09',
       time: '22h',
+      day: '2026-09-12',
     });
     expect(dayAndTimeIn({ at: '2026-09-13T02:05:00Z', timezone: null })).toEqual({
       date: '12/09',
       time: '23h05',
+      day: '2026-09-12',
     });
   });
 });

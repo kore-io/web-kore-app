@@ -2,7 +2,6 @@ import { Button, Dialog, PageHeader, useToast } from '@kore-io/design';
 import { useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, Navigate, useNavigate, useParams } from 'react-router';
-import { guestPartyPath, paths } from '../../../app/paths';
 import {
   usePartiesControllerCreateV1,
   usePartiesControllerGetV1,
@@ -24,6 +23,7 @@ import {
   type FieldErrors,
   type PartyDraft,
 } from '../party-form';
+import { useAreaPaths } from '../../../app/area';
 
 /** Novo grupo (Grupos e convidados RN03 a RN07; Penpot; decisão 213). */
 export function NewPartyPage() {
@@ -41,10 +41,11 @@ export function EditPartyPage() {
 }
 
 function Frame({ title, children }: { title: string; children: ReactNode }) {
+  const area = useAreaPaths();
   const { t } = useTranslation('guests');
   return (
     <div className="kore-party-form-page">
-      <Link to={paths.guests} className="kore-party-panel__back">
+      <Link to={area.guests} className="kore-party-panel__back">
         {t('panel.back')}
       </Link>
       <PageHeader title={title} description={t('partyForm.intro')} />
@@ -54,6 +55,7 @@ function Frame({ title, children }: { title: string; children: ReactNode }) {
 }
 
 function NewParty({ weddingId, audience }: { weddingId: string; audience: Audience }) {
+  const area = useAreaPaths();
   const { t } = useTranslation('guests');
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -74,7 +76,7 @@ function NewParty({ weddingId, audience }: { weddingId: string; audience: Audien
         tags={tags.data?.data ?? []}
         submitLabel={t('partyForm.save')}
         isSaving={create.isPending || create.isSuccess}
-        onCancel={() => void navigate(paths.guests)}
+        onCancel={() => void navigate(area.guests)}
         onSubmit={() => {
           const local = validateDraft(draft);
           setErrors(local);
@@ -85,7 +87,7 @@ function NewParty({ weddingId, audience }: { weddingId: string; audience: Audien
               onSuccess: () => {
                 void refresh();
                 showToast({ tone: 'success', message: t('partyForm.created') });
-                void navigate(paths.guests);
+                void navigate(area.guests);
               },
               onError: (error) => setErrors(saveErrors({ error, draft }).fields),
             },
@@ -105,9 +107,10 @@ function EditPartyLoader({
   partyId: string;
   audience: Audience;
 }) {
+  const area = useAreaPaths();
   const party = usePartiesControllerGetV1(weddingId, partyId);
   if (party.error instanceof ApiError && party.error.status === 404) {
-    return <Navigate to={paths.guests} replace />;
+    return <Navigate to={area.guests} replace />;
   }
   if (!party.data) return null;
   return <EditParty weddingId={weddingId} party={party.data} audience={audience} />;
@@ -122,6 +125,7 @@ function EditParty({
   party: PartyResponse;
   audience: Audience;
 }) {
+  const area = useAreaPaths();
   const { t } = useTranslation('guests');
   const { showToast } = useToast();
   const navigate = useNavigate();
@@ -134,7 +138,7 @@ function EditParty({
   const [errors, setErrors] = useState<FieldErrors>({});
   const [plusOnesError, setPlusOnesError] = useState<string | undefined>();
   const [confirming, setConfirming] = useState(false);
-  const panel = guestPartyPath({ partyId: party.id });
+  const panel = area.guestParty({ partyId: party.id });
 
   function save() {
     setConfirming(false);

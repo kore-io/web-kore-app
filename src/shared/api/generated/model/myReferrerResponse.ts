@@ -4,13 +4,18 @@
  * Kore API
  * OpenAPI spec version: 1
  */
+import type { MyReferrerBalancesResponse } from './myReferrerBalancesResponse';
 
 export interface MyReferrerResponse {
   referralCode: string;
   link: string;
-  /**
-   * Nulo com o desconto de indicação desligado. Sem o percentual da comissão (D4).
-   * @nullable
-   */
+  /** @nullable */
   discountPercent: number | null;
+  ratePercent: number;
+  balances: MyReferrerBalancesResponse;
+  /** @nullable */
+  taxIdMasked: string | null;
+  /** @nullable */
+  pixKeyMasked: string | null;
+  payoutDataComplete: boolean;
 }

@@ -1,0 +1,76 @@
+/*
+ * Colaboradores (Área do Casal 23 e Área do Cerimonialista 17): os cartões do Casal e da
+ * Cerimonialista. Na do casal, lado a lado no computador; na da colaboradora, um embaixo do
+ * outro, com até 640 px. No celular, sempre empilhados.
+ */
+.kore-collaborators {
+  @apply flex flex-col gap-6;
+}
+
+.kore-collaborators__cards {
+  @apply flex max-w-160 flex-col gap-6;
+}
+
+.kore-collaborators__cards--couple {
+  @apply max-w-none lg:grid lg:grid-cols-2 lg:gap-4;
+}
+
+.kore-collaborators__card {
+  @apply flex flex-col gap-4 rounded-lg border border-gray-300 bg-white p-5 md:p-6;
+}
+
+.kore-collaborators__overline {
+  @apply m-0 type-overline text-gray-700;
+}
+
+.kore-collaborators__title {
+  @apply m-0 type-heading text-ink;
+}
+
+.kore-collaborators__list {
+  @apply m-0 flex list-none flex-col gap-3 p-0;
+}
+
+.kore-collaborators__member {
+  @apply flex items-center gap-3;
+}
+
+.kore-collaborators__who {
+  @apply flex min-w-0 flex-1 flex-col;
+}
+
+.kore-collaborators__name {
+  @apply type-body-md text-ink;
+}
+
+.kore-collaborators__since {
+  @apply type-caption text-gray-700;
+}
+
+.kore-collaborators__actions {
+  @apply flex flex-col items-start gap-3 md:flex-row;
+}
+
+.kore-collaborators__help {
+  @apply m-0 type-caption text-gray-700;
+}
+
+.kore-collaborators__leave {
+  @apply self-start;
+}
+
+.kore-collaborators__empty {
+  @apply m-0 type-body-md text-gray-700;
+}
+
+.kore-collaborators__invite {
+  @apply self-start;
+}
+
+.kore-collaborators__pending {
+  @apply flex flex-col gap-3;
+}
+
+.kore-collaborators__form {
+  @apply flex flex-col gap-4;
+}

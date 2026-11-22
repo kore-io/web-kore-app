@@ -23,7 +23,9 @@ import type {
 import type {
   ContrastTooLowErrorBody,
   CreatePlannerTemplateBody,
+  MyReferrerResponse,
   MyWeddingDetailResponse,
+  MyWeddingsControllerListV1Params,
   MyWeddingsResponse,
   OriginNotAllowedErrorBody,
   PlannerTemplateResponse,
@@ -31,6 +33,7 @@ import type {
   ProfileNotOwnedErrorBody,
   RateLimitedErrorBody,
   ReferredWeddingResponse,
+  ReferrerCommissionsControllerListV1Params,
   ReferrerCommissionsResponse,
   SessionExpiredErrorBody,
   TemplateNotFoundErrorBody,
@@ -60,39 +63,57 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   return result;
 };
 
-export const getMyWeddingsControllerListV1Url = () => {
-  return `/v1/me/weddings`;
+export const getMyWeddingsControllerListV1Url = (params?: MyWeddingsControllerListV1Params) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/v1/me/weddings?${stringifiedParams}` : `/v1/me/weddings`;
 };
 
 export const myWeddingsControllerListV1 = async (
+  params?: MyWeddingsControllerListV1Params,
   options?: Parameters<typeof httpClient>[1],
 ): Promise<MyWeddingsResponse> => {
-  return httpClient<MyWeddingsResponse>(getMyWeddingsControllerListV1Url(), {
+  return httpClient<MyWeddingsResponse>(getMyWeddingsControllerListV1Url(params), {
     ...options,
     method: 'GET',
   });
 };
 
-export const getMyWeddingsControllerListV1QueryKey = () => {
-  return [`/v1/me/weddings`] as const;
+export const getMyWeddingsControllerListV1QueryKey = (
+  params?: MyWeddingsControllerListV1Params,
+) => {
+  return [`/v1/me/weddings`, ...(params ? [params] : [])] as const;
 };
 
 export const getMyWeddingsControllerListV1QueryOptions = <
   TData = Awaited<ReturnType<typeof myWeddingsControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof myWeddingsControllerListV1>>, TError, TData>
-  >;
-  request?: SecondParameter<typeof httpClient>;
-}) => {
+  TError = ErrorType<
+    ValidationErrorBody | SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody
+  >,
+>(
+  params?: MyWeddingsControllerListV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof myWeddingsControllerListV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getMyWeddingsControllerListV1QueryKey();
+  const queryKey = queryOptions?.queryKey ?? getMyWeddingsControllerListV1QueryKey(params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof myWeddingsControllerListV1>>> = ({
     signal,
-  }) => myWeddingsControllerListV1({ signal, ...requestOptions });
+  }) => myWeddingsControllerListV1(params, { signal, ...requestOptions });
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof myWeddingsControllerListV1>>,
@@ -105,13 +126,16 @@ export type MyWeddingsControllerListV1QueryResult = NonNullable<
   Awaited<ReturnType<typeof myWeddingsControllerListV1>>
 >;
 export type MyWeddingsControllerListV1QueryError = ErrorType<
-  SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody
+  ValidationErrorBody | SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody
 >;
 
 export function useMyWeddingsControllerListV1<
   TData = Awaited<ReturnType<typeof myWeddingsControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    ValidationErrorBody | SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody
+  >,
 >(
+  params: undefined | MyWeddingsControllerListV1Params,
   options: {
     query: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof myWeddingsControllerListV1>>, TError, TData>
@@ -130,8 +154,11 @@ export function useMyWeddingsControllerListV1<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useMyWeddingsControllerListV1<
   TData = Awaited<ReturnType<typeof myWeddingsControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    ValidationErrorBody | SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody
+  >,
 >(
+  params?: MyWeddingsControllerListV1Params,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof myWeddingsControllerListV1>>, TError, TData>
@@ -150,8 +177,11 @@ export function useMyWeddingsControllerListV1<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useMyWeddingsControllerListV1<
   TData = Awaited<ReturnType<typeof myWeddingsControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    ValidationErrorBody | SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody
+  >,
 >(
+  params?: MyWeddingsControllerListV1Params,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof myWeddingsControllerListV1>>, TError, TData>
@@ -163,8 +193,11 @@ export function useMyWeddingsControllerListV1<
 
 export function useMyWeddingsControllerListV1<
   TData = Awaited<ReturnType<typeof myWeddingsControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    ValidationErrorBody | SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody
+  >,
 >(
+  params?: MyWeddingsControllerListV1Params,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof myWeddingsControllerListV1>>, TError, TData>
@@ -173,7 +206,129 @@ export function useMyWeddingsControllerListV1<
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getMyWeddingsControllerListV1QueryOptions(options);
+  const queryOptions = getMyWeddingsControllerListV1QueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export const getMyReferrerControllerReferrerV1Url = () => {
+  return `/v1/me/referrer`;
+};
+
+export const myReferrerControllerReferrerV1 = async (
+  options?: Parameters<typeof httpClient>[1],
+): Promise<MyReferrerResponse> => {
+  return httpClient<MyReferrerResponse>(getMyReferrerControllerReferrerV1Url(), {
+    ...options,
+    method: 'GET',
+  });
+};
+
+export const getMyReferrerControllerReferrerV1QueryKey = () => {
+  return [`/v1/me/referrer`] as const;
+};
+
+export const getMyReferrerControllerReferrerV1QueryOptions = <
+  TData = Awaited<ReturnType<typeof myReferrerControllerReferrerV1>>,
+  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof myReferrerControllerReferrerV1>>, TError, TData>
+  >;
+  request?: SecondParameter<typeof httpClient>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getMyReferrerControllerReferrerV1QueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof myReferrerControllerReferrerV1>>> = ({
+    signal,
+  }) => myReferrerControllerReferrerV1({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof myReferrerControllerReferrerV1>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type MyReferrerControllerReferrerV1QueryResult = NonNullable<
+  Awaited<ReturnType<typeof myReferrerControllerReferrerV1>>
+>;
+export type MyReferrerControllerReferrerV1QueryError = ErrorType<
+  SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody
+>;
+
+export function useMyReferrerControllerReferrerV1<
+  TData = Awaited<ReturnType<typeof myReferrerControllerReferrerV1>>,
+  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof myReferrerControllerReferrerV1>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myReferrerControllerReferrerV1>>,
+          TError,
+          Awaited<ReturnType<typeof myReferrerControllerReferrerV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useMyReferrerControllerReferrerV1<
+  TData = Awaited<ReturnType<typeof myReferrerControllerReferrerV1>>,
+  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof myReferrerControllerReferrerV1>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof myReferrerControllerReferrerV1>>,
+          TError,
+          Awaited<ReturnType<typeof myReferrerControllerReferrerV1>>
+        >,
+        'initialData'
+      >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useMyReferrerControllerReferrerV1<
+  TData = Awaited<ReturnType<typeof myReferrerControllerReferrerV1>>,
+  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof myReferrerControllerReferrerV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useMyReferrerControllerReferrerV1<
+  TData = Awaited<ReturnType<typeof myReferrerControllerReferrerV1>>,
+  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof myReferrerControllerReferrerV1>>, TError, TData>
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getMyReferrerControllerReferrerV1QueryOptions(options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>;
@@ -987,42 +1142,71 @@ export const usePlannerTemplatesControllerRemoveV1 = <
 > => {
   return useMutation(getPlannerTemplatesControllerRemoveV1MutationOptions(options), queryClient);
 };
-export const getReferrerCommissionsControllerListV1Url = () => {
-  return `/v1/me/referrer/commissions`;
+export const getReferrerCommissionsControllerListV1Url = (
+  params?: ReferrerCommissionsControllerListV1Params,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/v1/me/referrer/commissions?${stringifiedParams}`
+    : `/v1/me/referrer/commissions`;
 };
 
 /**
- * @summary A tela Comissões (Comissões do indicador RN02, RN07 e RN10).
+ * @summary A tela Comissões (Comissões do indicador RN02, RN07 e RN10; Contrato de API).
  */
 export const referrerCommissionsControllerListV1 = async (
+  params?: ReferrerCommissionsControllerListV1Params,
   options?: Parameters<typeof httpClient>[1],
 ): Promise<ReferrerCommissionsResponse> => {
-  return httpClient<ReferrerCommissionsResponse>(getReferrerCommissionsControllerListV1Url(), {
-    ...options,
-    method: 'GET',
-  });
+  return httpClient<ReferrerCommissionsResponse>(
+    getReferrerCommissionsControllerListV1Url(params),
+    {
+      ...options,
+      method: 'GET',
+    },
+  );
 };
 
-export const getReferrerCommissionsControllerListV1QueryKey = () => {
-  return [`/v1/me/referrer/commissions`] as const;
+export const getReferrerCommissionsControllerListV1QueryKey = (
+  params?: ReferrerCommissionsControllerListV1Params,
+) => {
+  return [`/v1/me/referrer/commissions`, ...(params ? [params] : [])] as const;
 };
 
 export const getReferrerCommissionsControllerListV1QueryOptions = <
   TData = Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>, TError, TData>
-  >;
-  request?: SecondParameter<typeof httpClient>;
-}) => {
+  TError = ErrorType<
+    ValidationErrorBody | SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody
+  >,
+>(
+  params?: ReferrerCommissionsControllerListV1Params,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>,
+        TError,
+        TData
+      >
+    >;
+    request?: SecondParameter<typeof httpClient>;
+  },
+) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getReferrerCommissionsControllerListV1QueryKey();
+  const queryKey = queryOptions?.queryKey ?? getReferrerCommissionsControllerListV1QueryKey(params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>> = ({
     signal,
-  }) => referrerCommissionsControllerListV1({ signal, ...requestOptions });
+  }) => referrerCommissionsControllerListV1(params, { signal, ...requestOptions });
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>,
@@ -1035,13 +1219,16 @@ export type ReferrerCommissionsControllerListV1QueryResult = NonNullable<
   Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>
 >;
 export type ReferrerCommissionsControllerListV1QueryError = ErrorType<
-  SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody
+  ValidationErrorBody | SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody
 >;
 
 export function useReferrerCommissionsControllerListV1<
   TData = Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    ValidationErrorBody | SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody
+  >,
 >(
+  params: undefined | ReferrerCommissionsControllerListV1Params,
   options: {
     query: Partial<
       UseQueryOptions<
@@ -1064,8 +1251,11 @@ export function useReferrerCommissionsControllerListV1<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useReferrerCommissionsControllerListV1<
   TData = Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    ValidationErrorBody | SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody
+  >,
 >(
+  params?: ReferrerCommissionsControllerListV1Params,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -1088,8 +1278,11 @@ export function useReferrerCommissionsControllerListV1<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useReferrerCommissionsControllerListV1<
   TData = Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    ValidationErrorBody | SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody
+  >,
 >(
+  params?: ReferrerCommissionsControllerListV1Params,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -1103,13 +1296,16 @@ export function useReferrerCommissionsControllerListV1<
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
- * @summary A tela Comissões (Comissões do indicador RN02, RN07 e RN10).
+ * @summary A tela Comissões (Comissões do indicador RN02, RN07 e RN10; Contrato de API).
  */
 
 export function useReferrerCommissionsControllerListV1<
   TData = Awaited<ReturnType<typeof referrerCommissionsControllerListV1>>,
-  TError = ErrorType<SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody>,
+  TError = ErrorType<
+    ValidationErrorBody | SessionExpiredErrorBody | ProfileNotOwnedErrorBody | RateLimitedErrorBody
+  >,
 >(
+  params?: ReferrerCommissionsControllerListV1Params,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -1122,7 +1318,7 @@ export function useReferrerCommissionsControllerListV1<
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getReferrerCommissionsControllerListV1QueryOptions(options);
+  const queryOptions = getReferrerCommissionsControllerListV1QueryOptions(params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>;
