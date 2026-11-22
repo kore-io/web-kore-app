@@ -246,6 +246,8 @@ describe('Cadastro do cerimonialista: os Dados profissionais (RN04, RN05)', () =
     api();
     renderRoute({ url: URL });
     await openDetails(user);
+    // Os placeholders da RN04 (decisão 249(1)): "Digite uma cidade" e "UF".
+    expect(screen.getByLabelText('Cidade')).toHaveAttribute('placeholder', 'Digite uma cidade');
     await user.click(screen.getByRole('button', { name: 'Adicionar' }));
     expect(screen.getByText('Informe a cidade.')).toBeInTheDocument();
     await user.type(screen.getByLabelText('Cidade'), 'Campinas');

@@ -51,6 +51,7 @@ export function CityListField({ cities, onChange, error }: CityListFieldProps) {
           <Input
             id={cityId}
             value={city}
+            placeholder={t('plannerProfile.cityPlaceholder')}
             autoComplete="address-level2"
             invalid={shownError !== undefined && !stateInvalid}
             aria-describedby={hintId}

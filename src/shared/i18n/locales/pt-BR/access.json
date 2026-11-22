@@ -293,6 +293,7 @@
     "cities": "Cidades de atuação",
     "citiesHint": "Adicione as cidades onde você atende. Assim sabemos onde o Kore está chegando.",
     "city": "Cidade",
+    "cityPlaceholder": "Digite uma cidade",
     "state": "UF",
     "addCity": "Adicionar",
     "removeCity": "Remover {{city}}",
