@@ -116,6 +116,34 @@ test('a cerimonialista cria um casamento e gera o link do casal (RN02 a RN06)', 
   ).toBeVisible();
 });
 
+test('Cancelar o link no Pronto volta o casamento a Rascunho (RN06; decisão 297)', async ({
+  page,
+}) => {
+  await signInPlanner({ page });
+  await createWedding({ page });
+  await page.getByRole('button', { name: 'Gerar link' }).click();
+  const block = page.getByRole('region', { name: 'Link para o casal' });
+  await expect(block.getByRole('textbox', { name: 'Link para o casal' })).toHaveValue(
+    /\/convite\//,
+  );
+  await expect(page.getByText('Aguardando o casal')).toBeVisible();
+
+  await block.getByRole('button', { name: 'Cancelar link' }).click();
+  await page
+    .getByRole('alertdialog', { name: 'Cancelar o link do casal?' })
+    .getByRole('button', { name: 'Cancelar link' })
+    .click();
+  await expect(
+    page.getByText(
+      'O convite para o casal fica para depois. Envie quando quiser, no detalhe do casamento.',
+    ),
+  ).toBeVisible();
+  await expect(page.getByText('Rascunho', { exact: true })).toBeVisible();
+  await expect(page.getByText('Aguardando o casal')).toHaveCount(0);
+  await expect(page.getByRole('region', { name: 'Link para o casal' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Convidar o casal' })).toBeVisible();
+});
+
 test('a cerimonialista abre o link do casal que ela gerou: Convite inválido (RN05, 409 SELF_REFERRAL)', async ({
   page,
 }) => {
