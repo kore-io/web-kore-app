@@ -111,7 +111,7 @@ function api({
   withPlanner?: boolean;
   withSecondOwner?: boolean;
   pendingInvitations?: object[];
-  site?: { status: string; plannerCredit: object | null };
+  site?: { status: string; plannerCredit: object | null; showPlannerCredit: boolean };
 }) {
   const calls: Call[] = [];
   mockApi(({ method, path, body }) => {
@@ -263,21 +263,23 @@ describe('Colaboradores › Convidar cerimonialista do casal (Convites de acesso
     ]);
   });
 
+  // Sem cerimonialista (o único caso em que o Convidar cerimonialista existe), a API
+  // devolve o plannerCredit nulo e a preferência do casal na raiz (decisão 277(A)).
   it.each([
-    ['publicado, assinatura não ocultada', 'published', null, true],
-    ['depois do evento (ainda no ar)', 'post_event', { showPlannerCredit: true }, true],
-    ['na carência (ainda no ar)', 'grace', null, true],
-    ['publicado, assinatura ocultada pelo casal', 'published', { showPlannerCredit: false }, false],
-    ['rascunho', 'draft', null, false],
+    ['publicado, assinatura não ocultada', 'published', true, true],
+    ['depois do evento (ainda no ar)', 'post_event', true, true],
+    ['na carência (ainda no ar)', 'grace', true, true],
+    ['publicado, assinatura ocultada pelo casal', 'published', false, false],
+    ['rascunho', 'draft', true, false],
   ])(
-    'o aviso da assinatura no Dialog: %s (C7-6; decisão 277)',
-    async (_, status, credit, shown) => {
+    'o aviso da assinatura no Dialog: %s (C7-6; decisão 277(A))',
+    async (_, status, showPlannerCredit, shown) => {
       const user = userEvent.setup();
       api({
         me: coupleMe,
         meId: 'm1',
         withPlanner: false,
-        site: { status, plannerCredit: credit },
+        site: { status, plannerCredit: null, showPlannerCredit },
       });
       renderRoute({ url: '/app/colaboradores' });
       await user.click(await screen.findByRole('button', { name: 'Convidar cerimonialista' }));

@@ -118,14 +118,13 @@ function InviteDialog({
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string>();
   const formId = `kore-invite-${kind}`;
-  // O aviso da C7-6 (decisão 277), só no convite da cerimonialista: o site no ar e a
-  // assinatura não ocultada pelo casal. Sem cerimonialista, o Switch não existe
-  // (plannerCredit nulo) e a assinatura sai ao aceitar.
-  const credit = site.data?.plannerCredit;
+  // O aviso da C7-6 (decisão 277(A)), só no convite da cerimonialista: o site no ar e a
+  // assinatura não ocultada pelo casal. A preferência vem na raiz do GET …/site, também
+  // sem cerimonialista (o plannerCredit fica nulo sem colaboradora).
   const showNotice =
     kind === 'planner' &&
     ONLINE.has(site.data?.status ?? '') &&
-    (credit == null || credit.showPlannerCredit);
+    site.data?.showPlannerCredit === true;
 
   function close() {
     setEmail('');
