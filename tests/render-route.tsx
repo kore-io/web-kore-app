@@ -1,23 +1,36 @@
 import { ToastProvider } from '@kore-io/design';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render } from '@testing-library/react';
+import { StrictMode } from 'react';
 import { createMemoryRouter, Outlet, RouterProvider, type RouteObject } from 'react-router';
 import { vi } from 'vitest';
 import { routes } from '../src/app/routes';
 
-/** Abre o app numa rota, com os provedores reais e um QueryClient sem retry. */
-export function renderRoute({ url, state }: { url: string; state?: unknown }) {
+/**
+ * Abre o app numa rota, com os provedores reais e um QueryClient sem retry. Com `strict`, no
+ * StrictMode, como o `main.tsx` (os efeitos rodam duas vezes no dev).
+ */
+export function renderRoute({
+  url,
+  state,
+  strict = false,
+}: {
+  url: string;
+  state?: unknown;
+  strict?: boolean;
+}) {
   const router = createMemoryRouter(routes, { initialEntries: [{ ...splitUrl(url), state }] });
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
-  const view = render(
+  const app = (
     <QueryClientProvider client={queryClient}>
       <ToastProvider label="Avisos" dismissLabel="Fechar">
         <RouterProvider router={router} />
       </ToastProvider>
-    </QueryClientProvider>,
+    </QueryClientProvider>
   );
+  const view = render(strict ? <StrictMode>{app}</StrictMode> : app);
   return { ...view, router };
 }
 
