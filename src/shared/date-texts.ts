@@ -50,3 +50,51 @@ export function dayAndTimeIn({ at, timezone }: { at: string; timezone: string | 
     day: `${part('year')}-${part('month')}-${part('day')}`,
   };
 }
+
+/** O ano de um instante no fuso. */
+function yearIn({ at, timezone }: { at: Date; timezone: string }): number {
+  return Number(
+    new Intl.DateTimeFormat('en-GB', { timeZone: timezone, year: 'numeric' }).format(at),
+  );
+}
+
+/**
+ * Um instante por extenso curto no fuso do casamento, em frase (convenção 8 dos textos da
+ * F3): "28 de set."; com o ano só fora do ano corrente no fuso, "30 de abr. de 2027". O fuso
+ * vem de quem chama (nulo: o padrão).
+ */
+export function dayMonthIn({
+  at,
+  timezone,
+  now,
+}: {
+  at: string;
+  timezone: string | null;
+  now: Date;
+}): string {
+  const zone = timezone ?? DEFAULT_TIMEZONE;
+  const date = new Date(at);
+  const sameYear = yearIn({ at: date, timezone: zone }) === yearIn({ at: now, timezone: zone });
+  return new Intl.DateTimeFormat('pt-BR', {
+    timeZone: zone,
+    day: 'numeric',
+    month: 'short',
+    ...(!sameYear && { year: 'numeric' }),
+  }).format(date);
+}
+
+/**
+ * O instante com a hora no fuso do casamento, em frase: "28 de set. às 14h", "11 de ago. às
+ * 15h20" (a hora como no `dayAndTimeIn`).
+ */
+export function dayMonthTimeIn({
+  at,
+  timezone,
+  now,
+}: {
+  at: string;
+  timezone: string | null;
+  now: Date;
+}): string {
+  return `${dayMonthIn({ at, timezone, now })} às ${dayAndTimeIn({ at, timezone }).time}`;
+}
