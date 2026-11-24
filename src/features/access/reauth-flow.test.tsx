@@ -138,6 +138,18 @@ describe('a reentrada do REAUTH_REQUIRED passa pelo guard da área (Retenção R
     expect(activations).toEqual([{ profile: 'couple' }]);
   });
 
+  it('pela volta do Google no StrictMode (o efeito roda duas vezes no dev), uma vez só', async () => {
+    const path = '/app/configuracoes/notificacoes';
+    remember({ path, profile: 'couple' });
+    const { activations } = api();
+    const { router } = renderRoute({
+      url: `/entrar/google?step=choose_profile&next=${encodeURIComponent(path)}`,
+      strict: true,
+    });
+    await expectSettledAt({ router, path });
+    expect(activations).toEqual([{ profile: 'couple' }]);
+  });
+
   it('se a ativação falhar, segue o destino de sempre (a Seleção de perfil)', async () => {
     const path = '/app/configuracoes/notificacoes';
     remember({ path, profile: 'couple' });
