@@ -1,0 +1,147 @@
+/*
+ * Tabela de dados das listas da F3, no molde da GroupTable do DS v0.18 (Group Table Header
+ * e Group Row); no app pela decisão 321. Celular: cartões em uma coluna; tablet (≥ 768 px): em duas, com 24 px entre
+ * eles; computador (≥ 1024 px): a tabela, num painel branco com borda gray.300 e raio lg.
+ * Cartão: branco, borda gray.300, raio lg, 16 px de respiro e 8 px entre os campos. No
+ * topo, o título (primary) em type.label e, à direita, as ações (o ⋮), como no Group Row;
+ * depois, os outros campos com o rótulo da coluna em type.caption gray.700 à esquerda e o
+ * valor em type.body.md à direita; por último, o conteúdo aberto. A ordem do DOM é a das
+ * colunas; o cartão reordena pelo `order`.
+ * Tabela: as colunas num grid (o `--kore-data-table-columns` vem do componente), 16 px
+ * entre elas e de respiro nas pontas. Cabeçalho: 40 px, 10/16 px, fundo gray.100,
+ * type.overline em gray.700. Linha: 56 px ou mais, 12/16 px, borda gray.300 entre as
+ * linhas; a linha clicável ganha o fundo gray.100 no hover. Vazio: "—" em gray.500.
+ */
+.kore-data-table {
+  @apply lg:overflow-hidden lg:rounded-lg lg:border lg:border-gray-300 lg:bg-white;
+}
+
+/* No cartão, o cabeçalho sai da vista, mas fica na árvore acessível (o leitor de tela lê
+   cada valor com o nome da coluna). */
+.kore-data-table__head {
+  @apply sr-only lg:not-sr-only lg:block;
+}
+
+.kore-data-table__header-row {
+  @apply lg:grid lg:min-h-10 lg:grid-cols-(--kore-data-table-columns) lg:items-center lg:gap-4 lg:bg-gray-100 lg:px-4 lg:py-2.5;
+  @apply type-overline text-gray-700;
+}
+
+.kore-data-table__header {
+  @apply min-w-0;
+}
+
+.kore-data-table__header--end {
+  @apply text-right;
+}
+
+.kore-data-table__sr-only {
+  @apply sr-only;
+}
+
+.kore-data-table__body {
+  @apply grid gap-6 md:grid-cols-2;
+  @apply lg:flex lg:flex-col lg:gap-0;
+}
+
+/* Cartão (celular e tablet). */
+.kore-data-table__row {
+  @apply relative flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-gray-300 bg-white p-4;
+}
+
+.kore-data-table__cell {
+  @apply order-3 flex min-h-6 min-w-0 basis-full items-baseline justify-between gap-3;
+}
+
+.kore-data-table__cell-label {
+  @apply type-caption shrink-0 text-gray-700;
+}
+
+.kore-data-table__cell-value {
+  @apply type-body-md min-w-0 text-right text-ink;
+}
+
+.kore-data-table__cell--primary {
+  @apply order-1 min-h-11 flex-1 basis-0 items-center justify-start;
+}
+
+.kore-data-table__cell--actions {
+  @apply order-2 basis-auto items-center justify-end;
+}
+
+.kore-data-table__cell--primary .kore-data-table__cell-value {
+  @apply type-label text-left;
+}
+
+.kore-data-table__empty {
+  @apply text-gray-500;
+}
+
+.kore-data-table__details {
+  @apply type-body-md order-4 min-w-0 basis-full border-t border-gray-300 pt-3 text-ink;
+}
+
+/* A linha clicável: o link marcado com data-row-link cobre a linha inteira. */
+.kore-data-table__row--interactive [data-row-link] {
+  @apply after:absolute after:inset-0 after:rounded-lg lg:after:rounded-none;
+}
+
+.kore-data-table__row--interactive:hover {
+  @apply bg-gray-100;
+}
+
+/* O anel da linha só com o foco no link do título (o ⋮ tem o seu). */
+.kore-data-table__row--interactive:has([data-row-link]:focus-visible) {
+  @apply ring-2 ring-ring;
+}
+
+/* Linha da tabela (computador): as células seguem o grid do cabeçalho, sem os rótulos. */
+.kore-data-table__row {
+  @apply lg:grid lg:min-h-14 lg:grid-cols-(--kore-data-table-columns) lg:items-center lg:gap-x-4 lg:gap-y-2 lg:rounded-none lg:border-0 lg:border-b lg:border-gray-300 lg:px-4 lg:py-3;
+}
+
+.kore-data-table__row:last-child {
+  @apply lg:border-b-0;
+}
+
+.kore-data-table__row--interactive:has([data-row-link]:focus-visible) {
+  @apply lg:ring-inset;
+}
+
+.kore-data-table__cell,
+.kore-data-table__details {
+  @apply lg:order-none;
+}
+
+.kore-data-table__cell {
+  @apply lg:block lg:min-h-0;
+}
+
+.kore-data-table__cell-label {
+  @apply lg:hidden;
+}
+
+.kore-data-table__cell-value {
+  @apply lg:block lg:text-left;
+}
+
+.kore-data-table__cell--end .kore-data-table__cell-value {
+  @apply lg:text-right;
+}
+
+.kore-data-table__cell--primary {
+  @apply lg:min-h-0;
+}
+
+.kore-data-table__cell--actions .kore-data-table__cell-value {
+  @apply lg:flex lg:justify-end;
+}
+
+.kore-data-table__details {
+  @apply lg:col-span-full;
+}
+
+/* Os outros controles da linha clicável (ex.: o ⋮) ficam acima do link que a cobre. */
+.kore-data-table__row--interactive :is(button, a:not([data-row-link]), input, select) {
+  @apply relative z-10;
+}
