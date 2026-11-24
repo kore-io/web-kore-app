@@ -28,6 +28,22 @@ describe('IdempotencyKeys (Publicar RN03, B2-10)', () => {
     expect(keys.headersFor({ body: { method: 'card' } })).toEqual({ 'Idempotency-Key': 'key-2' });
   });
 
+  it('sem corpo (o Pagar do Admin, 259(3)), a 1ª chamada já gera a chave', () => {
+    const keys = sequentialKeys();
+    expect(keys.headersFor({ target: 'payout-a' })).toEqual({ 'Idempotency-Key': 'key-1' });
+    expect(keys.headersFor({ target: 'payout-a', body: undefined })).toEqual({
+      'Idempotency-Key': 'key-1',
+    });
+    expect(new IdempotencyKeys(() => 'k').headersFor()).toEqual({ 'Idempotency-Key': 'k' });
+  });
+
+  it('outro alvo com o mesmo corpo é outra intenção (a fila de Repasses)', () => {
+    const keys = sequentialKeys();
+    keys.headersFor({ target: 'payout-a' });
+    expect(keys.headersFor({ target: 'payout-b' })).toEqual({ 'Idempotency-Key': 'key-2' });
+    expect(keys.headersFor({ target: 'payout-a' })).toEqual({ 'Idempotency-Key': 'key-3' });
+  });
+
   it('a chave padrão é um UUID', () => {
     const key = new IdempotencyKeys().headersFor({ body: {} })['Idempotency-Key'];
     expect(key).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
