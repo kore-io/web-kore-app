@@ -51,16 +51,10 @@ function storedInviteToken() {
 export function destinationAfterLogin({
   next,
   returnPath,
-  reauth = false,
 }: {
   next: VerifyLoginChallengeResponseNext;
   returnPath?: string | undefined;
-  /** A reentrada do `REAUTH_REQUIRED` (Retenção RN08): volta à tela, sem a Seleção de perfil. */
-  reauth?: boolean;
 }): LoginDestination {
-  if (reauth && returnPath !== undefined && (next === 'home' || next === 'choose_profile')) {
-    return { kind: 'route', path: returnPath };
-  }
   // Voltar ao cadastro (o Entrar do Simule, Cadastro RN12) vale sobre a Seleção de perfil:
   // quem só colabora em outros casamentos segue para os Dados do casamento.
   if (returnPath === paths.signUp && next !== 'invite' && next !== 'planner_signup') {

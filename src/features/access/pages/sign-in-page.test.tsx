@@ -7,7 +7,6 @@ import { redirectTo } from '../../../shared/browser/redirect';
 vi.mock('../../../shared/browser/redirect', () => ({ redirectTo: vi.fn() }));
 
 afterEach(() => {
-  window.sessionStorage.clear();
   vi.unstubAllGlobals();
   vi.clearAllMocks();
 });
@@ -193,45 +192,6 @@ describe('Entrar ligado à API (Login sem senha e sessão; decisões 150, 151 e 
     renderRoute({ url: '/entrar?next=//malicioso.com' });
     await user.click(screen.getByRole('button', { name: 'Continuar com Google' }));
     expect(redirectTo).toHaveBeenCalledWith({ url: 'http://api.test/v1/auth/google?origin=none' });
-  });
-
-  it('a reentrada (REAUTH_REQUIRED) mostra o aviso da tela e volta a ela, mesmo com dois perfis (Retenção RN08)', async () => {
-    const user = userEvent.setup();
-    window.sessionStorage.setItem('kore.reauthReturn', '/app/configuracoes');
-    mockApi(({ path }) => {
-      if (path === '/v1/auth/login-challenges')
-        return Response.json(
-          { email: 'ana@exemplo.com', resendAvailableAt: inAMinute() },
-          { status: 202 },
-        );
-      if (path === '/v1/auth/login-challenges/verify')
-        return Response.json({
-          user: { id: 'u1', email: 'ana@exemplo.com', isNew: false },
-          next: 'choose_profile',
-        });
-      return Response.json({});
-    });
-    const { router } = renderRoute({
-      url: `/entrar?next=${encodeURIComponent('/app/configuracoes')}`,
-      state: {
-        notice: {
-          kind: 'reauth',
-          message: 'Por segurança, entrem de novo para excluir o casamento.',
-        },
-      },
-    });
-    expect(
-      screen.getByText('Por segurança, entrem de novo para excluir o casamento.'),
-    ).toBeInTheDocument();
-    await askCode(user);
-    await screen.findByRole('heading', { name: 'Confira seu e-\u2060mail' });
-    await user.keyboard('481905');
-    // A área depois decide sozinha (o /me do teste é vazio); conta a 1ª navegação do login.
-    const visited: string[] = [];
-    router.subscribe((state) => visited.push(state.location.pathname));
-    await user.click(screen.getByRole('button', { name: 'Entrar' }));
-    await waitFor(() => expect(visited[0]).toBe('/app/configuracoes'));
-    expect(window.sessionStorage.getItem('kore.reauthReturn')).toBeNull();
   });
 
   it('Sessão expirada abre o Entrar com o aviso (RN10)', () => {

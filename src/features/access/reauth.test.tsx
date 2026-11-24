@@ -1,10 +1,11 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it } from 'vitest';
 import { createMemoryRouter, RouterProvider } from 'react-router';
+import { afterEach, describe, expect, it } from 'vitest';
+import { getMeControllerMeV1QueryKey } from '../../shared/api/generated/me/me';
 import { ApiError } from '../../shared/api/http-client';
 import { useRequestReauth } from './hooks/use-request-reauth';
-import { destinationAfterLogin } from './login-navigation';
 import {
   consumeReauthReturn,
   isReauthRequired,
@@ -14,7 +15,7 @@ import {
 
 afterEach(() => window.sessionStorage.clear());
 
-describe('a reentrada do REAUTH_REQUIRED (Retenção RN08)', () => {
+describe('a marca da reentrada do REAUTH_REQUIRED (Retenção RN08)', () => {
   it('reconhece o 403 REAUTH_REQUIRED e só ele', () => {
     expect(
       isReauthRequired({
@@ -29,51 +30,60 @@ describe('a reentrada do REAUTH_REQUIRED (Retenção RN08)', () => {
     expect(isReauthRequired({ error: new TypeError('Failed to fetch') })).toBe(false);
   });
 
-  it('a marca vale uma vez e só para a mesma tela', () => {
-    rememberReauthReturn({ path: '/app/configuracoes/casamento' });
-    expect(consumeReauthReturn({ returnPath: '/app/configuracoes/casamento' })).toBe(true);
-    expect(consumeReauthReturn({ returnPath: '/app/configuracoes/casamento' })).toBe(false);
+  it('vale uma vez, só para a mesma tela, e devolve o perfil guardado', () => {
+    const path = '/app/configuracoes/casamento';
+    rememberReauthReturn({ path, profile: 'couple' });
+    expect(consumeReauthReturn({ returnPath: path })).toEqual({ path, profile: 'couple' });
+    expect(consumeReauthReturn({ returnPath: path })).toBeUndefined();
 
-    rememberReauthReturn({ path: '/app/configuracoes/casamento' });
-    expect(consumeReauthReturn({ returnPath: '/app' })).toBe(false);
+    rememberReauthReturn({ path, profile: 'planner' });
+    expect(consumeReauthReturn({ returnPath: '/app' })).toBeUndefined();
     expect(window.sessionStorage.getItem(REAUTH_STORAGE_KEY)).toBeNull();
   });
 
-  it('a marca com um caminho de fora do app não vale', () => {
-    window.sessionStorage.setItem(REAUTH_STORAGE_KEY, '//malicioso.com');
-    expect(consumeReauthReturn({ returnPath: '//malicioso.com' })).toBe(false);
-  });
-
-  it('na reentrada, volta à tela mesmo com mais de um perfil (sem a Seleção de perfil)', () => {
-    const returnPath = '/cerimonialista/dados-para-receber';
-    expect(destinationAfterLogin({ next: 'choose_profile', returnPath, reauth: true })).toEqual({
-      kind: 'route',
-      path: returnPath,
-    });
-    expect(destinationAfterLogin({ next: 'home', returnPath, reauth: true })).toEqual({
-      kind: 'route',
-      path: returnPath,
-    });
-    // Fora da reentrada, a Seleção de perfil continua (RN14 do Login).
-    expect(destinationAfterLogin({ next: 'choose_profile', returnPath })).toEqual({
-      kind: 'route',
-      path: '/perfis',
+  it('o perfil nulo (sem perfil, ex.: o staff) também volta', () => {
+    rememberReauthReturn({ path: '/admin/cobranca', profile: null });
+    expect(consumeReauthReturn({ returnPath: '/admin/cobranca' })).toEqual({
+      path: '/admin/cobranca',
+      profile: null,
     });
   });
 
-  it('o pedido leva ao Entrar com o aviso da tela e o caminho de volta', async () => {
-    function Screen() {
-      const requestReauth = useRequestReauth();
-      return (
-        <button
-          type="button"
-          onClick={() =>
-            requestReauth({ message: 'Por segurança, entrem de novo para excluir o casamento.' })
-          }
-        >
-          Excluir
-        </button>
-      );
+  it('a marca com um caminho de fora do app, um perfil estranho ou quebrada não vale', () => {
+    window.sessionStorage.setItem(
+      REAUTH_STORAGE_KEY,
+      JSON.stringify({ path: '//malicioso.com', profile: 'couple' }),
+    );
+    expect(consumeReauthReturn({ returnPath: '//malicioso.com' })).toBeUndefined();
+    window.sessionStorage.setItem(
+      REAUTH_STORAGE_KEY,
+      JSON.stringify({ path: '/app', profile: 'admin' }),
+    );
+    expect(consumeReauthReturn({ returnPath: '/app' })).toBeUndefined();
+    window.sessionStorage.setItem(REAUTH_STORAGE_KEY, '/app');
+    expect(consumeReauthReturn({ returnPath: '/app' })).toBeUndefined();
+  });
+});
+
+describe('o pedido da reentrada (useRequestReauth)', () => {
+  function Screen() {
+    const requestReauth = useRequestReauth();
+    return (
+      <button
+        type="button"
+        onClick={() =>
+          requestReauth({ message: 'Por segurança, entrem de novo para excluir o casamento.' })
+        }
+      >
+        Excluir
+      </button>
+    );
+  }
+
+  async function request({ activeProfile }: { activeProfile?: string | null }) {
+    const queryClient = new QueryClient();
+    if (activeProfile !== undefined) {
+      queryClient.setQueryData(getMeControllerMeV1QueryKey(), { activeProfile });
     }
     const router = createMemoryRouter(
       [
@@ -82,9 +92,18 @@ describe('a reentrada do REAUTH_REQUIRED (Retenção RN08)', () => {
       ],
       { initialEntries: ['/app/configuracoes/casamento?aba=1'] },
     );
-    render(<RouterProvider router={router} />);
+    render(
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>,
+    );
     await userEvent.setup().click(screen.getByRole('button', { name: 'Excluir' }));
     await act(async () => {});
+    return router;
+  }
+
+  it('leva ao Entrar com o aviso da tela, o caminho de volta e o perfil ativo do /me', async () => {
+    const router = await request({ activeProfile: 'couple' });
     expect(router.state.location.pathname).toBe('/entrar');
     expect(router.state.location.search).toBe(
       `?next=${encodeURIComponent('/app/configuracoes/casamento?aba=1')}`,
@@ -95,8 +114,17 @@ describe('a reentrada do REAUTH_REQUIRED (Retenção RN08)', () => {
         message: 'Por segurança, entrem de novo para excluir o casamento.',
       },
     });
-    expect(window.sessionStorage.getItem(REAUTH_STORAGE_KEY)).toBe(
-      '/app/configuracoes/casamento?aba=1',
-    );
+    expect(JSON.parse(window.sessionStorage.getItem(REAUTH_STORAGE_KEY) ?? '')).toEqual({
+      path: '/app/configuracoes/casamento?aba=1',
+      profile: 'couple',
+    });
+  });
+
+  it('sem o /me em cache, guarda o perfil nulo', async () => {
+    await request({});
+    expect(JSON.parse(window.sessionStorage.getItem(REAUTH_STORAGE_KEY) ?? '')).toEqual({
+      path: '/app/configuracoes/casamento?aba=1',
+      profile: null,
+    });
   });
 });

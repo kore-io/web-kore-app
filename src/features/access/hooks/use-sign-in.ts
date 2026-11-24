@@ -13,9 +13,7 @@ import { useCountdown } from '../../../shared/hooks/use-countdown';
 import type { SignInNotice } from '../components/sign-in-alert';
 import { isValidEmail } from '../email';
 import { requestCodeOutcome, verifyOutcome } from '../login-errors';
-import { destinationAfterLogin } from '../login-navigation';
-import { consumeReauthReturn } from '../reauth';
-import { useGoToDestination } from './use-go-to-destination';
+import { useFinishLogin } from './use-finish-login';
 
 /** RN04 do Login: 60 s entre pedidos (o reinício depois do código novo da RN05). */
 const RESEND_INTERVAL_MS = 60_000;
@@ -42,7 +40,7 @@ export function useSignIn({
 }: UseSignInOptions) {
   const { t } = useTranslation('access');
   const { showToast } = useToast();
-  const goTo = useGoToDestination();
+  const finishLogin = useFinishLogin();
   const requestCode = useLoginControllerRequestV1();
   const verify = useLoginControllerVerifyV1();
 
@@ -61,7 +59,8 @@ export function useSignIn({
       {
         onSuccess: ({ resendAvailableAt }) => {
           setEmail(to);
-          setNotice(undefined);
+          // O aviso da reentrada (Retenção RN08) continua no passo do código.
+          setNotice((current) => (current?.kind === 'reauth' ? current : undefined));
           setCodeInvalid(false);
           setResendAt(Date.parse(resendAvailableAt));
           if (resend) {
@@ -105,14 +104,7 @@ export function useSignIn({
       verify.mutate(
         { data: { email, code } },
         {
-          onSuccess: ({ next }) =>
-            goTo(
-              destinationAfterLogin({
-                next,
-                returnPath,
-                reauth: consumeReauthReturn({ returnPath }),
-              }),
-            ),
+          onSuccess: ({ next }) => finishLogin({ next, returnPath }),
           onError: (error) => {
             const outcome = verifyOutcome({ error, email });
             setNotice(outcome.notice);
