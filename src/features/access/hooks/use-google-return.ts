@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { paths } from '../../../app/paths';
 import { destinationAfterLogin, parseLoginStep, safeReturnPath } from '../login-navigation';
+import { consumeReauthReturn } from '../reauth';
 import type { SignInLocationState } from '../sign-in-location-state';
 import { useGoToDestination } from './use-go-to-destination';
 
@@ -22,7 +23,11 @@ export function useGoogleReturn({ step, next }: { step: string | null; next: str
     }
     const returnPath = safeReturnPath({ path: next });
     goTo(
-      destinationAfterLogin({ next: loginStep, ...(returnPath !== undefined && { returnPath }) }),
+      destinationAfterLogin({
+        next: loginStep,
+        ...(returnPath !== undefined && { returnPath }),
+        reauth: consumeReauthReturn({ returnPath }),
+      }),
     );
   }, [step, next, navigate, goTo]);
 }

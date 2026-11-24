@@ -5,6 +5,7 @@ import { apiError, mockApi, renderRoute } from '../../../../tests/render-route';
 vi.mock('../../../shared/browser/redirect', () => ({ redirectTo: vi.fn() }));
 
 afterEach(() => {
+  window.sessionStorage.clear();
   vi.unstubAllGlobals();
   vi.clearAllMocks();
   window.localStorage.clear();
@@ -47,6 +48,22 @@ describe('Botão do e-\u2060mail (/entrar/confirmar, decisões 139 e 157(5))', (
 describe('Volta do Google (/entrar/google, decisão 147)', () => {
   it('step home com next segue para a página de volta', async () => {
     const { router } = renderRoute({ url: '/entrar/google?step=home&next=/perfis' });
+    await waitFor(() => expect(router.state.location.pathname).toBe('/perfis'));
+  });
+
+  it('na reentrada (REAUTH_REQUIRED), choose_profile volta à tela de antes (Retenção RN08)', async () => {
+    // Uma tela que não redireciona sozinha sem o /me do teste.
+    window.sessionStorage.setItem('kore.reauthReturn', '/sessao-expirada');
+    const { router } = renderRoute({
+      url: `/entrar/google?step=choose_profile&next=${encodeURIComponent('/sessao-expirada')}`,
+    });
+    await waitFor(() => expect(router.state.location.pathname).toBe('/sessao-expirada'));
+  });
+
+  it('fora da reentrada, choose_profile segue para a Seleção de perfil', async () => {
+    const { router } = renderRoute({
+      url: `/entrar/google?step=choose_profile&next=${encodeURIComponent('/sessao-expirada')}`,
+    });
     await waitFor(() => expect(router.state.location.pathname).toBe('/perfis'));
   });
 

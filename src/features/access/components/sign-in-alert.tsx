@@ -21,13 +21,20 @@ export type SignInNotice =
   /** 429 RATE_LIMITED, o limite por IP (decisões 142(2) e 157(2)). */
   | { kind: 'rate-limited' }
   /** Rede fora, 5xx ou origem recusada (decisão 157(3)). */
-  | { kind: 'generic' };
+  | { kind: 'generic' }
+  /**
+   * A reentrada do `403 REAUTH_REQUIRED` (Retenção RN08): o texto vem da tela que pediu
+   * (ex.: "Por segurança, entrem de novo para excluir o casamento.").
+   */
+  | { kind: 'reauth'; message: string };
 
 /** O Alert da lib com os textos da Voz para cada situação do login. */
 export function SignInAlert({ notice }: { notice: SignInNotice }) {
   const { t } = useTranslation('access');
 
   switch (notice.kind) {
+    case 'reauth':
+      return <Alert tone="info">{notice.message}</Alert>;
     case 'session-expired':
       return (
         <Alert tone="info" title={t('sessionExpired.title')}>

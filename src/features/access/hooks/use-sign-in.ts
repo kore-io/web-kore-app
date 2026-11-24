@@ -14,6 +14,7 @@ import type { SignInNotice } from '../components/sign-in-alert';
 import { isValidEmail } from '../email';
 import { requestCodeOutcome, verifyOutcome } from '../login-errors';
 import { destinationAfterLogin } from '../login-navigation';
+import { consumeReauthReturn } from '../reauth';
 import { useGoToDestination } from './use-go-to-destination';
 
 /** RN04 do Login: 60 s entre pedidos (o reinício depois do código novo da RN05). */
@@ -104,7 +105,14 @@ export function useSignIn({
       verify.mutate(
         { data: { email, code } },
         {
-          onSuccess: ({ next }) => goTo(destinationAfterLogin({ next, returnPath })),
+          onSuccess: ({ next }) =>
+            goTo(
+              destinationAfterLogin({
+                next,
+                returnPath,
+                reauth: consumeReauthReturn({ returnPath }),
+              }),
+            ),
           onError: (error) => {
             const outcome = verifyOutcome({ error, email });
             setNotice(outcome.notice);
