@@ -171,5 +171,41 @@
       "title": "Nenhum pagamento ainda.",
       "description": "Ele aparece aqui quando vocês publicarem o site."
     }
+  },
+  "refund": {
+    "alert": {
+      "publication": "Vocês podem desistir até {{date}} e receber {{amount}} de volta.",
+      "extension": "Vocês podem desistir da extensão até {{date}} e receber {{amount}} de volta."
+    },
+    "action": "Desistir e pedir reembolso",
+    "blocked": "Indisponível enquanto o site está bloqueado. Para desistir da compra, escrevam para suporte@kore.com.br.",
+    "publication": {
+      "title": "Desistir da publicação?",
+      "card": "O site sai do ar e volta a ser rascunho. Devolvemos {{amount}} no mesmo cartão.",
+      "cardInterest": "O site sai do ar e volta a ser rascunho. Devolvemos {{amount}} no mesmo cartão, com os juros.",
+      "pix": "O site sai do ar e volta a ser rascunho. Devolvemos {{amount}} por Pix, para a conta que pagou.",
+      "withExtension": "O site sai do ar e volta a ser rascunho. Devolvemos {{total}} no mesmo cartão: {{publication}} da publicação e {{extension}} da extensão.",
+      "keep": "Manter o site no ar"
+    },
+    "extension": {
+      "title": "Desistir da extensão?",
+      "card": "A data de saída do ar volta a {{date}}. Devolvemos {{amount}} no mesmo cartão.",
+      "cardInterest": "A data de saída do ar volta a {{date}}. Devolvemos {{amount}} no mesmo cartão, com os juros.",
+      "pix": "A data de saída do ar volta a {{date}}. Devolvemos {{amount}} por Pix, para a conta que pagou.",
+      "keep": "Manter a extensão"
+    },
+    "reason": {
+      "label": "Motivo (opcional)",
+      "placeholder": "Decidimos adiar o casamento."
+    },
+    "requested": "No Pix, o valor volta em até 7 dias úteis. No cartão, o estorno aparece numa das próximas faturas.",
+    "disputed": "O banco do cartão abriu uma contestação deste pagamento. O site continua no ar. Se tiverem dúvidas, escrevam para suporte@kore.com.br.",
+    "toast": {
+      "publication": "Reembolso pedido. O site voltou a ser rascunho.",
+      "extension": "Reembolso pedido. A data de saída do ar voltou a {{date}}.",
+      "windowClosed": "O prazo para desistir terminou em {{date}}.",
+      "alreadyRequested": "O reembolso deste pagamento já foi pedido.",
+      "notLastExtension": "Há uma extensão mais recente. Desistam dela primeiro."
+    }
   }
 }

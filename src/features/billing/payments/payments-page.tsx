@@ -15,6 +15,7 @@ import { useActiveWedding } from '../../guests/hooks/use-active-wedding';
 import { siteStatus } from '../../site/site-texts';
 import { canOpenPublish, publishWaitsCouple } from '../publish/publish-entry';
 import { dayIn, numericDay, visibleStatus, type VisibleStatus } from './payments-texts';
+import { RefundSection } from './refund';
 
 /** O Selo de pagamento do DS (Penpot 04 e 21, A9), por situação. */
 const STATUS_TONES: Record<VisibleStatus, BadgeTone> = {
@@ -43,7 +44,8 @@ function Payments({ weddingId, owner }: { weddingId: string; owner: boolean }) {
   const navigate = useNavigate();
   const paths = useAreaPaths();
   const { data: me } = useMeControllerMeV1();
-  const timezone = me?.memberships.find((item) => item.weddingId === weddingId)?.timezone ?? null;
+  const membership = me?.memberships.find((item) => item.weddingId === weddingId);
+  const timezone = membership?.timezone ?? null;
   const billing = usePaymentsControllerBillingV1(weddingId);
   const now = new Date();
 
@@ -84,6 +86,16 @@ function Payments({ weddingId, owner }: { weddingId: string; owner: boolean }) {
           )
         }
       />
+      {owner && (
+        // O Desistir e as legendas, acima do histórico (Penpot 21, A9; E7).
+        <RefundSection
+          weddingId={weddingId}
+          payments={data.payments ?? []}
+          timezone={timezone}
+          blocked={membership?.lifecycle.blocked ?? false}
+          now={now}
+        />
+      )}
       {owner && <History payments={data.payments ?? []} timezone={timezone} now={now} />}
     </div>
   );

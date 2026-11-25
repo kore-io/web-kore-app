@@ -34,3 +34,21 @@
 .kore-payments__empty {
   @apply max-w-120 self-start;
 }
+
+/* O bloco Desistir (Penpot 21, "Bloco / Desistir"): o Alert e o botão, 12 px entre eles. */
+.kore-payments__refund {
+  @apply flex flex-col gap-3;
+}
+
+.kore-payments__refund-block {
+  @apply flex flex-col gap-3;
+}
+
+.kore-payments__refund-action {
+  @apply self-start;
+}
+
+/* O Motivo (opcional) do Dialog. */
+.kore-payments__reason {
+  @apply flex flex-col gap-1.5;
+}
