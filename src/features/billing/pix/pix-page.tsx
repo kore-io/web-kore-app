@@ -63,16 +63,17 @@ function Pix({ weddingId }: { weddingId: string }) {
   const published = billing.data?.status === 'published';
 
   // No dueAt, a tela vira o vencido na hora, sem esperar o pendente mudar (sugestão do Crivo
-  // no E4): um temporizador até lá refaz o render.
+  // no E4): um temporizador até lá refaz o render. Cada consulta do polling também confere
+  // (a resposta igual não redesenha sozinha), para o vencido não depender só do temporizador.
   const [, setTick] = useState(0);
   const dueAt = shown?.dueAt ?? null;
+  const checkedAt = billing.dataUpdatedAt;
   useEffect(() => {
     if (dueAt === null) return;
     const wait = new Date(dueAt).getTime() - Date.now();
-    if (wait <= 0) return;
-    const timer = setTimeout(() => setTick((tick) => tick + 1), wait + 100);
+    const timer = setTimeout(() => setTick((tick) => tick + 1), Math.max(wait, 0) + 100);
     return () => clearTimeout(timer);
-  }, [dueAt]);
+  }, [dueAt, checkedAt]);
 
   const done = useRef(false);
   useEffect(() => {
