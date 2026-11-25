@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getMeControllerMeV1QueryKey, useMeControllerMeV1 } from '../../shared/api/generated/me/me';
 import { getDashboardControllerGetV1QueryKey } from '../../shared/api/generated/rsvp/rsvp';
-import { apiErrorCode } from '../../shared/api/http-client';
+import { ApiError, apiErrorCode } from '../../shared/api/http-client';
 import { useActiveWedding } from '../guests/hooks/use-active-wedding';
 import { deliveriesClosed, expiredClosedText } from './delivery-closed';
 
@@ -58,4 +58,28 @@ export function useSiteExpiredRead({ weddingId, error }: { weddingId: string; er
       .finally(() => setWaiting(false));
   }, [expired, error, handle, queryClient, weddingId]);
   return expired && waiting;
+}
+
+/**
+ * O `409 DELIVERIES_CLOSED` de reason `post_event` em corrida nos envios (Envios RN01; 332):
+ * o Toast com o texto dos Envios no pós-evento, igual nos dois perfis (337(1)), e o Dashboard
+ * relido, que fecha a tela. Devolve se tratou o erro.
+ */
+export function useDeliveriesPostEvent({ weddingId }: { weddingId: string }) {
+  const { t } = useTranslation('deliveries');
+  const { showToast } = useToast();
+  const queryClient = useQueryClient();
+  return (error: unknown): boolean => {
+    if (!(error instanceof ApiError) || apiErrorCode({ error }) !== 'DELIVERIES_CLOSED') {
+      return false;
+    }
+    const body: unknown = error.body;
+    if (typeof body !== 'object' || body === null || !('reason' in body)) return false;
+    if (body.reason !== 'post_event') return false;
+    showToast({ tone: 'danger', message: t('closed.postEvent') });
+    void queryClient.invalidateQueries({
+      queryKey: getDashboardControllerGetV1QueryKey(weddingId),
+    });
+    return true;
+  };
 }
