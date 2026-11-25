@@ -7,6 +7,7 @@ import type {
   ActivityResponse,
   ChecklistItemResponse,
   DashboardResponse,
+  MeMembershipResponse,
 } from '../../../shared/api/generated/model';
 import { useDashboardControllerGetV1 } from '../../../shared/api/generated/rsvp/rsvp';
 import { oneDot } from '../../../shared/date-texts';
@@ -30,6 +31,8 @@ import { guestsByRespondedAt } from '../../guests/hooks/use-party-filters';
 import { useArea, useAreaPaths, type AreaPaths } from '../../../app/area';
 import { formatRsvpPercent } from '../../../shared/rsvp-percent';
 import { canOpenPublish, publishWaitsCouple } from '../../billing/publish/publish-entry';
+import { lifecycleView } from '../../billing/lifecycle/lifecycle';
+import { LifecycleBadge, lifecycleText } from '../../billing/lifecycle/lifecycle-banner';
 
 /** O caminho de cada item do Checklist (RN03), na área da tela. */
 function checklistPaths(area: AreaPaths): Record<ChecklistItemResponse['key'], string> {
@@ -189,7 +192,12 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
             <DeliveryCard data={data} closed={closed} />
           </>
         )}
-        <SiteCard data={data} now={now} audience={audience} />
+        <SiteCard
+          data={data}
+          now={now}
+          audience={audience}
+          membership={me?.memberships.find((item) => item.weddingId === weddingId)}
+        />
         <ChecklistCard items={data.checklist} publishWaits={publishWaitsCouple(data.site.status)} />
         {!empty && <ActivityCard weddingId={weddingId} items={data.recentActivity} now={now} />}
       </div>
@@ -249,11 +257,14 @@ function SiteCard({
   data,
   now,
   audience,
+  membership,
 }: {
   data: DashboardResponse;
   now: Date;
   audience: Audience;
+  membership: MeMembershipResponse | undefined;
 }) {
+  const { t: tBilling } = useTranslation('billing');
   const area = useAreaPaths();
   const { t } = useTranslation('dashboard');
   const { t: tSite } = useTranslation('site');
@@ -261,6 +272,16 @@ function SiteCard({
   const status = siteStatus(data.site.status);
   const live = status === 'published' || status === 'post_event';
   const beforePublish = canOpenPublish(data.site.status);
+  // A carência e o expirado (Data de saída RN06; Penpot 03, A5): o selo e o texto das faixas,
+  // pelo lifecycle do /me (329(3)); sem os botões de mudar a data até o E10 (329(1)).
+  const source = membership?.lifecycle && {
+    lifecycle: membership.lifecycle,
+    eventDate: membership.eventDate,
+    timezone: membership.timezone,
+  };
+  const view = source ? lifecycleView({ ...source, now }) : null;
+  const lifecycleCaption = view ? lifecycleText({ view, audience, now, t: tBilling }) : null;
+  const final = view?.kind === 'expired' && view.variant === 'final';
   return (
     <section
       className="kore-dashboard__card kore-dashboard__card--half kore-dashboard__site"
@@ -269,19 +290,24 @@ function SiteCard({
       <h2 id="kore-dashboard-site" className="kore-dashboard__card-title">
         {t('site.title')}
       </h2>
-      {status && (
-        <Badge
-          tone={live ? 'success' : 'neutral'}
-          {...(live && { icon: <Check strokeWidth={2.4} /> })}
-          className="kore-dashboard__badge"
-        >
-          {tSite(`status.${status}`)}
-        </Badge>
+      {source ? (
+        <LifecycleBadge source={source} expiredTone="danger" className="kore-dashboard__badge" />
+      ) : (
+        status && (
+          <Badge
+            tone={live ? 'success' : 'neutral'}
+            {...(live && { icon: <Check strokeWidth={2.4} /> })}
+            className="kore-dashboard__badge"
+          >
+            {tSite(`status.${status}`)}
+          </Badge>
+        )
       )}
       {data.site.slug && (
         <p className="kore-dashboard__site-address">{tSite('address', { slug: data.site.slug })}</p>
       )}
-      {live && data.site.endDate && (
+      {lifecycleCaption && <p className="kore-dashboard__card-caption">{lifecycleCaption}</p>}
+      {!lifecycleCaption && live && data.site.endDate && (
         <p className="kore-dashboard__card-caption">
           {oneDot(t('site.endDate', { date: longDate({ day: data.site.endDate, now }) }))}
         </p>
@@ -308,6 +334,11 @@ function SiteCard({
             onClick={() => void navigate(area.billingPublish)}
           >
             {t('site.publish')}
+          </Button>
+        ) : final && audience === 'couple' ? (
+          // Sem renovação, o casal ainda exporta os convidados (314(1); Penpot 03, A5).
+          <Button size="sm" variant="secondary" onClick={() => void navigate(area.guestExport)}>
+            {tBilling('lifecycle.exportGuests')}
           </Button>
         ) : (
           <Button size="sm" variant="secondary" onClick={() => void navigate(area.site)}>
