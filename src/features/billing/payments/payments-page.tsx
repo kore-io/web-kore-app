@@ -16,6 +16,7 @@ import { siteStatus } from '../../site/site-texts';
 import { canOpenPublish, publishWaitsCouple } from '../publish/publish-entry';
 import { dayIn, numericDay, visibleStatus, type VisibleStatus } from './payments-texts';
 import { RefundSection } from './refund';
+import { canChangeEndDateFree } from '../end-date/end-date';
 import { lifecycleView } from '../lifecycle/lifecycle';
 import { graceLabel } from '../lifecycle/lifecycle-banner';
 
@@ -62,6 +63,19 @@ function Payments({ weddingId, owner }: { weddingId: string; owner: boolean }) {
   const data = billing.data;
   const waits = publishWaitsCouple(data.status);
   const description = subtitleOf({ data, now, t, tSite, timezone });
+  const changeEndDate =
+    owner &&
+    membership?.lifecycle !== undefined &&
+    canChangeEndDateFree({
+      source: {
+        status: membership.lifecycle.status,
+        endDate: membership.lifecycle.endDate,
+        paidThrough: membership.lifecycle.paidThrough,
+        eventDate: membership.eventDate,
+        timezone: membership.timezone,
+      },
+      now,
+    });
   return (
     <div className="kore-payments">
       <PageHeader
@@ -69,22 +83,29 @@ function Payments({ weddingId, owner }: { weddingId: string; owner: boolean }) {
         {...(description && { description })}
         actions={
           // Decisão 326(1): no rascunho, o Publicar o site; aguardando o casal, desabilitado
-          // com o motivo (325). O Mudar a data entra no E10 (326(3)).
-          canOpenPublish(data.status) && (
-            <div className="kore-payments__actions">
-              <Button
-                disabled={waits}
-                {...(waits && { 'aria-describedby': 'kore-payments-waits' })}
-                onClick={() => void navigate(paths.billingPublish)}
-              >
-                {t('payments.publish')}
-              </Button>
-              {waits && (
-                <p id="kore-payments-waits" className="kore-payments__help">
-                  {tSite('publishWaitsCouple')}
-                </p>
-              )}
-            </div>
+          // com o motivo (325). Publicado, o Mudar a data de saída do ar (secundário, Penpot
+          // 21) quando há o que mudar sem pagar (E10; 333(2)).
+          changeEndDate ? (
+            <Button variant="secondary" onClick={() => void navigate(paths.billingEndDate)}>
+              {t('endDate.title')}
+            </Button>
+          ) : (
+            canOpenPublish(data.status) && (
+              <div className="kore-payments__actions">
+                <Button
+                  disabled={waits}
+                  {...(waits && { 'aria-describedby': 'kore-payments-waits' })}
+                  onClick={() => void navigate(paths.billingPublish)}
+                >
+                  {t('payments.publish')}
+                </Button>
+                {waits && (
+                  <p id="kore-payments-waits" className="kore-payments__help">
+                    {tSite('publishWaitsCouple')}
+                  </p>
+                )}
+              </div>
+            )
           )
         }
       />

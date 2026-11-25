@@ -56,8 +56,8 @@ interface LifecycleSource {
 /**
  * A faixa fixa do ciclo de vida no topo das telas do casamento (RN06; Penpot 09, A8 "Faixa
  * / Expirado"): Atenção na carência, Erro no expirado, nas versões do casal e da
- * colaboradora. Sem os botões de mudar a data até o E10 (329(1)); o sem renovação do casal
- * leva a Exportar os convidados. Com o casamento bloqueado, a faixa do bloqueio a substitui
+ * colaboradora. O caso B do casal leva a Voltar ao ar (E10; 333(2)); o Adiar a data e o
+ * Renovar entram no E11; o sem renovação do casal leva a Exportar os convidados. Com o casamento bloqueado, a faixa do bloqueio a substitui
  * (329(4)).
  */
 export function LifecycleBanner({
@@ -75,12 +75,20 @@ export function LifecycleBanner({
   const text = lifecycleText({ view, audience, now, t });
   if (!text) return null;
   const exportLink = view.kind === 'expired' && view.variant === 'final' && audience === 'couple';
+  // O Voltar ao ar do caso B entra no E10 (333(2)); o Adiar a data e o Renovar, no E11.
+  const backOnline =
+    view.kind === 'expired' && view.variant === 'paidAhead' && audience === 'couple';
   return (
     <Alert
       tone={view.kind === 'grace' ? 'warning' : 'danger'}
       title={text}
       className="kore-lifecycle-banner"
     >
+      {backOnline && (
+        <Link to={paths.billingEndDate} className="kore-lifecycle-banner__link">
+          {t('endDate.backOnline')}
+        </Link>
+      )}
       {exportLink && (
         <Link to={paths.guestExport} className="kore-lifecycle-banner__link">
           {t('lifecycle.exportGuests')}

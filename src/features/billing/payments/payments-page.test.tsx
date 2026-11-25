@@ -131,9 +131,9 @@ describe('Cobrança e publicação › Pagamentos (Pagamentos RN01; Penpot 21, A
       'Cartão 2x',
       'Pago',
     ]);
-    // Publicado: sem o Publicar; o Mudar a data entra no E10 (326(3)).
+    // Publicado: sem o Publicar, e com o Mudar a data de saída do ar (E10; 333(2)).
     expect(screen.queryByRole('button', { name: 'Publicar o site' })).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Mudar a data de saída do ar' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Mudar a data de saída do ar' })).toBeEnabled();
   });
 
   it('as formas, o mês no singular e as seis situações (RN01)', async () => {
