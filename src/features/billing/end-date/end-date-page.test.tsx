@@ -400,6 +400,32 @@ describe('Pagar a extensão (Data de saída RN04; Preço RN03; 293(1)(2); Penpot
     );
   });
 
+  it.each([
+    // O mês pago à frente também já passou: vazio, e não uma data com erro.
+    ['2026-11-30', ''],
+    // Hoje é 01/12: o mês pago à frente ainda passou (o mínimo é amanhã).
+    ['2026-12-01', ''],
+    // A partir de amanhã, o campo abre no mês pago à frente.
+    ['2026-12-02', '2026-12-02'],
+    ['2026-12-20', '2026-12-20'],
+  ])(
+    'a carência com o paidThrough %s depois da endDate abre o campo em "%s" (335(1))',
+    async (paidThrough, value) => {
+      mockEndDate({
+        lifecycle: {
+          status: 'grace',
+          endDate: '2026-11-28',
+          paidThrough,
+          graceUntil: '2026-12-05',
+        },
+      });
+      renderRoute({ url: URL_END_DATE });
+      await ready();
+      expect(field()).toHaveValue(value);
+      expect(field()).not.toHaveAttribute('aria-invalid', 'true');
+    },
+  );
+
   it('no Pix, a extensão segue para a tela do Pix com o kind', async () => {
     const user = userEvent.setup();
     mockEndDate({
