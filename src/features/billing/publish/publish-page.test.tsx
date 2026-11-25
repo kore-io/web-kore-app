@@ -139,6 +139,7 @@ function mockPublish({
   paidAfterPay = true,
   blockedAfterPay = false,
   pendingPayment = () => null,
+  billingFailsAfterPay = false,
 }: {
   lifecycleOverrides?: Partial<typeof lifecycle>;
   site?: { slug: string | null; eventDate: string | null; state: string | null };
@@ -150,6 +151,8 @@ function mockPublish({
   paidAfterPay?: boolean;
   /** Depois do POST, o /me traz o casamento bloqueado (o bloqueio em corrida). */
   blockedAfterPay?: boolean;
+  /** Depois do POST, o GET …/billing falha (a rede). */
+  billingFailsAfterPay?: boolean;
   /** O pendente do GET …/billing, pelo número de POSTs feitos. */
   pendingPayment?: (posts: number) => Record<string, unknown> | null;
 } = {}) {
@@ -170,6 +173,9 @@ function mockPublish({
       return Response.json(quoteFor(url.searchParams));
     }
     if (url.pathname === '/v1/weddings/w1/billing') {
+      if (billingFailsAfterPay && payments.length > 0) {
+        return apiError({ status: 503, body: { error: 'UNAVAILABLE' } });
+      }
       const paid = paidAfterPay && payments.length > 0;
       return Response.json({
         status: paid ? 'published' : 'draft',
@@ -737,6 +743,30 @@ describe('Publicar o site, o pagar com o cartão (E3; Publicar RN02 a RN07; deci
       ),
     ).not.toHaveLength(0);
     expect(payButton()).toBeDisabled();
+  });
+
+  it('a consulta do billing que falha depois do POST segue no Confirmando, sem o recusado (achado do Crivo no E4)', async () => {
+    const user = userEvent.setup();
+    const api = mockPublish({ paidAfterPay: false, billingFailsAfterPay: true });
+    renderAreaScreen({ url: URL_PUBLISH });
+    await ready(user);
+    await fillCardAndPayer(user);
+    await user.click(payButton());
+    expect(
+      await screen.findAllByText(
+        'Confirmando o pagamento com o banco do cartão. Isso leva alguns segundos.',
+      ),
+    ).not.toHaveLength(0);
+    // A consulta depois do POST já falhou: a tela não conclui nada com a do cache.
+    await waitFor(() =>
+      expect(
+        api.fetchMock.mock.calls.filter(([input]) =>
+          String(input).endsWith('/v1/weddings/w1/billing'),
+        ).length,
+      ).toBeGreaterThanOrEqual(2),
+    );
+    expect(screen.queryByText(/^O banco do cartão não aprovou/)).toBeNull();
+    expect(screen.getByRole('status')).toHaveTextContent('Confirmando o pagamento');
   });
 
   it('o cartão que sai do pendente sem o site publicado vira o recusado (a lista só traz os aplicados)', async () => {
