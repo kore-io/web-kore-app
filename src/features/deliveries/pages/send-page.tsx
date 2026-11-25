@@ -1,6 +1,7 @@
 import { Spinner } from '@kore-io/design';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
+import { useAreaPaths } from '../../../app/area';
 import { useDashboardControllerGetV1 } from '../../../shared/api/generated/rsvp/rsvp';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { useActiveWedding, type Audience } from '../../guests/hooks/use-active-wedding';
@@ -97,11 +98,18 @@ function Stepper({ step }: { step: Step }) {
 /** A legenda de antes de publicar (RN01; A2), nas duas vozes; o casal ganha o link. */
 export function ClosedNotice({ audience, closed }: { audience: Audience; closed: Closed }) {
   const { t } = useTranslation('deliveries');
+  const area = useAreaPaths();
   if (closed !== 'not_published') return null;
   return (
     <p className="kore-send__closed" id="kore-send-closed">
-      {/* O link Publicar o site volta com a tela paga do front da F3 (decisão 243). */}
       {t(`closed.notPublished.${audience}`)}
+      {/* Só o casal publica (Publicar e pagar RN01; decisão 243(c)). */}
+      {audience === 'couple' && (
+        <>
+          {' '}
+          <Link to={area.billingPublish}>{t('closed.publish')}</Link>
+        </>
+      )}
     </p>
   );
 }

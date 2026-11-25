@@ -230,14 +230,17 @@ describe('Envios › as abas e os grupos (Envios RN01, RN03, RN04, RN10; decisã
     await waitFor(() => expect(router.state.location.search).toBe('?etapa=canal'));
   });
 
-  it('antes de publicar: a legenda e Continuar desabilitado, sem o link até a tela paga da F3 (decisão 243)', async () => {
+  it('antes de publicar: a legenda com o link Publicar o site e Continuar desabilitado; a cerimonialista, sem o link (243(c))', async () => {
     mockSend({ status: 'draft' });
     preset(['p1']);
     const view = renderRoute({ url: '/app/envios/convites' });
     const continueButton = await screen.findByRole('button', { name: 'Continuar' });
     expect(continueButton).toBeDisabled();
     expect(continueButton).toHaveAccessibleDescription(/Publiquem o site para começar os envios\./);
-    expect(screen.queryByRole('link', { name: 'Publicar o site' })).toBeNull();
+    expect(screen.getByRole('link', { name: 'Publicar o site' })).toHaveAttribute(
+      'href',
+      '/app/cobranca/publicar',
+    );
     view.unmount();
     profileUnderTest.current = 'planner';
     mockSend({ status: 'draft' });

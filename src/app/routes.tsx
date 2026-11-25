@@ -82,8 +82,8 @@ function areaRoutes({ prefix }: { prefix: 'couple' | 'planner' }): RouteObject[]
       ),
     },
     { id: 'songs', path: 'musicas', element: <SongsPage /> },
-    // Publicar o site (E2 da F3): a entrada pela tela volta no E5, e o item da Sidebar entra
-    // com Pagamentos, no E6 (decisão 322).
+    // Publicar o site (E2 da F3): entra pelo Editor, pelo Dashboard e por Envios (E5); o item
+    // da Sidebar entra com Pagamentos, no E6 (decisão 322).
     { id: 'billing-publish', path: 'cobranca/publicar', element: <PublishPage /> },
     { id: 'billing-pix', path: 'cobranca/pix', element: <PixPage /> },
     { id: 'collaborators', path: 'colaboradores', element: <CollaboratorsPage /> },
