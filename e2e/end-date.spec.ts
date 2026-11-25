@@ -156,7 +156,9 @@ test('o caso B volta ao ar pela faixa, de graça (289(1); 293(5)(6); 333(2))', a
   await page.locator('.kore-lifecycle-banner').getByRole('link', { name: 'Voltar ao ar' }).click();
   await expect(page).toHaveURL(/\/app\/cobranca\/data-de-saida$/);
   await page.getByRole('button', { name: 'Voltar ao ar' }).click();
-  await expect(toast({ page, text: /^O site voltou ao ar e fica até / })).toBeVisible();
+  await expect(
+    page.getByRole('region', { name: /^Avisos/ }).getByText(/^O site voltou ao ar e fica até /),
+  ).toBeVisible();
   const { rows } = await db.query<{ status: string; expired_at: string | null }>(
     'select status, expired_at from weddings where id = $1',
     [weddingId],
