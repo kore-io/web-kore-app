@@ -64,6 +64,59 @@
       "noEventDateAndState": "Informem a data e a UF do casamento em Dados básicos para publicar.",
       "awaitingCouple": "O casal ainda não aceitou o convite.",
       "noDate": "Escolham a data de saída do ar para publicar."
+    },
+    "card": {
+      "number": {
+        "label": "Número do cartão",
+        "placeholder": "0000 0000 0000 0000",
+        "empty": "Informem o número do cartão.",
+        "invalid": "Este número de cartão não é válido. Confiram os números."
+      },
+      "holder": {
+        "label": "Nome impresso no cartão",
+        "placeholder": "Como está no cartão",
+        "empty": "Informem o nome como está impresso no cartão."
+      },
+      "expiry": {
+        "label": "Validade",
+        "placeholder": "MM/AA",
+        "empty": "Informem a validade, como 08/29.",
+        "format": "A validade precisa ter mês e ano, como 08/29.",
+        "expired": "Este cartão está vencido. Usem outro cartão ou paguem com Pix."
+      },
+      "cvv": {
+        "label": "CVV",
+        "placeholder": "000",
+        "help": "O CVV tem 3 ou 4 números, no verso ou na frente do cartão.",
+        "empty": "Informem o CVV, os 3 ou 4 números no verso ou na frente do cartão.",
+        "size": "O CVV tem 3 ou 4 números, no verso ou na frente do cartão."
+      }
+    },
+    "payer": {
+      "title": "Quem paga",
+      "name": {
+        "label": "Nome completo",
+        "placeholder": "Nome de quem paga",
+        "empty": "Informem o nome de quem paga."
+      },
+      "taxId": {
+        "label": "CPF",
+        "placeholder": "000.000.000-00",
+        "help": "Pode ser outra pessoa, como mãe ou pai. O CPF serve só para a cobrança e para evitar fraude, e o Kore não guarda o número inteiro.",
+        "invalid": "Este CPF não é válido. Confiram os números."
+      },
+      "previous": "{{name}} · CPF final {{last4}}",
+      "useOther": "Usar outro CPF"
+    },
+    "confirming": "Confirmando o pagamento com o banco do cartão. Isso leva alguns segundos.",
+    "declined": "O banco do cartão não aprovou o pagamento. Confiram os dados, usem outro cartão ou paguem com Pix.",
+    "toast": {
+      "confirmed": "Pagamento confirmado. O site está no ar.",
+      "priceChanged": "O valor mudou. Confiram o novo total antes de pagar.",
+      "paymentPending": "Já há um pagamento aguardando confirmação. Vejam em Pagamentos.",
+      "refundInProgress": "O reembolso anterior ainda está em andamento. Publiquem de novo quando ele for concluído.",
+      "gatewayUnavailable": "O serviço de pagamento não respondeu. Tentem de novo em alguns minutos. Se continuar, escrevam para suporte@kore.com.br.",
+      "alreadyPublished": "O site já está publicado."
     }
   }
 }
