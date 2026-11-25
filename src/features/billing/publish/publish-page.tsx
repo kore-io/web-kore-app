@@ -285,9 +285,11 @@ function PublishForm({
   useEffect(() => {
     if (resumable?.method !== 'card' || resumed.current) return;
     resumed.current = true;
+    // A data do pendente no campo (sugestão do Crivo no E4; 324(3)).
+    setEndDate((current) => (current === '' ? resumable.endDate : current));
     payment.resume({ paymentId: resumable.paymentId });
     // A trava retoma uma vez só, quando o pendente aparece.
-  }, [resumable?.method, resumable?.paymentId, payment]);
+  }, [resumable?.method, resumable?.paymentId, resumable?.endDate, payment]);
   const debouncedEndDate = useDebouncedValue({ value: endDate, delayMs: QUOTE_DEBOUNCE_MS });
   const free = pricing.installments.interestFreeUpTo;
   const max = limits?.endDateMax ?? null;
