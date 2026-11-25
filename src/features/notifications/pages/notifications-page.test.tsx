@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../../../tests/a11y';
 import { meFor, profileUnderTest } from '../../../../tests/profile';
 import {
@@ -144,25 +144,49 @@ describe('Notificações (Central RN04 a RN06)', () => {
     expect(router.state.location.search).toBe('?ordem=respondido');
   });
 
-  it('o aviso de cobrança (billing) não aparece: o front da F3 o desenha (Central RN01)', async () => {
+  it('o aviso de cobrança aparece com o título, o valor no detalhe e a data (E12; Publicar RN13)', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-08-12T15:00:00Z'));
+    onTestFinished(() => {
+      vi.useRealTimers();
+    });
     mockNotifications({
       pages: [
         [
-          notification('nb', { type: 'billing', payload: [{ kind: 'payment_confirmed' }] }),
+          notification('nb', {
+            type: 'billing',
+            payload: [
+              {
+                kind: 'payment_confirmed',
+                paymentId: 'p1',
+                endDate: '2027-02-14',
+                amountCents: 33710,
+                method: 'card',
+                installments: 2,
+                cardLast4: '4821',
+                at: '2026-08-10T14:48:00Z',
+              },
+            ],
+          }),
           notification('n1'),
         ],
       ],
     });
     renderRoute({ url: '/app/notificacoes' });
     const items = await screen.findAllByRole('listitem');
-    expect(items).toHaveLength(1);
-    expect(items[0]).toHaveTextContent('Família Moreira respondeu o convite');
-    expect(screen.queryByText(/^ respondeu o convite/)).toBeNull();
+    expect(items).toHaveLength(2);
+    expect(items[0]).toHaveTextContent(
+      'Pagamento confirmado. O site está no ar até 14 de fev. de 2027',
+    );
+    // A hora é a do fuso de quem lê: os testes rodam em SP e em UTC.
+    expect(items[0]).toHaveTextContent(
+      /R\$\s337,10 no cartão final 4821, 2x · 10\/08 às \d{1,2}h48/,
+    );
   });
 
-  it('só avisos de cobrança: o vazio', async () => {
+  it('um aviso de cobrança que o app não conhece fica fora, e a lista sem ele mostra o vazio', async () => {
     mockNotifications({
-      pages: [[notification('nb', { type: 'billing', payload: [{ kind: 'payment_confirmed' }] })]],
+      pages: [[notification('nb', { type: 'billing', payload: [{ kind: 'outro_aviso' }] })]],
     });
     renderRoute({ url: '/app/notificacoes' });
     expect(await screen.findByText('Ainda não há notificações')).toBeInTheDocument();
@@ -203,6 +227,51 @@ describe('Notificações (Central RN04 a RN06)', () => {
     await waitFor(() =>
       expect(calls.map((call) => call.path)).toContain(
         '/v1/me/notifications?weddingId=w1&type=rsvp',
+      ),
+    );
+  });
+
+  it('abrir um aviso de cobrança marca como lida e leva ao destino (E12; decisão 336(1))', async () => {
+    const user = userEvent.setup();
+    const billing = (id: string, entry: object) =>
+      notification(id, { type: 'billing', payload: [{ at: today(9, 0), ...entry }] });
+    const calls = mockNotifications({
+      pages: [
+        [
+          billing('b1', { kind: 'grace', day: 1, graceUntil: '2027-02-21' }),
+          billing('b2', { kind: 'purge_soon', purgeAt: '2027-08-22' }),
+          billing('b3', { kind: 'refund_completed', amountCents: 1000, method: 'pix' }),
+        ],
+      ],
+    });
+    const { router } = renderRoute({ url: '/app/notificacoes' });
+    // O casamento do mock é rascunho: a tela da data devolve a Pagamentos. Vale o caminho pedido.
+    const visited: string[] = [];
+    router.subscribe((state) => visited.push(state.location.pathname));
+    await user.click(await screen.findByRole('button', { name: /^A data de saída do ar passou/ }));
+    await waitFor(() => expect(visited).toContain('/app/cobranca/data-de-saida'));
+    expect(calls).toContainEqual({ method: 'POST', path: '/v1/me/notifications/b1/read' });
+    await router.navigate('/app/notificacoes');
+    await user.click(await screen.findByRole('button', { name: /^Os dados do casamento/ }));
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app/convidados/exportar'));
+    await router.navigate('/app/notificacoes');
+    await user.click(await screen.findByRole('button', { name: /^Reembolso concluído/ }));
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app/cobranca'));
+  });
+
+  it('o filtro Cobrança pede o tipo billing (241(4))', async () => {
+    const user = userEvent.setup();
+    const calls = mockNotifications();
+    renderRoute({ url: '/app/notificacoes' });
+    await screen.findAllByRole('listitem');
+    const filter = screen.getByRole('combobox', { name: 'Tipo' });
+    expect(
+      Array.from((filter as HTMLSelectElement).options).map((option) => option.textContent),
+    ).toEqual(['Todas', 'Respostas', 'Cobrança']);
+    await user.selectOptions(filter, 'Cobrança');
+    await waitFor(() =>
+      expect(calls.map((call) => call.path)).toContain(
+        '/v1/me/notifications?weddingId=w1&type=billing',
       ),
     );
   });

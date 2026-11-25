@@ -8,7 +8,8 @@
   "filter": {
     "label": "Tipo",
     "all": "Todas",
-    "rsvp": "Respostas"
+    "rsvp": "Respostas",
+    "billing": "Cobrança"
   },
   "empty": {
     "title": "Ainda não há notificações",
@@ -23,16 +24,36 @@
     "section": "O que avisar",
     "subtitle": "Escolha como você quer receber cada aviso.",
     "rsvp": "Respostas do convite",
+    "billing": "Cobrança e pagamentos",
     "email": "E-mail",
     "emailOptions": {
       "immediate": "Na hora",
       "daily": "Resumo diário às 20h",
       "off": "Desligado"
     },
+    "always": "Sempre",
     "push": "Push no celular (app instalado)",
     "pushDenied": "O navegador bloqueou as notificações do Kore. Libere nas configurações do navegador ou do aparelho.",
     "pushInstall": "Para receber push, instale o Kore no seu celular.",
     "note": "A central do app sempre recebe tudo. O push mostra só o nome do grupo, sem valores nem o texto do recado.",
+    "billingNote": "Os avisos de pagamento, de saída do ar e de exclusão do casamento sempre chegam por e-mail.",
     "saved": "Preferências salvas."
+  },
+  "billing": {
+    "paymentConfirmed": "Pagamento confirmado. O site está no ar até {{date}}",
+    "refundCompleted": "Reembolso concluído",
+    "endDateSoon_one": "O site fica no ar até {{date}}, daqui a {{count}} dia. Adiem a data para mantê-lo",
+    "endDateSoon_other": "O site fica no ar até {{date}}, daqui a {{count}} dias. Adiem a data para mantê-lo",
+    "endDateTomorrow": "O site fica no ar até amanhã, {{date}}. Adiem a data para mantê-lo",
+    "grace": "A data de saída do ar passou. O site fica no ar só até {{date}}",
+    "expired": "O site saiu do ar. Renovem para os convidados voltarem a vê-lo",
+    "expiredPaidAhead": "O site saiu do ar. Vocês já pagaram até {{date}}: voltem o site ao ar, sem custo",
+    "expiredFinal": "O site saiu do ar e não pode mais ser renovado. Exportem os convidados",
+    "keptUntil": "Os dados ficam guardados até {{date}}",
+    "purgeSoon": "Os dados do casamento serão apagados em {{date}}",
+    "courtesy": "O Kore estendeu o site sem custo. Ele fica no ar até {{date}}",
+    "card": "{{amount}} no cartão final {{last4}}",
+    "cardInstallments": "{{amount}} no cartão final {{last4}}, {{count}}x",
+    "pix": "{{amount}} por Pix"
   }
 }

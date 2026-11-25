@@ -45,6 +45,8 @@ function NotificationSettings({ weddingId }: { weddingId: string }) {
   const params = { weddingId };
   const preferences = useNotificationsControllerGetPreferencesV1(params);
   const rsvp = preferences.data?.items.find((item) => item.type === 'rsvp');
+  // Os avisos de cobrança, só para quem os recebe (o casal; decisão 236).
+  const billing = preferences.data?.items.find((item) => item.type === 'billing');
   const queryKey = getNotificationsControllerGetPreferencesV1QueryKey(params);
   const [availability, setAvailability] = useState<PushAvailability>(() => pushAvailability());
   const [pushBusy, setPushBusy] = useState(false);
@@ -137,6 +139,16 @@ function NotificationSettings({ weddingId }: { weddingId: string }) {
               </Select>
             </div>
           </div>
+          {billing && (
+            // Cobrança e pagamentos (236(3)): o e-mail fixo, sem seletor, "Sempre".
+            <div className="kore-settings__row">
+              <p className="kore-settings__type">{t('settings.billing')}</p>
+              <div className="kore-settings__field">
+                <span className="kore-settings__label">{t('settings.email')}</span>
+                <span className="kore-settings__fixed">{t('settings.always')}</span>
+              </div>
+            </div>
+          )}
           <PushRow
             push={preferences.data?.push}
             availability={availability}
@@ -144,6 +156,7 @@ function NotificationSettings({ weddingId }: { weddingId: string }) {
             onToggle={(on, vapidPublicKey) => void togglePush({ on, vapidPublicKey })}
           />
           <p className="kore-settings__note">{t('settings.note')}</p>
+          {billing && <p className="kore-settings__note">{t('settings.billingNote')}</p>}
         </section>
       )}
     </div>

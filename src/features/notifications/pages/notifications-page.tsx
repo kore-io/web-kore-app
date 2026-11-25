@@ -21,13 +21,18 @@ import { activityDate, activityTexts } from '../../dashboard/dashboard-texts';
 import { useActiveWedding } from '../../guests/hooks/use-active-wedding';
 import { useMarkNotificationRead } from '../hooks/use-mark-notification-read';
 import { isResponseItem, responseGroups } from '../notification-shape';
+import { billingEntry, billingTexts } from '../billing-notification';
 import { guestsByRespondedAt } from '../../guests/hooks/use-party-filters';
 import { useAreaPaths } from '../../../app/area';
 
 type Filter = '' | NotificationsControllerListV1Type;
 
-/** O tipo que a central desenha na F5: a resposta do convite, com ao menos um grupo. */
+/**
+ * Os tipos que a central do casal desenha: a resposta do convite, com ao menos um grupo, e
+ * os avisos de cobrança (E12; Publicar e pagar RN13; 241(4)).
+ */
 function isDrawn(item: NotificationResponse): boolean {
+  if (item.type === 'billing') return billingEntry(item.payload) !== null;
   return item.type === 'rsvp' && isResponseItem(item.payload);
 }
 
@@ -90,8 +95,7 @@ function Notifications({ weddingId }: { weddingId: string }) {
         message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
       }),
   });
-  // Só os tipos que o app desenha (as respostas, Central RN01): a API já grava os de
-  // cobrança (Publicar e pagar RN13), que entram com o front da F3.
+  // Só os tipos que o app desenha: as respostas e a cobrança (Central RN01; E12).
   const items = (list.data?.pages.flatMap((page) => page.items) ?? []).filter(isDrawn);
   const hasUnread = items.some((item) => item.readAt === null);
 
@@ -108,6 +112,7 @@ function Notifications({ weddingId }: { weddingId: string }) {
             >
               <option value="">{t('filter.all')}</option>
               <option value="rsvp">{t('filter.rsvp')}</option>
+              <option value="billing">{t('filter.billing')}</option>
             </Select>
             <Button
               variant="secondary"
@@ -138,9 +143,13 @@ function Notifications({ weddingId }: { weddingId: string }) {
       ) : (
         <>
           <ul className="kore-notifications__list">
-            {items.map((item) => (
-              <NotificationItem key={item.id} weddingId={weddingId} item={item} />
-            ))}
+            {items.map((item) =>
+              item.type === 'billing' ? (
+                <BillingItem key={item.id} weddingId={weddingId} item={item} />
+              ) : (
+                <NotificationItem key={item.id} weddingId={weddingId} item={item} />
+              ),
+            )}
           </ul>
           {list.hasNextPage && (
             <div className="kore-notifications__more">
@@ -206,6 +215,55 @@ function NotificationItem({ weddingId, item }: { weddingId: string; item: Notifi
               <span className="kore-notifications__detail">{date}</span>
             </>
           )}
+        </span>
+      </button>
+    </li>
+  );
+}
+
+/**
+ * Um aviso de cobrança (E12; Penpot 25 "Notificações — Cobrança"): o título sem ponto final e
+ * o detalhe com o valor, quando há, e a data. Abrir marca como lida e leva a Pagamentos, a
+ * Mudar a data ou ao Exportar os convidados.
+ */
+function BillingItem({ weddingId, item }: { weddingId: string; item: NotificationResponse }) {
+  const area = useAreaPaths();
+  const { t } = useTranslation('notifications');
+  const { t: tDashboard } = useTranslation('dashboard');
+  const navigate = useNavigate();
+  const markRead = useMarkNotificationRead({ weddingId });
+  const entry = billingEntry(item.payload);
+  if (!entry) return null;
+  const now = new Date();
+  const texts = billingTexts({ entry, now, t });
+  const date = activityDate({ t: tDashboard, at: entry.at, now });
+  const unread = item.readAt === null;
+  const to =
+    texts.destination === 'payments'
+      ? area.billing
+      : texts.destination === 'endDate'
+        ? area.billingEndDate
+        : area.guestExport;
+  return (
+    <li>
+      <button
+        type="button"
+        className="kore-notifications__item"
+        data-unread={unread || undefined}
+        onClick={() => {
+          if (unread) markRead({ id: item.id });
+          void navigate(to);
+        }}
+      >
+        {unread && <span className="kore-notifications__dot" aria-hidden="true" />}
+        <span className="kore-notifications__text">
+          <span className="kore-notifications__title">
+            {texts.title}
+            {unread && <span className="kore-notifications__sr">, {t('unread')}</span>}
+          </span>
+          <span className="kore-notifications__detail">
+            {[texts.detail, date].filter(Boolean).join(' · ')}
+          </span>
         </span>
       </button>
     </li>

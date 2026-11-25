@@ -88,6 +88,16 @@
   @apply type-label text-ink;
 }
 
+/* Duas linhas seguidas: uma borda só entre elas. */
+.kore-settings__row + .kore-settings__row {
+  @apply border-t-0;
+}
+
+/* O e-mail fixo da linha Cobrança e pagamentos (236(3)): o texto, sem seletor. */
+.kore-settings__fixed {
+  @apply type-body-md text-gray-700;
+}
+
 .kore-settings__push {
   @apply flex flex-col gap-1.5 border-b border-gray-300 pb-4;
 }
