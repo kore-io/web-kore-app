@@ -106,6 +106,18 @@ describe('o texto do Dialog da publicação com extensões (Pena; decisões 327(
         'O site sai do ar e volta a ser rascunho. Devolvemos R$ 511,10. A publicação e uma extensão, R$ 424,10, voltam no cartão que pagou. A outra extensão, R$ 87,00, volta por Pix, para a conta que pagou.',
       ),
     );
+    // O acréscimo da 328: duas extensões na forma da publicação e a outra em outra forma.
+    expect(
+      describeFor(card, [
+        extension(),
+        extension({ paidAt: '2026-08-12T10:00:00Z' }),
+        extension({ method: 'pix', paidAt: '2026-08-13T10:00:00Z' }),
+      ]),
+    ).toBe(
+      nb(
+        'O site sai do ar e volta a ser rascunho. Devolvemos R$ 598,10. A publicação e as extensões, R$ 511,10, voltam no cartão que pagou. A outra extensão, R$ 87,00, volta por Pix, para a conta que pagou.',
+      ),
+    );
     expect(
       describeFor(card, [
         extension({ method: 'pix' }),
