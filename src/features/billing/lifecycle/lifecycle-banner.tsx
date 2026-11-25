@@ -81,7 +81,11 @@ export function LifecycleBanner({
       title={text}
       className="kore-lifecycle-banner"
     >
-      {exportLink && <Link to={paths.guestExport}>{t('lifecycle.exportGuests')}</Link>}
+      {exportLink && (
+        <Link to={paths.guestExport} className="kore-lifecycle-banner__link">
+          {t('lifecycle.exportGuests')}
+        </Link>
+      )}
     </Alert>
   );
 }

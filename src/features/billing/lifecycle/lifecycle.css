@@ -1,0 +1,12 @@
+/*
+ * A faixa do ciclo de vida (Penpot 09, A8 "Faixa / Expirado"): o Alert no topo do conteúdo,
+ * com 24 px até o título da tela; o link (Exportar os convidados) em primary.dark, como o
+ * "Renovar" do Penpot.
+ */
+.kore-lifecycle-banner {
+  @apply mb-6;
+}
+
+.kore-lifecycle-banner__link {
+  @apply type-link text-primary-dark;
+}
