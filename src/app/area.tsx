@@ -67,6 +67,8 @@ export function areaPaths(base: string) {
     billing: `${base}/cobranca`,
     /** Cobrança e publicação › Publicar o site (Publicar e pagar RN01; decisão 316(2)). */
     billingPublish: `${base}/cobranca/publicar`,
+    /** Mudar a data de saída do ar (Data de saída RN04 e RN05; decisão 316(2); E10). */
+    billingEndDate: `${base}/cobranca/data-de-saida`,
     /** Pagar com Pix (Publicar e pagar RN03; decisão 316(2)). */
     billingPix: `${base}/cobranca/pix`,
     /** Site › Editor (decisão 214): abre os Dados básicos. */

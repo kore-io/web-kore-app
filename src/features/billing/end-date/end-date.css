@@ -1,0 +1,28 @@
+/*
+ * Mudar a data de saída do ar (Penpot 21, A6): no computador, a coluna das escolhas e a do
+ * resumo (400 px), com 24 px; os botões à direita, Cancelar e o primário. No celular, tudo numa
+ * coluna, com os botões na largura toda e o primário em cima (column-reverse).
+ */
+.kore-end-date {
+  @apply flex flex-col gap-6;
+}
+
+.kore-end-date__columns {
+  @apply flex flex-col gap-6 lg:flex-row lg:items-start;
+}
+
+.kore-end-date__choices {
+  @apply flex min-w-0 flex-1 flex-col gap-6;
+}
+
+.kore-end-date__summary {
+  @apply flex min-w-0 flex-col gap-4 lg:w-100 lg:shrink-0;
+}
+
+.kore-end-date__reason {
+  @apply m-0 type-caption text-gray-700 lg:text-right;
+}
+
+.kore-end-date__buttons {
+  @apply flex flex-col-reverse gap-3 lg:flex-row lg:justify-end;
+}

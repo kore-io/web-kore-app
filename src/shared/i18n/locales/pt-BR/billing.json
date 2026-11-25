@@ -258,5 +258,27 @@
       }
     },
     "exportGuests": "Exportar os convidados"
+  },
+  "endDate": {
+    "title": "Mudar a data de saída do ar",
+    "loading": "Carregando a data de saída do ar",
+    "onAirUntil": "No ar até {{date}}",
+    "offAirSince": "Fora do ar desde {{date}}",
+    "label": "Nova data de saída do ar",
+    "help": "Até {{max}}, 12 meses depois do casamento.",
+    "helpPaidAhead": "Até {{paidThrough}}, sem custo. Depois dela, até {{max}}, com os meses a mais.",
+    "bringForwardAlert": "Antecipar a data não devolve dinheiro: os meses já pagos não voltam.",
+    "freeAlert": "Sem cobrança: vocês já pagaram até {{date}}.",
+    "beyondPaid": "Esta data é depois do que vocês já pagaram. Atualizem a tela e escolham de novo.",
+    "cancel": "Cancelar",
+    "bringForward": "Antecipar a data",
+    "backOnline": "Voltar ao ar",
+    "backDate": "Voltar a data",
+    "extend": "Pagar e adiar",
+    "renew": "Pagar e renovar",
+    "toast": {
+      "backOnline": "O site voltou ao ar e fica até {{date}}.",
+      "until": "O site fica no ar até {{date}}."
+    }
   }
 }
