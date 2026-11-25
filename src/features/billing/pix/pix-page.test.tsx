@@ -252,6 +252,46 @@ describe('Pagar com Pix (Publicar RN03, RN07, RN11 e RN13; Penpot 21, A3)', () =
     });
   });
 
+  it('a extensão: a nova data vale na confirmação, que leva a Pagamentos com o Toast da data (E11)', async () => {
+    const EXTENSION = { ...PENDING, paymentId: 'x1', kind: 'extension', endDate: '2027-05-14' };
+    mockPix({
+      billing: (call) =>
+        call === 1
+          ? { status: 'published', pendingPayment: EXTENSION }
+          : {
+              status: 'published',
+              pendingPayment: null,
+              endDate: '2027-05-14',
+              payments: [{ id: 'x1', status: 'paid' }],
+            },
+    });
+    const { router } = renderAreaScreen({ url: URL_PIX });
+    expect(
+      await screen.findByText('A nova data vale assim que o pagamento for confirmado.'),
+    ).toBeInTheDocument();
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app/cobranca'), {
+      timeout: 7000,
+    });
+    expect(screen.getByText('O site fica no ar até 14 de mai. de 2027.')).toBeInTheDocument();
+  }, 10_000);
+
+  it('a extensão: o Pagar com cartão volta à tela da data, com o pendente a trocar (E11; 324)', async () => {
+    const user = userEvent.setup();
+    const EXTENSION = { ...PENDING, paymentId: 'x1', kind: 'extension', endDate: '2027-05-14' };
+    mockPix({ billing: () => ({ status: 'published', pendingPayment: EXTENSION }) });
+    const { router } = renderAreaScreen({ url: URL_PIX });
+    const visited: [string, unknown][] = [];
+    router.subscribe((state) => visited.push([state.location.pathname, state.location.state]));
+    await user.click(await screen.findByRole('button', { name: 'Pagar com cartão' }));
+    // A 1ª navegação; o /me deste teste está em rascunho, e a tela da data devolve a Pagamentos.
+    await waitFor(() =>
+      expect(visited[0]).toEqual([
+        '/app/cobranca/data-de-saida',
+        { method: 'card', endDate: '2027-05-14', replacesPaymentId: 'x1' },
+      ]),
+    );
+  });
+
   it('sem Pix pendente, o Publicar', async () => {
     mockPix({ billing: () => ({ status: 'draft', pendingPayment: null }) });
     const { router } = renderAreaScreen({ url: URL_PIX });
