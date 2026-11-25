@@ -106,6 +106,14 @@ describe('Convidados no casamento bloqueado (Bloqueado RN02 a RN04)', () => {
     }
   });
 
+  it('sem marcar grupos: as ações em lote são escrita (Penpot 05, "— bloqueado")', async () => {
+    mockGuests();
+    renderRoute({ url: '/app/convidados' });
+    expect(
+      await screen.findByRole('checkbox', { name: 'Selecionar Família Moreira' }),
+    ).toBeDisabled();
+  });
+
   it('no ⋮ da linha, Editar e Mover para a lixeira desabilitados; Abrir e Copiar link, não', async () => {
     const user = userEvent.setup();
     mockGuests();

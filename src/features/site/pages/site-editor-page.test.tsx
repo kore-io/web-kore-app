@@ -285,12 +285,11 @@ describe('Site › Editor no casamento bloqueado (Bloqueado RN02 a RN04)', () =>
     });
   }
 
-  it('o Salvar fica desabilitado com o motivo, mesmo com mudança; o Pré-visualizar continua', async () => {
-    const user = userEvent.setup();
+  it('a seção em leitura e o Salvar desabilitado com o motivo; o Pré-visualizar continua (Penpot 09)', async () => {
     mockBlocked();
     renderRoute({ url: '/app/site/dados-basicos' });
     const city = await screen.findByRole('textbox', { name: 'Cidade' });
-    await user.type(city, 'x');
+    expect(city).toBeDisabled();
     const save = screen.getByRole('button', { name: 'Salvar' });
     expect(save).toBeDisabled();
     expect(save).toHaveAccessibleDescription(LOCKED);

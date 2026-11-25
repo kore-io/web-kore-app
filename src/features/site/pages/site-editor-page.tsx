@@ -247,33 +247,37 @@ function SiteEditor({
                 <h2 id="kore-site-section-title" className="kore-site-editor__panel-title">
                   {t(`sections.names.${sectionKey}`)}
                 </h2>
-                {sectionKey === 'basics' && (
-                  <BasicsSection
-                    // O que cada um pode mudar e a publicação mudam os campos: a seção remonta.
-                    key={`${data.publishedAt ?? ''}:${JSON.stringify(data.editable)}`}
-                    weddingId={weddingId}
-                    site={data}
-                    audience={audience}
-                  />
-                )}
-                {sectionKey === 'appearance' && (
-                  <AppearanceSection weddingId={weddingId} site={data} audience={audience} />
-                )}
-                {sectionKey === 'song_question' && (
-                  <SongQuestionSection weddingId={weddingId} songQuestion={data.songQuestion} />
-                )}
-                {(() => {
-                  const section = data.sections.find((item) => item.type === sectionKey);
-                  if (!section) return null;
-                  const props = { weddingId, site: data, section, audience };
-                  if (section.type === 'story') return <StorySection {...props} />;
-                  if (section.type === 'countdown') return <CountdownSection {...props} />;
-                  if (section.type === 'ceremony') return <CeremonySection {...props} />;
-                  if (section.type === 'lodging') return <LodgingSection {...props} />;
-                  if (section.type === 'dress_code') return <DressCodeSection {...props} />;
-                  if (section.type === 'faq') return <FaqSection {...props} />;
-                  return null;
-                })()}
+                {/* Bloqueado RN04 (Penpot 09, "Editor — Dados básicos — bloqueado"): a seção em
+                    leitura, com os campos desabilitados; o motivo fica junto do Salvar. */}
+                <fieldset className="kore-site-editor__fieldset" disabled={lock.locked}>
+                  {sectionKey === 'basics' && (
+                    <BasicsSection
+                      // O que cada um pode mudar e a publicação mudam os campos: a seção remonta.
+                      key={`${data.publishedAt ?? ''}:${JSON.stringify(data.editable)}`}
+                      weddingId={weddingId}
+                      site={data}
+                      audience={audience}
+                    />
+                  )}
+                  {sectionKey === 'appearance' && (
+                    <AppearanceSection weddingId={weddingId} site={data} audience={audience} />
+                  )}
+                  {sectionKey === 'song_question' && (
+                    <SongQuestionSection weddingId={weddingId} songQuestion={data.songQuestion} />
+                  )}
+                  {(() => {
+                    const section = data.sections.find((item) => item.type === sectionKey);
+                    if (!section) return null;
+                    const props = { weddingId, site: data, section, audience };
+                    if (section.type === 'story') return <StorySection {...props} />;
+                    if (section.type === 'countdown') return <CountdownSection {...props} />;
+                    if (section.type === 'ceremony') return <CeremonySection {...props} />;
+                    if (section.type === 'lodging') return <LodgingSection {...props} />;
+                    if (section.type === 'dress_code') return <DressCodeSection {...props} />;
+                    if (section.type === 'faq') return <FaqSection {...props} />;
+                    return null;
+                  })()}
+                </fieldset>
               </section>
             </SectionFormProvider>
           </PreviewAppearanceProvider>

@@ -19,6 +19,7 @@ import { contactText, respondedAtText, responsesText } from '../party-texts';
 import { useLoadMoreOnScroll } from '../hooks/use-load-more-on-scroll';
 import type { usePartySelection } from '../hooks/use-party-selection';
 import { useAreaPaths } from '../../../app/area';
+import { useWriteLock } from '../../billing/lifecycle/blocked';
 
 interface PartyListProps {
   parties: PartyListItemResponse[];
@@ -46,6 +47,7 @@ export function PartyList({
 }: PartyListProps) {
   const area = useAreaPaths();
   const { t } = useTranslation('guests');
+  const lock = useWriteLock();
   const { t: tCommon } = useTranslation('common');
   // O Respondido em no fuso do casamento, como o .xlsx (decisão 246); o site já está em cache.
   const { weddingId } = useActiveWedding();
@@ -64,6 +66,9 @@ export function PartyList({
                 aria-label={t('table.selectAll')}
                 checked={selection.allSelected}
                 indeterminate={selection.someSelected}
+                // Bloqueado RN04 (Penpot 05 e 07, "— bloqueado"): sem marcar, porque as ações
+                // em lote são escrita.
+                disabled={lock.locked}
                 onChange={selection.toggleAll}
               />
             }
@@ -88,6 +93,7 @@ export function PartyList({
                 <Checkbox
                   aria-label={t('table.select', { name: party.name })}
                   checked={selection.isSelected(party.id)}
+                  disabled={lock.locked}
                   onChange={() => selection.toggle(party.id)}
                 />
               }
