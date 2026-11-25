@@ -30,7 +30,7 @@ import {
 } from '../sections';
 import { savedAtText, siteStatus } from '../site-texts';
 import { useAreaPaths } from '../../../app/area';
-import { canOpenPublish } from '../../billing/publish/publish-entry';
+import { canOpenPublish, publishWaitsCouple } from '../../billing/publish/publish-entry';
 
 type MobileTab = 'sections' | 'edit' | 'preview';
 
@@ -168,7 +168,15 @@ function SiteEditor({
             {/* Publicar o site (decisão 243(c); E5 da F3): secundário, só antes de publicar; com
                 mudança não salva, o Dialog de descartar vem antes. */}
             {canOpenPublish(data.status) && (
-              <Button variant="secondary" onClick={() => void navigate(area.billingPublish)}>
+              <Button
+                variant="secondary"
+                // Decisão 325: sem o aceite do casal, desabilitado com o motivo.
+                disabled={publishWaitsCouple(data.status)}
+                {...(publishWaitsCouple(data.status) && {
+                  'aria-describedby': 'kore-site-publish-help',
+                })}
+                onClick={() => void navigate(area.billingPublish)}
+              >
                 {t('publish')}
               </Button>
             )}
@@ -178,6 +186,11 @@ function SiteEditor({
             >
               {t('save')}
             </Button>
+            {publishWaitsCouple(data.status) && (
+              <p id="kore-site-publish-help" className="kore-site-editor__preview-help">
+                {t('publishWaitsCouple')}
+              </p>
+            )}
             {!data.slug && (
               <p id="kore-site-preview-help" className="kore-site-editor__preview-help">
                 {t(`previewSite.noSlug.${audience}`)}

@@ -29,7 +29,7 @@ import {
 import { guestsByRespondedAt } from '../../guests/hooks/use-party-filters';
 import { useArea, useAreaPaths, type AreaPaths } from '../../../app/area';
 import { formatRsvpPercent } from '../../../shared/rsvp-percent';
-import { canOpenPublish } from '../../billing/publish/publish-entry';
+import { canOpenPublish, publishWaitsCouple } from '../../billing/publish/publish-entry';
 
 /** O caminho de cada item do Checklist (RN03), na área da tela. */
 function checklistPaths(area: AreaPaths): Record<ChecklistItemResponse['key'], string> {
@@ -190,7 +190,7 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
           </>
         )}
         <SiteCard data={data} now={now} audience={audience} />
-        <ChecklistCard items={data.checklist} />
+        <ChecklistCard items={data.checklist} publishWaits={publishWaitsCouple(data.site.status)} />
         {!empty && <ActivityCard weddingId={weddingId} items={data.recentActivity} now={now} />}
       </div>
     </div>
@@ -287,7 +287,9 @@ function SiteCard({
         </p>
       )}
       {status === 'awaiting_couple' && (
-        <p className="kore-dashboard__card-text">{t('site.awaitingCouple')}</p>
+        <p id="kore-dashboard-site-waits" className="kore-dashboard__card-text">
+          {t('site.awaitingCouple')}
+        </p>
       )}
       {/* Antes de publicar, o preço só no Publicar (Publicar e pagar RN13; Penpot 03, A5). */}
       {beforePublish && (
@@ -295,7 +297,16 @@ function SiteCard({
       )}
       <div className="kore-dashboard__card-actions">
         {beforePublish ? (
-          <Button size="sm" variant="secondary" onClick={() => void navigate(area.billingPublish)}>
+          <Button
+            size="sm"
+            variant="secondary"
+            // Decisão 325: o casal ainda não aceitou; o motivo é o aviso acima.
+            disabled={publishWaitsCouple(data.site.status)}
+            {...(publishWaitsCouple(data.site.status) && {
+              'aria-describedby': 'kore-dashboard-site-waits',
+            })}
+            onClick={() => void navigate(area.billingPublish)}
+          >
             {t('site.publish')}
           </Button>
         ) : (
@@ -309,7 +320,13 @@ function SiteCard({
 }
 
 /** Checklist (RN03): na ordem do servidor; o feito com o ícone e riscado. */
-function ChecklistCard({ items }: { items: ChecklistItemResponse[] }) {
+function ChecklistCard({
+  items,
+  publishWaits,
+}: {
+  items: ChecklistItemResponse[];
+  publishWaits: boolean;
+}) {
   const area = useAreaPaths();
   const { t } = useTranslation('dashboard');
   const next = items.find((item) => !item.done)?.key;
@@ -346,16 +363,24 @@ function ChecklistCard({ items }: { items: ChecklistItemResponse[] }) {
             <span className="kore-dashboard__check-box" aria-hidden="true">
               {item.done && <Check strokeWidth={2.4} />}
             </span>
-            <Link to={checklistPaths(area)[item.key]} className="kore-dashboard__check-link">
-              {label(item)}
-              {/* O estado para o leitor de tela; na tela, a caixa marcada (decisão 239(B2)). */}
-              {item.done && (
-                <>
-                  {' '}
-                  <span className="kore-dashboard__sr">{t('checklist.done')}</span>
-                </>
-              )}
-            </Link>
+            {/* Decisão 325: sem o aceite do casal, o Publicar o site fica sem link, com o motivo. */}
+            {item.key === 'publish' && !item.done && publishWaits ? (
+              <span className="kore-dashboard__check-text">
+                <span className="kore-dashboard__check-link">{label(item)}</span>
+                <span className="kore-dashboard__check-reason">{t('site.awaitingCouple')}</span>
+              </span>
+            ) : (
+              <Link to={checklistPaths(area)[item.key]} className="kore-dashboard__check-link">
+                {label(item)}
+                {/* O estado para o leitor de tela; na tela, a caixa marcada (decisão 239(B2)). */}
+                {item.done && (
+                  <>
+                    {' '}
+                    <span className="kore-dashboard__sr">{t('checklist.done')}</span>
+                  </>
+                )}
+              </Link>
+            )}
           </li>
         ))}
       </ol>

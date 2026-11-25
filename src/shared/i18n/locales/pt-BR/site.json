@@ -11,6 +11,7 @@
   },
   "save": "Salvar",
   "publish": "Publicar",
+  "publishWaitsCouple": "O casal ainda não aceitou o convite.",
   "saved": "Alterações salvas.",
   "sections": {
     "title": "Seções",

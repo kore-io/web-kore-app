@@ -6,3 +6,12 @@
 export function canOpenPublish(status: string): boolean {
   return status === 'draft' || status === 'awaiting_couple';
 }
+
+/**
+ * O Publicar desabilitado, com o motivo, enquanto o casal não aceitou o convite (decisão 325;
+ * Dashboard, Casos de borda, decisão 32): no cartão Status, no cabeçalho do Editor e no
+ * Checklist.
+ */
+export function publishWaitsCouple(status: string): boolean {
+  return status === 'awaiting_couple';
+}
