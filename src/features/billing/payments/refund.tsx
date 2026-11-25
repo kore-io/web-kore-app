@@ -10,6 +10,7 @@ import {
   paymentsControllerRefundV1,
 } from '../../../shared/api/generated/billing/billing';
 import { getMeControllerMeV1QueryKey } from '../../../shared/api/generated/me/me';
+import { getSiteControllerGetV1QueryKey } from '../../../shared/api/generated/site/site';
 import type { BillingPaymentDto } from '../../../shared/api/generated/model';
 import { dayMonthIn, oneDot, shortDayMonth } from '../../../shared/date-texts';
 import { formatCents } from '../../../shared/money';
@@ -183,9 +184,11 @@ function RefundDialog({
   const [sending, setSending] = useState(false);
   const kind = payment.kind;
 
+  // O site muda no pedido (RN07): o /me, o billing e o site (o selo da Topbar) relidos.
   const refresh = () =>
     Promise.all([
       queryClient.invalidateQueries({ queryKey: getMeControllerMeV1QueryKey() }),
+      queryClient.invalidateQueries({ queryKey: getSiteControllerGetV1QueryKey(weddingId) }),
       queryClient.invalidateQueries({
         queryKey: getPaymentsControllerBillingV1QueryKey(weddingId),
       }),
@@ -205,6 +208,7 @@ function RefundDialog({
         const billing = await paymentsControllerBillingV1(weddingId);
         queryClient.setQueryData(getPaymentsControllerBillingV1QueryKey(weddingId), billing);
         void queryClient.invalidateQueries({ queryKey: getMeControllerMeV1QueryKey() });
+        void queryClient.invalidateQueries({ queryKey: getSiteControllerGetV1QueryKey(weddingId) });
         showToast({
           tone: 'success',
           message: oneDot(
