@@ -421,6 +421,10 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
       data: dashboard({
         role: 'collaborator',
         site: { slug: 'ana-e-marcos', publishedAt: null, endDate: null, status: 'awaiting_couple' },
+        checklist: [
+          { key: 'guests', done: true, progress: null },
+          { key: 'publish', done: false, progress: null },
+        ],
       }),
     });
     renderAreaScreen({ url: '/app' });
@@ -428,6 +432,14 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     expect(
       within(card('Status do site')).getByText('O casal ainda não aceitou o convite.'),
     ).toBeInTheDocument();
+    // Decisão 325: o Publicar desabilitado com o motivo, no cartão e no Checklist.
+    const publish = within(card('Status do site')).getByRole('button', { name: 'Publicar' });
+    expect(publish).toBeDisabled();
+    expect(publish).toHaveAccessibleDescription('O casal ainda não aceitou o convite.');
+    const checklist = card('Checklist');
+    expect(within(checklist).queryByRole('link', { name: /Publicar o site/ })).toBeNull();
+    const item = within(checklist).getByText('Publicar o site').closest('li') as HTMLElement;
+    expect(within(item).getByText('O casal ainda não aceitou o convite.')).toBeInTheDocument();
   });
 
   it('o site em rascunho: sem o aviso do casal (Colaboradora RN04)', async () => {

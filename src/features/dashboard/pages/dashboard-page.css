@@ -122,6 +122,15 @@ a.kore-dashboard__delivery-row:hover .kore-dashboard__delivery-value {
   @apply sr-only;
 }
 
+.kore-dashboard__check-text {
+  @apply flex flex-col;
+}
+
+/* O motivo do item sem link (decisão 325), em caption. */
+.kore-dashboard__check-reason {
+  @apply type-caption text-gray-700;
+}
+
 .kore-dashboard__check-link {
   @apply rounded-sm type-body-md text-ink no-underline hover:underline focus-visible:shadow-focus-ring focus-visible:outline-none;
 }

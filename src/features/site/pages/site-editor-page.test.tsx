@@ -151,6 +151,15 @@ describe('Site › Editor (Dados básicos RN01, RN10, RN11; decisão 214)', () =
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/cobranca/publicar'));
   });
 
+  it('aguardando o casal: o Publicar desabilitado com o motivo (decisão 325)', async () => {
+    mockSite(() => Response.json(site({ status: 'awaiting_couple', publishedAt: null })));
+    renderRoute({ url: '/app/site/dados-basicos' });
+    await screen.findByRole('heading', { name: 'Site', level: 1 });
+    const publish = screen.getByRole('button', { name: 'Publicar' });
+    expect(publish).toBeDisabled();
+    expect(publish).toHaveAccessibleDescription('O casal ainda não aceitou o convite.');
+  });
+
   it('rascunho sem endereço: só o status; sem gravação, sem o "salvo às"', async () => {
     mockSite(() => Response.json(site({ slug: null, status: 'draft', siteUpdatedAt: null })));
     renderRoute({ url: '/app/site/dados-basicos' });
