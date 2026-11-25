@@ -64,7 +64,9 @@ export function refundDescription({
   const total = formatCents({ cents: refundTotal({ payment, payments }) });
   if (payment.kind === 'extension') {
     // A data de volta, calculada pela API com o min(endDate, previousEndDate) da RN03 (327(2)).
-    const date = payment.refundEndDate ? shortDayMonth({ day: payment.refundEndDate, now }) : '';
+    // Sem ela (não esperado na extensão no prazo), o início da extensão, e não "volta a ."
+    // (sugestão do Crivo no E7).
+    const date = shortDayMonth({ day: payment.refundEndDate ?? payment.periodStart, now });
     return oneDot(t(`refund.extension.${methodKey(payment)}`, { date, amount: total }));
   }
   const extensions = extensionsPaid(payments);
@@ -247,67 +249,85 @@ function RefundDialog({
     ]);
   const toastError = (message: string) => showToast({ tone: 'danger', message });
 
+  /**
+   * O pedido aceito (202) sempre fecha o Dialog e mostra o Toast, mesmo se a releitura
+   * falhar: o reembolso já foi pedido no servidor (bloqueante do Crivo no E7). Na extensão, a
+   * data vem do billing relido e, na falha, do `refundEndDate` do pagamento (327(2)).
+   */
+  async function accepted() {
+    onClose();
+    if (kind === 'publication') {
+      showToast({ tone: 'success', message: t('refund.toast.publication') });
+      await refresh().catch(() => undefined);
+      return;
+    }
+    let endDate = payment.refundEndDate;
+    try {
+      const billing = await paymentsControllerBillingV1(weddingId);
+      queryClient.setQueryData(getPaymentsControllerBillingV1QueryKey(weddingId), billing);
+      endDate = billing.endDate ?? endDate;
+    } catch {
+      void queryClient.invalidateQueries({
+        queryKey: getPaymentsControllerBillingV1QueryKey(weddingId),
+      });
+    }
+    void queryClient.invalidateQueries({ queryKey: getMeControllerMeV1QueryKey() });
+    void queryClient.invalidateQueries({ queryKey: getSiteControllerGetV1QueryKey(weddingId) });
+    showToast({
+      tone: 'success',
+      message: oneDot(
+        t('refund.toast.extension', { date: endDate ? shortDayMonth({ day: endDate, now }) : '' }),
+      ),
+    });
+  }
+
   async function confirm() {
     setSending(true);
     try {
       const trimmed = reason.trim();
       await paymentsControllerRefundV1(weddingId, payment.id, trimmed ? { reason: trimmed } : {});
-      if (kind === 'publication') {
-        showToast({ tone: 'success', message: t('refund.toast.publication') });
-        await refresh();
-      } else {
-        // A data já voltou no pedido (RN07): o Toast usa a endDate relida (327(2)).
-        const billing = await paymentsControllerBillingV1(weddingId);
-        queryClient.setQueryData(getPaymentsControllerBillingV1QueryKey(weddingId), billing);
-        void queryClient.invalidateQueries({ queryKey: getMeControllerMeV1QueryKey() });
-        void queryClient.invalidateQueries({ queryKey: getSiteControllerGetV1QueryKey(weddingId) });
-        showToast({
-          tone: 'success',
-          message: oneDot(
-            t('refund.toast.extension', {
-              date: billing.endDate ? shortDayMonth({ day: billing.endDate, now }) : '',
-            }),
-          ),
-        });
-      }
-      onClose();
     } catch (error) {
       setSending(false);
-      const code = apiErrorCode({ error });
-      switch (code) {
-        case 'REFUND_WINDOW_CLOSED': {
-          const body =
-            error instanceof ApiError ? (error.body as { refundableUntil?: string | null }) : {};
-          const until = body.refundableUntil ?? payment.refundableUntil;
-          toastError(
-            oneDot(
-              t('refund.toast.windowClosed', {
-                date: until ? dayMonthIn({ at: until, timezone, now }) : '',
-              }),
-            ),
-          );
-          break;
-        }
-        case 'REFUND_ALREADY_REQUESTED':
-          toastError(t('refund.toast.alreadyRequested'));
-          break;
-        case 'REFUND_NOT_LAST_EXTENSION':
-          toastError(t('refund.toast.notLastExtension'));
-          break;
-        case 'WEDDING_BLOCKED':
-          // O /me novo desabilita o botão com o motivo (RN02; Bloqueado RN07).
-          toastError(t('refund.blocked'));
-          break;
-        default:
-          toastError(
-            `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
-          );
+      await reject(error);
+      return;
+    }
+    await accepted();
+  }
+
+  /** O pedido recusado: o Toast da causa e, com código, a tela relida (os 409 em corrida). */
+  async function reject(error: unknown) {
+    const code = apiErrorCode({ error });
+    switch (code) {
+      case 'REFUND_WINDOW_CLOSED': {
+        const body =
+          error instanceof ApiError ? (error.body as { refundableUntil?: string | null }) : {};
+        const until = body.refundableUntil ?? payment.refundableUntil;
+        toastError(
+          oneDot(
+            t('refund.toast.windowClosed', {
+              date: until ? dayMonthIn({ at: until, timezone, now }) : '',
+            }),
+          ),
+        );
+        break;
       }
-      // O estado mudou no servidor (prazo, outro pedido, contestação): a tela relê.
-      if (code !== undefined) {
-        await refresh();
-        onClose();
-      }
+      case 'REFUND_ALREADY_REQUESTED':
+        toastError(t('refund.toast.alreadyRequested'));
+        break;
+      case 'REFUND_NOT_LAST_EXTENSION':
+        toastError(t('refund.toast.notLastExtension'));
+        break;
+      case 'WEDDING_BLOCKED':
+        // O /me novo desabilita o botão com o motivo (RN02; Bloqueado RN07).
+        toastError(t('refund.blocked'));
+        break;
+      default:
+        toastError(`${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`);
+    }
+    // O estado mudou no servidor (prazo, outro pedido, contestação): a tela relê.
+    if (code !== undefined) {
+      await refresh().catch(() => undefined);
+      onClose();
     }
   }
 
