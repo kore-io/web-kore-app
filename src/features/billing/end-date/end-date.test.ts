@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { canChangeEndDateFree, endDateChoice, endDateLimits, paidAhead } from './end-date';
+import { canChangeEndDate, endDateChoice, endDateLimits, paidAhead } from './end-date';
 
 const SP = 'America/Sao_Paulo';
 const published = {
@@ -59,18 +59,14 @@ describe('Mudar a data: limites, mês pago à frente e a escolha (RN04 e RN05; 2
     const expired = { ...published, status: 'expired', endDate: '2026-11-20' };
     expect(endDateChoice({ source: expired, date: '2027-02-14', now })).toBe('restore');
     expect(endDateChoice({ source: expired, date: '2027-03-01', now })).toBe('extend');
-    expect(canChangeEndDateFree({ source: expired, now })).toBe(true);
-    const noAhead = { ...expired, paidThrough: '2026-11-20' };
-    expect(canChangeEndDateFree({ source: noAhead, now })).toBe(false);
   });
 
-  it('a carência sem mês pago à frente fica para o E11 (333)', () => {
-    const grace = {
-      ...published,
-      status: 'grace',
-      endDate: '2026-11-28',
-      paidThrough: '2026-11-28',
-    };
-    expect(canChangeEndDateFree({ source: grace, now })).toBe(false);
+  it('quem abre a tela: o site publicado em qualquer fase (E11)', () => {
+    for (const status of ['published', 'post_event', 'grace', 'expired']) {
+      expect(canChangeEndDate({ status })).toBe(true);
+    }
+    for (const status of ['draft', 'awaiting_couple']) {
+      expect(canChangeEndDate({ status })).toBe(false);
+    }
   });
 });

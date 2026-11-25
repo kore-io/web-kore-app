@@ -1,7 +1,6 @@
-import { Alert, Button, DateField, PageHeader, Select, Spinner } from '@kore-io/design';
+import { Alert, Button, DateField, PageHeader, Spinner } from '@kore-io/design';
 import { keepPreviousData } from '@tanstack/react-query';
-import type { TFunction } from 'i18next';
-import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate } from 'react-router';
 import { useAreaPaths } from '../../../app/area';
@@ -20,7 +19,6 @@ import { apiErrorCode } from '../../../shared/api/http-client';
 import { FormField } from '../../../shared/components/form-field';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { Panel } from '../../../shared/components/panel';
-import { PaymentOption, PaymentOptionGroup } from '../../../shared/components/payment-option';
 import { ValueList, ValueRow, ValueTotal } from '../../../shared/components/value-list';
 import { shortDate, shortDayMonth } from '../../../shared/date-texts';
 import { useDebouncedValue } from '../../../shared/hooks/use-debounced-value';
@@ -44,13 +42,11 @@ import {
   capStartsAtMonths,
   installmentOptions,
   isEndDateInRange,
-  percentText,
   summaryRows,
-  type InstallmentOption,
   type SummaryRow,
 } from './quote-view';
 
-type Method = 'pix' | 'card';
+import { MethodPanel, type Method } from './method-panel';
 
 /**
  * O Publicar aberto pela tela do Pix (Gerar novo Pix, Pagar com cartão; decisão 324): a forma,
@@ -60,6 +56,8 @@ export interface PublishLocationState {
   method?: Method;
   endDate?: string;
   replacesPaymentId?: string;
+  /** O que o Pix paga: a publicação ou a extensão (E11). */
+  kind?: 'publication' | 'extension';
 }
 
 function readPublishState(state: unknown): PublishLocationState {
@@ -411,7 +409,11 @@ function PublishForm({
               label={t('publish.endDate.label')}
               {...(max !== null && {
                 hint: fieldError
-                  ? t('publish.endDate.outOfRange', { max: maxText })
+                  ? // A data mínima e o limite, com o ano (decisão 335; pena-e11).
+                    t('publish.endDate.outOfRange', {
+                      min: limits?.endDateMin ? shortDate(limits.endDateMin) : '',
+                      max: maxText,
+                    })
                   : t('publish.endDate.help', { max: maxText }),
                 hintTone: fieldError ? 'danger' : 'neutral',
               })}
@@ -500,127 +502,6 @@ function PublishForm({
         </div>
       </div>
     </div>
-  );
-}
-
-function installmentText({
-  option,
-  t,
-}: {
-  option: InstallmentOption;
-  t: TFunction<'billing'>;
-}): string {
-  const brl = (cents: number) => formatCents({ cents });
-  const even = option.first === option.rest;
-  if (option.withInterest) {
-    return even
-      ? t('publish.installments.evenInterest', {
-          count: option.count,
-          amount: brl(option.rest),
-          total: brl(option.totalCents),
-        })
-      : t('publish.installments.unevenInterest', {
-          count: option.count,
-          first: brl(option.first),
-          rest: brl(option.rest),
-          total: brl(option.totalCents),
-        });
-  }
-  return even
-    ? t('publish.installments.even', { count: option.count, amount: brl(option.rest) })
-    : t('publish.installments.uneven', {
-        count: option.count,
-        first: brl(option.first),
-        rest: brl(option.rest),
-      });
-}
-
-function MethodPanel({
-  pricing,
-  method,
-  onMethodChange,
-  installments,
-  onInstallmentsChange,
-  options,
-  quote,
-  disabled,
-  children,
-}: {
-  pricing: PricingResponse;
-  method: Method;
-  onMethodChange: (method: Method) => void;
-  installments: number;
-  onInstallmentsChange: (installments: number) => void;
-  options: InstallmentOption[];
-  quote: BillingQuoteResponse | undefined;
-  disabled: boolean;
-  /** Os campos do cartão, abaixo das parcelas e dos juros (Penpot 21). */
-  children: ReactNode;
-}) {
-  const { t } = useTranslation('billing');
-  const free = pricing.installments.interestFreeUpTo;
-  const interest = quote?.installmentInterestCents ?? 0;
-  return (
-    <Panel title={t('publish.method.title')} gap="md">
-      <PaymentOptionGroup label={t('publish.method.title')}>
-        <PaymentOption
-          name="method"
-          value="pix"
-          checked={method === 'pix'}
-          disabled={disabled}
-          onChange={() => onMethodChange('pix')}
-          label={t('publish.method.pix', { percent: pricing.pixDiscountPercent })}
-        />
-        <PaymentOption
-          name="method"
-          value="card"
-          checked={method === 'card'}
-          disabled={disabled}
-          onChange={() => onMethodChange('card')}
-          label={t('publish.method.card')}
-          caption={t('publish.method.cardCaption', { max: pricing.installments.max, free })}
-        />
-      </PaymentOptionGroup>
-      {method === 'card' && (
-        <FormField
-          label={t('publish.installments.label')}
-          {...(options.length === 0 && { hint: t('publish.installments.noDate') })}
-        >
-          {({ id, describedBy }) => (
-            <Select
-              id={id}
-              value={String(installments)}
-              disabled={disabled || options.length === 0}
-              {...(describedBy !== undefined && { 'aria-describedby': describedBy })}
-              onChange={(event) => onInstallmentsChange(Number(event.target.value))}
-            >
-              {options.length === 0 ? (
-                <option value={String(installments)} />
-              ) : (
-                options.map((option) => (
-                  <option key={option.count} value={String(option.count)}>
-                    {installmentText({ option, t })}
-                  </option>
-                ))
-              )}
-            </Select>
-          )}
-        </FormField>
-      )}
-      {method === 'card' && installments > free && interest > 0 && quote?.totalCents && (
-        <Alert tone="info">
-          {t('publish.interestAlert', {
-            count: installments,
-            interest: formatCents({ cents: interest }),
-            rate: percentText({ percent: pricing.installments.interestPercent }),
-            fixed: formatCents({ cents: pricing.installments.interestFixedCents }),
-            total: formatCents({ cents: quote.totalCents }),
-            free,
-          })}
-        </Alert>
-      )}
-      {method === 'card' && children}
-    </Panel>
   );
 }
 

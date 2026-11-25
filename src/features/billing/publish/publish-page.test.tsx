@@ -381,7 +381,7 @@ describe('Publicar o site, a versão do casal (Publicar RN01; Preço RN03, RN04 
     renderAreaScreen({ url: URL_PUBLISH });
     await chooseDate(user, '2027-12-14');
     expect(
-      await screen.findByText('Escolham uma data depois do casamento e até 14 de nov. de 2027.'),
+      await screen.findByText('Escolham uma data de 15 de nov. de 2026 até 14 de nov. de 2027.'),
     ).toBeInTheDocument();
     expect(dateField()).toHaveAttribute('aria-invalid', 'true');
     expect(quotes.some((params) => params.get('endDate') === '2027-12-14')).toBe(false);
@@ -685,7 +685,10 @@ describe('Publicar o site, o pagar com o cartão (E3; Publicar RN02 a RN07; deci
     await user.click(payButton());
     // A tela do Pix, com a data (o Gerar novo Pix volta com ela; 324).
     await waitFor(() =>
-      expect(visited[0]).toEqual(['/app/cobranca/pix', { endDate: '2027-02-14' }]),
+      expect(visited[0]).toEqual([
+        '/app/cobranca/pix',
+        { endDate: '2027-02-14', kind: 'publication' },
+      ]),
     );
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Pagar com Pix' }),

@@ -140,7 +140,7 @@ test('o casal: a data no limite com o teto, o cartão em 8x com os juros e o Pix
   // A data fora do limite: o erro no campo.
   await page.getByLabel('Data de saída do ar').fill('2028-06-15');
   await expect(
-    page.getByText('Escolham uma data depois do casamento e até 15 de mai. de 2028.'),
+    page.getByText('Escolham uma data de 16 de mai. de 2027 até 15 de mai. de 2028.'),
   ).toBeVisible();
   await expect(page.getByLabel('Data de saída do ar')).toHaveAttribute('aria-invalid', 'true');
 

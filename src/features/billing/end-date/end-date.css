@@ -26,3 +26,29 @@
 .kore-end-date__buttons {
   @apply flex flex-col-reverse gap-3 lg:flex-row lg:justify-end;
 }
+
+.kore-end-date__loading {
+  @apply flex justify-center py-10;
+}
+
+.kore-end-date__empty {
+  @apply type-body-md text-gray-700;
+}
+
+/* O cartão em análise: o Spinner com a frase, acima dos botões (como no Publicar). */
+.kore-end-date__confirming {
+  @apply flex items-center gap-2 type-body-md text-ink lg:justify-end;
+}
+
+/* A A7: o Alert de Erro com a guarda dos dados e o Exportar os convidados. */
+.kore-end-date__final {
+  @apply max-w-200;
+}
+
+.kore-end-date__final-text {
+  @apply m-0;
+}
+
+.kore-end-date__final-link {
+  @apply type-link text-primary-dark;
+}

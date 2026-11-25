@@ -71,7 +71,8 @@
     },
     "expiredFinal": "O site está fora do ar e não pode mais ser renovado. Não dá para enviar convites, save the date nem lembretes.",
     "exportGuests": "Exportar os convidados",
-    "backOnline": "Voltar ao ar"
+    "backOnline": "Voltar ao ar",
+    "renew": "Renovar"
   },
   "groups": {
     "marked_zero": "{{count}} grupos marcados",

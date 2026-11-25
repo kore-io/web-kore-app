@@ -16,7 +16,7 @@ import { siteStatus } from '../../site/site-texts';
 import { canOpenPublish, publishWaitsCouple } from '../publish/publish-entry';
 import { dayIn, numericDay, visibleStatus, type VisibleStatus } from './payments-texts';
 import { RefundSection } from './refund';
-import { canChangeEndDateFree } from '../end-date/end-date';
+import { canChangeEndDate } from '../end-date/end-date';
 import { lifecycleView } from '../lifecycle/lifecycle';
 import { graceLabel } from '../lifecycle/lifecycle-banner';
 
@@ -63,19 +63,8 @@ function Payments({ weddingId, owner }: { weddingId: string; owner: boolean }) {
   const data = billing.data;
   const waits = publishWaitsCouple(data.status);
   const description = subtitleOf({ data, now, t, tSite, timezone });
-  const changeEndDate =
-    owner &&
-    membership?.lifecycle !== undefined &&
-    canChangeEndDateFree({
-      source: {
-        status: membership.lifecycle.status,
-        endDate: membership.lifecycle.endDate,
-        paidThrough: membership.lifecycle.paidThrough,
-        eventDate: membership.eventDate,
-        timezone: membership.timezone,
-      },
-      now,
-    });
+  // O Mudar a data de saída do ar para o dono, com o site publicado (E11).
+  const changeEndDate = owner && canChangeEndDate({ status: data.status });
   return (
     <div className="kore-payments">
       <PageHeader
@@ -84,7 +73,7 @@ function Payments({ weddingId, owner }: { weddingId: string; owner: boolean }) {
         actions={
           // Decisão 326(1): no rascunho, o Publicar o site; aguardando o casal, desabilitado
           // com o motivo (325). Publicado, o Mudar a data de saída do ar (secundário, Penpot
-          // 21) quando há o que mudar sem pagar (E10; 333(2)).
+          // 21), também na carência e no expirado (E11).
           changeEndDate ? (
             <Button variant="secondary" onClick={() => void navigate(paths.billingEndDate)}>
               {t('endDate.title')}

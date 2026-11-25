@@ -6,7 +6,7 @@
     "endDate": {
       "label": "Data de saída do ar",
       "help": "Depois do casamento e até {{max}}. O mês incompleto conta como mês inteiro.",
-      "outOfRange": "Escolham uma data depois do casamento e até {{max}}."
+      "outOfRange": "Escolham uma data de {{min}} até {{max}}."
     },
     "monthsAlert": "Na publicação, o preço para em {{cap}}. Depois de publicar, cada mês a mais custa {{monthly}}, sem esse limite.",
     "method": {
@@ -130,6 +130,7 @@
     "waiting": "Aguardando a confirmação do pagamento",
     "dueAt": "O código vale até {{date}}.",
     "effect": "O site vai ao ar assim que o pagamento for confirmado.",
+    "effectExtension": "A nova data vale assim que o pagamento for confirmado.",
     "payWithCard": "Pagar com cartão",
     "expired": "Este código Pix venceu. Gerem um novo para pagar.",
     "newPix": "Gerar novo Pix"
@@ -257,7 +258,9 @@
         "planner": "O site está fora do ar desde {{date}}. Ele chegou ao prazo máximo, 12 meses depois do casamento, e não pode mais ser renovado. Peça ao casal para exportar os convidados."
       }
     },
-    "exportGuests": "Exportar os convidados"
+    "exportGuests": "Exportar os convidados",
+    "postpone": "Adiar a data",
+    "renew": "Renovar"
   },
   "endDate": {
     "title": "Mudar a data de saída do ar",
@@ -279,6 +282,21 @@
     "toast": {
       "backOnline": "O site voltou ao ar e fica até {{date}}.",
       "until": "O site fica no ar até {{date}}."
-    }
+    },
+    "summary": {
+      "months_one": "{{count}} mês a mais × {{monthly}}",
+      "months_other": "{{count}} meses a mais × {{monthly}}",
+      "renewMonths_one": "{{count}} mês × {{monthly}} (de {{start}} até {{end}})",
+      "renewMonths_other": "{{count}} meses × {{monthly}} (de {{start}} até {{end}})",
+      "today": "hoje"
+    },
+    "helpRenewToday": "Os meses contam a partir de hoje.",
+    "helpRenewPaid": "Vocês já pagaram até {{paidThrough}}. Os meses contam a partir dessa data.",
+    "final": {
+      "alert": "O site chegou ao prazo máximo, 12 meses depois do casamento, e não pode mais ser renovado. Vocês ainda podem exportar os convidados.",
+      "retention": "Os dados ficam guardados até {{date}}. Depois, são apagados.",
+      "exportGuests": "Exportar os convidados"
+    },
+    "offAirSinceFull": "Fora do ar desde {{date}}"
   }
 }

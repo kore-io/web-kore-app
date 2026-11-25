@@ -94,32 +94,30 @@ describe('a faixa do ciclo de vida (Data de saída RN06; 231 P1; 293; 314; 329)'
       'O site está fora do ar desde 18 de jan. Peça ao casal para voltar o site ao ar.',
     ],
   ])(
-    '%s: a versão do casal e a da colaboradora; só o caso B do casal com o Voltar ao ar (E10; 333(2))',
+    '%s: a versão do casal, com a ação, e a da colaboradora, sem link (E10 e E11; 333(2))',
     async (_name, lifecycle, couple, planner) => {
       // O caso B vale com o paidThrough depois de hoje: roda em 20/01.
       if ('paidThrough' in lifecycle) vi.setSystemTime(new Date('2027-01-20T15:00:00Z'));
       mockLifecycle({ lifecycle });
       const view = renderRoute({ url: '/app' });
       expect(await bannerWith(couple)).not.toBeNull();
-      // O Adiar a data e o Renovar entram no E11, com o pagar (333(2)).
-      expect(screen.queryByRole('link', { name: /Adiar a data|Renovar/ })).toBeNull();
-      if ('paidThrough' in lifecycle) {
-        expect(screen.getByRole('link', { name: 'Voltar ao ar' })).toHaveAttribute(
-          'href',
-          '/app/cobranca/data-de-saida',
-        );
-      } else {
-        expect(screen.queryByRole('link', { name: 'Voltar ao ar' })).toBeNull();
-      }
-      expect(
-        screen.queryByRole('button', { name: /Adiar a data|Renovar|Voltar ao ar/ }),
-      ).toBeNull();
+      // A ação do casal leva a mudar a data (E10 e E11): Adiar a data, Renovar ou Voltar ao ar.
+      const action =
+        'paidThrough' in lifecycle
+          ? 'Voltar ao ar'
+          : lifecycle.status === 'grace'
+            ? 'Adiar a data'
+            : 'Renovar';
+      expect(screen.getByRole('link', { name: action })).toHaveAttribute(
+        'href',
+        '/app/cobranca/data-de-saida',
+      );
       view.unmount();
       profileUnderTest.current = 'planner';
       mockLifecycle({ lifecycle });
       renderRoute({ url: PLANNER_URL });
       expect(await bannerWith(planner)).not.toBeNull();
-      expect(screen.queryByRole('link', { name: 'Voltar ao ar' })).toBeNull();
+      expect(screen.queryByRole('link', { name: /Adiar a data|Renovar|Voltar ao ar/ })).toBeNull();
     },
   );
 
