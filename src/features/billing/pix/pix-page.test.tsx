@@ -133,6 +133,39 @@ describe('Pagar com Pix (Publicar RN03, RN07, RN11 e RN13; Penpot 21, A3)', () =
     expect(await screen.findByText('Código copiado.')).toBeInTheDocument();
   });
 
+  it('o dueAt que chega com a tela aberta vira o vencido na hora, sem consulta nova', async () => {
+    // Vence 1 s depois do relógio fixo; o billing não muda.
+    mockPix({
+      billing: () => ({
+        status: 'draft',
+        pendingPayment: { ...PENDING, dueAt: '2026-11-25T14:00:01Z' },
+      }),
+    });
+    renderAreaScreen({ url: URL_PIX });
+    await screen.findByRole('button', { name: 'Copiar código' });
+    vi.setSystemTime(new Date('2026-11-25T14:00:02Z'));
+    expect(
+      await screen.findByText(
+        'Este código Pix venceu. Gerem um novo para pagar.',
+        {},
+        { timeout: 3000 },
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('a área de transferência negada deixa o código selecionado no campo', async () => {
+    const user = userEvent.setup();
+    const writeText = vi.fn(async () => {
+      throw new Error('negado');
+    });
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+    mockPix();
+    renderAreaScreen({ url: URL_PIX });
+    await user.click(await screen.findByRole('button', { name: 'Copiar código' }));
+    await waitFor(() => expect(screen.getByRole('textbox')).toHaveFocus());
+    expect(screen.queryByText('Código copiado.')).toBeNull();
+  });
+
   it('a confirmação leva ao Dashboard com o Toast (RN13)', async () => {
     mockPix({
       billing: (call) =>
