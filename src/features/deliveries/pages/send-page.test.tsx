@@ -853,11 +853,11 @@ describe('Envios no expirado e na carência (Data de saída RN07; 314(3); decis�
     expect(screen.queryByText(/^Não foi possível continuar/)).toBeNull();
   });
 
-  it('o 409 SITE_EXPIRED na leitura da fila: o Toast, sem o aviso de erro de leitura', async () => {
+  it('o 409 SITE_EXPIRED na leitura da fila: o Toast; com o Dashboard relido sem o expirado, o Tentar de novo, e não o Spinner para sempre (sugestão do Crivo no E9)', async () => {
     mockSend({ queueError: SITE_EXPIRED });
     preset(['p1']);
     renderRoute({ url: '/app/envios/convites?etapa=fila' });
     expect(await screen.findByText(RENEW)).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Tentar de novo' })).toBeNull();
+    expect(await screen.findByRole('button', { name: 'Tentar de novo' })).toBeInTheDocument();
   });
 });
