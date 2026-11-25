@@ -5,7 +5,7 @@ import { useAreaPaths } from '../../../app/area';
 import { useDashboardControllerGetV1 } from '../../../shared/api/generated/rsvp/rsvp';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { useActiveWedding, type Audience } from '../../guests/hooks/use-active-wedding';
-import { deliveriesClosed, type Closed } from '../delivery-closed';
+import { deliveriesClosed, expiredClosedText, type Closed } from '../delivery-closed';
 import type { DeliveryKind } from '../delivery-texts';
 import { useMeControllerMeV1 } from '../../../shared/api/generated/me/me';
 import { ChannelStep } from './channel-step';
@@ -102,27 +102,30 @@ function Stepper({ step }: { step: Step }) {
 
 /**
  * A legenda dos envios fechados (Envios RN01, A2; Data de saída RN07, A8, Penpot 07), nas duas
- * vozes: antes de publicar, o casal ganha o link Publicar o site; no expirado, o Renovar entra
- * com o E10 (331(2)); no sem renovação, um texto só e o Exportar os convidados do casal (314(3)).
+ * vozes; só o casal ganha o link: antes de publicar, Publicar o site; no caso B, Voltar ao ar
+ * (331(1); pena-331); no sem renovação, Exportar os convidados (314(3)). O Renovar do expirado
+ * comum entra no E11, com o pagar (333(2)).
  */
 export function ClosedNotice({ audience, closed }: { audience: Audience; closed: Closed }) {
   const { t } = useTranslation('deliveries');
   const area = useAreaPaths();
-  if (closed === 'expired') {
+  const expiredText = expiredClosedText({ closed, audience, t });
+  if (expiredText) {
+    const link =
+      audience !== 'couple'
+        ? null
+        : closed === 'expired_paid_ahead'
+          ? { to: area.billingEndDate, label: t('closed.backOnline') }
+          : closed === 'expired_final'
+            ? { to: area.guestExport, label: t('closed.exportGuests') }
+            : null;
     return (
       <p className="kore-send__closed" id="kore-send-closed">
-        {t(`closed.expired.${audience}`)}
-      </p>
-    );
-  }
-  if (closed === 'expired_final') {
-    return (
-      <p className="kore-send__closed" id="kore-send-closed">
-        {t('closed.expiredFinal')}
-        {audience === 'couple' && (
+        {expiredText}
+        {link && (
           <>
             {' '}
-            <Link to={area.guestExport}>{t('closed.exportGuests')}</Link>
+            <Link to={link.to}>{link.label}</Link>
           </>
         )}
       </p>

@@ -65,8 +65,13 @@
       "couple": "O site está fora do ar. Renovem o site para enviar.",
       "planner": "O site está fora do ar. Peça ao casal para renovar."
     },
+    "expiredPaidAhead": {
+      "couple": "O site está fora do ar. Voltem o site ao ar, sem custo, para enviar.",
+      "planner": "O site está fora do ar. Peça ao casal para voltar o site ao ar."
+    },
     "expiredFinal": "O site está fora do ar e não pode mais ser renovado. Não dá para enviar convites, save the date nem lembretes.",
-    "exportGuests": "Exportar os convidados"
+    "exportGuests": "Exportar os convidados",
+    "backOnline": "Voltar ao ar"
   },
   "groups": {
     "marked_zero": "{{count}} grupos marcados",

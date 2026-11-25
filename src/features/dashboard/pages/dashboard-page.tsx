@@ -32,7 +32,7 @@ import { useArea, useAreaPaths, type AreaPaths } from '../../../app/area';
 import { formatRsvpPercent } from '../../../shared/rsvp-percent';
 import { canOpenPublish, publishWaitsCouple } from '../../billing/publish/publish-entry';
 import { lifecycleView } from '../../billing/lifecycle/lifecycle';
-import { deliveriesClosed } from '../../deliveries/delivery-closed';
+import { deliveriesClosed, expiredClosedText } from '../../deliveries/delivery-closed';
 import { LifecycleBadge, lifecycleText } from '../../billing/lifecycle/lifecycle-banner';
 
 /** O caminho de cada item do Checklist (RN03), na área da tela. */
@@ -93,11 +93,8 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
     : null;
   const closed = data ? closedKind !== null && closedKind !== 'post_event' : true;
   const closedText =
-    closedKind === 'expired'
-      ? tDeliveries(`closed.expired.${audience}`)
-      : closedKind === 'expired_final'
-        ? tDeliveries('closed.expiredFinal')
-        : t(`actions.closed.${audience}`);
+    expiredClosedText({ closed: closedKind, audience, t: tDeliveries }) ??
+    t(`actions.closed.${audience}`);
 
   const header = (
     <PageHeader
@@ -361,6 +358,11 @@ function SiteCard({
             onClick={() => void navigate(area.billingPublish)}
           >
             {t('site.publish')}
+          </Button>
+        ) : view?.kind === 'expired' && view.variant === 'paidAhead' && audience === 'couple' ? (
+          // Caso B: o Voltar ao ar (E10; 333(2); Penpot 03, A5).
+          <Button size="sm" variant="secondary" onClick={() => void navigate(area.billingEndDate)}>
+            {tBilling('endDate.backOnline')}
           </Button>
         ) : final && audience === 'couple' ? (
           // Sem renovação, o casal ainda exporta os convidados (314(1); Penpot 03, A5).

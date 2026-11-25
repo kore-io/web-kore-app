@@ -16,6 +16,7 @@ import { PlannerSignUpPage } from '../features/planner/pages/planner-sign-up-pag
 import { ReferralLinkPage } from '../features/planner/referral/referral-link-page';
 import { TemplatesPage } from '../features/planner/templates/templates-page';
 import { CollaboratorsPage } from '../features/collaborators/pages/collaborators-page';
+import { EndDatePage } from '../features/billing/end-date/end-date-page';
 import { PaymentsPage } from '../features/billing/payments/payments-page';
 import { PixPage } from '../features/billing/pix/pix-page';
 import { PublishPage } from '../features/billing/publish/publish-page';
@@ -88,6 +89,8 @@ function areaRoutes({ prefix }: { prefix: 'couple' | 'planner' }): RouteObject[]
     { id: 'billing', path: 'cobranca', element: <PaymentsPage /> },
     { id: 'billing-publish', path: 'cobranca/publicar', element: <PublishPage /> },
     { id: 'billing-pix', path: 'cobranca/pix', element: <PixPage /> },
+    // Mudar a data de saída do ar (E10; 316(2)): o que não cobra; a extensão paga no E11.
+    { id: 'billing-end-date', path: 'cobranca/data-de-saida', element: <EndDatePage /> },
     { id: 'collaborators', path: 'colaboradores', element: <CollaboratorsPage /> },
     // Dentro do casamento, as notificações da colaboradora são as dela, de todos os casamentos
     // (Notificações da cerimonialista RN08; decisão 300(6)).
