@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useAreaPaths } from '../../../app/area';
 import {
+  getPaymentsControllerBillingV1QueryKey,
   paymentsControllerPayV1,
   usePaymentsControllerBillingV1,
 } from '../../../shared/api/generated/billing/billing';
@@ -27,10 +28,10 @@ export type PayState =
 export type PayFailure = 'priceChanged' | 'payerNotFound' | 'quoteStale' | 'handled' | 'generic';
 
 /**
- * O pagar do Publicar com o cartão (Publicar e pagar RN03 a RN07; decisão 322(3)): o POST
- * com a `Idempotency-Key` por intenção (o alvo é o casamento, o corpo é o pedido), o cartão
- * recusado na hora, a espera da confirmação (o site só vai ao ar na confirmação, RN04) e os
- * erros com os textos da Voz. O Pix chega no E4.
+ * O pagar do Publicar (Publicar e pagar RN03 a RN07): o POST com a `Idempotency-Key` por
+ * intenção (o alvo é o casamento, o corpo é o pedido), o cartão recusado na hora, a espera
+ * da confirmação do cartão (o site só vai ao ar na confirmação, RN04), o Pix, que segue
+ * para a tela do Pix (E4), e os erros com os textos da Voz.
  */
 export function usePublishPayment({ weddingId }: { weddingId: string }) {
   const { t } = useTranslation('billing');
@@ -42,7 +43,17 @@ export function usePublishPayment({ weddingId }: { weddingId: string }) {
   const keys = useIdempotencyKeys();
   const [state, setState] = useState<PayState>({ kind: 'idle' });
   const confirmingId = state.kind === 'confirming' ? state.paymentId : null;
+  /**
+   * Quantas respostas do billing já tinham chegado quando a espera começou: só conta uma
+   * resposta que chegou de fato depois (o `dataUpdateCount` sobe só no sucesso). Na falha de
+   * rede, a do cache, de antes do POST, não conta (achado do Crivo no E4).
+   */
+  const [updatesBefore, setUpdatesBefore] = useState<number | null>(null);
 
+  // Quantas respostas do billing chegaram (sobe só no sucesso; lido do estado da query).
+  const billingUpdates = (): number =>
+    queryClient.getQueryState(getPaymentsControllerBillingV1QueryKey(weddingId))?.dataUpdateCount ??
+    0;
   const billing = usePaymentsControllerBillingV1(weddingId, {
     query: { refetchInterval: confirmingId !== null ? CONFIRM_POLL_MS : false },
   });
@@ -54,17 +65,32 @@ export function usePublishPayment({ weddingId }: { weddingId: string }) {
     void navigate(paths.dashboard);
   }
 
-  // A confirmação do cartão em análise chega pelo GET …/billing (RN04, RN09 e RN11).
+  // A confirmação do cartão em análise chega pelo GET …/billing (RN04, RN09 e RN11). A lista
+  // traz só os pagamentos aplicados: o pendente que some sem o site publicado não foi
+  // aprovado (o cartão que falha depois do "Confirmando…").
   const payment = billing.data?.payments?.find((item) => item.id === confirmingId);
+  const pendingId = billing.data?.pendingPayment?.paymentId ?? null;
   useEffect(() => {
     if (confirmingId === null || !billing.data) return;
     if (payment?.status === 'paid' || billing.data.status === 'published') confirmed();
-    else if (payment?.status === 'failed' || payment?.status === 'canceled') {
+    else if (
+      updatesBefore !== null &&
+      billingUpdates() > updatesBefore &&
+      pendingId !== confirmingId
+    ) {
       keys.reset();
       setState({ kind: 'declined' });
     }
     // confirmed muda a cada render; o que importa é a resposta nova do billing.
-  }, [billing.data, confirmingId]);
+  }, [billing.data, billing.dataUpdatedAt, updatesBefore, confirmingId]);
+
+  /** Reabrir com o cartão pendente: o Confirmando de novo (cobrança do Crivo no E3; 324). */
+  function resume({ paymentId }: { paymentId: string }) {
+    setState({ kind: 'confirming', paymentId });
+    setUpdatesBefore(billingUpdates());
+    // A 1ª consulta já; a falha segue no Confirmando, com o polling de 5 s.
+    void billing.refetch();
+  }
 
   function toastError(message: string) {
     showToast({ tone: 'danger', message });
@@ -86,9 +112,15 @@ export function usePublishPayment({ weddingId }: { weddingId: string }) {
         setState({ kind: 'declined' });
         return null;
       }
-      setState({ kind: 'confirming', paymentId: created.paymentId });
+      if (created.method === 'pix') {
+        // O Pix segue na tela dele (A3), com o copia e cola do GET …/billing.
+        keys.reset();
+        setState({ kind: 'idle' });
+        void navigate(paths.billingPix, { state: { endDate: body.endDate } });
+        return null;
+      }
       // A 1ª consulta já, sem esperar os 5 s: o cartão local confirma rápido.
-      void billing.refetch();
+      resume({ paymentId: created.paymentId });
       return null;
     } catch (error) {
       setState({ kind: 'idle' });
@@ -119,6 +151,12 @@ export function usePublishPayment({ weddingId }: { weddingId: string }) {
           void queryClient.invalidateQueries({ queryKey: getMeControllerMeV1QueryKey() });
           toastError(t('publish.reason.blocked'));
           return 'handled';
+        case 'PAYMENT_ALREADY_PAID':
+          // O Pix trocado já tinha sido pago: o Kore aplicou o pagamento (RN07; Pena, item 2).
+          void queryClient.invalidateQueries({ queryKey: getMeControllerMeV1QueryKey() });
+          showToast({ tone: 'success', message: t('publish.toast.alreadyPaid') });
+          void navigate(paths.dashboard);
+          return 'handled';
         case 'NOT_DRAFT':
           showToast({ tone: 'success', message: t('publish.toast.alreadyPublished') });
           void queryClient.invalidateQueries({ queryKey: getMeControllerMeV1QueryKey() });
@@ -136,6 +174,8 @@ export function usePublishPayment({ weddingId }: { weddingId: string }) {
   return {
     state,
     pay,
+    resume,
+    billing: billing.data,
     previousPayer: billing.data?.payer ?? null,
     dismissDeclined: () => setState({ kind: 'idle' }),
   };

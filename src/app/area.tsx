@@ -65,6 +65,8 @@ export function areaPaths(base: string) {
     settingsNotifications: `${base}/configuracoes/notificacoes`,
     /** Cobrança e publicação › Publicar o site (Publicar e pagar RN01; decisão 316(2)). */
     billingPublish: `${base}/cobranca/publicar`,
+    /** Pagar com Pix (Publicar e pagar RN03; decisão 316(2)). */
+    billingPix: `${base}/cobranca/pix`,
     /** Site › Editor (decisão 214): abre os Dados básicos. */
     site: `${base}/site`,
     /** O Painel de um grupo: link próprio, para compartilhar e para o voltar (198). */

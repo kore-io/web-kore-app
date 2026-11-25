@@ -16,6 +16,7 @@ import { PlannerSignUpPage } from '../features/planner/pages/planner-sign-up-pag
 import { ReferralLinkPage } from '../features/planner/referral/referral-link-page';
 import { TemplatesPage } from '../features/planner/templates/templates-page';
 import { CollaboratorsPage } from '../features/collaborators/pages/collaborators-page';
+import { PixPage } from '../features/billing/pix/pix-page';
 import { PublishPage } from '../features/billing/publish/publish-page';
 import { DashboardPage } from '../features/dashboard/pages/dashboard-page';
 import { DeadlinePage } from '../features/deliveries/pages/deadline-page';
@@ -84,6 +85,7 @@ function areaRoutes({ prefix }: { prefix: 'couple' | 'planner' }): RouteObject[]
     // Publicar o site (E2 da F3): a entrada pela tela volta no E5, e o item da Sidebar entra
     // com Pagamentos, no E6 (decisão 322).
     { id: 'billing-publish', path: 'cobranca/publicar', element: <PublishPage /> },
+    { id: 'billing-pix', path: 'cobranca/pix', element: <PixPage /> },
     { id: 'collaborators', path: 'colaboradores', element: <CollaboratorsPage /> },
     // Dentro do casamento, as notificações da colaboradora são as dela, de todos os casamentos
     // (Notificações da cerimonialista RN08; decisão 300(6)).

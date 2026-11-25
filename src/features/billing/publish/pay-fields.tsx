@@ -43,12 +43,15 @@ type T = ReturnType<typeof useTranslation<'billing'>>['t'];
  * campo, com os textos da Voz. Vazio quando está tudo certo.
  */
 export function payErrors({
+  method,
   card,
   payer,
   previousPayer,
   now,
   t,
 }: {
+  /** No Pix, só quem paga; o cartão só no cartão. */
+  method: 'pix' | 'card';
   card: CardValues;
   payer: PayerValues;
   previousPayer: PayerDto | null;
@@ -56,13 +59,15 @@ export function payErrors({
   t: T;
 }): PayErrors {
   const errors: PayErrors = {};
-  if (card.number.trim() === '') errors.number = t('publish.card.number.empty');
-  else if (!isValidCardNumber(card.number)) errors.number = t('publish.card.number.invalid');
-  if (card.holder.trim() === '') errors.holder = t('publish.card.holder.empty');
-  const expiry = expiryState({ value: card.expiry, now });
-  if (expiry !== 'ok') errors.expiry = t(`publish.card.expiry.${expiry}`);
-  const cvv = cvvState(card.cvv);
-  if (cvv !== 'ok') errors.cvv = t(`publish.card.cvv.${cvv}`);
+  if (method === 'card') {
+    if (card.number.trim() === '') errors.number = t('publish.card.number.empty');
+    else if (!isValidCardNumber(card.number)) errors.number = t('publish.card.number.invalid');
+    if (card.holder.trim() === '') errors.holder = t('publish.card.holder.empty');
+    const expiry = expiryState({ value: card.expiry, now });
+    if (expiry !== 'ok') errors.expiry = t(`publish.card.expiry.${expiry}`);
+    const cvv = cvvState(card.cvv);
+    if (cvv !== 'ok') errors.cvv = t(`publish.card.cvv.${cvv}`);
+  }
   if (previousPayerId({ payer, previousPayer }) === null) {
     if (payer.name.trim() === '') errors.name = t('publish.payer.name.empty');
     if (!isValidCpf(payer.taxId)) errors.taxId = t('publish.payer.taxId.invalid');

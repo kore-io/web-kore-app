@@ -138,6 +138,8 @@ function mockPublish({
     ),
   paidAfterPay = true,
   blockedAfterPay = false,
+  pendingPayment = () => null,
+  billingFailsAfterPay = false,
 }: {
   lifecycleOverrides?: Partial<typeof lifecycle>;
   site?: { slug: string | null; eventDate: string | null; state: string | null };
@@ -149,6 +151,10 @@ function mockPublish({
   paidAfterPay?: boolean;
   /** Depois do POST, o /me traz o casamento bloqueado (o bloqueio em corrida). */
   blockedAfterPay?: boolean;
+  /** Depois do POST, o GET …/billing falha (a rede). */
+  billingFailsAfterPay?: boolean;
+  /** O pendente do GET …/billing, pelo número de POSTs feitos. */
+  pendingPayment?: (posts: number) => Record<string, unknown> | null;
 } = {}) {
   const quotes: URLSearchParams[] = [];
   const payments: unknown[] = [];
@@ -167,6 +173,9 @@ function mockPublish({
       return Response.json(quoteFor(url.searchParams));
     }
     if (url.pathname === '/v1/weddings/w1/billing') {
+      if (billingFailsAfterPay && payments.length > 0) {
+        return apiError({ status: 503, body: { error: 'UNAVAILABLE' } });
+      }
       const paid = paidAfterPay && payments.length > 0;
       return Response.json({
         status: paid ? 'published' : 'draft',
@@ -178,7 +187,7 @@ function mockPublish({
         purgeAt: null,
         publicationSource: null,
         awaitingPayment: false,
-        pendingPayment: null,
+        pendingPayment: pendingPayment(payments.length),
         payments: paid ? [{ id: 'p1', status: 'paid' }] : [],
         payer,
       });
@@ -485,7 +494,22 @@ describe('Publicar o site, o pagar com o cartão (E3; Publicar RN02 a RN07; deci
 
   it('o cartão em análise mostra o "Confirmando…" e espera a confirmação (RN04)', async () => {
     const user = userEvent.setup();
-    mockPublish({ paidAfterPay: false });
+    mockPublish({
+      paidAfterPay: false,
+      // Depois do POST, o cartão segue pendente no billing.
+      pendingPayment: (posts) =>
+        posts > 0
+          ? {
+              paymentId: 'p1',
+              kind: 'publication',
+              method: 'card',
+              amountCents: 33710,
+              dueAt: null,
+              pixCopyPaste: null,
+              endDate: '2027-02-14',
+            }
+          : null,
+    });
     renderAreaScreen({ url: URL_PUBLISH });
     await ready(user);
     await fillCardAndPayer(user);
@@ -619,16 +643,177 @@ describe('Publicar o site, o pagar com o cartão (E3; Publicar RN02 a RN07; deci
     expect(dateField()).toBeDisabled();
   });
 
-  it('com o Pix, o Pagar e publicar fica desabilitado sem motivo até o E4 (322(3))', async () => {
+  it('com o Pix: só quem paga, o POST sem cartão e a tela do Pix (E4)', async () => {
     const user = userEvent.setup();
-    mockPublish();
-    renderAreaScreen({ url: URL_PUBLISH });
+    const api = mockPublish({
+      paidAfterPay: false,
+      pendingPayment: (posts) =>
+        posts > 0
+          ? {
+              paymentId: 'p1',
+              kind: 'publication',
+              method: 'pix',
+              amountCents: 32699,
+              dueAt: '2026-11-25T15:00:00Z',
+              pixCopyPaste: '00020126LOCALPIX',
+              endDate: '2027-02-14',
+            }
+          : null,
+      pay: () =>
+        Response.json(
+          {
+            paymentId: 'p1',
+            status: 'pending',
+            method: 'pix',
+            amountCents: 32699,
+            dueAt: '2026-11-25T15:00:00Z',
+            pix: { copyPaste: '00020126LOCALPIX' },
+            nextAction: { type: 'none' },
+          },
+          { status: 201 },
+        ),
+    });
+    const { router } = renderAreaScreen({ url: URL_PUBLISH });
     await ready(user);
     await user.click(screen.getByRole('radio', { name: 'Pix à vista · 3% de desconto' }));
-    expect(payButton()).toBeDisabled();
-    expect(payButton()).not.toHaveAccessibleDescription();
     expect(screen.queryByLabelText('Número do cartão')).toBeNull();
-    expect(screen.queryByRole('region', { name: 'Quem paga' })).toBeNull();
+    await user.type(screen.getByLabelText('Nome completo'), 'Ana Beatriz Moreira');
+    await user.type(screen.getByLabelText('CPF'), '52998224725');
+    await waitFor(() => expect(payButton()).toBeEnabled());
+    const visited: [string, unknown][] = [];
+    router.subscribe((state) => visited.push([state.location.pathname, state.location.state]));
+    await user.click(payButton());
+    // A tela do Pix, com a data (o Gerar novo Pix volta com ela; 324).
+    await waitFor(() =>
+      expect(visited[0]).toEqual(['/app/cobranca/pix', { endDate: '2027-02-14' }]),
+    );
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Pagar com Pix' }),
+    ).toBeInTheDocument();
+    // Direto para a tela do Pix, sem voltar ao Publicar pelo billing velho do cache.
+    expect(visited).toHaveLength(1);
+    expect(api.payments).toEqual([
+      {
+        kind: 'publication',
+        endDate: '2027-02-14',
+        method: 'pix',
+        payer: { name: 'Ana Beatriz Moreira', taxId: '52998224725' },
+        installments: 1,
+        priceVersion: '2026-11',
+        expectedTotalCents: 32699,
+      },
+    ]);
+  });
+
+  it('reabrir com o Pix pendente leva à tela do Pix (decisão 324)', async () => {
+    mockPublish({
+      pendingPayment: () => ({
+        paymentId: 'p0',
+        kind: 'publication',
+        method: 'pix',
+        amountCents: 32699,
+        dueAt: '2026-11-25T15:00:00Z',
+        pixCopyPaste: '00020126LOCALPIX',
+        endDate: '2027-03-14',
+      }),
+    });
+    const { router } = renderAreaScreen({ url: URL_PUBLISH });
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app/cobranca/pix'));
+    // A data do pendente vai junto (324(3)).
+    expect(router.state.location.state).toEqual({ endDate: '2027-03-14' });
+  });
+
+  it('reabrir com o cartão pendente retoma o Confirmando (decisão 324; cobrança do Crivo)', async () => {
+    mockPublish({
+      paidAfterPay: false,
+      pendingPayment: () => ({
+        paymentId: 'p0',
+        kind: 'publication',
+        method: 'card',
+        amountCents: 33710,
+        dueAt: null,
+        pixCopyPaste: null,
+        endDate: '2027-02-14',
+      }),
+    });
+    renderAreaScreen({ url: URL_PUBLISH });
+    expect(
+      await screen.findAllByText(
+        'Confirmando o pagamento com o banco do cartão. Isso leva alguns segundos.',
+      ),
+    ).not.toHaveLength(0);
+    expect(payButton()).toBeDisabled();
+    // A data do pendente no campo (sugestão do Crivo no E4).
+    expect(dateField()).toHaveValue('2027-02-14');
+  });
+
+  it('a consulta do billing que falha depois do POST segue no Confirmando, sem o recusado (achado do Crivo no E4)', async () => {
+    const user = userEvent.setup();
+    const api = mockPublish({ paidAfterPay: false, billingFailsAfterPay: true });
+    renderAreaScreen({ url: URL_PUBLISH });
+    await ready(user);
+    await fillCardAndPayer(user);
+    await user.click(payButton());
+    expect(
+      await screen.findAllByText(
+        'Confirmando o pagamento com o banco do cartão. Isso leva alguns segundos.',
+      ),
+    ).not.toHaveLength(0);
+    // A consulta depois do POST já falhou: a tela não conclui nada com a do cache.
+    await waitFor(() =>
+      expect(
+        api.fetchMock.mock.calls.filter(([input]) =>
+          String(input).endsWith('/v1/weddings/w1/billing'),
+        ).length,
+      ).toBeGreaterThanOrEqual(2),
+    );
+    expect(screen.queryByText(/^O banco do cartão não aprovou/)).toBeNull();
+    expect(screen.getByRole('status')).toHaveTextContent('Confirmando o pagamento');
+  });
+
+  it('o cartão que sai do pendente sem o site publicado vira o recusado (a lista só traz os aplicados)', async () => {
+    const user = userEvent.setup();
+    // Depois do POST, o billing não tem mais o pendente nem o site publicado.
+    mockPublish({ paidAfterPay: false });
+    renderAreaScreen({ url: URL_PUBLISH });
+    await ready(user);
+    await fillCardAndPayer(user);
+    await user.click(payButton());
+    expect(
+      await screen.findByText(
+        'O banco do cartão não aprovou o pagamento. Confiram os dados, usem outro cartão ou paguem com Pix.',
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('vindo da tela do Pix (Pagar com cartão): a forma, a data e o replacesPaymentId (RN07; 324)', async () => {
+    const user = userEvent.setup();
+    const api = mockPublish();
+    renderAreaScreen({
+      url: URL_PUBLISH,
+      state: { method: 'card', endDate: '2027-02-14', replacesPaymentId: 'p0' },
+    });
+    await waitFor(() => expect(payButton()).toBeEnabled());
+    expect(dateField()).toHaveValue('2027-02-14');
+    await fillCardAndPayer(user);
+    await user.click(payButton());
+    await waitFor(() => expect(api.payments).toHaveLength(1));
+    expect(api.payments[0]).toMatchObject({ method: 'card', replacesPaymentId: 'p0' });
+  });
+
+  it('o PAYMENT_ALREADY_PAID mostra o Toast da Pena e vai ao Dashboard (RN07; Pena, item 2)', async () => {
+    const user = userEvent.setup();
+    mockPublish({ pay: () => apiError({ status: 409, body: { error: 'PAYMENT_ALREADY_PAID' } }) });
+    const { router } = renderAreaScreen({ url: URL_PUBLISH });
+    await ready(user);
+    await fillCardAndPayer(user);
+    await user.click(payButton());
+    expect(
+      await screen.findByText(
+        'Este Pix já foi pago. O pagamento foi confirmado e o site está no ar.',
+      ),
+    ).toBeInTheDocument();
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app'));
   });
 });
 

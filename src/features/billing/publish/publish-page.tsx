@@ -3,7 +3,7 @@ import { keepPreviousData } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate } from 'react-router';
+import { Navigate, useLocation, useNavigate } from 'react-router';
 import { useAreaPaths } from '../../../app/area';
 import {
   useBillingQuoteControllerGetQuoteV1,
@@ -51,6 +51,20 @@ import {
 } from './quote-view';
 
 type Method = 'pix' | 'card';
+
+/**
+ * O Publicar aberto pela tela do Pix (Gerar novo Pix, Pagar com cartão; decisão 324): a forma,
+ * a data, quando o app a tem, e o pendente que o novo pagamento troca (RN07).
+ */
+export interface PublishLocationState {
+  method?: Method;
+  endDate?: string;
+  replacesPaymentId?: string;
+}
+
+function readPublishState(state: unknown): PublishLocationState {
+  return typeof state === 'object' && state !== null ? (state as PublishLocationState) : {};
+}
 
 /** O tempo de espera da data digitada antes de pedir a cotação. */
 const QUOTE_DEBOUNCE_MS = 300;
@@ -246,8 +260,11 @@ function PublishForm({
   blocker: string | undefined;
 }) {
   const { t } = useTranslation('billing');
-  const [endDate, setEndDate] = useState('');
-  const [method, setMethod] = useState<Method>('card');
+  const paths = useAreaPaths();
+  const location = useLocation();
+  const from = readPublishState(location.state);
+  const [endDate, setEndDate] = useState(from.endDate ?? '');
+  const [method, setMethod] = useState<Method>(from.method ?? 'card');
   const [installments, setInstallments] = useState(1);
   const [card, setCard] = useState<CardValues>(EMPTY_CARD);
   const [payer, setPayer] = useState<PayerValues>(EMPTY_PAYER);
@@ -260,6 +277,19 @@ function PublishForm({
     rootRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
   }, [focusRequest]);
   const payment = usePublishPayment({ weddingId });
+  // Reabrir com o cartão pendente: o Confirmando de novo (324; cobrança do Crivo no E3).
+  const pending = payment.billing?.pendingPayment;
+  const resumable =
+    pending?.kind === 'publication' && from.replacesPaymentId === undefined ? pending : null;
+  const resumed = useRef(false);
+  useEffect(() => {
+    if (resumable?.method !== 'card' || resumed.current) return;
+    resumed.current = true;
+    // A data do pendente no campo (sugestão do Crivo no E4; 324(3)).
+    setEndDate((current) => (current === '' ? resumable.endDate : current));
+    payment.resume({ paymentId: resumable.paymentId });
+    // A trava retoma uma vez só, quando o pendente aparece.
+  }, [resumable?.method, resumable?.paymentId, resumable?.endDate, payment]);
   const debouncedEndDate = useDebouncedValue({ value: endDate, delayMs: QUOTE_DEBOUNCE_MS });
   const free = pricing.installments.interestFreeUpTo;
   const max = limits?.endDateMax ?? null;
@@ -317,12 +347,10 @@ function PublishForm({
   const reason =
     blocker ?? (fieldError ? undefined : endDate === '' ? t('publish.reason.noDate') : undefined);
   const busy = payment.state.kind === 'sending' || payment.state.kind === 'confirming';
-  // Só o cartão paga no E3; com o Pix, desabilitado sem motivo até o E4 (322(3)).
   const canPay =
     blocker === undefined &&
     !fieldError &&
     !busy &&
-    method === 'card' &&
     shown?.totalCents !== undefined &&
     shown.totalCents !== null &&
     debouncedEndDate === endDate;
@@ -330,6 +358,7 @@ function PublishForm({
   async function submit() {
     if (!shown?.totalCents) return;
     const found = payErrors({
+      method,
       card,
       payer,
       previousPayer: payment.previousPayer,
@@ -346,13 +375,15 @@ function PublishForm({
       body: {
         kind: 'publication',
         endDate: debouncedEndDate,
-        method: 'card',
-        installments,
+        method,
         payer:
           payerId !== null
             ? { payerId }
             : { name: payer.name.trim(), taxId: digitsOnly(payer.taxId) },
-        cardToken: localCardToken({ number: card.number }),
+        // No Pix, à vista: 1 (o campo é obrigatório no contrato).
+        installments: method === 'card' ? installments : 1,
+        ...(method === 'card' && { cardToken: localCardToken({ number: card.number }) }),
+        ...(from.replacesPaymentId !== undefined && { replacesPaymentId: from.replacesPaymentId }),
         priceVersion: shown.priceVersion,
         expectedTotalCents: shown.totalCents,
       },
@@ -361,6 +392,13 @@ function PublishForm({
     if (failure === 'priceChanged' || failure === 'quoteStale') void quote.refetch();
     // O pagador anterior sumiu do gateway: o CPF de novo (316(3)).
     if (failure === 'payerNotFound') setPayer((current) => ({ ...current, useOther: true }));
+  }
+
+  // Reabrir com o Pix pendente: a tela do Pix (324).
+  if (resumable?.method === 'pix') {
+    // A data do pendente vai junto (o Gerar novo Pix volta com ela; 324(3)).
+    const state: PublishLocationState = { endDate: resumable.endDate };
+    return <Navigate to={paths.billingPix} replace state={state} />;
   }
 
   return (
@@ -421,18 +459,17 @@ function PublishForm({
               }}
             />
           </MethodPanel>
-          {method === 'card' && (
-            <PayerPanel
-              values={payer}
-              errors={errors}
-              previousPayer={payment.previousPayer}
-              disabled={blocker !== undefined || busy}
-              onChange={(values) => {
-                setPayer(values);
-                setErrors({});
-              }}
-            />
-          )}
+          {/* Quem paga vale para as duas formas (RN02). */}
+          <PayerPanel
+            values={payer}
+            errors={errors}
+            previousPayer={payment.previousPayer}
+            disabled={blocker !== undefined || busy}
+            onChange={(values) => {
+              setPayer(values);
+              setErrors({});
+            }}
+          />
         </div>
         <div className="kore-publish__summary">
           {quoteFailed ? (
