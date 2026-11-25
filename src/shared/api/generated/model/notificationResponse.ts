@@ -5,21 +5,33 @@
  * OpenAPI spec version: 1
  */
 import type { BillingEntryResponse } from './billingEntryResponse';
+import type { CommissionEntryResponse } from './commissionEntryResponse';
+import type { CoupleEntryResponse } from './coupleEntryResponse';
 import type { NotificationEntryResponse } from './notificationEntryResponse';
 import type { NotificationResponseType } from './notificationResponseType';
+import type { ReferrerReassignedEntryResponse } from './referrerReassignedEntryResponse';
 
 export interface NotificationResponse {
   type: NotificationResponseType;
   /** Os primeiros nomes do casal; o app junta. */
   partnerNames: string[];
   /**
-   * rsvp: por grupo, sem restrição, música nem nome de convidado (Central RN04).
-   * wedding_published e membership_removed: [{ partnerNames }] (revisão C8-3).
-   * referrer_reassigned: [{ partnerNames, direction }], `lost` ao indicador
-   * antigo e `gained` ao novo, sem o nome do outro (Backoffice - acesso RN07).
-   * billing: um item por pagamento, com o valor só no detalhe (RN13).
+   * O formato de cada item depende do `type` (decisões 275 e 316(13)):
+   * - rsvp: `NotificationEntryResponse`, por grupo, sem restrição, música nem
+   *   nome de convidado (Central RN04);
+   * - wedding_published e membership_removed: `CoupleEntryResponse` (C8-3);
+   * - commission: `CommissionEntryResponse` (Comissões do indicador RN09);
+   * - referrer_reassigned: `ReferrerReassignedEntryResponse` (Backoffice - acesso RN07);
+   * - billing: `BillingEntryResponse`, um item por aviso, com o valor só no
+   *   detalhe (Publicar e pagar RN13).
    */
-  payload: (NotificationEntryResponse | BillingEntryResponse)[];
+  payload: (
+    | NotificationEntryResponse
+    | CoupleEntryResponse
+    | CommissionEntryResponse
+    | ReferrerReassignedEntryResponse
+    | BillingEntryResponse
+  )[];
   /** @nullable */
   readAt: string | null;
   updatedAt: string;

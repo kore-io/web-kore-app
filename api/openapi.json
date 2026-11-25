@@ -10328,6 +10328,9 @@
                     },
                     {
                       "$ref": "#/components/schemas/IdempotencyKeyReusedErrorBody"
+                    },
+                    {
+                      "$ref": "#/components/schemas/PayerNotFoundErrorBody"
                     }
                   ]
                 }
@@ -15605,6 +15608,11 @@
             "nullable": true,
             "example": "2027-03-20"
           },
+          "timezone": {
+            "type": "string",
+            "description": "O fuso IANA do casamento: as datas com hora e o \"hoje\" das faixas e da\ncobrança (decisões 263(2) e 316(6)).",
+            "example": "America/Sao_Paulo"
+          },
           "lifecycle": {
             "description": "As faixas e o selo da Topbar (Data de saída do ar RN06; decisão 231).",
             "allOf": [
@@ -15630,6 +15638,7 @@
         "required": [
           "role",
           "eventDate",
+          "timezone",
           "lifecycle",
           "weddingId",
           "weddingName",
@@ -15698,6 +15707,25 @@
             "type": "string",
             "example": "Ana & Marcos"
           },
+          "partnerNames": {
+            "description": "Os primeiros nomes, como na central: a faixa diz \"Ana e Marcos\" (decisão 316(12)).",
+            "example": [
+              "Ana",
+              "Marcos"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "lifecycle": {
+            "description": "O ciclo de vida do casal visto, com o bloqueio: as faixas e as travas da\nárea, como no vínculo (decisão 316(12)).",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MeLifecycleResponse"
+              }
+            ]
+          },
           "startedAt": {
             "type": "string",
             "format": "date-time"
@@ -15711,6 +15739,8 @@
         "required": [
           "weddingId",
           "coupleNames",
+          "partnerNames",
+          "lifecycle",
           "startedAt",
           "expiresAt"
         ]
@@ -23515,6 +23545,85 @@
           "declined"
         ]
       },
+      "CoupleEntryResponse": {
+        "type": "object",
+        "properties": {
+          "partnerNames": {
+            "description": "Os primeiros nomes do casal; o app junta.",
+            "example": [
+              "Ana",
+              "Marcos"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "partnerNames"
+        ]
+      },
+      "CommissionEntryResponse": {
+        "type": "object",
+        "properties": {
+          "commissionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amountCents": {
+            "type": "number",
+            "example": 6742
+          },
+          "partnerNames": {
+            "example": [
+              "Ana",
+              "Marcos"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "at": {
+            "type": "string",
+            "description": "Quando a comissão ficou disponível.",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "commissionId",
+          "amountCents",
+          "partnerNames",
+          "at"
+        ]
+      },
+      "ReferrerReassignedEntryResponse": {
+        "type": "object",
+        "properties": {
+          "partnerNames": {
+            "example": [
+              "Ana",
+              "Marcos"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "direction": {
+            "enum": [
+              "lost",
+              "gained"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "partnerNames",
+          "direction"
+        ]
+      },
       "BillingEntryResponse": {
         "type": "object",
         "properties": {
@@ -23576,7 +23685,7 @@
           },
           "endDate": {
             "type": "string",
-            "description": "A data de saída do ar paga, AAAA-MM-DD (só no payment_confirmed)."
+            "description": "A data de saída do ar, AAAA-MM-DD: a paga no payment_confirmed e a nova na\ncourtesy (a Cortesia do Admin; Backoffice - cobrança RN06)."
           },
           "amountCents": {
             "type": "number",
@@ -23634,11 +23743,20 @@
           },
           "payload": {
             "type": "array",
-            "description": "rsvp: por grupo, sem restrição, música nem nome de convidado (Central RN04).\nwedding_published e membership_removed: [{ partnerNames }] (revisão C8-3).\nreferrer_reassigned: [{ partnerNames, direction }], `lost` ao indicador\nantigo e `gained` ao novo, sem o nome do outro (Backoffice - acesso RN07).\nbilling: um item por pagamento, com o valor só no detalhe (RN13).",
+            "description": "O formato de cada item depende do `type` (decisões 275 e 316(13)):\n- rsvp: `NotificationEntryResponse`, por grupo, sem restrição, música nem\n  nome de convidado (Central RN04);\n- wedding_published e membership_removed: `CoupleEntryResponse` (C8-3);\n- commission: `CommissionEntryResponse` (Comissões do indicador RN09);\n- referrer_reassigned: `ReferrerReassignedEntryResponse` (Backoffice - acesso RN07);\n- billing: `BillingEntryResponse`, um item por aviso, com o valor só no\n  detalhe (Publicar e pagar RN13).",
             "items": {
               "oneOf": [
                 {
                   "$ref": "#/components/schemas/NotificationEntryResponse"
+                },
+                {
+                  "$ref": "#/components/schemas/CoupleEntryResponse"
+                },
+                {
+                  "$ref": "#/components/schemas/CommissionEntryResponse"
+                },
+                {
+                  "$ref": "#/components/schemas/ReferrerReassignedEntryResponse"
                 },
                 {
                   "$ref": "#/components/schemas/BillingEntryResponse"
@@ -25680,6 +25798,31 @@
           "message"
         ]
       },
+      "PayerNotFoundErrorBody": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "number",
+            "enum": [
+              422
+            ]
+          },
+          "error": {
+            "type": "string",
+            "enum": [
+              "PAYER_NOT_FOUND"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "statusCode",
+          "error",
+          "message"
+        ]
+      },
       "GatewayUnavailableErrorBody": {
         "type": "object",
         "properties": {
@@ -25710,16 +25853,16 @@
           "paymentId"
         ]
       },
-      "PayerBody": {
+      "NewPayerBody": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string",
             "description": "Nome completo de quem paga (pode ser outra pessoa).",
+            "example": "Ana Beatriz Moreira",
             "minLength": 2,
             "maxLength": 200,
-            "pattern": "\\S",
-            "example": "Ana Beatriz Moreira"
+            "pattern": "\\S"
           },
           "taxId": {
             "type": "string",
@@ -25731,6 +25874,36 @@
           "name",
           "taxId"
         ]
+      },
+      "PreviousPayerBody": {
+        "type": "object",
+        "properties": {
+          "payerId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "payerId"
+        ]
+      },
+      "PayerBody": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 200,
+            "pattern": "\\S"
+          },
+          "taxId": {
+            "type": "string"
+          },
+          "payerId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
       },
       "CreatePaymentBody": {
         "type": "object",
@@ -25761,7 +25934,20 @@
             "example": 2
           },
           "payer": {
-            "$ref": "#/components/schemas/PayerBody"
+            "description": "O nome e o CPF, ou o pagador anterior pelo `payerId` (decisão 316(3)).",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/NewPayerBody"
+              },
+              {
+                "$ref": "#/components/schemas/PreviousPayerBody"
+              }
+            ],
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PayerBody"
+              }
+            ]
           },
           "cardToken": {
             "type": "string",
@@ -26014,11 +26200,18 @@
           "taxIdLast4": {
             "type": "string",
             "example": "4821"
+          },
+          "payerId": {
+            "type": "string",
+            "nullable": true,
+            "description": "Para pagar de novo sem o CPF, em `payer.payerId` do POST …/payments\n(decisão 316(3)). Nulo quando o pagador não tem cliente no gateway atual:\no app pede o CPF.",
+            "format": "uuid"
           }
         },
         "required": [
           "name",
-          "taxIdLast4"
+          "taxIdLast4",
+          "payerId"
         ]
       },
       "BillingResponse": {
@@ -26638,6 +26831,10 @@
           "payerTaxIdLast4": {
             "type": "string"
           },
+          "pastGatewayWindow": {
+            "type": "boolean",
+            "description": "Passou do prazo de estorno do gateway (Pix: 90 dias; cartão: nunca, até o\nAsaas confirmar): o Dialog do Reembolsar avisa antes que o estorno vai\nfalhar (RN05; decisão 316(11)(e)). A resposta do Reembolsar segue trazendo\no mesmo booleano (259(2))."
+          },
           "amountCents": {
             "type": "number"
           },
@@ -26677,6 +26874,7 @@
           "pixDiscountCents",
           "installmentInterestCents",
           "payerTaxIdLast4",
+          "pastGatewayWindow",
           "amountCents",
           "applied"
         ]
@@ -27872,6 +28070,17 @@
             "description": "A troca do e-mail pelo staff trava chave Pix e remoção de membros até aqui (decisão 253(2)).",
             "format": "date-time"
           },
+          "since": {
+            "type": "string",
+            "description": "Desde quando tem acesso: a data do vínculo, o \"desde\" das Pessoas com acesso (316(11)(f)).",
+            "format": "date-time"
+          },
+          "accessEmailAdminOnlyUntil": {
+            "type": "string",
+            "nullable": true,
+            "description": "Até quando uma nova troca do e-mail desta pessoa é só do Admin (a 2ª em 7\ndias; RN09 e decisão 253(1)): o suporte vê o botão desabilitado com a causa.",
+            "format": "date-time"
+          },
           "email": {
             "type": "string"
           }
@@ -27881,7 +28090,28 @@
           "name",
           "role",
           "accessChangeLockedUntil",
+          "since",
+          "accessEmailAdminOnlyUntil",
           "email"
+        ]
+      },
+      "AdminAccessEmailChangeResponse": {
+        "type": "object",
+        "properties": {
+          "lockedUntil": {
+            "type": "string",
+            "nullable": true,
+            "description": "As 3 conferências erradas em 24 h travam a troca até aqui (para qualquer\npapel; o Admin libera); nulo sem a trava.",
+            "format": "date-time"
+          },
+          "payerCheck": {
+            "type": "boolean",
+            "description": "Há pagamento: o Dialog pede os 4 últimos do CPF de quem pagou (a 3ª conferência)."
+          }
+        },
+        "required": [
+          "lockedUntil",
+          "payerCheck"
         ]
       },
       "AdminPendingPaymentResponse": {
@@ -28023,6 +28253,9 @@
             "items": {
               "$ref": "#/components/schemas/AdminPersonResponse"
             }
+          },
+          "accessEmailChange": {
+            "$ref": "#/components/schemas/AdminAccessEmailChangeResponse"
           },
           "publishedAt": {
             "type": "string",
@@ -28175,6 +28408,32 @@
           "total"
         ]
       },
+      "AdminLogActorResponse": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "nullable": true
+          },
+          "role": {
+            "nullable": true,
+            "description": "O staff (`admin`, `support`), o papel no casamento da linha (`owner`,\n`collaborator`) ou, sem vínculo, o do indicador (`planner`, `seller`);\nnulo se nada disso. O app escolhe o rótulo.",
+            "enum": [
+              "admin",
+              "support",
+              "owner",
+              "collaborator",
+              "planner",
+              "seller"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "role"
+        ]
+      },
       "AdminWeddingLogEntryResponse": {
         "type": "object",
         "properties": {
@@ -28217,6 +28476,16 @@
             "nullable": true,
             "description": "O hash do IP, curto; nunca o IP."
           },
+          "actor": {
+            "nullable": true,
+            "description": "Quem agiu, como no Log da aplicação; nulo no sistema e no convidado (decisão 320(2)).",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AdminLogActorResponse"
+              }
+            ]
+          },
           "action": {
             "type": "string"
           }
@@ -28230,6 +28499,7 @@
           "entityId",
           "data",
           "ipHashShort",
+          "actor",
           "action"
         ]
       },
@@ -29151,6 +29421,22 @@
             "nullable": true,
             "description": "O hash do IP, curto; nunca o IP."
           },
+          "actor": {
+            "nullable": true,
+            "description": "Nulo no sistema e no convidado (sem `actorUserId`).",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AdminLogActorResponse"
+              }
+            ]
+          },
+          "coupleNames": {
+            "type": "string",
+            "nullable": true,
+            "description": "\"Ana & Marcos\", para a coluna Casamento; nulo sem casamento ou depois do expurgo.",
+            "example": "Ana & Marcos"
+          },
           "action": {
             "type": "string"
           }
@@ -29166,6 +29452,8 @@
           "entityId",
           "data",
           "ipHashShort",
+          "actor",
+          "coupleNames",
           "action"
         ]
       },

@@ -11,6 +11,11 @@ export interface MeMembershipResponse {
   role: MeMembershipResponseRole;
   /** @nullable */
   eventDate: string | null;
+  /**
+   * O fuso IANA do casamento: as datas com hora e o "hoje" das faixas e da
+   * cobrança (decisões 263(2) e 316(6)).
+   */
+  timezone: string;
   /** As faixas e o selo da Topbar (Data de saída do ar RN06; decisão 231). */
   lifecycle: MeLifecycleResponse;
   weddingId: string;

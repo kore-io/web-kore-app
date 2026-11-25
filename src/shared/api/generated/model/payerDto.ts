@@ -8,4 +8,11 @@
 export interface PayerDto {
   name: string;
   taxIdLast4: string;
+  /**
+   * Para pagar de novo sem o CPF, em `payer.payerId` do POST …/payments
+   * (decisão 316(3)). Nulo quando o pagador não tem cliente no gateway atual:
+   * o app pede o CPF.
+   * @nullable
+   */
+  payerId: string | null;
 }

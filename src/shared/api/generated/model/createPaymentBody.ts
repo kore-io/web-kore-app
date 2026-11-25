@@ -6,7 +6,9 @@
  */
 import type { CreatePaymentBodyKind } from './createPaymentBodyKind';
 import type { CreatePaymentBodyMethod } from './createPaymentBodyMethod';
+import type { NewPayerBody } from './newPayerBody';
 import type { PayerBody } from './payerBody';
+import type { PreviousPayerBody } from './previousPayerBody';
 
 export interface CreatePaymentBody {
   /** A publicação ou a extensão (Data de saída do ar RN04: adiar e renovar). */
@@ -18,7 +20,8 @@ export interface CreatePaymentBody {
    * @maximum 12
    */
   installments: number;
-  payer: PayerBody;
+  /** O nome e o CPF, ou o pagador anterior pelo `payerId` (decisão 316(3)). */
+  payer: PayerBody & (NewPayerBody | PreviousPayerBody);
   /**
    * O token do cartão, quando o gateway tokeniza (B2-16); nunca o número.
    * @minLength 1

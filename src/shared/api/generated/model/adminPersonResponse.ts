@@ -16,5 +16,13 @@ export interface AdminPersonResponse {
    * @nullable
    */
   accessChangeLockedUntil: string | null;
+  /** Desde quando tem acesso: a data do vínculo, o "desde" das Pessoas com acesso (316(11)(f)). */
+  since: string;
+  /**
+   * Até quando uma nova troca do e-mail desta pessoa é só do Admin (a 2ª em 7
+   * dias; RN09 e decisão 253(1)): o suporte vê o botão desabilitado com a causa.
+   * @nullable
+   */
+  accessEmailAdminOnlyUntil: string | null;
   email: string;
 }
