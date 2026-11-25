@@ -10,7 +10,7 @@ import { useSiteControllerGetV1 } from '../../shared/api/generated/site/site';
 import { LoadError } from '../../shared/components/load-error';
 import { areaPaths, COUPLE_AREA } from '../area';
 import { AppShell } from './app-shell';
-import { SiteStatusBadge } from './site-status-badge';
+import { LifecycleBadge, LifecycleBanner } from '../../features/billing/lifecycle/lifecycle-banner';
 import { WeddingNavigation } from './wedding-navigation';
 
 /**
@@ -47,14 +47,19 @@ export function CoupleAreaLayout() {
   // Resposta sem a pergunta (ex.: falha parcial): sem o item, e a área segue de pé.
   const songQuestion = site.data?.songQuestion as { enabled?: boolean } | undefined;
   const songsEnabled = songQuestion?.enabled === true;
-  // O selo de status do site na Topbar (Dashboard RN07; decisão 239(B3)).
-  const siteStatusValue = (site.data as { status?: unknown } | undefined)?.status;
 
   // Sem os dados da pessoa, sem o AppShell: o aviso no meio da tela (decisão 164).
   if (failed) return <LoadError onRetry={retry} />;
   if (!me) return null;
 
-  const couple = me.memberships.find((membership) => membership.role === 'owner')?.weddingName;
+  const ownMembership = me.memberships.find((membership) => membership.role === 'owner');
+  const couple = ownMembership?.weddingName;
+  // O ciclo de vida do /me: o selo da Topbar e a faixa (329(3); Data de saída RN06).
+  const lifecycle = ownMembership?.lifecycle && {
+    lifecycle: ownMembership.lifecycle,
+    eventDate: ownMembership.eventDate,
+    timezone: ownMembership.timezone,
+  };
   // Trocar de perfil com mais de um perfil; Criar outro perfil quando falta o de
   // cerimonialista, a conta não é de vendas e o cadastro de cerimonialista está aberto
   // (Cadastro e perfil RN08; decisões 85 e 308(1)).
@@ -89,9 +94,7 @@ export function CoupleAreaLayout() {
   return (
     <AppShell
       title={couple ?? null}
-      {...(typeof siteStatusValue === 'string' && {
-        status: <SiteStatusBadge status={siteStatusValue} />,
-      })}
+      {...(lifecycle && { status: <LifecycleBadge source={lifecycle} /> })}
       user={menuUser({ user: me.user })}
       activeProfile={
         couple ? t('activeProfileCoupleWedding', { couple }) : t('activeProfileCouple')
@@ -113,6 +116,7 @@ export function CoupleAreaLayout() {
       }}
       navigation={<WeddingNavigation area={AREA} songsEnabled={songsEnabled} />}
     >
+      {lifecycle && <LifecycleBanner source={lifecycle} audience="couple" />}
       <Outlet />
     </AppShell>
   );
