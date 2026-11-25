@@ -1,6 +1,6 @@
 import { Alert, Button, Dialog, Input, useToast } from '@kore-io/design';
 import { useQueryClient } from '@tanstack/react-query';
-import { useState, type FormEvent } from 'react';
+import { useId, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   useAccessInvitationsControllerCancelV1,
@@ -14,6 +14,13 @@ import { ApiError, apiErrorCode } from '../../../shared/api/http-client';
 import { FormField } from '../../../shared/components/form-field';
 import { isValidEmail } from '../../access/email';
 import { cardDate } from '../collaborators-texts';
+import {
+  isWeddingBlocked,
+  lockedProps,
+  useErrorMessage,
+  useWriteLock,
+  WriteLockReason,
+} from '../../billing/lifecycle/blocked';
 
 /**
  * Os status em que o site está no ar, como o `live` da API (publicado, depois do evento e
@@ -82,6 +89,9 @@ export function InvitePlanner({ weddingId }: { weddingId: string }) {
 export function InviteButton({ kind, weddingId }: { kind: InvitationKind; weddingId: string }) {
   const texts = useInviteTexts({ kind });
   const [open, setOpen] = useState(false);
+  // Bloqueado RN04: convidar é escrita.
+  const lock = useWriteLock();
+  const lockId = `${useId()}-locked`;
   return (
     <>
       <Button
@@ -89,9 +99,11 @@ export function InviteButton({ kind, weddingId }: { kind: InvitationKind; weddin
         variant="secondary"
         className="kore-collaborators__invite"
         onClick={() => setOpen(true)}
+        {...lockedProps({ locked: lock.locked, id: lockId })}
       >
         {texts.open}
       </Button>
+      <WriteLockReason id={lockId} className="kore-collaborators__help" />
       <InviteDialog kind={kind} open={open} weddingId={weddingId} onClose={() => setOpen(false)} />
     </>
   );
@@ -111,6 +123,7 @@ function InviteDialog({
   const { t } = useTranslation('collaborators');
   const texts = useInviteTexts({ kind });
   const { showToast } = useToast();
+  const errorMessage = useErrorMessage();
   const refresh = useRefreshMembers({ weddingId });
   const send = useAccessInvitationsControllerSendV1();
   const me = useMeControllerMeV1();
@@ -164,7 +177,13 @@ function InviteDialog({
             showToast({ tone: 'danger', message: texts.full });
             return;
           }
-          showToast({ tone: 'danger', message: t('couple.invite.sendError') });
+          showToast({
+            tone: 'danger',
+            // O bloqueio em corrida (Bloqueado RN04): o motivo, no lugar do erro do envio.
+            message: isWeddingBlocked(failure)
+              ? errorMessage(failure)
+              : t('couple.invite.sendError'),
+          });
         },
       },
     );
@@ -233,6 +252,10 @@ export function PendingInvitation({
   const refresh = useRefreshMembers({ weddingId });
   const send = useAccessInvitationsControllerSendV1();
   const cancel = useAccessInvitationsControllerCancelV1();
+  const errorMessage = useErrorMessage();
+  // Bloqueado RN04: reenviar e cancelar o convite são escrita.
+  const lock = useWriteLock();
+  const lockId = `${useId()}-locked`;
   const email = invitation.email ?? '';
   const expired = new Date(invitation.expiresAt).getTime() <= now.getTime();
   const busy = send.isPending || cancel.isPending;
@@ -245,7 +268,7 @@ export function PendingInvitation({
       showToast({ tone: 'danger', message: t('couple.invite.notPending') });
       return;
     }
-    showToast({ tone: 'danger', message });
+    showToast({ tone: 'danger', message: isWeddingBlocked(error) ? errorMessage(error) : message });
   }
 
   function resend() {
@@ -287,13 +310,26 @@ export function PendingInvitation({
         </span>
       </div>
       <div className="kore-collaborators__actions">
-        <Button type="button" variant="secondary" disabled={busy} onClick={resend}>
+        <Button
+          type="button"
+          variant="secondary"
+          disabled={busy}
+          onClick={resend}
+          {...lockedProps({ locked: lock.locked, id: lockId })}
+        >
           {t('couple.invite.resend')}
         </Button>
-        <Button type="button" variant="ghost" disabled={busy} onClick={cancelInvitation}>
+        <Button
+          type="button"
+          variant="ghost"
+          disabled={busy}
+          onClick={cancelInvitation}
+          {...lockedProps({ locked: lock.locked, id: lockId })}
+        >
           {t('couple.invite.cancelInvitation')}
         </Button>
       </div>
+      <WriteLockReason id={lockId} className="kore-collaborators__help" />
     </div>
   );
 }
