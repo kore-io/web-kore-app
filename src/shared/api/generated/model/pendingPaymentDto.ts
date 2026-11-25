@@ -10,7 +10,13 @@ import type { PendingPaymentDtoMethod } from './pendingPaymentDtoMethod';
 export interface PendingPaymentDto {
   paymentId: string;
   kind: PendingPaymentDtoKind;
+  /** A forma do pendente: o Publicar volta com ela escolhida (decisão 324). */
   method: PendingPaymentDtoMethod;
+  /**
+   * A data de saída do ar pedida (o `endDate` do POST …/payments): o Publicar
+   * volta com ela preenchida (decisão 324(3)).
+   */
+  endDate: string;
   amountCents: number;
   /** @nullable */
   dueAt: string | null;

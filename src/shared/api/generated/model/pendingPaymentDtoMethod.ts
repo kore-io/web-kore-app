@@ -5,6 +5,9 @@
  * OpenAPI spec version: 1
  */
 
+/**
+ * A forma do pendente: o Publicar volta com ela escolhida (decisão 324).
+ */
 export type PendingPaymentDtoMethod =
   (typeof PendingPaymentDtoMethod)[keyof typeof PendingPaymentDtoMethod];
 
