@@ -32,15 +32,17 @@ export function endDateLimits({ source, now }: { source: EndDateSource; now: Dat
 
 /**
  * Há mês pago à frente que dá para usar de graça (RN04 e RN05; 289; 293(3)): o `paidThrough`
- * depois da data atual (quem antecipou) ou, no expirado, depois de hoje. No ar sem antecipar,
- * o `paidThrough` é a própria data: a ajuda é a comum, como no Penpot (A6).
+ * depois do maior entre a data atual (quem antecipou) e hoje, no fuso do casamento (341). Na
+ * carência e no expirado a data atual já passou, e um `paidThrough` que também passou não
+ * serve. No ar sem antecipar, o `paidThrough` é a própria data: a ajuda é a comum, como no
+ * Penpot (A6).
  */
 export function paidAhead({ source, now }: { source: EndDateSource; now: Date }): string | null {
-  const { paidThrough } = source;
+  const { paidThrough, endDate } = source;
   if (!paidThrough) return null;
-  const from =
-    source.status === 'expired' ? todayIn({ timezone: source.timezone, now }) : source.endDate;
-  return from && paidThrough > from ? paidThrough : null;
+  const today = todayIn({ timezone: source.timezone, now });
+  const from = source.status !== 'expired' && endDate && endDate > today ? endDate : today;
+  return paidThrough > from ? paidThrough : null;
 }
 
 /**
