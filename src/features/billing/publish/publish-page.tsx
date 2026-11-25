@@ -1,7 +1,7 @@
 import { Alert, Button, DateField, PageHeader, Select, Spinner } from '@kore-io/design';
 import { keepPreviousData } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
-import { useId, useState } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
 import { useAreaPaths } from '../../../app/area';
@@ -27,6 +27,19 @@ import { useDebouncedValue } from '../../../shared/hooks/use-debounced-value';
 import { formatCents, formatRulePrice } from '../../../shared/money';
 import { TERMS_URL } from '../../../site/links';
 import { useActiveWedding } from '../../guests/hooks/use-active-wedding';
+import { usePublishPayment } from './use-publish-payment';
+import {
+  CardFields,
+  EMPTY_CARD,
+  EMPTY_PAYER,
+  PayerPanel,
+  payErrors,
+  previousPayerId,
+  type CardValues,
+  type PayErrors,
+  type PayerValues,
+} from './pay-fields';
+import { digitsOnly, localCardToken } from './payment-form';
 import {
   capStartsAtMonths,
   installmentOptions,
@@ -47,9 +60,10 @@ const PUBLISHED = new Set(['published', 'post_event', 'grace', 'expired']);
 
 /**
  * Publicar o site (`…/cobranca/publicar`; Publicar e pagar RN01; Preço e cotação RN03,
- * RN04 e RN09; Penpot 21, A1 e A4). No E2, a cotação: a data, a forma, as parcelas, o
- * Resumo, o Comparar e o Resumo do contrato, com os bloqueios ao lado do botão. O pagar
- * chega no E3: até lá, o Pagar e publicar fica desabilitado (decisão 322).
+ * RN04 e RN09; Penpot 21, A1 a A4): a cotação (a data, a forma, as parcelas, o Resumo, o
+ * Comparar e o Resumo do contrato, com os bloqueios ao lado do botão) e, no E3, o pagar com
+ * o cartão (Quem paga, os campos do cartão, o recusado e a confirmação). Com o Pix, o Pagar
+ * e publicar fica desabilitado até o E4 (decisão 322(3)).
  */
 export function PublishPage() {
   const { weddingId, role } = useActiveWedding();
@@ -97,27 +111,36 @@ function ContractPanel({ price }: { price?: { totalCents: number; endDate: strin
 
 /**
  * O motivo acima dos botões e os botões (Penpot: Cancelar e Pagar e publicar à direita; no
- * celular, a largura toda, com o Pagar em cima). O Pagar e publicar fica desabilitado até o
- * E3 (decisão 322); o motivo, quando há, é o que o app conhece antes do clique (228(4)).
+ * celular, a largura toda, com o Pagar em cima). O motivo, quando há, é o que o app conhece
+ * antes do clique (228(4)); enquanto o cartão é confirmado, o Spinner com a frase da Pena.
  */
 function PublishActions({
   reason,
-  describedBy,
+  onPay,
+  confirming = false,
 }: {
   reason?: string | undefined;
-  describedBy?: string | undefined;
+  /** Sem ele, o Pagar e publicar fica desabilitado. */
+  onPay?: (() => void) | undefined;
+  confirming?: boolean;
 }) {
   const { t } = useTranslation('billing');
   const navigate = useNavigate();
   const paths = useAreaPaths();
   const reasonId = useId();
-  const description = reason !== undefined ? reasonId : describedBy;
   return (
     <div className="kore-publish__actions">
-      {reason !== undefined && (
-        <p id={reasonId} className="kore-publish__reason">
-          {reason}
-        </p>
+      {confirming ? (
+        <div id={reasonId} className="kore-publish__confirming">
+          <Spinner label={t('publish.confirming')} />
+          <span aria-hidden="true">{t('publish.confirming')}</span>
+        </div>
+      ) : (
+        reason !== undefined && (
+          <p id={reasonId} className="kore-publish__reason">
+            {reason}
+          </p>
+        )
       )}
       <div className="kore-publish__buttons">
         <Button variant="secondary" size="lg" onClick={() => void navigate(paths.dashboard)}>
@@ -125,8 +148,9 @@ function PublishActions({
         </Button>
         <Button
           size="lg"
-          disabled
-          {...(description !== undefined && { 'aria-describedby': description })}
+          disabled={onPay === undefined}
+          {...((reason !== undefined || confirming) && { 'aria-describedby': reasonId })}
+          {...(onPay !== undefined && { onClick: onPay })}
         >
           {t('publish.pay')}
         </Button>
@@ -225,6 +249,17 @@ function PublishForm({
   const [endDate, setEndDate] = useState('');
   const [method, setMethod] = useState<Method>('card');
   const [installments, setInstallments] = useState(1);
+  const [card, setCard] = useState<CardValues>(EMPTY_CARD);
+  const [payer, setPayer] = useState<PayerValues>(EMPTY_PAYER);
+  const [errors, setErrors] = useState<PayErrors>({});
+  // Depois do Pagar com erros, o foco vai ao 1º campo inválido (sugestão do Crivo no E3).
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [focusRequest, setFocusRequest] = useState(0);
+  useEffect(() => {
+    if (focusRequest === 0) return;
+    rootRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+  }, [focusRequest]);
+  const payment = usePublishPayment({ weddingId });
   const debouncedEndDate = useDebouncedValue({ value: endDate, delayMs: QUOTE_DEBOUNCE_MS });
   const free = pricing.installments.interestFreeUpTo;
   const max = limits?.endDateMax ?? null;
@@ -281,9 +316,55 @@ function PublishForm({
   const maxText = max !== null ? shortDate(max) : '';
   const reason =
     blocker ?? (fieldError ? undefined : endDate === '' ? t('publish.reason.noDate') : undefined);
+  const busy = payment.state.kind === 'sending' || payment.state.kind === 'confirming';
+  // Só o cartão paga no E3; com o Pix, desabilitado sem motivo até o E4 (322(3)).
+  const canPay =
+    blocker === undefined &&
+    !fieldError &&
+    !busy &&
+    method === 'card' &&
+    shown?.totalCents !== undefined &&
+    shown.totalCents !== null &&
+    debouncedEndDate === endDate;
+
+  async function submit() {
+    if (!shown?.totalCents) return;
+    const found = payErrors({
+      card,
+      payer,
+      previousPayer: payment.previousPayer,
+      now: new Date(),
+      t,
+    });
+    setErrors(found);
+    if (Object.keys(found).length > 0) {
+      setFocusRequest((count) => count + 1);
+      return;
+    }
+    const payerId = previousPayerId({ payer, previousPayer: payment.previousPayer });
+    const failure = await payment.pay({
+      body: {
+        kind: 'publication',
+        endDate: debouncedEndDate,
+        method: 'card',
+        installments,
+        payer:
+          payerId !== null
+            ? { payerId }
+            : { name: payer.name.trim(), taxId: digitsOnly(payer.taxId) },
+        cardToken: localCardToken({ number: card.number }),
+        priceVersion: shown.priceVersion,
+        expectedTotalCents: shown.totalCents,
+      },
+    });
+    // O valor mudou ou a data e as parcelas saíram dos limites: a cotação de novo (RN05).
+    if (failure === 'priceChanged' || failure === 'quoteStale') void quote.refetch();
+    // O pagador anterior sumiu do gateway: o CPF de novo (316(3)).
+    if (failure === 'payerNotFound') setPayer((current) => ({ ...current, useOther: true }));
+  }
 
   return (
-    <div className="kore-publish">
+    <div className="kore-publish" ref={rootRef}>
       <PublishHeader />
       <div className="kore-publish__columns">
         <div className="kore-publish__choices">
@@ -327,8 +408,31 @@ function PublishForm({
             onInstallmentsChange={setInstallments}
             options={options}
             quote={shown}
-            disabled={blocker !== undefined}
-          />
+            disabled={blocker !== undefined || busy}
+          >
+            <CardFields
+              values={card}
+              errors={errors}
+              disabled={blocker !== undefined || busy}
+              onChange={(values) => {
+                setCard(values);
+                setErrors({});
+                if (payment.state.kind === 'declined') payment.dismissDeclined();
+              }}
+            />
+          </MethodPanel>
+          {method === 'card' && (
+            <PayerPanel
+              values={payer}
+              errors={errors}
+              previousPayer={payment.previousPayer}
+              disabled={blocker !== undefined || busy}
+              onChange={(values) => {
+                setPayer(values);
+                setErrors({});
+              }}
+            />
+          )}
         </div>
         <div className="kore-publish__summary">
           {quoteFailed ? (
@@ -346,7 +450,16 @@ function PublishForm({
                 price: { totalCents: shown.totalCents, endDate: debouncedEndDate },
               })}
           />
-          <PublishActions reason={reason} />
+          {payment.state.kind === 'declined' && (
+            <Alert tone="danger" role="alert">
+              {t('publish.declined')}
+            </Alert>
+          )}
+          <PublishActions
+            reason={reason}
+            confirming={payment.state.kind === 'confirming'}
+            {...(canPay && { onPay: () => void submit() })}
+          />
         </div>
       </div>
     </div>
@@ -394,6 +507,7 @@ function MethodPanel({
   options,
   quote,
   disabled,
+  children,
 }: {
   pricing: PricingResponse;
   method: Method;
@@ -403,6 +517,8 @@ function MethodPanel({
   options: InstallmentOption[];
   quote: BillingQuoteResponse | undefined;
   disabled: boolean;
+  /** Os campos do cartão, abaixo das parcelas e dos juros (Penpot 21). */
+  children: ReactNode;
 }) {
   const { t } = useTranslation('billing');
   const free = pricing.installments.interestFreeUpTo;
@@ -466,6 +582,7 @@ function MethodPanel({
           })}
         </Alert>
       )}
+      {method === 'card' && children}
     </Panel>
   );
 }

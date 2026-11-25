@@ -124,14 +124,40 @@ function quoteFor(params: URLSearchParams) {
 function mockPublish({
   lifecycleOverrides = {},
   site = { slug: 'ana-e-marcos', eventDate: '2026-11-14', state: 'SP' },
+  payer = null,
+  pay = () =>
+    Response.json(
+      {
+        paymentId: 'p1',
+        status: 'pending',
+        method: 'card',
+        amountCents: 33710,
+        nextAction: { type: 'none' },
+      },
+      { status: 201 },
+    ),
+  paidAfterPay = true,
+  blockedAfterPay = false,
 }: {
   lifecycleOverrides?: Partial<typeof lifecycle>;
   site?: { slug: string | null; eventDate: string | null; state: string | null };
+  /** O pagador anterior do GET …/billing (316(3)). */
+  payer?: { name: string; taxIdLast4: string; payerId: string | null } | null;
+  /** A resposta do POST …/payments. */
+  pay?: (body: unknown) => Response;
+  /** Depois do POST, o GET …/billing já traz o pagamento confirmado. */
+  paidAfterPay?: boolean;
+  /** Depois do POST, o /me traz o casamento bloqueado (o bloqueio em corrida). */
+  blockedAfterPay?: boolean;
 } = {}) {
   const quotes: URLSearchParams[] = [];
-  mockApi(({ path }) => {
+  const payments: unknown[] = [];
+  const fetchMock = mockApi(({ method, path, body }) => {
     const url = new URL(path, 'http://api.test');
-    if (url.pathname === '/v1/me') return Response.json(meFor(me(lifecycleOverrides)));
+    if (url.pathname === '/v1/me') {
+      const blocked = blockedAfterPay && payments.length > 0;
+      return Response.json(meFor(me({ ...lifecycleOverrides, ...(blocked && { blocked }) })));
+    }
     if (url.pathname === '/v1/pricing') return Response.json(pricing);
     if (url.pathname === '/v1/weddings/w1/site') {
       return Response.json({ ...site, timezone: 'America/Sao_Paulo' });
@@ -140,9 +166,45 @@ function mockPublish({
       quotes.push(url.searchParams);
       return Response.json(quoteFor(url.searchParams));
     }
+    if (url.pathname === '/v1/weddings/w1/billing') {
+      const paid = paidAfterPay && payments.length > 0;
+      return Response.json({
+        status: paid ? 'published' : 'draft',
+        publishedAt: null,
+        endDate: null,
+        paidThrough: null,
+        graceUntil: null,
+        expiredAt: null,
+        purgeAt: null,
+        publicationSource: null,
+        awaitingPayment: false,
+        pendingPayment: null,
+        payments: paid ? [{ id: 'p1', status: 'paid' }] : [],
+        payer,
+      });
+    }
+    if (method === 'POST' && url.pathname === '/v1/weddings/w1/payments') {
+      payments.push(body);
+      return pay(body);
+    }
     return apiError({ status: 404, body: { error: 'NOT_FOUND' } });
   });
-  return quotes;
+  return Object.assign(quotes, { payments, fetchMock });
+}
+
+/** Preenche o cartão válido de teste e quem paga. */
+async function fillCardAndPayer(
+  user: ReturnType<typeof userEvent.setup>,
+  { payer = true }: { payer?: boolean } = {},
+) {
+  await user.type(screen.getByLabelText('Número do cartão'), '4111111111111111');
+  await user.type(screen.getByLabelText('Nome impresso no cartão'), 'ANA B MOREIRA');
+  await user.type(screen.getByLabelText('Validade'), '0829');
+  await user.type(screen.getByLabelText('CVV'), '123');
+  if (payer) {
+    await user.type(screen.getByLabelText('Nome completo'), 'Ana Beatriz Moreira');
+    await user.type(screen.getByLabelText('CPF'), '52998224725');
+  }
 }
 
 const URL_PUBLISH = '/app/cobranca/publicar';
@@ -235,8 +297,8 @@ describe('Publicar o site, a versão do casal (Publicar RN01; Preço RN03, RN04 
     const refund = screen.getAllByText(/^Vocês podem desistir em até 7 dias/);
     expect(refund).toHaveLength(1);
     expect(within(contract).getByText(/^Vocês podem desistir em até 7 dias/)).toBe(refund[0]);
-    // Até o E3, o Pagar e publicar fica desabilitado, sem motivo novo (decisão 322).
-    expect(payButton()).toBeDisabled();
+    // Com o cartão e a cotação, o Pagar e publicar fica habilitado (E3), sem motivo.
+    expect(payButton()).toBeEnabled();
     expect(payButton()).not.toHaveAccessibleDescription();
   });
 
@@ -363,6 +425,210 @@ describe('Publicar o site, a versão do casal (Publicar RN01; Preço RN03, RN04 
     await chooseDate(user, '2027-02-14');
     await screen.findByText('Ativação');
     await expectNoA11yViolations({ container });
+  });
+});
+
+describe('Publicar o site, o pagar com o cartão (E3; Publicar RN02 a RN07; decisão 322(3))', () => {
+  async function ready(user: ReturnType<typeof userEvent.setup>) {
+    await chooseDate(user, '2027-02-14');
+    await waitFor(() => expect(payButton()).toBeEnabled());
+  }
+
+  it('sem os dados, os erros de cada campo e nada mandado (Pena, item 5; 322(4))', async () => {
+    const user = userEvent.setup();
+    const api = mockPublish();
+    renderAreaScreen({ url: URL_PUBLISH });
+    await ready(user);
+    await user.click(payButton());
+    for (const text of [
+      'Informem o número do cartão.',
+      'Informem o nome como está impresso no cartão.',
+      'Informem a validade, como 08/29.',
+      'Informem o CVV, os 3 ou 4 números no verso ou na frente do cartão.',
+      'Informem o nome de quem paga.',
+      'Este CPF não é válido. Confiram os números.',
+    ]) {
+      expect(screen.getByText(text)).toBeInTheDocument();
+    }
+    expect(screen.getByLabelText('Número do cartão')).toHaveAttribute('aria-invalid', 'true');
+    // O foco no 1º campo inválido (sugestão do Crivo no E3).
+    await waitFor(() => expect(screen.getByLabelText('Número do cartão')).toHaveFocus());
+    expect(api.payments).toEqual([]);
+  });
+
+  it('paga: o corpo com o token local, o total esperado e a Idempotency-Key; confirma e volta ao Dashboard', async () => {
+    const user = userEvent.setup();
+    const api = mockPublish();
+    const { router } = renderAreaScreen({ url: URL_PUBLISH });
+    await ready(user);
+    await fillCardAndPayer(user);
+    await user.click(payButton());
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app'));
+    expect(api.payments).toEqual([
+      {
+        kind: 'publication',
+        endDate: '2027-02-14',
+        method: 'card',
+        installments: 1,
+        payer: { name: 'Ana Beatriz Moreira', taxId: '52998224725' },
+        cardToken: 'local_card_1111',
+        priceVersion: '2026-11',
+        expectedTotalCents: 33710,
+      },
+    ]);
+    const call = api.fetchMock.mock.calls.find(([input]) =>
+      String(input).endsWith('/v1/weddings/w1/payments'),
+    );
+    const headers = (call?.[1]?.headers ?? {}) as Record<string, string>;
+    expect(headers['Idempotency-Key']).toMatch(/^[0-9a-f-]{36}$/);
+  });
+
+  it('o cartão em análise mostra o "Confirmando…" e espera a confirmação (RN04)', async () => {
+    const user = userEvent.setup();
+    mockPublish({ paidAfterPay: false });
+    renderAreaScreen({ url: URL_PUBLISH });
+    await ready(user);
+    await fillCardAndPayer(user);
+    await user.click(payButton());
+    // O Spinner (um status, com o texto para o leitor de tela) e a frase visível.
+    expect(
+      await screen.findAllByText(
+        'Confirmando o pagamento com o banco do cartão. Isso leva alguns segundos.',
+      ),
+    ).not.toHaveLength(0);
+    expect(screen.getByRole('status')).toHaveTextContent('Confirmando o pagamento');
+    expect(payButton()).toBeDisabled();
+  });
+
+  it('o cartão recusado: o Alert e o casal tenta de novo na mesma tela (RN03)', async () => {
+    const user = userEvent.setup();
+    const api = mockPublish({
+      pay: () =>
+        Response.json(
+          {
+            paymentId: 'p1',
+            status: 'failed',
+            method: 'card',
+            amountCents: 33710,
+            failureReason: 'card_declined',
+            nextAction: { type: 'none' },
+          },
+          { status: 201 },
+        ),
+    });
+    renderAreaScreen({ url: URL_PUBLISH });
+    await ready(user);
+    await fillCardAndPayer(user);
+    await user.click(payButton());
+    expect(
+      await screen.findByText(
+        'O banco do cartão não aprovou o pagamento. Confiram os dados, usem outro cartão ou paguem com Pix.',
+      ),
+    ).toBeInTheDocument();
+    expect(payButton()).toBeEnabled();
+    // Outra tentativa é outra intenção: chave nova (B2-10).
+    await user.click(payButton());
+    await waitFor(() => expect(api.payments).toHaveLength(2));
+    const keys = api.fetchMock.mock.calls
+      .filter(([input]) => String(input).endsWith('/v1/weddings/w1/payments'))
+      .map(([, init]) => (init?.headers as Record<string, string>)['Idempotency-Key']);
+    expect(new Set(keys).size).toBe(2);
+  });
+
+  it('o pagador anterior: o nome e o CPF final, o pagar pelo payerId e o Usar outro CPF (316(3))', async () => {
+    const user = userEvent.setup();
+    const api = mockPublish({
+      payer: { name: 'Ana Beatriz Moreira', taxIdLast4: '4821', payerId: 'pay-1' },
+    });
+    renderAreaScreen({ url: URL_PUBLISH });
+    await ready(user);
+    expect(await screen.findByText('Ana Beatriz Moreira · CPF final 4821')).toBeInTheDocument();
+    expect(screen.queryByLabelText('CPF')).toBeNull();
+    await fillCardAndPayer(user, { payer: false });
+    await user.click(payButton());
+    await waitFor(() => expect(api.payments).toHaveLength(1));
+    expect(api.payments[0]).toMatchObject({ payer: { payerId: 'pay-1' } });
+  });
+
+  it('Usar outro CPF abre o nome e o CPF', async () => {
+    const user = userEvent.setup();
+    mockPublish({ payer: { name: 'Ana Beatriz Moreira', taxIdLast4: '4821', payerId: 'pay-1' } });
+    renderAreaScreen({ url: URL_PUBLISH });
+    await ready(user);
+    await user.click(await screen.findByRole('button', { name: 'Usar outro CPF' }));
+    expect(screen.getByLabelText('CPF')).toBeInTheDocument();
+    expect(screen.getByLabelText('Nome completo')).toBeInTheDocument();
+  });
+
+  it('o 422 PAYER_NOT_FOUND volta a pedir o CPF', async () => {
+    const user = userEvent.setup();
+    mockPublish({
+      payer: { name: 'Ana Beatriz Moreira', taxIdLast4: '4821', payerId: 'pay-1' },
+      pay: () => apiError({ status: 422, body: { error: 'PAYER_NOT_FOUND' } }),
+    });
+    renderAreaScreen({ url: URL_PUBLISH });
+    await ready(user);
+    await fillCardAndPayer(user, { payer: false });
+    await user.click(payButton());
+    expect(await screen.findByLabelText('CPF')).toBeInTheDocument();
+  });
+
+  it.each([
+    ['PRICE_CHANGED', 409, 'O valor mudou. Confiram o novo total antes de pagar.'],
+    ['PAYMENT_PENDING', 409, 'Já há um pagamento aguardando confirmação. Vejam em Pagamentos.'],
+    [
+      'GATEWAY_UNAVAILABLE',
+      503,
+      'O serviço de pagamento não respondeu. Tentem de novo em alguns minutos. Se continuar, escrevam para suporte@kore.com.br.',
+    ],
+    [
+      'REFUND_IN_PROGRESS',
+      409,
+      'O reembolso anterior ainda está em andamento. Publiquem de novo quando ele for concluído.',
+    ],
+  ])('o %s mostra o aviso da Voz', async (error, status, text) => {
+    const user = userEvent.setup();
+    const api = mockPublish({ pay: () => apiError({ status, body: { error } }) });
+    renderAreaScreen({ url: URL_PUBLISH });
+    await ready(user);
+    const quotesBefore = api.length;
+    await fillCardAndPayer(user);
+    await user.click(payButton());
+    expect(await screen.findByText(text)).toBeInTheDocument();
+    // O valor mudou: a cotação de novo (Preço RN05).
+    if (error === 'PRICE_CHANGED')
+      await waitFor(() => expect(api.length).toBeGreaterThan(quotesBefore));
+  });
+
+  it('o 403 WEDDING_BLOCKED em corrida refaz o /me: o motivo e a tela desabilitada (Bloqueado RN07)', async () => {
+    const user = userEvent.setup();
+    mockPublish({
+      blockedAfterPay: true,
+      pay: () => apiError({ status: 403, body: { error: 'WEDDING_BLOCKED' } }),
+    });
+    renderAreaScreen({ url: URL_PUBLISH });
+    await ready(user);
+    await fillCardAndPayer(user);
+    await user.click(payButton());
+    await waitFor(() =>
+      expect(payButton()).toHaveAccessibleDescription(
+        'Indisponível enquanto o site está bloqueado.',
+      ),
+    );
+    expect(payButton()).toBeDisabled();
+    expect(dateField()).toBeDisabled();
+  });
+
+  it('com o Pix, o Pagar e publicar fica desabilitado sem motivo até o E4 (322(3))', async () => {
+    const user = userEvent.setup();
+    mockPublish();
+    renderAreaScreen({ url: URL_PUBLISH });
+    await ready(user);
+    await user.click(screen.getByRole('radio', { name: 'Pix à vista · 3% de desconto' }));
+    expect(payButton()).toBeDisabled();
+    expect(payButton()).not.toHaveAccessibleDescription();
+    expect(screen.queryByLabelText('Número do cartão')).toBeNull();
+    expect(screen.queryByRole('region', { name: 'Quem paga' })).toBeNull();
   });
 });
 

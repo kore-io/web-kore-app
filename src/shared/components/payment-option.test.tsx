@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { createRef } from 'react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../../tests/a11y';
@@ -101,6 +102,25 @@ describe('PaymentOption (Penpot 21, "Opção / Cartão de crédito")', () => {
     );
     await user.click(screen.getByText('Legenda desabilitada'));
     expect(disabledChange).not.toHaveBeenCalled();
+  });
+
+  it('com um ref da tela, o toque na legenda continua escolhendo a opção (cobrança do Crivo no E2)', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const screenRef = createRef<HTMLInputElement>();
+    render(
+      <PaymentOption
+        ref={screenRef}
+        name="method"
+        value="card"
+        onChange={onChange}
+        label="Cartão de crédito"
+        caption="Em até 12x. Até 6x, sem juros."
+      />,
+    );
+    expect(screenRef.current).toBe(screen.getByRole('radio', { name: 'Cartão de crédito' }));
+    await user.click(screen.getByText('Em até 12x. Até 6x, sem juros.'));
+    expect(onChange).toHaveBeenCalledTimes(1);
   });
 
   it('sem violações de acessibilidade', async () => {

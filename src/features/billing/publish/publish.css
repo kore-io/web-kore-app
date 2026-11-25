@@ -55,3 +55,27 @@
 .kore-publish__buttons {
   @apply flex flex-col-reverse gap-3 lg:flex-row lg:justify-end;
 }
+
+/* Os campos do cartão (Penpot 21, "Campos do cartão"): 16 px entre eles; a Validade e o CVV
+   lado a lado, com 16 px, também no celular (Penpot). */
+.kore-publish__card-fields {
+  @apply flex flex-col gap-4;
+}
+
+.kore-publish__card-row {
+  @apply grid grid-cols-2 items-start gap-4;
+}
+
+/* Quem paga com o pagador anterior: o nome e o CPF final, e o Usar outro CPF abaixo. */
+.kore-publish__payer {
+  @apply type-body-md text-ink;
+}
+
+.kore-publish__payer-other {
+  @apply self-start;
+}
+
+/* A confirmação do cartão: o Spinner e a frase da Pena, no lugar do motivo. */
+.kore-publish__confirming {
+  @apply type-caption flex items-center gap-2 text-gray-700 lg:justify-end;
+}
