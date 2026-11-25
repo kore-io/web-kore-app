@@ -232,5 +232,31 @@
       "alreadyRequested": "O reembolso deste pagamento já foi pedido.",
       "notLastExtension": "Há uma extensão mais recente. Desistam dela primeiro."
     }
+  },
+  "lifecycle": {
+    "badge": {
+      "daysLeft_one": "Vence em {{count}} dia",
+      "daysLeft_other": "Vence em {{count}} dias",
+      "lastDay": "Último dia no ar"
+    },
+    "banner": {
+      "grace": {
+        "couple": "A data de saída do ar passou. O site fica no ar só até {{date}}. Adiem a data para mantê-lo.",
+        "planner": "A data de saída do ar passou. O site fica no ar só até {{date}}. Peça ao casal para adiar a data."
+      },
+      "renew": {
+        "couple": "O site está fora do ar desde {{date}}. Renovem para os convidados voltarem a vê-lo.",
+        "planner": "O site está fora do ar desde {{date}}. Peça ao casal para renovar."
+      },
+      "paidAhead": {
+        "couple": "O site está fora do ar desde {{date}}, mas vocês já pagaram até {{paidThrough}}. Voltem o site ao ar, sem custo.",
+        "planner": "O site está fora do ar desde {{date}}. Peça ao casal para voltar o site ao ar."
+      },
+      "final": {
+        "couple": "O site está fora do ar desde {{date}}. Ele chegou ao prazo máximo, 12 meses depois do casamento, e não pode mais ser renovado. Vocês ainda podem exportar os convidados.",
+        "planner": "O site está fora do ar desde {{date}}. Ele chegou ao prazo máximo, 12 meses depois do casamento, e não pode mais ser renovado. Peça ao casal para exportar os convidados."
+      }
+    },
+    "exportGuests": "Exportar os convidados"
   }
 }

@@ -216,6 +216,13 @@ describe('Cobrança e publicação › Pagamentos (Pagamentos RN01; Penpot 21, A
     expect(await screen.findByText('Expirado')).toBeInTheDocument();
   });
 
+  it('carência: o subtítulo com o rótulo do selo (326(2); cobrança do Crivo no E6)', async () => {
+    // 25/11 em São Paulo; expira em 02/12 (graceUntil + 1): faltam 7 dias.
+    mockBilling(billing({ status: 'grace', graceUntil: '2026-12-01' }));
+    renderRoute({ url: URL_BILLING });
+    expect(await screen.findByText('Vence em 7 dias')).toBeInTheDocument();
+  });
+
   it('a colaboradora vê só o status e as datas, sem o histórico (decisões 29 e 272(2))', async () => {
     profileUnderTest.current = 'planner';
     mockBilling(billing({ payments: undefined, pendingPayment: undefined }));

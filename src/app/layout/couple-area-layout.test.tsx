@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../../tests/a11y';
 import { apiError, mockApi, renderRoute } from '../../../tests/render-route';
 
@@ -156,23 +156,56 @@ describe('área do casal com o /v1/me (decisão 163)', () => {
     },
   );
 
+  const lifecycleOf = (overrides: Record<string, unknown>) => ({
+    status: 'published',
+    endDate: '2027-02-14',
+    graceUntil: null,
+    expiredAt: null,
+    paidThrough: '2027-02-14',
+    deletionScheduledFor: null,
+    blocked: false,
+    ...overrides,
+  });
+  const withLifecycle = (lifecycle: Record<string, unknown>) =>
+    me({
+      memberships: [
+        {
+          weddingId: 'w1',
+          role: 'owner',
+          weddingName: 'Ana & Marcos',
+          eventDate: '2026-11-14',
+          city: 'Campinas',
+          state: 'SP',
+          timezone: 'America/Sao_Paulo',
+          lifecycle: lifecycleOf(lifecycle),
+        },
+      ],
+    });
+
   it.each([
-    ['published', 'Publicado'],
-    ['draft', 'Rascunho'],
-    ['post_event', 'Pós-evento'],
+    ['published', {}, 'Publicado'],
+    ['draft', { status: 'draft' }, 'Rascunho'],
+    ['post_event', { status: 'post_event' }, 'Pós-evento'],
+    // 18/02 em São Paulo: expira em 22/02 (graceUntil + 1), faltam 4 dias.
+    ['grace', { status: 'grace', graceUntil: '2027-02-21' }, 'Vence em 4 dias'],
+    ['grace no último dia', { status: 'grace', graceUntil: '2027-02-18' }, 'Último dia no ar'],
+    ['expired', { status: 'expired', expiredAt: '2027-02-15' }, 'Expirado'],
   ])(
-    'o selo de status do site na Topbar: %s (Dashboard RN07; decisão 239(B3))',
-    async (status, label) => {
-      mockApi(({ path }) =>
-        path === '/v1/weddings/w1/site' ? Response.json({ status }) : meOnly(path),
-      );
+    'o selo de status do site na Topbar, pelo lifecycle do /me: %s (RN06; 329(3))',
+    async (_name, lifecycle, label) => {
+      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.setSystemTime(new Date('2027-02-18T15:00:00Z'));
+      onTestFinished(() => {
+        vi.useRealTimers();
+      });
+      mockApi(({ path }) => meOnly(path, withLifecycle(lifecycle)));
       renderRoute({ url: '/app' });
       const banner = await screen.findByRole('banner');
       expect(await within(banner).findByText(label)).toBeInTheDocument();
     },
   );
 
-  it('sem a leitura do site, a Topbar fica sem selo', async () => {
+  it('sem o lifecycle no /me, a Topbar fica sem selo', async () => {
     mockApi(({ path }) => meOnly(path));
     renderRoute({ url: '/app' });
     const banner = await screen.findByRole('banner');

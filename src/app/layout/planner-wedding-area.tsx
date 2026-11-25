@@ -16,7 +16,7 @@ import { LoadError } from '../../shared/components/load-error';
 import { AreaProvider, areaPaths, plannerWeddingBase } from '../area';
 import { paths } from '../paths';
 import { AppShell } from './app-shell';
-import { SiteStatusBadge } from './site-status-badge';
+import { LifecycleBadge, LifecycleBanner } from '../../features/billing/lifecycle/lifecycle-banner';
 import { WeddingNavigation } from './wedding-navigation';
 
 /** A resposta de quem perdeu o vínculo (removida, saiu, casamento excluído): RN01 de Papéis. */
@@ -122,7 +122,6 @@ export function PlannerWeddingArea() {
 
   const area = areaPaths(plannerWeddingBase({ weddingId }));
   const songQuestion = site.data?.songQuestion as { enabled?: boolean } | undefined;
-  const siteStatus = (site.data as { status?: unknown } | undefined)?.status;
 
   return (
     <AreaProvider area={{ base: plannerWeddingBase({ weddingId }), weddingId, kind: 'planner' }}>
@@ -134,8 +133,16 @@ export function PlannerWeddingArea() {
             memberships={me.memberships}
           />
         }
-        {...(typeof siteStatus === 'string' && {
-          status: <SiteStatusBadge status={siteStatus} />,
+        {...(membership.lifecycle && {
+          status: (
+            <LifecycleBadge
+              source={{
+                lifecycle: membership.lifecycle,
+                eventDate: membership.eventDate,
+                timezone: membership.timezone,
+              }}
+            />
+          ),
         })}
         user={shell.user}
         activeProfile={shell.activeProfile}
@@ -163,6 +170,16 @@ export function PlannerWeddingArea() {
         </div>
         {membership.lifecycle.status === 'awaiting_couple' && (
           <AwaitingCoupleBanner weddingId={weddingId} />
+        )}
+        {membership.lifecycle && (
+          <LifecycleBanner
+            source={{
+              lifecycle: membership.lifecycle,
+              eventDate: membership.eventDate,
+              timezone: membership.timezone,
+            }}
+            audience="planner"
+          />
         )}
         <Outlet />
       </AppShell>
