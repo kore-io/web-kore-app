@@ -90,6 +90,9 @@ interface Call {
   body: unknown;
 }
 
+/** Quantas vezes a Topbar leu o GET …/site (o selo do status). */
+const siteReads = { count: 0 };
+
 function mockRefund({
   data = () => billing(),
   refund = () =>
@@ -104,6 +107,10 @@ function mockRefund({
   let reads = 0;
   mockApi(({ method, path, body }) => {
     if (path === '/v1/me') return Response.json(meFor(me({ blocked })));
+    if (path === '/v1/weddings/w1/site') {
+      siteReads.count += 1;
+      return apiError({ status: 404, body: { error: 'NOT_FOUND' } });
+    }
     if (path === '/v1/weddings/w1/billing') {
       reads += 1;
       return Response.json(data(reads));
@@ -140,6 +147,7 @@ async function openDialog(user: ReturnType<typeof userEvent.setup>, index = 0) {
 describe('Desistir e pedir reembolso (Pagamentos RN02 a RN07; Penpot 21, A9; decisão 327)', () => {
   it('a publicação: o Alert com o prazo no fuso e o valor; o Dialog do cartão; o motivo vai no pedido', async () => {
     const user = userEvent.setup();
+    siteReads.count = 0;
     const calls = mockRefund({
       data: (reads) =>
         reads === 1
@@ -167,10 +175,13 @@ describe('Desistir e pedir reembolso (Pagamentos RN02 a RN07; Penpot 21, A9; dec
       within(dialog).getByRole('textbox', { name: 'Motivo (opcional)' }),
       'Decidimos adiar o casamento.',
     );
+    const before = siteReads.count;
     await user.click(within(dialog).getByRole('button', { name: ACTION }));
     expect(
       await screen.findByText('Reembolso pedido. O site voltou a ser rascunho.'),
     ).toBeInTheDocument();
+    // O selo da Topbar relê o site: ele volta a Rascunho no pedido (RN07).
+    await waitFor(() => expect(siteReads.count).toBeGreaterThan(before));
     expect(calls).toEqual([
       {
         path: '/v1/weddings/w1/payments/p1/refund-request',
