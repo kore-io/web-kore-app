@@ -99,7 +99,10 @@ test('a carência segue o pós-evento; o expirado fecha com o texto da RN07 (332
   await expect(send).toHaveAccessibleDescription(RENEW);
   await page.goto('/app/envios/convites');
   await expect(page.getByRole('button', { name: 'Continuar' })).toHaveAccessibleDescription(RENEW);
-  await expect(page.getByRole('link', { name: 'Renovar' })).toHaveCount(0);
+  // O Renovar do casal leva a mudar a data (E11).
+  await expect(
+    page.locator('#kore-send-closed').getByRole('link', { name: 'Renovar' }),
+  ).toHaveAttribute('href', '/app/cobranca/data-de-saida');
 });
 
 test('sem renovação: o texto único e o Exportar os convidados do casal nos Envios (314(3))', async ({

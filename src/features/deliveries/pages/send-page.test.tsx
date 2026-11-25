@@ -798,14 +798,18 @@ describe('Envios no expirado e na carência (Data de saída RN07; 314(3); decis�
     expect(screen.queryByText(/^Publiquem o site|^O site está fora do ar/)).toBeNull();
   });
 
-  it('expirado: Continuar desabilitado com o texto de cada versão, sem o Renovar até o E10 (331(2))', async () => {
+  it('expirado: Continuar desabilitado com o texto de cada versão; o casal com o Renovar (RN07; E11)', async () => {
     mockSend({ status: 'expired', lifecycle: { expiredAt: '2026-12-01' } });
     preset(['p1']);
     const view = renderRoute({ url: '/app/envios/convites' });
     const button = await screen.findByRole('button', { name: 'Continuar' });
     expect(button).toBeDisabled();
-    expect(button).toHaveAccessibleDescription(RENEW);
-    expect(screen.queryByRole('link', { name: 'Renovar' })).toBeNull();
+    expect(button).toHaveAccessibleDescription(`${RENEW} Renovar`);
+    expect(
+      within(document.getElementById('kore-send-closed') as HTMLElement).getByRole('link', {
+        name: 'Renovar',
+      }),
+    ).toHaveAttribute('href', '/app/cobranca/data-de-saida');
     view.unmount();
     profileUnderTest.current = 'planner';
     mockSend({ status: 'expired', lifecycle: { expiredAt: '2026-12-01' } });

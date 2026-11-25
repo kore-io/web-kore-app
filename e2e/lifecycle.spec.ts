@@ -96,8 +96,11 @@ test('a carência do casal: o selo, a faixa, o cartão Status e o subtítulo de 
   );
   await expect(banner.first()).toBeVisible();
   await expect(statusCard(page).getByText('Vence em 4 dias')).toBeVisible();
-  // Sem os botões de mudar a data até o E10 (329(1)).
-  await expect(page.getByRole('button', { name: 'Adiar a data' })).toHaveCount(0);
+  // O Adiar a data leva a mudar a data (E11): na faixa (link) e no cartão (botão).
+  await expect(
+    page.locator('.kore-lifecycle-banner').getByRole('link', { name: 'Adiar a data' }),
+  ).toBeVisible();
+  await expect(statusCard(page).getByRole('button', { name: 'Adiar a data' })).toBeVisible();
   await page.goto('/app/cobranca');
   await expect(
     page.getByRole('heading', { level: 1, name: 'Cobrança e publicação' }),
