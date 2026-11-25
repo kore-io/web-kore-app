@@ -230,6 +230,11 @@ describe('Publicar o site, a versão do casal (Publicar RN01; Preço RN03, RN04 
         'Na publicação, o preço para em R$ 449. Depois de publicar, cada mês a mais custa R$ 29, sem esse limite.',
       ),
     ).toBeInTheDocument();
+    // A desistência uma vez só, dentro do Resumo do contrato (decisão 323(d)).
+    const contract = screen.getByRole('region', { name: 'Resumo do contrato' });
+    const refund = screen.getAllByText(/^Vocês podem desistir em até 7 dias/);
+    expect(refund).toHaveLength(1);
+    expect(within(contract).getByText(/^Vocês podem desistir em até 7 dias/)).toBe(refund[0]);
     // Até o E3, o Pagar e publicar fica desabilitado, sem motivo novo (decisão 322).
     expect(payButton()).toBeDisabled();
     expect(payButton()).not.toHaveAccessibleDescription();
