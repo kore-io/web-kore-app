@@ -66,6 +66,11 @@
     "title": "Status do site",
     "endDate": "No ar até {{date}}.",
     "edit": "Editar site",
+    "publish": "Publicar",
+    "freeToBuild": {
+      "couple": "Montar é grátis. Vocês só pagam quando publicarem.",
+      "planner": "Montar é grátis. O casal só paga quando publicar."
+    },
     "awaitingCouple": "O casal ainda não aceitou o convite."
   },
   "checklist": {

@@ -29,14 +29,14 @@ import {
 import { guestsByRespondedAt } from '../../guests/hooks/use-party-filters';
 import { useArea, useAreaPaths, type AreaPaths } from '../../../app/area';
 import { formatRsvpPercent } from '../../../shared/rsvp-percent';
+import { canOpenPublish } from '../../billing/publish/publish-entry';
 
 /** O caminho de cada item do Checklist (RN03), na área da tela. */
 function checklistPaths(area: AreaPaths): Record<ChecklistItemResponse['key'], string> {
   return {
     guests: area.guests,
     appearance: area.siteSection({ section: 'aparencia' }),
-    // A tela paga de publicar vem com o front da F3 (decisão 243): até lá, o Editor.
-    publish: area.site,
+    publish: area.billingPublish,
     invites: area.deliveryInvites,
     reminders: area.deliveryReminder,
   };
@@ -189,7 +189,7 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
             <DeliveryCard data={data} closed={closed} />
           </>
         )}
-        <SiteCard data={data} now={now} />
+        <SiteCard data={data} now={now} audience={audience} />
         <ChecklistCard items={data.checklist} />
         {!empty && <ActivityCard weddingId={weddingId} items={data.recentActivity} now={now} />}
       </div>
@@ -245,13 +245,22 @@ function DeliveryCard({ data, closed }: { data: DashboardResponse; closed: boole
 }
 
 /** Status do site (RN02, RN07): o selo, o endereço e "No ar até {data}.", e o botão. */
-function SiteCard({ data, now }: { data: DashboardResponse; now: Date }) {
+function SiteCard({
+  data,
+  now,
+  audience,
+}: {
+  data: DashboardResponse;
+  now: Date;
+  audience: Audience;
+}) {
   const area = useAreaPaths();
   const { t } = useTranslation('dashboard');
   const { t: tSite } = useTranslation('site');
   const navigate = useNavigate();
   const status = siteStatus(data.site.status);
   const live = status === 'published' || status === 'post_event';
+  const beforePublish = canOpenPublish(data.site.status);
   return (
     <section
       className="kore-dashboard__card kore-dashboard__card--half kore-dashboard__site"
@@ -280,11 +289,20 @@ function SiteCard({ data, now }: { data: DashboardResponse; now: Date }) {
       {status === 'awaiting_couple' && (
         <p className="kore-dashboard__card-text">{t('site.awaitingCouple')}</p>
       )}
+      {/* Antes de publicar, o preço só no Publicar (Publicar e pagar RN13; Penpot 03, A5). */}
+      {beforePublish && (
+        <p className="kore-dashboard__card-caption">{t(`site.freeToBuild.${audience}`)}</p>
+      )}
       <div className="kore-dashboard__card-actions">
-        {/* O Publicar volta com a tela paga do front da F3 (Publicar e pagar RN17; 243). */}
-        <Button size="sm" variant="secondary" onClick={() => void navigate(area.site)}>
-          {t('site.edit')}
-        </Button>
+        {beforePublish ? (
+          <Button size="sm" variant="secondary" onClick={() => void navigate(area.billingPublish)}>
+            {t('site.publish')}
+          </Button>
+        ) : (
+          <Button size="sm" variant="secondary" onClick={() => void navigate(area.site)}>
+            {t('site.edit')}
+          </Button>
+        )}
       </div>
     </section>
   );

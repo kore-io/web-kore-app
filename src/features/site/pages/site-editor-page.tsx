@@ -30,6 +30,7 @@ import {
 } from '../sections';
 import { savedAtText, siteStatus } from '../site-texts';
 import { useAreaPaths } from '../../../app/area';
+import { canOpenPublish } from '../../billing/publish/publish-entry';
 
 type MobileTab = 'sections' | 'edit' | 'preview';
 
@@ -164,6 +165,13 @@ function SiteEditor({
             >
               {t('previewSite.open')}
             </Button>
+            {/* Publicar o site (decisão 243(c); E5 da F3): secundário, só antes de publicar; com
+                mudança não salva, o Dialog de descartar vem antes. */}
+            {canOpenPublish(data.status) && (
+              <Button variant="secondary" onClick={() => void navigate(area.billingPublish)}>
+                {t('publish')}
+              </Button>
+            )}
             <Button
               disabled={!dirty || form?.canSave === false || saving}
               onClick={() => void save()}
