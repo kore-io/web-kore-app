@@ -16,6 +16,8 @@ import { siteStatus } from '../../site/site-texts';
 import { canOpenPublish, publishWaitsCouple } from '../publish/publish-entry';
 import { dayIn, numericDay, visibleStatus, type VisibleStatus } from './payments-texts';
 import { RefundSection } from './refund';
+import { lifecycleView } from '../lifecycle/lifecycle';
+import { graceLabel } from '../lifecycle/lifecycle-banner';
 
 /** O Selo de pagamento do DS (Penpot 04 e 21, A9), por situação. */
 const STATUS_TONES: Record<VisibleStatus, BadgeTone> = {
@@ -59,7 +61,7 @@ function Payments({ weddingId, owner }: { weddingId: string; owner: boolean }) {
   }
   const data = billing.data;
   const waits = publishWaitsCouple(data.status);
-  const description = subtitleOf({ data, now, t, tSite });
+  const description = subtitleOf({ data, now, t, tSite, timezone });
   return (
     <div className="kore-payments">
       <PageHeader
@@ -103,17 +105,19 @@ function Payments({ weddingId, owner }: { weddingId: string; owner: boolean }) {
 
 /**
  * "Publicado · no ar até 14 de fev. de 2027" e "Pós-evento · …" (RN01; 326(2)); o rascunho
- * sem subtítulo, como no Penpot; o expirado só com o rótulo, e a carência sem nada, até as
- * faixas do E8.
+ * sem subtítulo, como no Penpot; o expirado só com o rótulo do selo; a carência com o rótulo
+ * do selo, "Vence em N dias" ou "Último dia no ar" (E8).
  */
 function subtitleOf({
   data,
   now,
+  timezone,
   t,
   tSite,
 }: {
   data: BillingResponse;
   now: Date;
+  timezone: string | null;
   t: TFunction<'billing'>;
   tSite: TFunction<'site'>;
 }): string | null {
@@ -127,6 +131,9 @@ function subtitleOf({
     );
   }
   if (status === 'expired') return tSite('status.expired');
+  // Na carência, o rótulo do selo: "Vence em N dias" ou "Último dia no ar" (326(2); E8).
+  const view = lifecycleView({ lifecycle: data, eventDate: null, timezone, now });
+  if (view.kind === 'grace') return graceLabel({ daysLeft: view.daysLeft, t });
   return null;
 }
 
