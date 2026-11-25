@@ -61,10 +61,15 @@ export function PublishPage() {
   return <CouplePublish weddingId={weddingId} membership={membership} />;
 }
 
-/** O cabeçalho da tela, igual nas duas versões. */
-function PublishHeader() {
+/** O cabeçalho da tela; a colaboradora vê o título sem o subtítulo, que fala ao casal (323). */
+function PublishHeader({ withDescription = true }: { withDescription?: boolean }) {
   const { t } = useTranslation('billing');
-  return <PageHeader title={t('publish.title')} description={t('publish.description')} />;
+  return (
+    <PageHeader
+      title={t('publish.title')}
+      {...(withDescription && { description: t('publish.description') })}
+    />
+  );
 }
 
 /** O Resumo do contrato; o preço e a data só com a cotação (o casal). */
@@ -135,7 +140,7 @@ function PlannerPublish() {
   const { t } = useTranslation('billing');
   return (
     <div className="kore-publish">
-      <PublishHeader />
+      <PublishHeader withDescription={false} />
       <div className="kore-publish__planner">
         <ContractPanel />
         <PublishActions reason={t('publish.reason.planner')} />
