@@ -24,16 +24,19 @@
     "section": "O que avisar",
     "subtitle": "Escolha como você quer receber cada aviso.",
     "rsvp": "Respostas do convite",
+    "billing": "Cobrança e pagamentos",
     "email": "E-mail",
     "emailOptions": {
       "immediate": "Na hora",
       "daily": "Resumo diário às 20h",
       "off": "Desligado"
     },
+    "always": "Sempre",
     "push": "Push no celular (app instalado)",
     "pushDenied": "O navegador bloqueou as notificações do Kore. Libere nas configurações do navegador ou do aparelho.",
     "pushInstall": "Para receber push, instale o Kore no seu celular.",
     "note": "A central do app sempre recebe tudo. O push mostra só o nome do grupo, sem valores nem o texto do recado.",
+    "billingNote": "Os avisos de pagamento, de saída do ar e de exclusão do casamento sempre chegam por e-mail.",
     "saved": "Preferências salvas."
   },
   "billing": {
