@@ -1,6 +1,6 @@
 import { useToast } from '@kore-io/design';
 import { useQueryClient } from '@tanstack/react-query';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getMeControllerMeV1QueryKey, useMeControllerMeV1 } from '../../shared/api/generated/me/me';
 import { getDashboardControllerGetV1QueryKey } from '../../shared/api/generated/rsvp/rsvp';
@@ -41,16 +41,22 @@ export function useSiteExpired({ weddingId }: { weddingId: string }) {
 
 /**
  * A leitura da fila que volta `409 SITE_EXPIRED`: o Toast uma vez, e a tela espera o
- * Dashboard relido fechar a etapa (no lugar do aviso de erro de leitura).
+ * Dashboard relido fechar a etapa. Se ele voltar sem o expirado, a espera acaba e a tela
+ * mostra o aviso de erro de leitura, com o Tentar de novo (sugestão do Crivo no E9).
  */
 export function useSiteExpiredRead({ weddingId, error }: { weddingId: string; error: unknown }) {
   const handle = useSiteExpired({ weddingId });
+  const queryClient = useQueryClient();
   const expired = apiErrorCode({ error }) === 'SITE_EXPIRED';
   const shown = useRef(false);
+  const [waiting, setWaiting] = useState(true);
   useEffect(() => {
     if (!expired || shown.current) return;
     shown.current = true;
     handle(error);
-  }, [expired, error, handle]);
-  return expired;
+    void queryClient
+      .refetchQueries({ queryKey: getDashboardControllerGetV1QueryKey(weddingId) })
+      .finally(() => setWaiting(false));
+  }, [expired, error, handle, queryClient, weddingId]);
+  return expired && waiting;
 }
