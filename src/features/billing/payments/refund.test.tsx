@@ -101,8 +101,11 @@ function mockRefund({
   refund = () =>
     Response.json({ status: 'refund_requested', refundsPaymentIds: ['p1'] }, { status: 202 }),
   blocked = false,
+  billingFails = () => false,
 }: {
   data?: (calls: number) => Record<string, unknown>;
+  /** A leitura do billing falha (a rede), pelo número da leitura. */
+  billingFails?: (calls: number) => boolean;
   refund?: () => Response;
   blocked?: boolean;
 } = {}) {
@@ -116,6 +119,7 @@ function mockRefund({
     }
     if (path === '/v1/weddings/w1/billing') {
       reads += 1;
+      if (billingFails(reads)) return apiError({ status: 503, body: { error: 'UNAVAILABLE' } });
       return Response.json(data(reads));
     }
     if (method === 'POST' && path.endsWith('/refund-request')) {
@@ -294,6 +298,32 @@ describe('Desistir e pedir reembolso (Pagamentos RN02 a RN07; Penpot 21, A9; dec
         'Reembolso pedido. A data de saída do ar voltou a 1 de mar. de 2027.',
       ),
     ).toBeInTheDocument();
+  });
+
+  it('a extensão aceita com a releitura falhando: fecha, mostra o Toast pelo refundEndDate e relê o site (bloqueante do Crivo no E7)', async () => {
+    const user = userEvent.setup();
+    siteReads.count = 0;
+    const calls = mockRefund({
+      data: () => billing({ endDate: '2027-05-14', payments: [EXTENSION] }),
+      // A 1ª leitura abre a tela; a seguinte, depois do 202, falha.
+      billingFails: (reads) => reads > 1,
+    });
+    renderRoute({ url: URL_BILLING });
+    const dialog = await openDialog(user);
+    const before = siteReads.count;
+    await user.click(within(dialog).getByRole('button', { name: ACTION }));
+    expect(
+      await screen.findByText(
+        'Reembolso pedido. A data de saída do ar voltou a 14 de mar. de 2027.',
+      ),
+    ).toBeInTheDocument();
+    expect(calls).toHaveLength(1);
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    // Sem o Toast de erro: o pedido foi aceito.
+    expect(
+      screen.queryByText('Não foi possível continuar. Confira sua conexão e tente de novo.'),
+    ).toBeNull();
+    await waitFor(() => expect(siteReads.count).toBeGreaterThan(before));
   });
 
   it('bloqueado: o Desistir desabilitado com o texto do suporte (RN02; P6)', async () => {
