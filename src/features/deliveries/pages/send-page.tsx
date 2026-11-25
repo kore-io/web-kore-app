@@ -47,7 +47,7 @@ function Send({
       </div>
     );
   }
-  // A carência fica aberta (330); o expirado fecha, com o sem renovação à parte (RN07; 314(3)).
+  // A carência segue o pós-evento (332); o expirado fecha, com o sem renovação à parte (RN07; 314(3)).
   const closed: Closed = deliveriesClosed({
     status: dashboard.data.site.status,
     membership: me?.memberships.find((item) => item.weddingId === weddingId),

@@ -83,7 +83,7 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
   const firstName = me?.user.name?.trim().split(/\s+/)[0];
   const now = new Date();
   const data = dashboard.data;
-  // Envios RN01 e Data de saída RN07: a carência fica aberta (330); o pós-evento, como antes.
+  // Envios RN01 e Data de saída RN07: a carência segue o pós-evento (332), como antes.
   const closedKind = data
     ? deliveriesClosed({
         status: data.site.status,

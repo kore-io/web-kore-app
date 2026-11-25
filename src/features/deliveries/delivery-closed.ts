@@ -4,8 +4,9 @@ import { lifecycleView } from '../billing/lifecycle/lifecycle';
 /**
  * Por que os envios estão fechados (Envios RN01; Data de saída do ar RN07), ou nulo:
  * - antes de publicar, e no pós-evento, como antes;
- * - no expirado, `expired`, e no sem renovação, `expired_final` (314(3));
- * - na carência o site está no ar, e os envios seguem abertos (decisão 330).
+ * - na carência, como no pós-evento: ela vem sempre depois do casamento, e a API recusa os
+ *   envios com o `DELIVERIES_CLOSED` de reason `post_event` (decisão 332, que revoga a 330);
+ * - no expirado, `expired`, e no sem renovação, `expired_final` (314(3)).
  */
 export type Closed = 'not_published' | 'post_event' | 'expired' | 'expired_final' | null;
 
@@ -20,8 +21,8 @@ export function deliveriesClosed({
   membership: Pick<MeMembershipResponse, 'lifecycle' | 'eventDate' | 'timezone'> | undefined;
   now: Date;
 }): Closed {
-  if (status === 'published' || status === 'grace') return null;
-  if (status === 'post_event') return 'post_event';
+  if (status === 'published') return null;
+  if (status === 'post_event' || status === 'grace') return 'post_event';
   if (status === 'expired') {
     const view = membership?.lifecycle
       ? lifecycleView({
