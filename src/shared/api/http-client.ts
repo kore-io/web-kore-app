@@ -22,6 +22,20 @@ export class ApiError<TBody = unknown> extends Error {
 /** Tipo do erro dos hooks gerados pelo Orval: o ApiError com o corpo de erro da rota. */
 export type ErrorType<TBody> = ApiError<TBody>;
 
+type Listener = () => void;
+const weddingBlockedListeners = new Set<Listener>();
+
+/**
+ * Avisa quando uma resposta da API traz o `403 WEDDING_BLOCKED` (Bloqueado RN07), venha ela
+ * de um hook ou de uma chamada direta. Devolve a função que desliga o aviso.
+ */
+export function onWeddingBlocked(listener: Listener): () => void {
+  weddingBlockedListeners.add(listener);
+  return () => {
+    weddingBlockedListeners.delete(listener);
+  };
+}
+
 /** Código do erro no corpo da API (`error`), quando houver. */
 export function apiErrorCode({ error }: { error: unknown }): string | undefined {
   if (!(error instanceof ApiError)) return undefined;
@@ -54,6 +68,12 @@ export async function httpClient<T>(path: string, init: RequestInit = {}): Promi
     headers: { Accept: 'application/json', ...init.headers },
   });
   const body = await readBody(response);
-  if (!response.ok) throw new ApiError({ status: response.status, body });
+  if (!response.ok) {
+    const error = new ApiError({ status: response.status, body });
+    if (apiErrorCode({ error }) === 'WEDDING_BLOCKED') {
+      weddingBlockedListeners.forEach((listener) => listener());
+    }
+    throw error;
+  }
   return body as T;
 }
