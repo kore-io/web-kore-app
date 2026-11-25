@@ -38,6 +38,25 @@ describe('Mudar a data: limites, mês pago à frente e a escolha (RN04 e RN05; 2
     expect(paidAhead({ source: { ...expired, paidThrough: '2026-11-20' }, now })).toBeNull();
   });
 
+  it('na carência, o paidThrough que também já passou não é mês pago à frente (341)', () => {
+    const grace = { ...published, status: 'grace', endDate: '2026-11-28' };
+    expect(paidAhead({ source: { ...grace, paidThrough: '2026-11-30' }, now })).toBeNull();
+    // Hoje (01/12) também não conta: o mês pago à frente começa amanhã.
+    expect(paidAhead({ source: { ...grace, paidThrough: '2026-12-01' }, now })).toBeNull();
+    expect(paidAhead({ source: { ...grace, paidThrough: '2026-12-02' }, now })).toBe('2026-12-02');
+    // Hoje é o do fuso do casamento: 23h de 30/11 em São Paulo, o 30/11 ainda não passou.
+    expect(
+      paidAhead({
+        source: { ...grace, endDate: '2026-11-20', paidThrough: '2026-12-01' },
+        now: new Date('2026-12-01T02:00:00Z'),
+      }),
+    ).toBe('2026-12-01');
+    // O restore não cabe com o paidThrough passado: a data mínima é amanhã.
+    expect(
+      endDateChoice({ source: { ...grace, paidThrough: '2026-11-30' }, date: '2026-12-02', now }),
+    ).toBe('extend');
+  });
+
   it.each([
     ['2027-02-14', 'same'],
     ['2027-01-10', 'bringForward'],
