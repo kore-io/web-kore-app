@@ -19,8 +19,10 @@ type Call = { method: string; path: string; body: unknown };
 function mockPreferences({
   save = 'ok',
   push = { vapidPublicKey: 'AQID', subscribed: false },
+  billing = false,
 }: {
   save?: 'ok' | 'fail';
+  billing?: boolean;
   push?: { vapidPublicKey: string | null; subscribed: boolean };
 } = {}) {
   const calls: Call[] = [];
@@ -29,7 +31,10 @@ function mockPreferences({
     if (isLayoutRead({ method, path })) return layoutReadNotFound();
     if (path.startsWith('/v1/me/notification-preferences') && method === 'GET') {
       return Response.json({
-        items: [{ type: 'rsvp', email: 'daily', inApp: true, push: false }],
+        items: [
+          { type: 'rsvp', email: 'daily', inApp: true, push: false },
+          ...(billing ? [{ type: 'billing', email: 'immediate', inApp: true, push: false }] : []),
+        ],
         push,
       });
     }
@@ -111,6 +116,29 @@ describe('Configurações › Notificações (Central RN07; decisão 221)', () =
         'A central do app sempre recebe tudo. O push mostra só o nome do grupo, sem valores nem o texto do recado.',
       ),
     ).toBeInTheDocument();
+  });
+
+  it('Cobrança e pagamentos: o e-mail fixo "Sempre", sem seletor, e a legenda (236(3)(4))', async () => {
+    mockPreferences({ billing: true });
+    renderRoute({ url: '/app/configuracoes/notificacoes' });
+    expect(await screen.findByText('Cobrança e pagamentos')).toBeInTheDocument();
+    expect(screen.getByText('Sempre')).toBeInTheDocument();
+    // Um seletor só, o das respostas.
+    expect(screen.getAllByRole('combobox')).toHaveLength(1);
+    expect(
+      // O "e-mail" leva o WORD JOINER depois do hífen (decisão 161).
+      screen.getByText(
+        /^Os avisos de pagamento, de saída do ar e de exclusão do casamento sempre chegam por e-.?mail\.$/u,
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it('sem os avisos de cobrança (quem não é do casal): sem a linha e sem a legenda', async () => {
+    mockPreferences();
+    renderRoute({ url: '/app/configuracoes/notificacoes' });
+    await screen.findByText('Respostas do convite');
+    expect(screen.queryByText('Cobrança e pagamentos')).toBeNull();
+    expect(screen.queryByText(/sempre chegam por e-mail/)).toBeNull();
   });
 
   it('mudar o e-mail grava na hora, com o Toast "Preferências salvas."', async () => {
