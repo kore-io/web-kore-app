@@ -33,6 +33,15 @@
   @apply md:col-span-2 lg:col-span-6;
 }
 
+/* O botão do vazio com o motivo do bloqueio embaixo (Bloqueado RN04). */
+.kore-dashboard__empty-action {
+  @apply flex flex-col items-center gap-2;
+}
+
+.kore-dashboard__empty-help {
+  @apply m-0 type-caption text-gray-700;
+}
+
 .kore-dashboard__stat {
   @apply lg:col-span-2;
 }

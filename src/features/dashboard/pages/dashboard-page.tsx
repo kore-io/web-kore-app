@@ -183,7 +183,7 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
             title={t(`guests.empty.${audience}`)}
             titleAs="h2"
             action={
-              <>
+              <div className="kore-dashboard__empty-action">
                 <Button
                   disabled={lock.locked}
                   {...(lock.locked && { 'aria-describedby': 'kore-dashboard-empty-locked' })}
@@ -192,11 +192,11 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
                   {t('guests.add')}
                 </Button>
                 {lock.reason && (
-                  <p id="kore-dashboard-empty-locked" className="kore-dashboard__help">
+                  <p id="kore-dashboard-empty-locked" className="kore-dashboard__empty-help">
                     {lock.reason}
                   </p>
                 )}
-              </>
+              </div>
             }
           />
         ) : (
