@@ -254,3 +254,61 @@ describe('Site › Editor (Dados básicos RN01, RN10, RN11; decisão 214)', () =
     await expectNoA11yViolations({ container });
   });
 });
+
+describe('Site › Editor no casamento bloqueado (Bloqueado RN02 a RN04)', () => {
+  const LOCKED = 'Indisponível enquanto o site está bloqueado.';
+  const lifecycle = (blocked: boolean) => ({
+    status: 'published',
+    endDate: '2027-02-14',
+    graceUntil: null,
+    expiredAt: null,
+    paidThrough: '2027-02-14',
+    deletionScheduledFor: null,
+    blocked,
+  });
+  function mockBlocked({
+    blocked = true,
+    patch,
+  }: { blocked?: boolean; patch?: () => Response } = {}) {
+    mockApi(({ method, path }) => {
+      if (path === '/v1/me') {
+        const memberships = me.memberships.map((membership) => ({
+          ...membership,
+          timezone: 'America/Sao_Paulo',
+          lifecycle: lifecycle(blocked),
+        }));
+        return Response.json({ ...me, memberships });
+      }
+      if (path === '/v1/weddings/w1/site' && method === 'PATCH' && patch) return patch();
+      if (path === '/v1/weddings/w1/site') return Response.json(site());
+      return apiError({ status: 404, body: { error: 'NOT_FOUND' } });
+    });
+  }
+
+  it('o Salvar fica desabilitado com o motivo, mesmo com mudança; o Pré-visualizar continua', async () => {
+    const user = userEvent.setup();
+    mockBlocked();
+    renderRoute({ url: '/app/site/dados-basicos' });
+    const city = await screen.findByRole('textbox', { name: 'Cidade' });
+    await user.type(city, 'x');
+    const save = screen.getByRole('button', { name: 'Salvar' });
+    expect(save).toBeDisabled();
+    expect(save).toHaveAccessibleDescription(LOCKED);
+    expect(screen.getByRole('button', { name: 'Pré-visualizar' })).toBeEnabled();
+  });
+
+  it('o 403 WEDDING_BLOCKED em corrida ao salvar: o Toast com o motivo, no lugar do genérico', async () => {
+    const user = userEvent.setup();
+    mockBlocked({
+      blocked: false,
+      patch: () => Response.json({ error: 'WEDDING_BLOCKED' }, { status: 403 }),
+    });
+    renderRoute({ url: '/app/site/dados-basicos' });
+    const city = await screen.findByRole('textbox', { name: 'Cidade' });
+    await user.type(city, 'x');
+    await user.click(screen.getByRole('button', { name: 'Salvar' }));
+    const region = await screen.findByRole('region', { name: /^Avisos/ });
+    expect(await within(region).findByText(LOCKED)).toBeInTheDocument();
+    expect(within(region).queryByText(/^Não foi possível continuar/)).toBeNull();
+  });
+});
