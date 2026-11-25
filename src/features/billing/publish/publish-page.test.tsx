@@ -451,6 +451,8 @@ describe('Publicar o site, o pagar com o cartão (E3; Publicar RN02 a RN07; deci
       expect(screen.getByText(text)).toBeInTheDocument();
     }
     expect(screen.getByLabelText('Número do cartão')).toHaveAttribute('aria-invalid', 'true');
+    // O foco no 1º campo inválido (sugestão do Crivo no E3).
+    await waitFor(() => expect(screen.getByLabelText('Número do cartão')).toHaveFocus());
     expect(api.payments).toEqual([]);
   });
 
