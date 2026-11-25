@@ -52,6 +52,7 @@ const PUBLICATION = {
   paidAt: '2026-08-10T14:48:00Z',
   refundableUntil: '2026-08-18T02:59:59Z',
   disputeDeadline: null,
+  refundEndDate: null,
 };
 
 const EXTENSION = {
@@ -65,6 +66,8 @@ const EXTENSION = {
   installments: 1,
   paidAt: '2026-08-12T15:00:00Z',
   refundableUntil: '2026-08-20T02:59:59Z',
+  // A data para onde a endDate volta (RN03): aqui, a da cortesia que veio antes (14/03).
+  refundEndDate: '2027-03-14',
 };
 
 function billing(overrides: Record<string, unknown> = {}) {
@@ -261,7 +264,7 @@ describe('Desistir e pedir reembolso (Pagamentos RN02 a RN07; Penpot 21, A9; dec
       within(extension).getByRole('heading', { name: 'Desistir da extensão?' }),
     ).toBeInTheDocument();
     expect(extension).toHaveAccessibleDescription(
-      nb('A data de saída do ar volta a 14 de fev. de 2027. Devolvemos R$ 87,00 no mesmo cartão.'),
+      nb('A data de saída do ar volta a 14 de mar. de 2027. Devolvemos R$ 87,00 no mesmo cartão.'),
     );
     await user.click(within(extension).getByRole('button', { name: 'Manter a extensão' }));
     const publication = await openDialog(user, 1);
