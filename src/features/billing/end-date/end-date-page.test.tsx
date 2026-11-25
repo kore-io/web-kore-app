@@ -423,6 +423,12 @@ describe('Pagar a extensão (Data de saída RN04; Preço RN03; 293(1)(2); Penpot
       await ready();
       expect(field()).toHaveValue(value);
       expect(field()).not.toHaveAttribute('aria-invalid', 'true');
+      // A ajuda só fala do mês pago à frente que ainda serve (341).
+      expect(field()).toHaveAccessibleDescription(
+        value
+          ? `Até ${value === '2026-12-02' ? '2 de dez.' : '20 de dez.'}, sem custo. Depois dela, até 14 de nov. de 2027, com os meses a mais.`
+          : 'Até 14 de nov. de 2027, 12 meses depois do casamento.',
+      );
     },
   );
 
