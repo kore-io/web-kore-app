@@ -56,7 +56,10 @@ function Pix({ weddingId }: { weddingId: string }) {
   // (a reconciliação o cancela, RN11).
   const [shown, setShown] = useState<PendingPaymentDto | null>(null);
   const pending = pixPending(billing.data?.pendingPayment);
-  if (pending && pending.paymentId !== shown?.paymentId) setShown(pending);
+  // O pendente de agora (o dueAt pode mudar); o último visto, quando ele some.
+  if (pending && (pending.paymentId !== shown?.paymentId || pending.dueAt !== shown.dueAt)) {
+    setShown(pending);
+  }
   const published = billing.data?.status === 'published';
 
   const done = useRef(false);
