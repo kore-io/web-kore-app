@@ -114,7 +114,9 @@ export function usePublishPayment({ weddingId }: { weddingId: string }) {
           toastError(t('publish.toast.gatewayUnavailable'));
           return 'handled';
         case 'WEDDING_BLOCKED':
-          // O /me novo (Bloqueado RN07) mostra o motivo ao lado do botão.
+          // O pagar não passa pelo MutationCache do E1: refaz o /me aqui (Bloqueado RN07),
+          // e o /me novo mostra o motivo ao lado do botão e desabilita a tela.
+          void queryClient.invalidateQueries({ queryKey: getMeControllerMeV1QueryKey() });
           toastError(t('publish.reason.blocked'));
           return 'handled';
         case 'NOT_DRAFT':
