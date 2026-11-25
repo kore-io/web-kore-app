@@ -6,7 +6,7 @@ import { getMeControllerMeV1QueryKey, useMeControllerMeV1 } from '../../shared/a
 import { getDashboardControllerGetV1QueryKey } from '../../shared/api/generated/rsvp/rsvp';
 import { apiErrorCode } from '../../shared/api/http-client';
 import { useActiveWedding } from '../guests/hooks/use-active-wedding';
-import { deliveriesClosed } from './delivery-closed';
+import { deliveriesClosed, expiredClosedText } from './delivery-closed';
 
 /**
  * O `409 SITE_EXPIRED` em corrida nos envios (Data de saída do ar RN07; 314(3)): o Toast com
@@ -28,8 +28,7 @@ export function useSiteExpired({ weddingId }: { weddingId: string }) {
     });
     showToast({
       tone: 'danger',
-      message:
-        closed === 'expired_final' ? t('closed.expiredFinal') : t(`closed.expired.${audience}`),
+      message: expiredClosedText({ closed, audience, t }) ?? t(`closed.expired.${audience}`),
     });
     void queryClient.invalidateQueries({
       queryKey: getDashboardControllerGetV1QueryKey(weddingId),
