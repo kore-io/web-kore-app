@@ -11,10 +11,13 @@ import {
 
 /*
  * Envios no expirado (E9 da F3; Data de saída do ar RN07; 314(3); decisões 331 e 332): na
- * carência, como no pós-evento (só leitura); no expirado, o Continuar e o Enviar convites do
+ * carência, como no pós-evento (só leitura, com o motivo da 337(1)); no expirado, o Continuar e o Enviar convites do
  * Dashboard fecham com o texto da RN07; no sem renovação, o texto único com o Exportar os
  * convidados do casal. O estado vem do banco, com as datas relativas a current_date.
  */
+
+const POST_EVENT =
+  'O casamento já aconteceu. Não dá mais para enviar convites, save the date nem lembretes.';
 
 let db: Db;
 test.beforeAll(async () => {
@@ -82,10 +85,18 @@ test('a carência segue o pós-evento; o expirado fecha com o texto da RN07 (332
   });
   await signIn({ page, email });
   await page.goto('/app');
-  await expect(page.getByRole('button', { name: 'Enviar convites' })).toBeEnabled();
+  // O Enviar convites fecha com o motivo do pós-evento (337(1); 338).
+  await expect(page.getByRole('button', { name: 'Enviar convites' })).toHaveAccessibleDescription(
+    POST_EVENT,
+  );
+  await expect(page.getByRole('button', { name: 'Enviar convites' })).toBeDisabled();
   await page.goto('/app/envios/convites');
   // Como no pós-evento: só leitura, sem o "Publiquem o site" (a API recusa a fila na carência).
   await expect(page.getByRole('button', { name: 'Continuar' })).toBeDisabled();
+  // O motivo do pós-evento, sem link (337(1)).
+  await expect(page.getByRole('button', { name: 'Continuar' })).toHaveAccessibleDescription(
+    POST_EVENT,
+  );
   await expect(page.getByText(/^Publiquem o site|^O site está fora do ar\./)).toHaveCount(0);
 
   await db.query(
