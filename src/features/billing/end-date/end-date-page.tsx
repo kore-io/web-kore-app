@@ -200,7 +200,9 @@ function EndDate({
         <div className="kore-end-date__summary">
           {choice === 'bringForward' && <Alert tone="info">{t('endDate.bringForwardAlert')}</Alert>}
           {choice === 'restore' && source.paidThrough && (
-            <Alert tone="info">{t('endDate.freeAlert', { date: day(source.paidThrough) })}</Alert>
+            <Alert tone="info">
+              {oneDot(t('endDate.freeAlert', { date: day(source.paidThrough) }))}
+            </Alert>
           )}
           {blocked && (
             <p id={reasonId} className="kore-end-date__reason">

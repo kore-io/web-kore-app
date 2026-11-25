@@ -2,7 +2,7 @@ import { Alert, Badge, type BadgeTone } from '@kore-io/design';
 import type { TFunction } from 'i18next';
 import { Check, FileText } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
+import { Link, useMatch } from 'react-router';
 import { useAreaPaths } from '../../../app/area';
 import type { MeLifecycleResponse } from '../../../shared/api/generated/model';
 import { oneDot, shortDayMonth } from '../../../shared/date-texts';
@@ -70,6 +70,8 @@ export function LifecycleBanner({
   const { t } = useTranslation('billing');
   const paths = useAreaPaths();
   const now = new Date();
+  // Na própria tela de mudar a data, a faixa fica sem o link (Penpot 21, A6 caso B).
+  const onEndDate = useMatch({ path: paths.billingEndDate, end: true }) !== null;
   if (source.lifecycle.blocked) return null;
   const view = lifecycleView({ ...source, now });
   const text = lifecycleText({ view, audience, now, t });
@@ -77,7 +79,7 @@ export function LifecycleBanner({
   const exportLink = view.kind === 'expired' && view.variant === 'final' && audience === 'couple';
   // O Voltar ao ar do caso B entra no E10 (333(2)); o Adiar a data e o Renovar, no E11.
   const backOnline =
-    view.kind === 'expired' && view.variant === 'paidAhead' && audience === 'couple';
+    view.kind === 'expired' && view.variant === 'paidAhead' && audience === 'couple' && !onEndDate;
   return (
     <Alert
       tone={view.kind === 'grace' ? 'warning' : 'danger'}
