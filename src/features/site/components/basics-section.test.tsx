@@ -305,6 +305,26 @@ describe('Site › Dados básicos (RN02 a RN08, RN10)', () => {
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/site/faq'));
   });
 
+  it('o Publicar com mudança não salva pede o Dialog antes; Descartar leva ao Publicar o site (243(c))', async () => {
+    const user = userEvent.setup();
+    mockBasics();
+    const { router } = renderRoute({ url: '/app/site/dados-basicos' });
+    await user.type(await screen.findByRole('textbox', { name: 'Cidade' }), ' Centro');
+    const publish = screen.getByRole('button', { name: 'Publicar' });
+    await user.click(publish);
+    const dialog = await screen.findByRole('alertdialog', { name: 'Descartar as alterações?' });
+    await user.click(within(dialog).getByRole('button', { name: 'Continuar editando' }));
+    expect(router.state.location.pathname).toBe('/app/site/dados-basicos');
+    expect(field('Cidade')).toHaveValue('Campinas Centro');
+    await user.click(publish);
+    await user.click(
+      within(await screen.findByRole('alertdialog')).getByRole('button', {
+        name: 'Descartar alterações',
+      }),
+    );
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app/cobranca/publicar'));
+  });
+
   it('fechar a aba com mudança não salva pede o aviso do navegador; sem mudança, não (RN10)', async () => {
     const user = userEvent.setup();
     mockBasics();
