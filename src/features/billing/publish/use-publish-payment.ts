@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { useAreaPaths } from '../../../app/area';
 import {
+  getPaymentsControllerBillingV1QueryKey,
   paymentsControllerPayV1,
   usePaymentsControllerBillingV1,
 } from '../../../shared/api/generated/billing/billing';
@@ -42,9 +43,17 @@ export function usePublishPayment({ weddingId }: { weddingId: string }) {
   const keys = useIdempotencyKeys();
   const [state, setState] = useState<PayState>({ kind: 'idle' });
   const confirmingId = state.kind === 'confirming' ? state.paymentId : null;
-  /** O pagamento de que já chegou uma resposta do billing pedida depois do POST. */
-  const [freshFor, setFreshFor] = useState<string | null>(null);
+  /**
+   * Quantas respostas do billing já tinham chegado quando a espera começou: só conta uma
+   * resposta que chegou de fato depois (o `dataUpdateCount` sobe só no sucesso). Na falha de
+   * rede, a do cache, de antes do POST, não conta (achado do Crivo no E4).
+   */
+  const [updatesBefore, setUpdatesBefore] = useState<number | null>(null);
 
+  // Quantas respostas do billing chegaram (sobe só no sucesso; lido do estado da query).
+  const billingUpdates = (): number =>
+    queryClient.getQueryState(getPaymentsControllerBillingV1QueryKey(weddingId))?.dataUpdateCount ??
+    0;
   const billing = usePaymentsControllerBillingV1(weddingId, {
     query: { refetchInterval: confirmingId !== null ? CONFIRM_POLL_MS : false },
   });
@@ -64,18 +73,23 @@ export function usePublishPayment({ weddingId }: { weddingId: string }) {
   useEffect(() => {
     if (confirmingId === null || !billing.data) return;
     if (payment?.status === 'paid' || billing.data.status === 'published') confirmed();
-    else if (freshFor === confirmingId && pendingId !== confirmingId) {
+    else if (
+      updatesBefore !== null &&
+      billingUpdates() > updatesBefore &&
+      pendingId !== confirmingId
+    ) {
       keys.reset();
       setState({ kind: 'declined' });
     }
     // confirmed muda a cada render; o que importa é a resposta nova do billing.
-  }, [billing.data, freshFor, confirmingId]);
+  }, [billing.data, billing.dataUpdatedAt, updatesBefore, confirmingId]);
 
   /** Reabrir com o cartão pendente: o Confirmando de novo (cobrança do Crivo no E3; 324). */
   function resume({ paymentId }: { paymentId: string }) {
     setState({ kind: 'confirming', paymentId });
-    // Só a resposta pedida agora conta: a de antes do POST ainda não tem o pendente.
-    void billing.refetch().then(() => setFreshFor(paymentId));
+    setUpdatesBefore(billingUpdates());
+    // A 1ª consulta já; a falha segue no Confirmando, com o polling de 5 s.
+    void billing.refetch();
   }
 
   function toastError(message: string) {
