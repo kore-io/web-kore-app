@@ -78,6 +78,31 @@ describe('PaymentOption (Penpot 21, "Opção / Cartão de crédito")', () => {
     expect((onChange.mock.calls[0]?.[0] as { target: HTMLInputElement }).target.value).toBe('pix');
   });
 
+  it('o toque na legenda escolhe a opção; desabilitada, não', async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    options({ onChange, method: 'pix' });
+    await user.click(screen.getByText('Em até 12x. Até 6x, sem juros.'));
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect((onChange.mock.calls[0]?.[0] as { target: HTMLInputElement }).target.value).toBe('card');
+    // A legenda não entra no nome do Radio.
+    expect(screen.getByRole('radio', { name: 'Cartão de crédito' })).toBeInTheDocument();
+
+    const disabledChange = vi.fn();
+    render(
+      <PaymentOption
+        name="other"
+        value="card"
+        disabled
+        onChange={disabledChange}
+        label="Cartão (outro)"
+        caption="Legenda desabilitada"
+      />,
+    );
+    await user.click(screen.getByText('Legenda desabilitada'));
+    expect(disabledChange).not.toHaveBeenCalled();
+  });
+
   it('sem violações de acessibilidade', async () => {
     const { container } = options();
     await expectNoA11yViolations({ container });
