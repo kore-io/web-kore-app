@@ -96,10 +96,16 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
         now,
       })
     : null;
+  // O cartão Envios segue com os links no pós-evento e na carência (Envios só leitura).
   const closed = data ? closedKind !== null && closedKind !== 'post_event' : true;
+  // O Enviar convites fecha também no pós-evento e na carência, com o texto dos Envios
+  // (Dashboard RN05; Data de saída RN07; decisão 338, como a 331(3) no expirado).
+  const sendClosed = data ? closedKind !== null : true;
   const closedText =
     expiredClosedText({ closed: closedKind, audience, t: tDeliveries }) ??
-    t(`actions.closed.${audience}`);
+    (closedKind === 'post_event'
+      ? tDeliveries('closed.postEvent')
+      : t(`actions.closed.${audience}`));
 
   const header = (
     <PageHeader
@@ -120,13 +126,13 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
             {t('actions.editSite')}
           </Button>
           <Button
-            disabled={!data || closed}
-            {...(data && closed && { 'aria-describedby': 'kore-dashboard-closed' })}
+            disabled={!data || sendClosed}
+            {...(data && sendClosed && { 'aria-describedby': 'kore-dashboard-closed' })}
             onClick={() => void navigate(area.deliveryInvites)}
           >
             {t('actions.sendInvites')}
           </Button>
-          {data && closed && (
+          {data && sendClosed && (
             <p id="kore-dashboard-closed" className="kore-dashboard__help">
               {closedText}
             </p>
