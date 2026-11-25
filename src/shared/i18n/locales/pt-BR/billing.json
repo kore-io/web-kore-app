@@ -130,6 +130,7 @@
     "waiting": "Aguardando a confirmação do pagamento",
     "dueAt": "O código vale até {{date}}.",
     "effect": "O site vai ao ar assim que o pagamento for confirmado.",
+    "effectExtension": "A nova data vale assim que o pagamento for confirmado.",
     "payWithCard": "Pagar com cartão",
     "expired": "Este código Pix venceu. Gerem um novo para pagar.",
     "newPix": "Gerar novo Pix"

@@ -56,6 +56,8 @@ export interface PublishLocationState {
   method?: Method;
   endDate?: string;
   replacesPaymentId?: string;
+  /** O que o Pix paga: a publicação ou a extensão (E11). */
+  kind?: 'publication' | 'extension';
 }
 
 function readPublishState(state: unknown): PublishLocationState {

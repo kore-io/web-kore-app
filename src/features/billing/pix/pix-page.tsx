@@ -13,7 +13,7 @@ import {
 import type { PendingPaymentDto } from '../../../shared/api/generated/model';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { Panel } from '../../../shared/components/panel';
-import { dayMonthTimeIn } from '../../../shared/date-texts';
+import { dayMonthTimeIn, oneDot, shortDayMonth } from '../../../shared/date-texts';
 import { formatCents } from '../../../shared/money';
 import { useActiveWedding } from '../../guests/hooks/use-active-wedding';
 import type { PublishLocationState } from '../publish/publish-page';
@@ -34,9 +34,9 @@ export function PixPage() {
   return <Pix weddingId={weddingId} />;
 }
 
-/** O pendente de Pix da publicação (o de extensão é da tela da data, no E11). */
+/** O pendente de Pix, da publicação ou da extensão (E11). */
 function pixPending(pending: PendingPaymentDto | null | undefined) {
-  return pending?.kind === 'publication' && pending.method === 'pix' ? pending : null;
+  return pending?.method === 'pix' ? pending : null;
 }
 
 function Pix({ weddingId }: { weddingId: string }) {
@@ -46,7 +46,7 @@ function Pix({ weddingId }: { weddingId: string }) {
   const queryClient = useQueryClient();
   const paths = useAreaPaths();
   const location = useLocation();
-  const { endDate } = (location.state ?? {}) as PublishLocationState;
+  const { endDate, kind: fromKind } = (location.state ?? {}) as PublishLocationState;
   const { data: me } = useMeControllerMeV1();
   const timezone = me?.memberships.find((item) => item.weddingId === weddingId)?.timezone ?? null;
   const billing = usePaymentsControllerBillingV1(weddingId, {
@@ -60,7 +60,15 @@ function Pix({ weddingId }: { weddingId: string }) {
   if (pending && (pending.paymentId !== shown?.paymentId || pending.dueAt !== shown.dueAt)) {
     setShown(pending);
   }
-  const published = billing.data?.status === 'published';
+  // A publicação termina com o site no ar; a extensão, com o pagamento pago (E11).
+  const kind = shown?.kind ?? pending?.kind ?? fromKind ?? 'publication';
+  const extension = kind === 'extension';
+  const paid =
+    shown !== null &&
+    billing.data?.payments?.some(
+      (item) => item.id === shown.paymentId && item.status === 'paid',
+    ) === true;
+  const published = extension ? paid : billing.data?.status === 'published';
 
   // No dueAt, a tela vira o vencido na hora, sem esperar o pendente mudar (sugestão do Crivo
   // no E4): um temporizador até lá refaz o render. Cada consulta do polling também confere
@@ -80,9 +88,21 @@ function Pix({ weddingId }: { weddingId: string }) {
     if (!published || done.current) return;
     done.current = true;
     void queryClient.invalidateQueries({ queryKey: getMeControllerMeV1QueryKey() });
+    if (extension) {
+      // "O site fica no ar até {nova data}." e Pagamentos (Data de saída RN04).
+      const day = billing.data?.endDate;
+      showToast({
+        tone: 'success',
+        message: oneDot(
+          t('endDate.toast.until', { date: day ? shortDayMonth({ day, now: new Date() }) : '' }),
+        ),
+      });
+      void navigate(paths.billing);
+      return;
+    }
     showToast({ tone: 'success', message: t('publish.toast.confirmed') });
     void navigate(paths.dashboard);
-  }, [published, queryClient, showToast, t, navigate, paths.dashboard]);
+  }, [published, extension, billing.data?.endDate, queryClient, showToast, t, navigate, paths]);
 
   if (billing.isError) return <LoadErrorNotice onRetry={() => void billing.refetch()} />;
   // O billing do cache pode ser de antes do POST (sem o pendente): decide só com o de agora.
@@ -93,12 +113,13 @@ function Pix({ weddingId }: { weddingId: string }) {
       </div>
     );
   }
-  // Sem pendente que a tela tenha mostrado: não há Pix para pagar; o Publicar.
-  if (!shown) return <Navigate to={paths.billingPublish} replace />;
+  // Sem pendente que a tela tenha mostrado: não há Pix para pagar; o Publicar ou a data.
+  const back = extension ? paths.billingEndDate : paths.billingPublish;
+  if (!shown) return <Navigate to={back} replace />;
 
   const now = new Date();
   const expired = !pending || (shown.dueAt !== null && new Date(shown.dueAt) <= now);
-  /** Volta ao Publicar preenchido, com a cotação nova (decisão 324). */
+  /** Volta ao Publicar (ou à data, na extensão) preenchido, com a cotação nova (324). */
   const backToPublish = (method: 'pix' | 'card') => {
     const state: PublishLocationState = {
       method,
@@ -107,7 +128,7 @@ function Pix({ weddingId }: { weddingId: string }) {
       // Troca o pendente que o servidor ainda tem (RN07); o já cancelado não precisa.
       ...(pending && { replacesPaymentId: pending.paymentId }),
     };
-    void navigate(paths.billingPublish, { state });
+    void navigate(back, { state });
   };
 
   return (
@@ -123,7 +144,7 @@ function Pix({ weddingId }: { weddingId: string }) {
             </Button>
           </>
         ) : (
-          <PixCode pending={shown} timezone={timezone} now={now} />
+          <PixCode pending={shown} timezone={timezone} now={now} extension={extension} />
         )}
         <Button variant="ghost" className="kore-pix__card" onClick={() => backToPublish('card')}>
           {t('pix.payWithCard')}
@@ -138,10 +159,13 @@ function PixCode({
   pending,
   timezone,
   now,
+  extension,
 }: {
   pending: PendingPaymentDto;
   timezone: string | null;
   now: Date;
+  /** Na extensão, "A nova data vale assim que o pagamento for confirmado." (A6). */
+  extension: boolean;
 }) {
   const { t } = useTranslation('billing');
   const { showToast } = useToast();
@@ -189,7 +213,7 @@ function PixCode({
           {t('pix.dueAt', { date: dayMonthTimeIn({ at: pending.dueAt, timezone, now }) })}
         </p>
       )}
-      <p className="kore-pix__caption">{t('pix.effect')}</p>
+      <p className="kore-pix__caption">{extension ? t('pix.effectExtension') : t('pix.effect')}</p>
     </>
   );
 }
