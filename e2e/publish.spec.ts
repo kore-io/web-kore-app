@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { codeFrom, latestEmail, newEmail } from './mailpit';
-import { signIn } from './support/app';
+import { signIn, toast } from './support/app';
 import {
   connectBackoffice,
   createPlanner,
@@ -200,4 +200,89 @@ test('a colaboradora: o Pagar e publicar desabilitado e sem valores (Colaborador
   await expect(page.getByLabel('Data de saída do ar')).toHaveCount(0);
   await expect(page.getByText(/^Preço:/)).toHaveCount(0);
   expect(quotes).toEqual([]);
+});
+
+const API_URL = process.env.E2E_API_URL ?? 'http://localhost:3000';
+
+/** Escolhe a data (no limite), o cartão em 1x e preenche o cartão e quem paga. */
+async function fillPublish({
+  page,
+  cardNumber,
+  payer = true,
+}: {
+  page: Page;
+  cardNumber: string;
+  payer?: boolean;
+}) {
+  await page.getByLabel('Data de saída do ar').fill(END_DATE_MAX);
+  await expect(rowValue(page.getByRole('region', { name: 'Resumo' }), 'Ativação')).toBeVisible();
+  await page.getByLabel('Número do cartão').fill(cardNumber);
+  await page.getByLabel('Nome impresso no cartão').fill('ANA SOUZA');
+  await page.getByLabel('Validade').fill('0829');
+  await page.getByLabel('CVV').fill('123');
+  if (payer) {
+    await page.getByLabel('Nome completo').fill('Ana Souza');
+    await page.getByLabel('CPF').fill('52998224725');
+  }
+}
+
+test('o cartão aprovado: o Confirmando, a confirmação e o site no ar (E3; RN03 e RN04)', async ({
+  page,
+}) => {
+  test.slow();
+  const { email, weddingId } = await couple();
+  await signIn({ page, email });
+  await page.goto('/app/cobranca/publicar');
+  await fillPublish({ page, cardNumber: '4111111111111111' });
+  const created = page.waitForResponse(
+    (response) =>
+      response.request().method() === 'POST' &&
+      response.url().endsWith(`/v1/weddings/${weddingId}/payments`),
+  );
+  await page.getByRole('button', { name: 'Pagar e publicar' }).click();
+  const response = await created;
+  expect(response.status()).toBe(201);
+  expect(response.request().headers()['idempotency-key']).toMatch(/^[0-9a-f-]{36}$/);
+  const { paymentId, status } = (await response.json()) as { paymentId: string; status: string };
+  expect(status).toBe('pending');
+  // O site só vai ao ar na confirmação (RN04): até ela, o Confirmando (o Spinner e a frase).
+  await expect(
+    page.getByRole('status').filter({ hasText: 'Confirmando o pagamento' }),
+  ).toBeAttached();
+  await expect(page.getByRole('button', { name: 'Pagar e publicar' })).toBeDisabled();
+  // A rota dev é pública, mas passa pelo OriginGuard: a origem do app.
+  const confirm = await page.request.post(`${API_URL}/v1/dev/payments/${paymentId}/confirm`, {
+    data: {},
+    headers: { Origin: new URL(page.url()).origin },
+  });
+  expect(confirm.ok(), `${confirm.status()} ${await confirm.text()}`).toBe(true);
+  await expect(page).toHaveURL(/\/app$/, { timeout: 20_000 });
+  await expect(toast({ page, text: 'Pagamento confirmado. O site está no ar.' })).toBeVisible();
+  const { rows } = await db.query<{ status: string }>('select status from weddings where id = $1', [
+    weddingId,
+  ]);
+  expect(rows[0]?.status).toBe('published');
+});
+
+test('o cartão recusado (final 0002) e, de volta à tela, o pagador anterior (RN02, RN03; 316(3))', async ({
+  page,
+}) => {
+  test.slow();
+  const { email } = await couple();
+  await signIn({ page, email });
+  await page.goto('/app/cobranca/publicar');
+  await fillPublish({ page, cardNumber: '4000000000000002' });
+  await page.getByRole('button', { name: 'Pagar e publicar' }).click();
+  await expect(
+    page.getByText(
+      'O banco do cartão não aprovou o pagamento. Confiram os dados, usem outro cartão ou paguem com Pix.',
+    ),
+  ).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Pagar e publicar' })).toBeEnabled();
+  // De volta, o pagador anterior: o nome e o CPF final, sem o CPF inteiro.
+  await page.reload();
+  await expect(page.getByText('Ana Souza · CPF final 4725')).toBeVisible();
+  await expect(page.getByLabel('CPF')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Usar outro CPF' }).click();
+  await expect(page.getByLabel('CPF')).toBeVisible();
 });
