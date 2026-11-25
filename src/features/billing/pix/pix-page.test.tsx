@@ -188,6 +188,24 @@ describe('Pagar com Pix (Publicar RN03, RN07, RN11 e RN13; Penpot 21, A3)', () =
     expect(router.state.location.state).toEqual({ method: 'pix', endDate: '2027-03-14' });
   }, 10_000);
 
+  it('o mesmo pendente com o dueAt que passa vira o vencido, com o replaces (RN11)', async () => {
+    mockPix({
+      billing: (call) => ({
+        status: 'draft',
+        pendingPayment: call === 1 ? PENDING : { ...PENDING, dueAt: '2026-11-25T13:00:00Z' },
+      }),
+    });
+    renderAreaScreen({ url: URL_PIX });
+    await screen.findByRole('button', { name: 'Copiar código' });
+    expect(
+      await screen.findByText(
+        'Este código Pix venceu. Gerem um novo para pagar.',
+        {},
+        { timeout: 7000 },
+      ),
+    ).toBeInTheDocument();
+  }, 10_000);
+
   it('Pagar com cartão volta ao Publicar no cartão, com o pendente a trocar (RN07; 324)', async () => {
     const user = userEvent.setup();
     mockPix();
