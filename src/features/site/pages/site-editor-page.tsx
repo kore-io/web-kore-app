@@ -31,6 +31,7 @@ import {
 import { savedAtText, siteStatus } from '../site-texts';
 import { useAreaPaths } from '../../../app/area';
 import { canOpenPublish, publishWaitsCouple } from '../../billing/publish/publish-entry';
+import { lockedProps, useWriteLock, WriteLockReason } from '../../billing/lifecycle/blocked';
 
 type MobileTab = 'sections' | 'edit' | 'preview';
 
@@ -57,6 +58,7 @@ function SiteEditor({
   const area = useAreaPaths();
   const { t } = useTranslation('site');
   const navigate = useNavigate();
+  const lock = useWriteLock();
   const site = useSiteControllerGetV1(weddingId);
   const [form, setForm] = useState<SectionForm | null>(null);
   const [saving, setSaving] = useState(false);
@@ -176,6 +178,7 @@ function SiteEditor({
                   'aria-describedby': 'kore-site-publish-help',
                 })}
                 onClick={() => void navigate(area.billingPublish)}
+                {...lockedProps({ locked: lock.locked, id: 'kore-site-locked' })}
               >
                 {t('publish')}
               </Button>
@@ -183,9 +186,12 @@ function SiteEditor({
             <Button
               disabled={!dirty || form?.canSave === false || saving}
               onClick={() => void save()}
+              {...lockedProps({ locked: lock.locked, id: 'kore-site-locked' })}
             >
               {t('save')}
             </Button>
+            {/* Bloqueado RN04: salvar e publicar são escrita; ver o site continua. */}
+            <WriteLockReason id="kore-site-locked" className="kore-site-editor__preview-help" />
             {publishWaitsCouple(data.status) && (
               <p id="kore-site-publish-help" className="kore-site-editor__preview-help">
                 {t('publishWaitsCouple')}

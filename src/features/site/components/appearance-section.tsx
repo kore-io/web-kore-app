@@ -18,6 +18,7 @@ import { useSectionForm } from '../section-form';
 import { loadEditorFonts } from '../site-fonts';
 import { useSectionTemplateActions } from '../sections/template-actions';
 import { AppearanceFields, draftFrom, useAppearanceDraft } from './appearance-fields';
+import { useErrorMessage } from '../../billing/lifecycle/blocked';
 
 /** Aparência (S2): fontes, paleta, cor principal e destaque com o contraste, e o fundo. */
 export function AppearanceSection({
@@ -31,8 +32,8 @@ export function AppearanceSection({
 }) {
   const { t } = useTranslation('site');
   const actions = useSectionTemplateActions();
-  const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
+  const errorMessage = useErrorMessage();
   const queryClient = useQueryClient();
   const put = useSiteControllerAppearanceV1();
   const state = useAppearanceDraft({ initial: site.appearance });
@@ -95,7 +96,7 @@ export function AppearanceSection({
         }
         showToast({
           tone: 'danger',
-          message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
+          message: errorMessage(error),
         });
         return false;
       }

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import type { Audience } from '../../guests/hooks/use-active-wedding';
 import type { SiteImageRefResponse } from '../../../shared/api/generated/model';
 import { IMAGE_ACCEPT, useSiteImageUpload } from '../images/use-site-image-upload';
+import { lockedProps, useWriteLock, WriteLockReason } from '../../billing/lifecycle/blocked';
 
 export type ImageValue = Pick<SiteImageRefResponse, 'id' | 'url' | 'thumbUrl'> | null;
 
@@ -35,6 +36,8 @@ export function ImageField({
   const picker = useRef<HTMLInputElement>(null);
   const [progress, setProgress] = useState<number | null>(null);
   const labelId = useId();
+  const lockId = `${labelId}-locked`;
+  const lock = useWriteLock();
 
   async function send(file: File) {
     setProgress(0);
@@ -59,10 +62,20 @@ export function ImageField({
         <div className="kore-site-cover__current">
           <img className="kore-site-cover__thumb" src={cover.thumbUrl} alt={alt} />
           <div className="kore-site-cover__actions">
-            <Button variant="secondary" size="sm" onClick={() => picker.current?.click()}>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => picker.current?.click()}
+              {...lockedProps({ locked: lock.locked, id: lockId })}
+            >
               {t('images.change')}
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => onChange(null)}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onChange(null)}
+              {...lockedProps({ locked: lock.locked, id: lockId })}
+            >
               {t('images.remove')}
             </Button>
           </div>
@@ -85,9 +98,12 @@ export function ImageField({
           title={t(`images.drop.${audience}`)}
           hint={t('images.dropHint')}
           accept={IMAGE_ACCEPT}
+          disabled={lock.locked}
           onFile={(file) => void send(file)}
         />
       )}
+      {/* Bloqueado RN04: enviar, trocar e tirar a foto são escrita. */}
+      <WriteLockReason id={lockId} className="kore-site-cover__help" />
       {help !== undefined && <p className="kore-site-cover__help">{help}</p>}
     </div>
   );

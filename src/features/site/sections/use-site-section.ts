@@ -13,6 +13,7 @@ import {
 } from '../../../shared/api/generated/site/site';
 import { ApiError } from '../../../shared/api/http-client';
 import { useSectionForm } from '../section-form';
+import { useErrorMessage } from '../../billing/lifecycle/blocked';
 
 export type SectionType = SiteSectionResponse['type'];
 
@@ -50,8 +51,8 @@ export function useSiteSection<C>({
   blocked?: (content: C) => boolean;
 }) {
   const { t } = useTranslation('site');
-  const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
+  const errorMessage = useErrorMessage();
   const queryClient = useQueryClient();
   const put = useSiteControllerSectionV1();
   const initial = (): SectionDraft<C> => ({
@@ -120,7 +121,7 @@ export function useSiteSection<C>({
         }
         showToast({
           tone: 'danger',
-          message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
+          message: errorMessage(error),
         });
         return false;
       }

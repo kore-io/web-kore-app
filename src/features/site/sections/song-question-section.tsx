@@ -12,6 +12,7 @@ import {
 } from '../../../shared/api/generated/site/site';
 import { FormField } from '../../../shared/components/form-field';
 import { useSectionForm } from '../section-form';
+import { useErrorMessage } from '../../billing/lifecycle/blocked';
 
 /** O texto da pergunta vai até 120 caracteres (Música RN01). */
 export const SONG_QUESTION_MAX = 120;
@@ -31,8 +32,8 @@ export function SongQuestionSection({
   songQuestion: SiteSongQuestionResponse;
 }) {
   const { t } = useTranslation('site');
-  const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
+  const errorMessage = useErrorMessage();
   const queryClient = useQueryClient();
   const [original, setOriginal] = useState(songQuestion);
   const [enabled, setEnabled] = useState(songQuestion.enabled);
@@ -59,10 +60,10 @@ export function SongQuestionSection({
         setText(saved.text);
         showToast({ tone: 'success', message: t('saved') });
         return true;
-      } catch {
+      } catch (error) {
         showToast({
           tone: 'danger',
-          message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
+          message: errorMessage(error),
         });
         return false;
       }

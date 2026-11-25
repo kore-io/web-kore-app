@@ -9,6 +9,7 @@ import { ApiError, apiErrorCode } from '../../../shared/api/http-client';
 import type { Audience } from '../../guests/hooks/use-active-wedding';
 import { compressImage, MAX_SOURCE_BYTES } from './compress-image';
 import { putFile } from './put-file';
+import { useErrorMessage } from '../../billing/lifecycle/blocked';
 
 const ACCEPTED = ['image/jpeg', 'image/png'];
 export const IMAGE_ACCEPT = '.jpg,.jpeg,.png,image/jpeg,image/png';
@@ -29,16 +30,14 @@ export function useSiteImageUpload({
   audience: Audience;
 }) {
   const { t } = useTranslation('site');
-  const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
+  const errorMessage = useErrorMessage();
 
-  function fail(failure: UploadFailure) {
+  function fail(failure: UploadFailure, error?: unknown) {
     showToast({
       tone: 'danger',
       message:
-        failure === 'generic'
-          ? `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`
-          : t(`images.errors.${failure}.${audience}`),
+        failure === 'generic' ? errorMessage(error) : t(`images.errors.${failure}.${audience}`),
     });
     return null;
   }
@@ -68,7 +67,7 @@ export function useSiteImageUpload({
         sizeBytes: blob.size,
       });
     } catch (error) {
-      return fail(failureOf(error));
+      return fail(failureOf(error), error);
     }
     try {
       await putFile({
@@ -85,7 +84,7 @@ export function useSiteImageUpload({
       return await siteImagesControllerConfirmV1(weddingId, { imageId: authorization.imageId });
     } catch (error) {
       // A foto que o servidor não consegue ler cai no mesmo texto do tipo (RN05).
-      return fail(apiErrorCode({ error }) === 'IMAGE_INVALID' ? 'type' : failureOf(error));
+      return fail(apiErrorCode({ error }) === 'IMAGE_INVALID' ? 'type' : failureOf(error), error);
     }
   };
 }
