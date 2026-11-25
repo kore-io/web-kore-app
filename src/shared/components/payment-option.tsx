@@ -1,5 +1,5 @@
 import { Radio, type RadioProps } from '@kore-io/design';
-import { useId, type ReactNode } from 'react';
+import { useId, useRef, type ReactNode } from 'react';
 
 /**
  * A forma de pagamento do Publicar e da extensão (Penpot 21, "Formas", "Radio / Pix à vista"
@@ -39,19 +39,34 @@ export interface PaymentOptionProps extends Omit<RadioProps, 'children'> {
   caption?: ReactNode;
 }
 
-/** Uma opção: o Radio e, com 4 px, a legenda, que também descreve o Radio ao leitor de tela. */
+/**
+ * Uma opção: o Radio e, com 4 px, a legenda, que também descreve o Radio ao leitor de tela.
+ * O toque na legenda escolhe a opção, como o toque no rótulo (sugestão do Crivo no L3); ela
+ * não vira um 2º rótulo, que entraria no nome do Radio.
+ */
 export function PaymentOption({ label, caption, ...radio }: PaymentOptionProps) {
   const captionId = useId();
+  const inputRef = useRef<HTMLInputElement>(null);
   const describedBy = [radio['aria-describedby'], caption !== undefined && captionId]
     .filter(Boolean)
     .join(' ');
   return (
     <div className="kore-payment-option">
-      <Radio {...radio} {...(describedBy !== '' && { 'aria-describedby': describedBy })}>
+      <Radio
+        ref={inputRef}
+        {...radio}
+        {...(describedBy !== '' && { 'aria-describedby': describedBy })}
+      >
         {label}
       </Radio>
       {caption !== undefined && (
-        <span id={captionId} className="kore-payment-option__caption">
+        <span
+          id={captionId}
+          className="kore-payment-option__caption"
+          onClick={() => {
+            if (!inputRef.current?.disabled) inputRef.current?.click();
+          }}
+        >
           {caption}
         </span>
       )}
