@@ -20,6 +20,7 @@ import { oneDot, shortDayMonth } from '../../../shared/date-texts';
 import { useActiveWedding, type Audience } from '../../guests/hooks/use-active-wedding';
 import { deadlineState } from '../deadline';
 import { useAreaPaths } from '../../../app/area';
+import { useBlockedToast, useWriteLock } from '../../billing/lifecycle/blocked';
 
 /** Envios › Prazo de resposta (Prazo e respostas RN01 a RN03; Penpot A7). */
 export function DeadlinePage() {
@@ -78,6 +79,8 @@ function DeadlineForm({
   const { t } = useTranslation('deliveries');
   const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
+  const blockedToast = useBlockedToast();
+  const lock = useWriteLock();
   const queryClient = useQueryClient();
   const now = new Date();
   const saved = dashboard.rsvpDeadline;
@@ -104,6 +107,8 @@ function DeadlineForm({
       if (code === 'DEADLINE_IN_PAST') setError(t(`deadline.inPast.${audience}`));
       else if (code === 'DEADLINE_AFTER_EVENT' && dashboard.eventDate)
         setError(oneDot(t(`deadline.afterEvent.${audience}`, { date: date(dashboard.eventDate) })));
+      // O bloqueio em corrida (Bloqueado RN04): o Toast com o motivo.
+      else if (blockedToast(caught)) return;
       else
         showToast({
           tone: 'danger',
@@ -181,18 +186,28 @@ function DeadlineForm({
           </>
         }
       />
+      {lock.reason && (
+        <p id="kore-deadline-locked" className="kore-deadline__locked">
+          {lock.reason}
+        </p>
+      )}
       <div className="kore-deadline__actions">
         {saved && (
           <Button
             type="button"
             variant="secondary"
-            disabled={sending}
+            disabled={sending || lock.locked}
+            {...(lock.locked && { 'aria-describedby': 'kore-deadline-locked' })}
             onClick={() => void put(null)}
           >
             {t('deadline.remove')}
           </Button>
         )}
-        <Button type="submit" disabled={sending || !value || value === saved}>
+        <Button
+          type="submit"
+          disabled={sending || lock.locked || !value || value === saved}
+          {...(lock.locked && { 'aria-describedby': 'kore-deadline-locked' })}
+        >
           {t('deadline.save')}
         </Button>
       </div>

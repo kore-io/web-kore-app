@@ -5,6 +5,7 @@ import { useAreaPaths } from '../../../app/area';
 import { useDashboardControllerGetV1 } from '../../../shared/api/generated/rsvp/rsvp';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { useActiveWedding, type Audience } from '../../guests/hooks/use-active-wedding';
+import { useWriteLock } from '../../billing/lifecycle/blocked';
 import { deliveriesClosed, expiredClosedText, type Closed } from '../delivery-closed';
 import type { DeliveryKind } from '../delivery-texts';
 import { useMeControllerMeV1 } from '../../../shared/api/generated/me/me';
@@ -39,6 +40,7 @@ function Send({
   const [search] = useSearchParams();
   const dashboard = useDashboardControllerGetV1(weddingId);
   const { data: me } = useMeControllerMeV1();
+  const lock = useWriteLock();
   if (dashboard.isError) return <LoadErrorNotice onRetry={() => void dashboard.refetch()} />;
   if (!dashboard.data) {
     return (
@@ -48,11 +50,14 @@ function Send({
     );
   }
   // A carência segue o pós-evento (332); o expirado fecha, com o sem renovação à parte (RN07; 314(3)).
-  const closed: Closed = deliveriesClosed({
-    status: dashboard.data.site.status,
-    membership: me?.memberships.find((item) => item.weddingId === weddingId),
-    now: new Date(),
-  });
+  // O bloqueio fecha os envios à frente dos outros motivos (Bloqueado RN04).
+  const closed: Closed = lock.locked
+    ? 'blocked'
+    : deliveriesClosed({
+        status: dashboard.data.site.status,
+        membership: me?.memberships.find((item) => item.weddingId === weddingId),
+        now: new Date(),
+      });
   const asked = (search.get('etapa') as Step | null) ?? 'grupos';
   // Fechado, só a etapa dos grupos, com a legenda (RN01).
   const step: Step = closed ? 'grupos' : asked;
@@ -109,6 +114,7 @@ function Stepper({ step }: { step: Step }) {
 export function ClosedNotice({ audience, closed }: { audience: Audience; closed: Closed }) {
   const { t } = useTranslation('deliveries');
   const area = useAreaPaths();
+  const { reason: lockReason } = useWriteLock();
   const expiredText = expiredClosedText({ closed, audience, t });
   if (expiredText) {
     const link =
@@ -130,6 +136,14 @@ export function ClosedNotice({ audience, closed }: { audience: Audience; closed:
             <Link to={link.to}>{link.label}</Link>
           </>
         )}
+      </p>
+    );
+  }
+  // O bloqueio (Bloqueado RN04): o motivo dos botões de escrita, sem link.
+  if (closed === 'blocked') {
+    return (
+      <p className="kore-send__closed" id="kore-send-closed">
+        {lockReason}
       </p>
     );
   }
