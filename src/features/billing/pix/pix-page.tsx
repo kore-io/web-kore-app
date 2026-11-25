@@ -1,6 +1,5 @@
 import { Alert, Button, Input, PageHeader, Spinner, useToast } from '@kore-io/design';
 import { useQueryClient } from '@tanstack/react-query';
-import QRCode from 'qrcode';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate } from 'react-router';
@@ -61,6 +60,18 @@ function Pix({ weddingId }: { weddingId: string }) {
     setShown(pending);
   }
   const published = billing.data?.status === 'published';
+
+  // No dueAt, a tela vira o vencido na hora, sem esperar o pendente mudar (sugestão do Crivo
+  // no E4): um temporizador até lá refaz o render.
+  const [, setTick] = useState(0);
+  const dueAt = shown?.dueAt ?? null;
+  useEffect(() => {
+    if (dueAt === null) return;
+    const wait = new Date(dueAt).getTime() - Date.now();
+    if (wait <= 0) return;
+    const timer = setTimeout(() => setTick((tick) => tick + 1), wait + 100);
+    return () => clearTimeout(timer);
+  }, [dueAt]);
 
   const done = useRef(false);
   useEffect(() => {
@@ -133,6 +144,7 @@ function PixCode({
   const { t } = useTranslation('billing');
   const { showToast } = useToast();
   const instructionId = useId();
+  const codeRef = useRef<HTMLInputElement>(null);
   const code = pending.pixCopyPaste ?? '';
   return (
     <>
@@ -142,6 +154,7 @@ function PixCode({
       <PixQr code={code} label={t('pix.qrAlt')} />
       <div className="kore-pix__copy">
         <Input
+          ref={codeRef}
           readOnly
           value={code}
           aria-labelledby={instructionId}
@@ -151,9 +164,15 @@ function PixCode({
         <Button
           variant="secondary"
           onClick={() => {
-            void navigator.clipboard
-              .writeText(code)
-              .then(() => showToast({ tone: 'success', message: t('pix.copied') }));
+            void navigator.clipboard.writeText(code).then(
+              () => showToast({ tone: 'success', message: t('pix.copied') }),
+              // A área de transferência negada: o código fica selecionado no campo, para copiar
+              // à mão (sugestão do Crivo no E4).
+              () => {
+                codeRef.current?.focus();
+                codeRef.current?.select();
+              },
+            );
           }}
         >
           {t('pix.copy')}
@@ -180,9 +199,12 @@ function PixQr({ code, label }: { code: string; label: string }) {
   useEffect(() => {
     current.current = code;
     if (!code) return;
-    void QRCode.toDataURL(code, { margin: 1, width: 400 }).then((url) => {
-      if (current.current === code) setSrc(url);
-    });
+    // O qrcode só carrega nesta tela, fora do pacote principal (sugestão do Crivo no E4).
+    void import('qrcode')
+      .then(({ default: QRCode }) => QRCode.toDataURL(code, { margin: 1, width: 400 }))
+      .then((url) => {
+        if (current.current === code) setSrc(url);
+      });
   }, [code]);
   return (
     <div className="kore-pix__qr">
