@@ -12,6 +12,7 @@ import {
   type DraftGroup,
   type NameError,
 } from '../paste-draft';
+import { lockedProps, useWriteLock, WriteLockReason } from '../../billing/lifecycle/blocked';
 
 type Paste = ReturnType<typeof usePasteImport>;
 
@@ -73,6 +74,7 @@ export function PasteText({
 /** Prévia da lista colada (RN11 e RN12; decisão 210). */
 export function PastePreview({ paste, audience }: { paste: Paste; audience: Audience }) {
   const { t } = useTranslation('guests');
+  const lock = useWriteLock();
   const draft = paste.draft;
   if (!draft) return null;
   const counts = draftCounts(draft);
@@ -111,10 +113,16 @@ export function PastePreview({ paste, audience }: { paste: Paste; audience: Audi
         <Button variant="secondary" onClick={paste.back}>
           {t('pasteList.back')}
         </Button>
-        <Button disabled={!draftIsValid(draft) || paste.isImporting} onClick={paste.importAll}>
+        {/* Bloqueado RN04: importar é escrita. */}
+        <Button
+          disabled={!draftIsValid(draft) || paste.isImporting}
+          onClick={paste.importAll}
+          {...lockedProps({ locked: lock.locked, id: 'kore-paste-locked' })}
+        >
           {t('importSheet.import', { count: counts.guests })}
         </Button>
       </div>
+      <WriteLockReason id="kore-paste-locked" className="kore-import-preview__lock" />
     </div>
   );
 }

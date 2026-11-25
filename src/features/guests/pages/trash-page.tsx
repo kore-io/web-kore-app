@@ -9,6 +9,7 @@ import type {
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { useActiveWedding, type Audience } from '../hooks/use-active-wedding';
 import { useTrashList } from '../hooks/use-trash-list';
+import { lockedProps, useWriteLock, WriteLockReason } from '../../billing/lifecycle/blocked';
 
 /** Prazo da lixeira (Lixeira RN10): o purgeAt é a data da remoção mais 30 dias. */
 const TRASH_DAYS = 30;
@@ -36,6 +37,8 @@ export function TrashPage() {
 function TrashView({ weddingId, audience }: { weddingId: string; audience: Audience }) {
   const { t } = useTranslation('guests');
   const trash = useTrashList({ weddingId, audience });
+  // Bloqueado RN04: restaurar é escrita.
+  const lock = useWriteLock();
 
   if (trash.isLoading) {
     return (
@@ -63,6 +66,9 @@ function TrashView({ weddingId, audience }: { weddingId: string; audience: Audie
       {/* Vazia: o vazio tipo 1 da Voz, sem CTA (decisão 208). */}
       {trash.items.length === 0 && <EmptyState icon={<Trash2 />} title={t('trashPage.empty')} />}
       {trash.items.length > 0 && (
+        <WriteLockReason id="kore-trash-locked" className="kore-trash__details" />
+      )}
+      {trash.items.length > 0 && (
         <ul className="kore-trash__list">
           {trash.items.map((item) => (
             <li key={`${item.type}-${item.id}`} className="kore-trash__item">
@@ -78,6 +84,11 @@ function TrashView({ weddingId, audience }: { weddingId: string; audience: Audie
                 aria-describedby={`trash-${item.id}`}
                 disabled={trash.restoringId === item.id}
                 onClick={() => trash.restore({ type: item.type, id: item.id })}
+                {...lockedProps({
+                  locked: lock.locked,
+                  id: 'kore-trash-locked',
+                  describedBy: `trash-${item.id}`,
+                })}
               >
                 {t('trashPage.restore')}
               </Button>

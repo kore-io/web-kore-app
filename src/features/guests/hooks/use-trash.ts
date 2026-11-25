@@ -9,6 +9,7 @@ import {
 import { getTagsControllerListV1QueryKey } from '../../../shared/api/generated/tags/tags';
 import { apiErrorCode } from '../../../shared/api/http-client';
 import type { Audience } from './use-active-wedding';
+import { useErrorMessage } from '../../billing/lifecycle/blocked';
 
 /**
  * Mover para a lixeira (Lixeira de convidados, RN01 a RN07): o grupo, o convidado e os
@@ -18,8 +19,8 @@ import type { Audience } from './use-active-wedding';
  */
 export function useTrash({ weddingId, audience }: { weddingId: string; audience: Audience }) {
   const { t } = useTranslation('guests');
-  const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
+  const errorMessage = useErrorMessage();
   const queryClient = useQueryClient();
   const trashParty = usePartiesControllerTrashV1();
   const trashGuest = useGuestsControllerTrashV1();
@@ -41,7 +42,7 @@ export function useTrash({ weddingId, audience }: { weddingId: string; audience:
         ? t(`trash.alreadyResponded.${kind}`)
         : code === 'LAST_GUEST'
           ? t(`panel.move.lastGuest.${audience}`)
-          : `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`;
+          : errorMessage(error);
     showToast({ tone: 'danger', message });
   }
 

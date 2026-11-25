@@ -14,6 +14,7 @@ import {
 import { ApiError, apiErrorCode } from '../../../shared/api/http-client';
 import { FormField } from '../../../shared/components/form-field';
 import type { Audience } from '../hooks/use-active-wedding';
+import { useErrorMessage } from '../../billing/lifecycle/blocked';
 
 const DIET_MAX = 200;
 const PLUS_ONE_NAME_MAX = 80;
@@ -54,8 +55,8 @@ function ChangeResponseForm({
   returnFocusRef,
 }: ChangeResponseDialogProps & { guest: PartyGuestResponse }) {
   const { t } = useTranslation('guests');
-  const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
+  const errorMessage = useErrorMessage();
   const queryClient = useQueryClient();
   const radioName = useId();
   const formId = useId();
@@ -114,7 +115,7 @@ function ChangeResponseForm({
             ? t(`panel.response.changed.${audience}`)
             : conflict
               ? t('panel.response.afterDeadline')
-              : `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
+              : errorMessage(error),
       });
     } finally {
       setSaving(false);

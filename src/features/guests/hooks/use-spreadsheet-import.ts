@@ -12,6 +12,7 @@ import { getTagsControllerListV1QueryKey } from '../../../shared/api/generated/t
 import { apiErrorCode } from '../../../shared/api/http-client';
 import type { Audience } from './use-active-wedding';
 import { useAreaPaths } from '../../../app/area';
+import { useErrorMessage } from '../../billing/lifecycle/blocked';
 
 /** Recusas do arquivo inteiro, com o texto na Importação RN03 e na decisão 209. */
 const REFUSALS = ['TEMPLATE_MISMATCH', 'TOO_MANY_ROWS', 'NOT_XLSX', 'FILE_TOO_LARGE'] as const;
@@ -33,8 +34,8 @@ export function useSpreadsheetImport({
 }) {
   const area = useAreaPaths();
   const { t } = useTranslation('guests');
-  const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
+  const errorMessage = useErrorMessage();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const preview = useGuestImportsControllerSpreadsheetPreviewV1();
@@ -43,10 +44,10 @@ export function useSpreadsheetImport({
   const [result, setResult] = useState<SpreadsheetPreviewResponse | null>(null);
   const [refusal, setRefusal] = useState<string | null>(null);
 
-  function genericError() {
+  function genericError(error?: unknown) {
     showToast({
       tone: 'danger',
-      message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
+      message: errorMessage(error),
     });
   }
 
@@ -71,7 +72,7 @@ export function useSpreadsheetImport({
             if (REFUSALS.includes(code as Refusal)) {
               setRefusal(t(`importSheet.refused.${code as Refusal}.${audience}`));
             } else {
-              genericError();
+              genericError(error);
             }
           },
         },
@@ -107,7 +108,7 @@ export function useSpreadsheetImport({
               setRefusal(t(`importSheet.refused.${code as Refusal}.${audience}`));
               setResult(null);
             } else {
-              genericError();
+              genericError(error);
             }
           },
         },

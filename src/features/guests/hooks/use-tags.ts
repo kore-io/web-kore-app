@@ -10,6 +10,7 @@ import {
 } from '../../../shared/api/generated/tags/tags';
 import type { TagResponseColor } from '../../../shared/api/generated/model';
 import { apiErrorCode } from '../../../shared/api/http-client';
+import { useErrorMessage } from '../../billing/lifecycle/blocked';
 
 /** Erro do campo do nome, pelo código da API (decisão 189(1)): o app monta o texto. */
 export type TagNameError = 'taken' | 'empty' | 'limit' | null;
@@ -21,8 +22,8 @@ export type TagNameError = 'taken' | 'empty' | 'limit' | null;
  */
 export function useTags({ weddingId }: { weddingId: string }) {
   const { t } = useTranslation('guests');
-  const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
+  const errorMessage = useErrorMessage();
   const queryClient = useQueryClient();
   const list = useTagsControllerListV1(weddingId);
   const create = useTagsControllerCreateV1();
@@ -39,10 +40,10 @@ export function useTags({ weddingId }: { weddingId: string }) {
     });
   }
 
-  function genericError() {
+  function genericError(error?: unknown) {
     showToast({
       tone: 'danger',
-      message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
+      message: errorMessage(error),
     });
   }
 
@@ -51,7 +52,7 @@ export function useTags({ weddingId }: { weddingId: string }) {
     const code = apiErrorCode({ error });
     if (code === 'TAG_NAME_TAKEN') return 'taken';
     if (code === 'TAG_LIMIT_REACHED') return 'limit';
-    genericError();
+    genericError(error);
     return null;
   }
 
@@ -115,8 +116,8 @@ export function useTags({ weddingId }: { weddingId: string }) {
             showToast({ tone: 'success', message: t('tags.deleted', { name }) });
             onDone({ deleted: true });
           },
-          onError: () => {
-            genericError();
+          onError: (error) => {
+            genericError(error);
             onDone({ deleted: false });
           },
         },

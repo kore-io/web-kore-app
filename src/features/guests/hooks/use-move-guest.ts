@@ -8,6 +8,7 @@ import {
 } from '../../../shared/api/generated/parties/parties';
 import { apiErrorCode } from '../../../shared/api/http-client';
 import type { Audience } from './use-active-wedding';
+import { useErrorMessage } from '../../billing/lifecycle/blocked';
 
 /**
  * Mover de grupo (RN10; decisão 201): o POST /guests/:guestId/move, o Toast "{nome} foi
@@ -16,8 +17,8 @@ import type { Audience } from './use-active-wedding';
  */
 export function useMoveGuest({ weddingId, audience }: { weddingId: string; audience: Audience }) {
   const { t } = useTranslation('guests');
-  const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
+  const errorMessage = useErrorMessage();
   const queryClient = useQueryClient();
   const move = useGuestsControllerMoveV1();
 
@@ -66,7 +67,7 @@ export function useMoveGuest({ weddingId, audience }: { weddingId: string; audie
             }
             showToast({
               tone: 'danger',
-              message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
+              message: errorMessage(error),
             });
           },
           onSettled: onDone,

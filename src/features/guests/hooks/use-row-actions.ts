@@ -7,6 +7,7 @@ import { getPartiesControllerGetV1QueryOptions } from '../../../shared/api/gener
 import type { PartyListItemResponse } from '../../../shared/api/generated/model';
 import type { RowAction } from '../components/party-row-menu';
 import { useAreaPaths } from '../../../app/area';
+import { useErrorMessage } from '../../billing/lifecycle/blocked';
 
 /**
  * As ações do ⋮ da lista. Copiar link e Mover para a lixeira precisam do grupo inteiro
@@ -16,8 +17,8 @@ import { useAreaPaths } from '../../../app/area';
 export function useRowActions({ weddingId }: { weddingId: string }) {
   const area = useAreaPaths();
   const { t } = useTranslation('guests');
-  const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
+  const errorMessage = useErrorMessage();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const trigger = useRef<HTMLElement | null>(null);
@@ -25,10 +26,10 @@ export function useRowActions({ weddingId }: { weddingId: string }) {
     null,
   );
 
-  function failed() {
+  function failed(error?: unknown) {
     showToast({
       tone: 'danger',
-      message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
+      message: errorMessage(error),
     });
   }
 

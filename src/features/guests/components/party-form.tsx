@@ -15,6 +15,7 @@ import {
   type GuestDraft,
   type PartyDraft,
 } from '../party-form';
+import { lockedProps, useWriteLock, WriteLockReason } from '../../billing/lifecycle/blocked';
 
 /** O texto de um erro de campo, pelo código e pelo perfil (RN04; 189(5); 213(3)). */
 export function fieldErrorText({
@@ -84,6 +85,7 @@ export function PartyForm({
   onCancel,
 }: PartyFormProps) {
   const { t } = useTranslation('guests');
+  const lock = useWriteLock();
   const text = (
     error: FieldError | undefined,
     field: Parameters<typeof fieldErrorText>[0]['field'],
@@ -214,10 +216,16 @@ export function PartyForm({
         <Button type="button" variant="secondary" onClick={onCancel}>
           {t('partyForm.cancel')}
         </Button>
-        <Button type="submit" disabled={isSaving}>
+        {/* Bloqueado RN04: salvar o grupo é escrita. */}
+        <Button
+          type="submit"
+          disabled={isSaving}
+          {...lockedProps({ locked: lock.locked, id: 'kore-party-form-locked' })}
+        >
           {submitLabel}
         </Button>
       </div>
+      <WriteLockReason id="kore-party-form-locked" className="kore-party-form__lock" />
     </form>
   );
 }

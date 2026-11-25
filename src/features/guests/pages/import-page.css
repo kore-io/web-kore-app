@@ -109,3 +109,8 @@
 .kore-import-preview__actions {
   @apply flex flex-col-reverse gap-3 md:flex-row md:justify-end;
 }
+
+/* O motivo do bloqueio, embaixo do Importar (Bloqueado RN04). */
+.kore-import-preview__lock {
+  @apply md:text-right;
+}

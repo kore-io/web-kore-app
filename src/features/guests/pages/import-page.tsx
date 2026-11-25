@@ -8,6 +8,7 @@ import { usePasteImport } from '../hooks/use-paste-import';
 import { useSpreadsheetImport } from '../hooks/use-spreadsheet-import';
 import { rowErrorText } from '../import-texts';
 import { PastePreview, PasteText } from './paste-list';
+import { lockedProps, useWriteLock, WriteLockReason } from '../../billing/lifecycle/blocked';
 
 /** O modelo estático da planilha (decisão 209), em public/. */
 const TEMPLATE_URL = '/modelo-convidados-kore.xlsx';
@@ -107,6 +108,7 @@ function Preview({
   onImport: () => void;
 }) {
   const { t } = useTranslation('guests');
+  const lock = useWriteLock();
   const parties = t('importSheet.parties', { count: preview.parties });
   const guests = t('importSheet.guests', { count: preview.guests });
   const leftOut = preview.counts.errors + preview.counts.duplicates;
@@ -194,10 +196,16 @@ function Preview({
         <Button variant="secondary" onClick={onReset}>
           {t('importSheet.sendAnother')}
         </Button>
-        <Button disabled={preview.guests === 0 || isImporting} onClick={onImport}>
+        {/* Bloqueado RN04: importar é escrita. */}
+        <Button
+          disabled={preview.guests === 0 || isImporting}
+          onClick={onImport}
+          {...lockedProps({ locked: lock.locked, id: 'kore-import-locked' })}
+        >
           {t('importSheet.import', { count: preview.guests })}
         </Button>
       </div>
+      <WriteLockReason id="kore-import-locked" className="kore-import-preview__lock" />
     </div>
   );
 }

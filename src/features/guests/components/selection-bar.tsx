@@ -3,6 +3,7 @@ import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TagResponse } from '../../../shared/api/generated/model';
 import type { Audience } from '../hooks/use-active-wedding';
+import { lockedProps, useWriteLock, WriteLockReason } from '../../billing/lifecycle/blocked';
 
 /** O máximo de grupos do POST /tags/:id/apply (decisão 206). */
 export const APPLY_TAG_MAX_PARTIES = 200;
@@ -38,6 +39,9 @@ export function SelectionBar({
   // Acima de 200 marcados, o apply recusaria: o botão fica desabilitado com o aviso (206).
   const tooMany = count > APPLY_TAG_MAX_PARTIES;
   const hintId = useId();
+  // Bloqueado RN04: as ações em lote são escrita (o Lembrar leva aos Envios, que fecham).
+  const lock = useWriteLock();
+  const locked = lockedProps({ locked: lock.locked, id: `${hintId}-locked` });
   return (
     <div className="kore-selection-bar">
       <p className="kore-selection-bar__count" role="status">
@@ -52,6 +56,7 @@ export function SelectionBar({
               size="sm"
               disabled={tags.length === 0 || tooMany || isApplying}
               aria-describedby={tooMany ? hintId : undefined}
+              {...locked}
             >
               {t('selection.addTag')}
             </Button>
@@ -82,10 +87,12 @@ export function SelectionBar({
           disabled={tooMany}
           aria-describedby={tooMany ? hintId : undefined}
           onClick={onTrash}
+          {...locked}
         >
           {t('trash.action')}
         </Button>
       </div>
+      <WriteLockReason id={`${hintId}-locked`} className="kore-selection-bar__hint" />
       {tooMany && (
         <p id={hintId} className="kore-selection-bar__hint">
           {t(`selection.tooMany.${audience}`)}

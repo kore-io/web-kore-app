@@ -3,6 +3,7 @@ import { useQueryClient, type Query } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { ApiError, apiErrorCode } from '../../../shared/api/http-client';
 import { serverFieldErrors, type FieldErrors, type PartyDraft } from '../party-form';
+import { useErrorMessage } from '../../billing/lifecycle/blocked';
 
 /** Atualiza tudo do casamento depois de gravar um grupo (lista, resumo, painel e tags). */
 export function useRefreshWedding({ weddingId }: { weddingId: string }) {
@@ -22,8 +23,8 @@ export function useRefreshWedding({ weddingId }: { weddingId: string }) {
  */
 export function useSaveErrors() {
   const { t } = useTranslation('guests');
-  const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
+  const errorMessage = useErrorMessage();
   return ({
     error,
     draft,
@@ -44,7 +45,7 @@ export function useSaveErrors() {
     }
     showToast({
       tone: 'danger',
-      message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
+      message: errorMessage(error),
     });
     return { fields: {} };
   };

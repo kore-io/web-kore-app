@@ -8,6 +8,7 @@ import {
   usePartiesControllerRegenerateV1,
 } from '../../../shared/api/generated/parties/parties';
 import { ApiError } from '../../../shared/api/http-client';
+import { useErrorMessage } from '../../billing/lifecycle/blocked';
 
 /**
  * Painel do grupo (RN14): o GET do grupo, o Copiar link (RN11) e o Regenerar link (RN12).
@@ -15,16 +16,16 @@ import { ApiError } from '../../../shared/api/http-client';
  */
 export function usePartyPanel({ weddingId, partyId }: { weddingId: string; partyId: string }) {
   const { t } = useTranslation('guests');
-  const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
+  const errorMessage = useErrorMessage();
   const queryClient = useQueryClient();
   const party = usePartiesControllerGetV1(weddingId, partyId);
   const regenerate = usePartiesControllerRegenerateV1();
 
-  function failed() {
+  function failed(error?: unknown) {
     showToast({
       tone: 'danger',
-      message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
+      message: errorMessage(error),
     });
   }
 

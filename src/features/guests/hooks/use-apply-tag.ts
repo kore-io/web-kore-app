@@ -5,6 +5,7 @@ import {
   getTagsControllerListV1QueryKey,
   useTagsControllerApplyV1,
 } from '../../../shared/api/generated/tags/tags';
+import { useErrorMessage } from '../../billing/lifecycle/blocked';
 
 /**
  * Adicionar tag à seleção (Tags RN08; decisão 204): aplica a tag aos grupos marcados numa
@@ -13,8 +14,8 @@ import {
  */
 export function useApplyTag({ weddingId }: { weddingId: string }) {
   const { t } = useTranslation('guests');
-  const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
+  const errorMessage = useErrorMessage();
   const queryClient = useQueryClient();
   const apply = useTagsControllerApplyV1();
 
@@ -49,10 +50,10 @@ export function useApplyTag({ weddingId }: { weddingId: string }) {
             });
             onDone();
           },
-          onError: () =>
+          onError: (error) =>
             showToast({
               tone: 'danger',
-              message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
+              message: errorMessage(error),
             }),
         },
       ),
