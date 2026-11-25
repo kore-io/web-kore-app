@@ -133,5 +133,43 @@
     "payWithCard": "Pagar com cartão",
     "expired": "Este código Pix venceu. Gerem um novo para pagar.",
     "newPix": "Gerar novo Pix"
+  },
+  "payments": {
+    "title": "Cobrança e publicação",
+    "loading": "Carregando a cobrança",
+    "live": "{{status}} · no ar até {{date}}",
+    "publish": "Publicar o site",
+    "section": "Pagamentos",
+    "columns": {
+      "date": "Data",
+      "kind": "Tipo",
+      "months": "Meses cobertos",
+      "amount": "Valor",
+      "method": "Forma",
+      "status": "Situação"
+    },
+    "kind": {
+      "publication": "Publicação",
+      "extension": "Extensão"
+    },
+    "months_one": "{{start}} a {{end}} ({{count}} mês)",
+    "months_other": "{{start}} a {{end}} ({{count}} meses)",
+    "method": {
+      "pix": "Pix",
+      "card": "Cartão",
+      "cardInstallments": "Cartão {{count}}x"
+    },
+    "status": {
+      "paid": "Pago",
+      "pending": "Pendente",
+      "failed": "Não aprovado",
+      "refund_requested": "Reembolso pedido",
+      "refunded": "Reembolsado",
+      "disputed": "Em contestação"
+    },
+    "empty": {
+      "title": "Nenhum pagamento ainda.",
+      "description": "Ele aparece aqui quando vocês publicarem o site."
+    }
   }
 }

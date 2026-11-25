@@ -1,0 +1,36 @@
+/*
+ * Cobrança e publicação › Pagamentos (Penpot 21, A9): o cabeçalho com o subtítulo e a ação;
+ * a seção Pagamentos com o título em 18/700 e a tabela de dados (cartões no celular); o vazio
+ * do DS com 480 px, à esquerda.
+ */
+.kore-payments {
+  @apply flex flex-col gap-6;
+}
+
+.kore-payments__loading {
+  @apply flex justify-center py-10;
+}
+
+.kore-payments__actions {
+  @apply flex flex-col items-end gap-2;
+}
+
+.kore-payments__help {
+  @apply m-0 type-caption text-gray-700;
+}
+
+.kore-payments__history {
+  @apply flex flex-col gap-3;
+}
+
+.kore-payments__section {
+  @apply m-0 type-heading text-ink;
+}
+
+.kore-payments__amount {
+  @apply font-semibold;
+}
+
+.kore-payments__empty {
+  @apply max-w-120 self-start;
+}
