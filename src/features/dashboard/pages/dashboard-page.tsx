@@ -33,7 +33,12 @@ import { formatRsvpPercent } from '../../../shared/rsvp-percent';
 import { canOpenPublish, publishWaitsCouple } from '../../billing/publish/publish-entry';
 import { lifecycleView } from '../../billing/lifecycle/lifecycle';
 import { deliveriesClosed, expiredClosedText } from '../../deliveries/delivery-closed';
-import { LifecycleBadge, lifecycleText } from '../../billing/lifecycle/lifecycle-banner';
+import {
+  LifecycleBadge,
+  lifecycleAction,
+  lifecycleActionLabel,
+  lifecycleText,
+} from '../../billing/lifecycle/lifecycle-banner';
 
 /** O caminho de cada item do Checklist (RN03), na área da tela. */
 function checklistPaths(area: AreaPaths): Record<ChecklistItemResponse['key'], string> {
@@ -305,7 +310,7 @@ function SiteCard({
   };
   const view = source ? lifecycleView({ ...source, now }) : null;
   const lifecycleCaption = view ? lifecycleText({ view, audience, now, t: tBilling }) : null;
-  const final = view?.kind === 'expired' && view.variant === 'final';
+  const action = view ? lifecycleAction({ view, audience }) : null;
   return (
     <section
       className="kore-dashboard__card kore-dashboard__card--half kore-dashboard__site"
@@ -359,15 +364,16 @@ function SiteCard({
           >
             {t('site.publish')}
           </Button>
-        ) : view?.kind === 'expired' && view.variant === 'paidAhead' && audience === 'couple' ? (
-          // Caso B: o Voltar ao ar (E10; 333(2); Penpot 03, A5).
-          <Button size="sm" variant="secondary" onClick={() => void navigate(area.billingEndDate)}>
-            {tBilling('endDate.backOnline')}
-          </Button>
-        ) : final && audience === 'couple' ? (
-          // Sem renovação, o casal ainda exporta os convidados (314(1); Penpot 03, A5).
-          <Button size="sm" variant="secondary" onClick={() => void navigate(area.guestExport)}>
-            {tBilling('lifecycle.exportGuests')}
+        ) : action ? (
+          // A ação do casal (Penpot 03, A5): Adiar a data, Renovar, Voltar ao ar ou Exportar.
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() =>
+              void navigate(action.to === 'endDate' ? area.billingEndDate : area.guestExport)
+            }
+          >
+            {lifecycleActionLabel({ label: action.label, t: tBilling })}
           </Button>
         ) : (
           <Button size="sm" variant="secondary" onClick={() => void navigate(area.site)}>

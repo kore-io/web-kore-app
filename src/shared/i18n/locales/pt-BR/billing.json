@@ -258,7 +258,9 @@
         "planner": "O site está fora do ar desde {{date}}. Ele chegou ao prazo máximo, 12 meses depois do casamento, e não pode mais ser renovado. Peça ao casal para exportar os convidados."
       }
     },
-    "exportGuests": "Exportar os convidados"
+    "exportGuests": "Exportar os convidados",
+    "postpone": "Adiar a data",
+    "renew": "Renovar"
   },
   "endDate": {
     "title": "Mudar a data de saída do ar",

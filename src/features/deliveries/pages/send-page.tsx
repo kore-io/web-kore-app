@@ -103,8 +103,8 @@ function Stepper({ step }: { step: Step }) {
 /**
  * A legenda dos envios fechados (Envios RN01, A2; Data de saída RN07, A8, Penpot 07), nas duas
  * vozes; só o casal ganha o link: antes de publicar, Publicar o site; no caso B, Voltar ao ar
- * (331(1); pena-331); no sem renovação, Exportar os convidados (314(3)). O Renovar do expirado
- * comum entra no E11, com o pagar (333(2)).
+ * (331(1); pena-331); no expirado comum, Renovar (RN07; E11); no sem renovação, Exportar os
+ * convidados (314(3)).
  */
 export function ClosedNotice({ audience, closed }: { audience: Audience; closed: Closed }) {
   const { t } = useTranslation('deliveries');
@@ -118,7 +118,9 @@ export function ClosedNotice({ audience, closed }: { audience: Audience; closed:
           ? { to: area.billingEndDate, label: t('closed.backOnline') }
           : closed === 'expired_final'
             ? { to: area.guestExport, label: t('closed.exportGuests') }
-            : null;
+            : closed === 'expired'
+              ? { to: area.billingEndDate, label: t('closed.renew') }
+              : null;
     return (
       <p className="kore-send__closed" id="kore-send-closed">
         {expiredText}
