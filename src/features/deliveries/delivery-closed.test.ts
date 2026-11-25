@@ -17,10 +17,11 @@ const membership = (lifecycle: Record<string, unknown>) => ({
 });
 const now = new Date('2027-03-01T15:00:00Z');
 
-describe('deliveriesClosed (Envios RN01; Data de saída RN07; 314(3); 330)', () => {
+describe('deliveriesClosed (Envios RN01; Data de saída RN07; 314(3); 332)', () => {
   it.each([
     ['published', null],
-    ['grace', null],
+    // A carência vem sempre depois do casamento: como o pós-evento (332).
+    ['grace', 'post_event'],
     ['post_event', 'post_event'],
     ['draft', 'not_published'],
     ['awaiting_couple', 'not_published'],

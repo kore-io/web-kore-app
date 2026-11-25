@@ -10,8 +10,8 @@ import {
 } from './support/backoffice';
 
 /*
- * Envios no expirado (E9 da F3; Data de saída do ar RN07; 314(3); decisões 330 e 331): na
- * carência os envios seguem abertos; no expirado, o Continuar e o Enviar convites do
+ * Envios no expirado (E9 da F3; Data de saída do ar RN07; 314(3); decisões 331 e 332): na
+ * carência, como no pós-evento (só leitura); no expirado, o Continuar e o Enviar convites do
  * Dashboard fecham com o texto da RN07; no sem renovação, o texto único com o Exportar os
  * convidados do casal. O estado vem do banco, com as datas relativas a current_date.
  */
@@ -71,7 +71,7 @@ async function couple({ eventDaysAgo, state }: { eventDaysAgo: number; state: st
   return { email, weddingId };
 }
 
-test('a carência deixa os envios abertos; o expirado fecha com o texto da RN07 (330; RN07)', async ({
+test('a carência segue o pós-evento; o expirado fecha com o texto da RN07 (332; RN07)', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -84,7 +84,8 @@ test('a carência deixa os envios abertos; o expirado fecha com o texto da RN07 
   await page.goto('/app');
   await expect(page.getByRole('button', { name: 'Enviar convites' })).toBeEnabled();
   await page.goto('/app/envios/convites');
-  await expect(page.getByRole('button', { name: 'Continuar' })).toBeVisible();
+  // Como no pós-evento: só leitura, sem o "Publiquem o site" (a API recusa a fila na carência).
+  await expect(page.getByRole('button', { name: 'Continuar' })).toBeDisabled();
   await expect(page.getByText(/^Publiquem o site|^O site está fora do ar\./)).toHaveCount(0);
 
   await db.query(

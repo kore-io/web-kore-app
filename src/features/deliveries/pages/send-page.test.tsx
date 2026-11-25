@@ -783,18 +783,19 @@ describe('Envios › as versões e os textos que faltavam (DoD das F4 e F5; RN03
   });
 });
 
-describe('Envios no expirado e na carência (Data de saída RN07; 314(3); decisões 330 e 331)', () => {
+describe('Envios no expirado e na carência (Data de saída RN07; 314(3); decisões 331 e 332)', () => {
   const SITE_EXPIRED = { status: 409, body: { error: 'SITE_EXPIRED' } };
   const RENEW = 'O site está fora do ar. Renovem o site para enviar.';
   const FINAL =
     'O site está fora do ar e não pode mais ser renovado. Não dá para enviar convites, save the date nem lembretes.';
 
-  it('na carência os envios seguem abertos (330)', async () => {
+  it('na carência, como no pós-evento: só leitura, sem o "Publiquem o site" (332; Envios RN01)', async () => {
     mockSend({ status: 'grace' });
     preset(['p1']);
-    renderRoute({ url: '/app/envios/convites' });
-    expect(await screen.findByRole('button', { name: 'Continuar' })).toBeEnabled();
-    expect(screen.queryByText(/^O site está fora do ar/)).toBeNull();
+    renderRoute({ url: '/app/envios/convites?etapa=fila' });
+    // Fechado, só a etapa dos grupos (a API recusa com DELIVERIES_CLOSED, reason post_event).
+    expect(await screen.findByRole('button', { name: 'Continuar' })).toBeDisabled();
+    expect(screen.queryByText(/^Publiquem o site|^O site está fora do ar/)).toBeNull();
   });
 
   it('expirado: Continuar desabilitado com o texto de cada versão, sem o Renovar até o E10 (331(2))', async () => {

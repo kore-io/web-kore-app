@@ -571,7 +571,7 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
       expect(within(card('Status do site')).queryByText(/^No ar até/)).toBeNull();
     });
 
-    it('carência: o Enviar convites segue aberto (330)', async () => {
+    it('carência: como no pós-evento, sem o "Publiquem o site" (332)', async () => {
       vi.useFakeTimers({ toFake: ['Date'] });
       vi.setSystemTime(new Date('2027-02-18T15:00:00Z'));
       mockDashboard({
@@ -581,6 +581,7 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
       renderRoute({ url: '/app' });
       await screen.findByText('142');
       expect(screen.getByRole('button', { name: 'Enviar convites' })).toBeEnabled();
+      expect(screen.queryByText('Publiquem o site para começar os envios.')).toBeNull();
     });
 
     it('expirado: o Enviar convites desabilitado com o texto da RN07, e o cartão Envios sem a legenda de publicar (331(3))', async () => {
