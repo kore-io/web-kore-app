@@ -5,15 +5,16 @@ import { useAreaPaths } from '../../../app/area';
 import { useDashboardControllerGetV1 } from '../../../shared/api/generated/rsvp/rsvp';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { useActiveWedding, type Audience } from '../../guests/hooks/use-active-wedding';
+import { deliveriesClosed, type Closed } from '../delivery-closed';
 import type { DeliveryKind } from '../delivery-texts';
+import { useMeControllerMeV1 } from '../../../shared/api/generated/me/me';
 import { ChannelStep } from './channel-step';
 import { GroupsStep } from './groups-step';
 import { QueueStep } from './queue-step';
 
 export type Step = 'grupos' | 'canal' | 'fila';
 
-/** Por que os envios estão fechados (Envios RN01), ou nulo. */
-export type Closed = 'not_published' | 'post_event' | null;
+export type { Closed } from '../delivery-closed';
 
 /**
  * Uma aba de envio (Envios RN01 a RN08; Penpot, página 07; decisão 235): Grupos → Canal e
@@ -37,6 +38,7 @@ function Send({
   const { t } = useTranslation('deliveries');
   const [search] = useSearchParams();
   const dashboard = useDashboardControllerGetV1(weddingId);
+  const { data: me } = useMeControllerMeV1();
   if (dashboard.isError) return <LoadErrorNotice onRetry={() => void dashboard.refetch()} />;
   if (!dashboard.data) {
     return (
@@ -45,9 +47,12 @@ function Send({
       </div>
     );
   }
-  const status = dashboard.data.site.status;
-  const closed: Closed =
-    status === 'post_event' ? 'post_event' : status === 'published' ? null : 'not_published';
+  // A carência fica aberta (330); o expirado fecha, com o sem renovação à parte (RN07; 314(3)).
+  const closed: Closed = deliveriesClosed({
+    status: dashboard.data.site.status,
+    membership: me?.memberships.find((item) => item.weddingId === weddingId),
+    now: new Date(),
+  });
   const asked = (search.get('etapa') as Step | null) ?? 'grupos';
   // Fechado, só a etapa dos grupos, com a legenda (RN01).
   const step: Step = closed ? 'grupos' : asked;
@@ -95,10 +100,34 @@ function Stepper({ step }: { step: Step }) {
   );
 }
 
-/** A legenda de antes de publicar (RN01; A2), nas duas vozes; o casal ganha o link. */
+/**
+ * A legenda dos envios fechados (Envios RN01, A2; Data de saída RN07, A8, Penpot 07), nas duas
+ * vozes: antes de publicar, o casal ganha o link Publicar o site; no expirado, o Renovar entra
+ * com o E10 (331(2)); no sem renovação, um texto só e o Exportar os convidados do casal (314(3)).
+ */
 export function ClosedNotice({ audience, closed }: { audience: Audience; closed: Closed }) {
   const { t } = useTranslation('deliveries');
   const area = useAreaPaths();
+  if (closed === 'expired') {
+    return (
+      <p className="kore-send__closed" id="kore-send-closed">
+        {t(`closed.expired.${audience}`)}
+      </p>
+    );
+  }
+  if (closed === 'expired_final') {
+    return (
+      <p className="kore-send__closed" id="kore-send-closed">
+        {t('closed.expiredFinal')}
+        {audience === 'couple' && (
+          <>
+            {' '}
+            <Link to={area.guestExport}>{t('closed.exportGuests')}</Link>
+          </>
+        )}
+      </p>
+    );
+  }
   if (closed !== 'not_published') return null;
   return (
     <p className="kore-send__closed" id="kore-send-closed">

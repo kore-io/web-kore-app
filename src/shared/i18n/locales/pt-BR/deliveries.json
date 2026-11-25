@@ -60,7 +60,13 @@
       "couple": "Publiquem o site para começar os envios.",
       "planner": "Os envios começam depois que o casal publicar o site."
     },
-    "publish": "Publicar o site"
+    "publish": "Publicar o site",
+    "expired": {
+      "couple": "O site está fora do ar. Renovem o site para enviar.",
+      "planner": "O site está fora do ar. Peça ao casal para renovar."
+    },
+    "expiredFinal": "O site está fora do ar e não pode mais ser renovado. Não dá para enviar convites, save the date nem lembretes.",
+    "exportGuests": "Exportar os convidados"
   },
   "groups": {
     "marked_zero": "{{count}} grupos marcados",

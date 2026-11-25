@@ -178,7 +178,7 @@ export function GroupsStep({
         <ClosedNotice audience={audience} closed={closed} />
         <Button
           disabled={blocked}
-          {...(closed === 'not_published'
+          {...(closed === 'not_published' || closed === 'expired' || closed === 'expired_final'
             ? { 'aria-describedby': 'kore-send-closed' }
             : over && { 'aria-describedby': 'kore-send-limit' })}
           onClick={() => {
