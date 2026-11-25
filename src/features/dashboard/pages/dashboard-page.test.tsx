@@ -91,10 +91,37 @@ function dashboard(overrides: Partial<DashboardResponse> = {}): DashboardRespons
 
 type Call = { method: string; path: string };
 
-function mockDashboard({ data = dashboard() }: { data?: DashboardResponse | null } = {}) {
+function mockDashboard({
+  data = dashboard(),
+  lifecycle,
+}: {
+  data?: DashboardResponse | null;
+  /** O lifecycle do /me (o selo e o texto do cartão Status; E8). */
+  lifecycle?: Record<string, unknown>;
+} = {}) {
   const calls: Call[] = [];
+  const meWith = lifecycle
+    ? {
+        ...me,
+        memberships: me.memberships.map((membership) => ({
+          ...membership,
+          eventDate: '2026-11-14',
+          timezone: 'America/Sao_Paulo',
+          lifecycle: {
+            status: 'published',
+            endDate: '2027-02-14',
+            graceUntil: null,
+            expiredAt: null,
+            paidThrough: '2027-02-14',
+            deletionScheduledFor: null,
+            blocked: false,
+            ...lifecycle,
+          },
+        })),
+      }
+    : me;
   mockApi(({ method, path }) => {
-    if (path === '/v1/me') return Response.json(meFor(me));
+    if (path === '/v1/me') return Response.json(meFor(meWith));
     if (path === '/v1/weddings/w1/dashboard') {
       return data ? Response.json(data) : apiError({ status: 500, body: { error: 'INTERNAL' } });
     }
@@ -520,5 +547,62 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     const { container } = renderRoute({ url: '/app' });
     await screen.findByText('142');
     await expectNoA11yViolations({ container });
+  });
+
+  describe('o cartão Status pelo ciclo de vida (Penpot 03, A5; Data de saída RN06; E8)', () => {
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('carência: o selo "Vence em 4 dias" e o texto da faixa, no lugar do "No ar até"', async () => {
+      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.setSystemTime(new Date('2027-02-18T15:00:00Z'));
+      mockDashboard({ lifecycle: { status: 'grace', graceUntil: '2027-02-21' } });
+      renderRoute({ url: '/app' });
+      await screen.findByRole('heading', { name: 'Status do site', level: 2 });
+      expect(
+        await within(card('Status do site')).findByText('Vence em 4 dias'),
+      ).toBeInTheDocument();
+      expect(
+        within(card('Status do site')).getByText(
+          'A data de saída do ar passou. O site fica no ar só até 21 de fev. Adiem a data para mantê-lo.',
+        ),
+      ).toBeInTheDocument();
+      expect(within(card('Status do site')).queryByText(/^No ar até/)).toBeNull();
+    });
+
+    it('a colaboradora no expirado: o texto dela, sem botão de renovar (RN06)', async () => {
+      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.setSystemTime(new Date('2027-03-01T15:00:00Z'));
+      profileUnderTest.current = 'planner';
+      mockDashboard({
+        data: dashboard({ role: 'collaborator' }),
+        lifecycle: { status: 'expired', expiredAt: '2027-02-22' },
+      });
+      renderAreaScreen({ url: '/app' });
+      await screen.findByText('Você colabora neste casamento.');
+      expect(
+        await within(card('Status do site')).findByText(
+          'O site está fora do ar desde 22 de fev. Peça ao casal para renovar.',
+        ),
+      ).toBeInTheDocument();
+      expect(within(card('Status do site')).getByText('Expirado')).toBeInTheDocument();
+      expect(within(card('Status do site')).queryByRole('button', { name: /Renovar/ })).toBeNull();
+    });
+
+    it('sem renovação: o Exportar os convidados do casal no cartão (314(1))', async () => {
+      const user = userEvent.setup();
+      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.setSystemTime(new Date('2027-11-25T15:00:00Z'));
+      mockDashboard({ lifecycle: { status: 'expired', expiredAt: '2027-11-22' } });
+      const { router } = renderRoute({ url: '/app' });
+      await screen.findByRole('heading', { name: 'Status do site', level: 2 });
+      await user.click(
+        await within(card('Status do site')).findByRole('button', {
+          name: 'Exportar os convidados',
+        }),
+      );
+      await waitFor(() => expect(router.state.location.pathname).toBe('/app/convidados/exportar'));
+    });
   });
 });
