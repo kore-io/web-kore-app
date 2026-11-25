@@ -253,7 +253,7 @@ describe('Desistir e pedir reembolso (Pagamentos RN02 a RN07; Penpot 21, A9; dec
       { normalizer },
     );
     const publicationAlert = screen.getByText(
-      'Vocês podem desistir até 17 de ago. e receber R$ 424,10 de volta.',
+      'Vocês podem desistir até 17 de ago. e receber R$ 424,10 de volta, com a extensão.',
       { normalizer },
     );
     expect(
@@ -270,7 +270,7 @@ describe('Desistir e pedir reembolso (Pagamentos RN02 a RN07; Penpot 21, A9; dec
     const publication = await openDialog(user, 1);
     expect(publication).toHaveAccessibleDescription(
       nb(
-        'O site sai do ar e volta a ser rascunho. Devolvemos R$ 424,10 no mesmo cartão: R$ 337,10 da publicação e R$ 87,00 da extensão.',
+        'O site sai do ar e volta a ser rascunho. Devolvemos R$ 424,10 no cartão: R$ 337,10 da publicação e R$ 87,00 da extensão, cada valor no cartão que pagou.',
       ),
     );
   });
