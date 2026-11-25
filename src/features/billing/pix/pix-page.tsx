@@ -1,5 +1,6 @@
 import { Alert, Button, Input, PageHeader, Spinner, useToast } from '@kore-io/design';
 import { useQueryClient } from '@tanstack/react-query';
+import QRCode from 'qrcode';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate } from 'react-router';
@@ -199,12 +200,14 @@ function PixQr({ code, label }: { code: string; label: string }) {
   useEffect(() => {
     current.current = code;
     if (!code) return;
-    // O qrcode só carrega nesta tela, fora do pacote principal (sugestão do Crivo no E4).
-    void import('qrcode')
-      .then(({ default: QRCode }) => QRCode.toDataURL(code, { margin: 1, width: 400 }))
+    // Import estático: o import() desta dependência CJS dá 504 (Outdated Optimize Dep) no
+    // Vite de dev e o QR some (sugestão do Crivo no E4, avaliada e não seguida).
+    void QRCode.toDataURL(code, { margin: 1, width: 400 })
       .then((url) => {
         if (current.current === code) setSrc(url);
-      });
+      })
+      // Sem o QR (o módulo não carregou), a tela segue pelo copia e cola.
+      .catch(() => setSrc(null));
   }, [code]);
   return (
     <div className="kore-pix__qr">
