@@ -4,6 +4,7 @@
  * Kore API
  * OpenAPI spec version: 1
  */
+import type { AdminLogActorResponse } from './adminLogActorResponse';
 import type { AdminLogRowResponseActorKind } from './adminLogRowResponseActorKind';
 import type { AdminLogRowResponseData } from './adminLogRowResponseData';
 
@@ -31,5 +32,15 @@ export interface AdminLogRowResponse {
    * @nullable
    */
   ipHashShort: string | null;
+  /**
+   * Nulo no sistema e no convidado (sem `actorUserId`).
+   * @nullable
+   */
+  actor: AdminLogActorResponse | null;
+  /**
+   * "Ana & Marcos", para a coluna Casamento; nulo sem casamento ou depois do expurgo.
+   * @nullable
+   */
+  coupleNames: string | null;
   action: string;
 }

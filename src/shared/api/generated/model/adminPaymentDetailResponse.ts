@@ -53,6 +53,13 @@ export interface AdminPaymentDetailResponse {
   pixDiscountCents: number;
   installmentInterestCents: number;
   payerTaxIdLast4: string;
+  /**
+   * Passou do prazo de estorno do gateway (Pix: 90 dias; cartão: nunca, até o
+   * Asaas confirmar): o Dialog do Reembolsar avisa antes que o estorno vai
+   * falhar (RN05; decisão 316(11)(e)). A resposta do Reembolsar segue trazendo
+   * o mesmo booleano (259(2)).
+   */
+  pastGatewayWindow: boolean;
   amountCents: number;
   /** Pago e não aplicado: o pagamento sem destino, com o estorno automático. */
   applied: boolean;

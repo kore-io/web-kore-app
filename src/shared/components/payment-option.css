@@ -13,5 +13,10 @@
 }
 
 .kore-payment-option__caption {
-  @apply type-caption pl-7.5 text-gray-700;
+  @apply type-caption cursor-pointer pl-7.5 text-gray-700;
+}
+
+/* Desabilitada, a legenda acompanha o rótulo do Radio (a 45%, sugestão do Crivo no L3). */
+.kore-payment-option:has(.kore-radio__input:disabled) .kore-payment-option__caption {
+  @apply cursor-not-allowed opacity-45;
 }

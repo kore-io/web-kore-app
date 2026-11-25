@@ -4,10 +4,18 @@
  * Kore API
  * OpenAPI spec version: 1
  */
+import type { MeLifecycleResponse } from './meLifecycleResponse';
 
 export interface MeSupportSessionResponse {
   weddingId: string;
   coupleNames: string;
+  /** Os primeiros nomes, como na central: a faixa diz "Ana e Marcos" (decisão 316(12)). */
+  partnerNames: string[];
+  /**
+   * O ciclo de vida do casal visto, com o bloqueio: as faixas e as travas da
+   * área, como no vínculo (decisão 316(12)).
+   */
+  lifecycle: MeLifecycleResponse;
   startedAt: string;
   /** Sem nova requisição, a sessão acaba aqui (30 minutos sem uso ou o teto de 2 horas). */
   expiresAt: string;

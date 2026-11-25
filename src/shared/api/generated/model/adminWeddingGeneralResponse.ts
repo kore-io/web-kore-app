@@ -4,6 +4,7 @@
  * Kore API
  * OpenAPI spec version: 1
  */
+import type { AdminAccessEmailChangeResponse } from './adminAccessEmailChangeResponse';
 import type { AdminBlockResponse } from './adminBlockResponse';
 import type { AdminPendingPaymentResponse } from './adminPendingPaymentResponse';
 import type { AdminPersonResponse } from './adminPersonResponse';
@@ -36,6 +37,7 @@ export interface AdminWeddingGeneralResponse {
   rsvpPercent?: number | null;
   createdAt: string;
   people?: AdminPersonResponse[];
+  accessEmailChange?: AdminAccessEmailChangeResponse;
   /**
    * Publicação · Saída do ar · Carência até · Expurgo previsto.
    * @nullable

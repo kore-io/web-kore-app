@@ -4,6 +4,7 @@
  * Kore API
  * OpenAPI spec version: 1
  */
+import type { AdminLogActorResponse } from './adminLogActorResponse';
 import type { AdminWeddingLogEntryResponseActorKind } from './adminWeddingLogEntryResponseActorKind';
 import type { AdminWeddingLogEntryResponseData } from './adminWeddingLogEntryResponseData';
 
@@ -27,5 +28,10 @@ export interface AdminWeddingLogEntryResponse {
    * @nullable
    */
   ipHashShort: string | null;
+  /**
+   * Quem agiu, como no Log da aplicação; nulo no sistema e no convidado (decisão 320(2)).
+   * @nullable
+   */
+  actor: AdminLogActorResponse | null;
   action: string;
 }

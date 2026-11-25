@@ -42,6 +42,7 @@ import type {
   NotDraftErrorBody,
   NotPublishedErrorBody,
   OriginNotAllowedErrorBody,
+  PayerNotFoundErrorBody,
   PaymentAlreadyPaidErrorBody,
   PaymentCreatedResponse,
   PaymentDisputedErrorBody,
@@ -950,6 +951,7 @@ export const getPaymentsControllerPayV1MutationOptions = <
     | WeddingDeletionScheduledErrorBody
     | EndDateOutOfRangeErrorBody
     | IdempotencyKeyReusedErrorBody
+    | PayerNotFoundErrorBody
     | RateLimitedErrorBody
     | GatewayUnavailableErrorBody
   >,
@@ -1013,6 +1015,7 @@ export type PaymentsControllerPayV1MutationError = ErrorType<
   | WeddingDeletionScheduledErrorBody
   | EndDateOutOfRangeErrorBody
   | IdempotencyKeyReusedErrorBody
+  | PayerNotFoundErrorBody
   | RateLimitedErrorBody
   | GatewayUnavailableErrorBody
 >;
@@ -1049,6 +1052,7 @@ export const usePaymentsControllerPayV1 = <
     | WeddingDeletionScheduledErrorBody
     | EndDateOutOfRangeErrorBody
     | IdempotencyKeyReusedErrorBody
+    | PayerNotFoundErrorBody
     | RateLimitedErrorBody
     | GatewayUnavailableErrorBody
   >,
