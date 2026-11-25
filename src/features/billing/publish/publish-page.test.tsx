@@ -137,6 +137,7 @@ function mockPublish({
       { status: 201 },
     ),
   paidAfterPay = true,
+  blockedAfterPay = false,
 }: {
   lifecycleOverrides?: Partial<typeof lifecycle>;
   site?: { slug: string | null; eventDate: string | null; state: string | null };
@@ -146,12 +147,17 @@ function mockPublish({
   pay?: (body: unknown) => Response;
   /** Depois do POST, o GET …/billing já traz o pagamento confirmado. */
   paidAfterPay?: boolean;
+  /** Depois do POST, o /me traz o casamento bloqueado (o bloqueio em corrida). */
+  blockedAfterPay?: boolean;
 } = {}) {
   const quotes: URLSearchParams[] = [];
   const payments: unknown[] = [];
   const fetchMock = mockApi(({ method, path, body }) => {
     const url = new URL(path, 'http://api.test');
-    if (url.pathname === '/v1/me') return Response.json(meFor(me(lifecycleOverrides)));
+    if (url.pathname === '/v1/me') {
+      const blocked = blockedAfterPay && payments.length > 0;
+      return Response.json(meFor(me({ ...lifecycleOverrides, ...(blocked && { blocked }) })));
+    }
     if (url.pathname === '/v1/pricing') return Response.json(pricing);
     if (url.pathname === '/v1/weddings/w1/site') {
       return Response.json({ ...site, timezone: 'America/Sao_Paulo' });
@@ -590,6 +596,25 @@ describe('Publicar o site, o pagar com o cartão (E3; Publicar RN02 a RN07; deci
     // O valor mudou: a cotação de novo (Preço RN05).
     if (error === 'PRICE_CHANGED')
       await waitFor(() => expect(api.length).toBeGreaterThan(quotesBefore));
+  });
+
+  it('o 403 WEDDING_BLOCKED em corrida refaz o /me: o motivo e a tela desabilitada (Bloqueado RN07)', async () => {
+    const user = userEvent.setup();
+    mockPublish({
+      blockedAfterPay: true,
+      pay: () => apiError({ status: 403, body: { error: 'WEDDING_BLOCKED' } }),
+    });
+    renderAreaScreen({ url: URL_PUBLISH });
+    await ready(user);
+    await fillCardAndPayer(user);
+    await user.click(payButton());
+    await waitFor(() =>
+      expect(payButton()).toHaveAccessibleDescription(
+        'Indisponível enquanto o site está bloqueado.',
+      ),
+    );
+    expect(payButton()).toBeDisabled();
+    expect(dateField()).toBeDisabled();
   });
 
   it('com o Pix, o Pagar e publicar fica desabilitado sem motivo até o E4 (322(3))', async () => {
