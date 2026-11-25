@@ -1,0 +1,54 @@
+/*
+ * Pagar com Pix (Penpot 21, "Painel / Pague com Pix"): o painel de 560 px (no celular, a
+ * largura toda), com 14 px entre os itens; o valor em type.heading; o QR de 200 px, centrado,
+ * com raio md; a linha do copia e cola com 8 px entre o campo e o Copiar código; a espera com
+ * o Spinner em type.body.md ink; as legendas em type.caption gray.700.
+ */
+.kore-pix {
+  @apply flex flex-col gap-6;
+}
+
+.kore-pix__loading {
+  @apply flex justify-center py-10;
+}
+
+.kore-pix__panel {
+  @apply max-w-140;
+}
+
+.kore-pix__amount {
+  @apply type-heading text-ink;
+}
+
+.kore-pix__instruction {
+  @apply type-body-md text-gray-700;
+}
+
+.kore-pix__qr {
+  @apply size-50 self-center overflow-hidden rounded-md bg-gray-100;
+}
+
+.kore-pix__qr-image {
+  @apply size-full;
+}
+
+.kore-pix__copy {
+  @apply flex items-center gap-2;
+}
+
+.kore-pix__code {
+  @apply min-w-0 flex-1;
+}
+
+.kore-pix__waiting {
+  @apply type-body-md flex items-center gap-2 text-ink;
+}
+
+.kore-pix__caption {
+  @apply type-caption text-gray-700;
+}
+
+.kore-pix__new,
+.kore-pix__card {
+  @apply self-start;
+}

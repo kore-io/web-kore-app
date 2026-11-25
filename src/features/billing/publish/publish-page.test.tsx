@@ -679,6 +679,11 @@ describe('Publicar o site, o pagar com o cartão (E3; Publicar RN02 a RN07; deci
     await waitFor(() =>
       expect(visited[0]).toEqual(['/app/cobranca/pix', { endDate: '2027-02-14' }]),
     );
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Pagar com Pix' }),
+    ).toBeInTheDocument();
+    // Direto para a tela do Pix, sem voltar ao Publicar pelo billing velho do cache.
+    expect(visited).toHaveLength(1);
     expect(api.payments).toEqual([
       {
         kind: 'publication',
