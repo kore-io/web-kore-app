@@ -87,3 +87,46 @@ export function useWeddingBlockedRefetch() {
     [queryClient],
   );
 }
+
+/**
+ * As props de um botão de escrita com a trava (Bloqueado RN04): desabilitado e descrito pelo
+ * motivo (`WriteLockReason` com o mesmo `id`). Sem a trava, nada muda; vem depois das outras
+ * props do botão, porque o bloqueio passa à frente dos outros motivos.
+ */
+export function lockedProps({
+  locked,
+  id,
+  describedBy,
+}: {
+  locked: boolean;
+  id: string;
+  /** A descrição que o botão já tinha (ex.: o nome do item da linha), mantida antes do motivo. */
+  describedBy?: string;
+}) {
+  if (!locked) return {};
+  return { disabled: true, 'aria-describedby': describedBy ? `${describedBy} ${id}` : id };
+}
+
+/** O motivo dos botões de escrita travados (Bloqueado RN04), com o `id` que eles citam. */
+export function WriteLockReason({ id, className }: { id: string; className?: string }) {
+  const { reason } = useWriteLock();
+  if (!reason) return null;
+  return (
+    <p id={id} className={className ? `kore-write-lock ${className}` : 'kore-write-lock'}>
+      {reason}
+    </p>
+  );
+}
+
+/**
+ * O texto do Toast de erro de uma escrita: o motivo do bloqueio no `403 WEDDING_BLOCKED` em
+ * corrida (Bloqueado RN04) e, nos outros, o erro genérico.
+ */
+export function useErrorMessage() {
+  const { t } = useTranslation('billing');
+  const { t: tAccess } = useTranslation('access');
+  return (error?: unknown): string =>
+    isWeddingBlocked(error)
+      ? t('lifecycle.blocked.reason')
+      : `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`;
+}

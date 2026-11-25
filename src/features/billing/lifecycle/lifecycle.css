@@ -10,3 +10,8 @@
 .kore-lifecycle-banner__link {
   @apply type-link text-primary-dark;
 }
+
+/* O motivo dos botões de escrita do casamento bloqueado (Bloqueado RN04). */
+.kore-write-lock {
+  @apply m-0 type-caption text-gray-700;
+}
