@@ -286,3 +286,34 @@ test('o cartão recusado (final 0002) e, de volta à tela, o pagador anterior (R
   await page.getByRole('button', { name: 'Usar outro CPF' }).click();
   await expect(page.getByLabel('CPF')).toBeVisible();
 });
+
+test('as entradas do Publicar: o Dashboard, o Checklist, o Editor e Envios (243(c); E5)', async ({
+  page,
+}) => {
+  test.slow();
+  const { email } = await couple();
+  await signIn({ page, email });
+  const heading = page.getByRole('heading', { level: 1, name: 'Publicar o site' });
+
+  // Dashboard (Penpot 03, A5): a linha do preço e o Publicar no cartão Status do site.
+  await page.goto('/app');
+  const status = page.getByRole('region', { name: 'Status do site' });
+  await expect(
+    status.getByText('Montar é grátis. Vocês só pagam quando publicarem.'),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('region', { name: 'Checklist' }).getByRole('link', { name: 'Publicar o site' }),
+  ).toHaveAttribute('href', '/app/cobranca/publicar');
+  await status.getByRole('button', { name: 'Publicar' }).click();
+  await expect(heading).toBeVisible();
+
+  // O cabeçalho do Editor.
+  await page.goto('/app/site/dados-basicos');
+  await page.getByRole('button', { name: 'Publicar', exact: true }).click();
+  await expect(heading).toBeVisible();
+
+  // A legenda de Envios.
+  await page.goto('/app/envios/convites');
+  await page.getByRole('link', { name: 'Publicar o site' }).click();
+  await expect(heading).toBeVisible();
+});
