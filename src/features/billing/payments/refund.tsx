@@ -45,9 +45,10 @@ export function refundTotal({
 }
 
 /**
- * O texto do Dialog (RN02; Pena). A publicação com extensão tem o texto com as partes no
- * caso que a Pena escreveu (tudo no cartão, sem juros, uma extensão); nos outros, o texto
- * da forma com o total, até os textos novos (327(3)).
+ * O texto do Dialog (RN02; Pena; decisões 327(3) e 328, `.prs/f3/pena-327.md`). A publicação
+ * com extensões: numa forma só, uma frase com o total e as partes ("cada valor no cartão que
+ * pagou" ou "para a conta que pagou"); em formas diferentes, o total e uma frase por forma,
+ * a da publicação primeiro. "Com os juros" vai junto do valor que os tem (de 7x a 12x).
  */
 export function refundDescription({
   payment,
@@ -60,28 +61,84 @@ export function refundDescription({
   now: Date;
   t: TFunction<'billing'>;
 }): string {
-  const amount = formatCents({ cents: refundTotal({ payment, payments }) });
+  const total = formatCents({ cents: refundTotal({ payment, payments }) });
   if (payment.kind === 'extension') {
     // A data de volta, calculada pela API com o min(endDate, previousEndDate) da RN03 (327(2)).
     const date = payment.refundEndDate ? shortDayMonth({ day: payment.refundEndDate, now }) : '';
-    return oneDot(t(`refund.extension.${methodKey(payment)}`, { date, amount }));
+    return oneDot(t(`refund.extension.${methodKey(payment)}`, { date, amount: total }));
   }
   const extensions = extensionsPaid(payments);
-  const [extension] = extensions;
-  if (
-    extension &&
-    extensions.length === 1 &&
-    [payment, extension].every((item) => methodKey(item) === 'card')
-  ) {
-    return t('refund.publication.withExtension', {
-      total: amount,
+  if (extensions.length === 0)
+    return t(`refund.publication.${methodKey(payment)}`, { amount: total });
+
+  const sum = (items: BillingPaymentDto[]) =>
+    items.reduce((value, item) => value + item.amountCents, 0);
+  const interest = (items: BillingPaymentDto[]) =>
+    items.some((item) => methodKey(item) === 'cardInterest');
+  const all = [payment, ...extensions];
+  if (all.every((item) => item.method === payment.method)) {
+    const key = payment.method === 'pix' ? 'pix' : interest(all) ? 'cardInterest' : 'card';
+    return t(`refund.publication.withExtensions.${key}`, {
+      total,
       publication: formatCents({ cents: payment.amountCents }),
-      extension: formatCents({ cents: extension.amountCents }),
+      extensions: t('refund.publication.withExtensions.extensions', {
+        count: extensions.length,
+        amount: formatCents({ cents: sum(extensions) }),
+      }),
     });
   }
-  const interest = [payment, ...extensions].some((item) => methodKey(item) === 'cardInterest');
-  const key = payment.method === 'pix' ? 'pix' : interest ? 'cardInterest' : 'card';
-  return t(`refund.publication.${key}`, { amount });
+
+  // Formas diferentes: o total e uma frase por forma, a da publicação primeiro.
+  const methods = [payment.method, payment.method === 'pix' ? 'card' : 'pix'] as const;
+  const sentences = methods.map((method) => {
+    const items = all.filter((item) => item.method === method);
+    const own = items.filter((item) => item.kind === 'extension');
+    const withPublication = items.includes(payment);
+    const subject = withPublication
+      ? own.length === 0
+        ? t('refund.publication.withExtensions.subject.publication')
+        : t('refund.publication.withExtensions.subject.publicationAndExtensions', {
+            count: own.length,
+          })
+      : own.length === extensions.length
+        ? t('refund.publication.withExtensions.subject.extensions', { count: own.length })
+        : t('refund.publication.withExtensions.subject.otherExtensions', { count: own.length });
+    const value = formatCents({ cents: sum(items) });
+    return t('refund.publication.withExtensions.group', {
+      count: items.length,
+      subject,
+      amount: interest(items)
+        ? t('refund.publication.withExtensions.withInterest', { amount: value })
+        : value,
+      where: t(`refund.publication.withExtensions.where.${method}`),
+    });
+  });
+  return [t('refund.publication.withExtensions.mixedTotal', { total }), ...sentences].join(' ');
+}
+
+/** O Alert do prazo: a publicação com extensões diz por que o total é maior (Pena, item 8). */
+function alertText({
+  payment,
+  payments,
+  timezone,
+  now,
+  t,
+}: {
+  payment: BillingPaymentDto;
+  payments: BillingPaymentDto[];
+  timezone: string | null;
+  now: Date;
+  t: TFunction<'billing'>;
+}): string {
+  const values = {
+    date: dayMonthIn({ at: payment.refundableUntil ?? '', timezone, now }),
+    amount: formatCents({ cents: refundTotal({ payment, payments }) }),
+  };
+  const extensions = payment.kind === 'publication' ? extensionsPaid(payments).length : 0;
+  if (extensions > 0) {
+    return t('refund.alert.publicationWithExtensions', { ...values, count: extensions });
+  }
+  return t(`refund.alert.${payment.kind}`, values);
 }
 
 /** Os pagamentos no prazo de desistir, do mais novo ao mais antigo (RN02; 327(4)). */
@@ -121,12 +178,7 @@ export function RefundSection({
     <div className="kore-payments__refund">
       {items.map((payment) => (
         <div key={payment.id} className="kore-payments__refund-block">
-          <Alert tone="info">
-            {t(`refund.alert.${payment.kind}`, {
-              date: dayMonthIn({ at: payment.refundableUntil ?? '', timezone, now }),
-              amount: formatCents({ cents: refundTotal({ payment, payments }) }),
-            })}
-          </Alert>
+          <Alert tone="info">{alertText({ payment, payments, timezone, now, t })}</Alert>
           <Button
             variant="secondary"
             className="kore-payments__refund-action"

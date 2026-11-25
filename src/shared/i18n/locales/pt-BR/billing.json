@@ -175,7 +175,9 @@
   "refund": {
     "alert": {
       "publication": "Vocês podem desistir até {{date}} e receber {{amount}} de volta.",
-      "extension": "Vocês podem desistir da extensão até {{date}} e receber {{amount}} de volta."
+      "extension": "Vocês podem desistir da extensão até {{date}} e receber {{amount}} de volta.",
+      "publicationWithExtensions_one": "Vocês podem desistir até {{date}} e receber {{amount}} de volta, com a extensão.",
+      "publicationWithExtensions_other": "Vocês podem desistir até {{date}} e receber {{amount}} de volta, com as extensões."
     },
     "action": "Desistir e pedir reembolso",
     "blocked": "Indisponível enquanto o site está bloqueado. Para desistir da compra, escrevam para suporte@kore.com.br.",
@@ -184,8 +186,31 @@
       "card": "O site sai do ar e volta a ser rascunho. Devolvemos {{amount}} no mesmo cartão.",
       "cardInterest": "O site sai do ar e volta a ser rascunho. Devolvemos {{amount}} no mesmo cartão, com os juros.",
       "pix": "O site sai do ar e volta a ser rascunho. Devolvemos {{amount}} por Pix, para a conta que pagou.",
-      "withExtension": "O site sai do ar e volta a ser rascunho. Devolvemos {{total}} no mesmo cartão: {{publication}} da publicação e {{extension}} da extensão.",
-      "keep": "Manter o site no ar"
+      "keep": "Manter o site no ar",
+      "withExtensions": {
+        "card": "O site sai do ar e volta a ser rascunho. Devolvemos {{total}} no cartão: {{publication}} da publicação e {{extensions}}, cada valor no cartão que pagou.",
+        "cardInterest": "O site sai do ar e volta a ser rascunho. Devolvemos {{total}} no cartão, com os juros: {{publication}} da publicação e {{extensions}}, cada valor no cartão que pagou.",
+        "pix": "O site sai do ar e volta a ser rascunho. Devolvemos {{total}} por Pix: {{publication}} da publicação e {{extensions}}, cada valor para a conta que pagou.",
+        "extensions_one": "{{amount}} da extensão",
+        "extensions_other": "{{amount}} das extensões",
+        "mixedTotal": "O site sai do ar e volta a ser rascunho. Devolvemos {{total}}.",
+        "subject": {
+          "publication": "A publicação",
+          "publicationAndExtensions_one": "A publicação e uma extensão",
+          "publicationAndExtensions_other": "A publicação e as extensões",
+          "extensions_one": "A extensão",
+          "extensions_other": "As extensões",
+          "otherExtensions_one": "A outra extensão",
+          "otherExtensions_other": "As outras extensões"
+        },
+        "group_one": "{{subject}}, {{amount}}, volta {{where}}.",
+        "group_other": "{{subject}}, {{amount}}, voltam {{where}}.",
+        "withInterest": "{{amount}} com os juros",
+        "where": {
+          "card": "no cartão que pagou",
+          "pix": "por Pix, para a conta que pagou"
+        }
+      }
     },
     "extension": {
       "title": "Desistir da extensão?",
