@@ -13,7 +13,7 @@
   },
   "empty": {
     "title": "Ainda não há notificações",
-    "description": "Elas aparecem aqui quando um grupo responder o convite."
+    "description": "Elas aparecem aqui quando um grupo responder o convite ou houver um aviso sobre o site e os pagamentos."
   },
   "filterEmpty": "Nenhuma notificação deste tipo.",
   "collaborator": "Por enquanto, os avisos deste casamento vão só para o casal.",
