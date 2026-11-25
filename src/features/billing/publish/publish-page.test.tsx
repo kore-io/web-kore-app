@@ -743,6 +743,8 @@ describe('Publicar o site, o pagar com o cartão (E3; Publicar RN02 a RN07; deci
       ),
     ).not.toHaveLength(0);
     expect(payButton()).toBeDisabled();
+    // A data do pendente no campo (sugestão do Crivo no E4).
+    expect(dateField()).toHaveValue('2027-02-14');
   });
 
   it('a consulta do billing que falha depois do POST segue no Confirmando, sem o recusado (achado do Crivo no E4)', async () => {
