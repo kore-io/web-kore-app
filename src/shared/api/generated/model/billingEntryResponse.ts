@@ -29,8 +29,14 @@ export interface BillingEntryResponse {
    * @nullable
    */
   paidThrough?: string | null;
-  /** purge_soon (Retenção e expurgo RN02): o dia em que os dados são apagados, AAAA-MM-DD. */
-  purgeAt?: string;
+  /**
+   * O dia em que os dados são apagados, AAAA-MM-DD (Retenção e expurgo RN02):
+   * no purge_soon e no expired ("Os dados ficam guardados até…", decisão
+   * 336(3)). No expired, nulo quando o casamento não tem e ausente nas
+   * notificações gravadas antes do campo.
+   * @nullable
+   */
+  purgeAt?: string | null;
   /**
    * A data de saída do ar, AAAA-MM-DD: a paga no payment_confirmed e a nova na
    * courtesy (a Cortesia do Admin; Backoffice - cobrança RN06).
