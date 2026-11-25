@@ -133,8 +133,8 @@ test('o casal: a data no limite com o teto, o cartão em 8x com os juros e o Pix
   );
   await expect(page.getByLabel('Parcelas')).toHaveCount(0);
 
-  // Até o E3, o Pagar e publicar fica desabilitado, sem motivo (decisão 322).
-  await expect(pay).toBeDisabled();
+  // Com o Pix, o Pagar e publicar paga (E4), sem motivo.
+  await expect(pay).toBeEnabled();
   await expect(pay).not.toHaveAccessibleDescription(/./);
 
   // A data fora do limite: o erro no campo.
