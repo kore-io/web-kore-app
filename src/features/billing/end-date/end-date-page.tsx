@@ -193,9 +193,11 @@ function EndDate({
   const [date, setDate] = useState(() => {
     if (from.endDate) return from.endDate;
     if (expired) return ahead ?? '';
-    // Na carência a data atual já passou: o campo abre vazio, ou no mês pago à frente
-    // (sugestão do Crivo no E10).
-    if (limits && source.endDate && source.endDate < limits.min) return ahead ?? '';
+    // Na carência a data atual já passou: o campo abre no mês pago à frente, se ele ainda
+    // couber nos limites (a partir de amanhã), ou vazio; nunca nasce com erro (335(1)).
+    if (limits && source.endDate && source.endDate < limits.min) {
+      return ahead && ahead >= limits.min ? ahead : '';
+    }
     return source.endDate ?? '';
   });
   const [method, setMethod] = useState<Method>(from.method ?? 'card');
