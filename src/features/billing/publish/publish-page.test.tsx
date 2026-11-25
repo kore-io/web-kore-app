@@ -685,7 +685,10 @@ describe('Publicar o site, o pagar com o cartão (E3; Publicar RN02 a RN07; deci
     await user.click(payButton());
     // A tela do Pix, com a data (o Gerar novo Pix volta com ela; 324).
     await waitFor(() =>
-      expect(visited[0]).toEqual(['/app/cobranca/pix', { endDate: '2027-02-14' }]),
+      expect(visited[0]).toEqual([
+        '/app/cobranca/pix',
+        { endDate: '2027-02-14', kind: 'publication' },
+      ]),
     );
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Pagar com Pix' }),

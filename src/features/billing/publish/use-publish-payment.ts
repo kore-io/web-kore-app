@@ -12,6 +12,7 @@ import {
 import { getMeControllerMeV1QueryKey } from '../../../shared/api/generated/me/me';
 import type { CreatePaymentBody } from '../../../shared/api/generated/model';
 import { apiErrorCode } from '../../../shared/api/http-client';
+import { oneDot, shortDayMonth } from '../../../shared/date-texts';
 import { useIdempotencyKeys } from '../../../shared/idempotency';
 
 /** O polling da confirmação do cartão: o mesmo do Pix, a cada 5 s, sem limite (316(4)). */
@@ -28,12 +29,20 @@ export type PayState =
 export type PayFailure = 'priceChanged' | 'payerNotFound' | 'quoteStale' | 'handled' | 'generic';
 
 /**
- * O pagar do Publicar (Publicar e pagar RN03 a RN07): o POST com a `Idempotency-Key` por
- * intenção (o alvo é o casamento, o corpo é o pedido), o cartão recusado na hora, a espera
- * da confirmação do cartão (o site só vai ao ar na confirmação, RN04), o Pix, que segue
- * para a tela do Pix (E4), e os erros com os textos da Voz.
+ * O pagar do Publicar e da extensão (Publicar e pagar RN03 a RN07; Data de saída RN04): o
+ * POST com a `Idempotency-Key` por intenção (o alvo é o casamento, o corpo é o pedido), o
+ * cartão recusado na hora, a espera da confirmação do cartão (o site só vai ao ar, ou a data
+ * só muda, na confirmação), o Pix, que segue para a tela do Pix, e os erros com os textos
+ * da Voz. Na extensão, a confirmação é o pagamento pago (o site já estava no ar), com o Toast
+ * da nova data e a volta a Pagamentos (E11).
  */
-export function usePublishPayment({ weddingId }: { weddingId: string }) {
+export function usePublishPayment({
+  weddingId,
+  kind = 'publication',
+}: {
+  weddingId: string;
+  kind?: 'publication' | 'extension';
+}) {
   const { t } = useTranslation('billing');
   const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
@@ -58,9 +67,26 @@ export function usePublishPayment({ weddingId }: { weddingId: string }) {
     query: { refetchInterval: confirmingId !== null ? CONFIRM_POLL_MS : false },
   });
 
-  function confirmed() {
+  function confirmed({ endDate }: { endDate?: string | null | undefined } = {}) {
     keys.reset();
     void queryClient.invalidateQueries({ queryKey: getMeControllerMeV1QueryKey() });
+    if (kind === 'extension') {
+      // "O site fica no ar até 14 de mai. de 2027." (Data de saída RN04; Penpot 21, A9).
+      setState({ kind: 'idle' });
+      showToast({
+        tone: 'success',
+        message: oneDot(
+          t('endDate.toast.until', {
+            date: endDate ? shortDayMonth({ day: endDate, now: new Date() }) : '',
+          }),
+        ),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: getPaymentsControllerBillingV1QueryKey(weddingId),
+      });
+      void navigate(paths.billing);
+      return;
+    }
     showToast({ tone: 'success', message: t('publish.toast.confirmed') });
     void navigate(paths.dashboard);
   }
@@ -72,7 +98,9 @@ export function usePublishPayment({ weddingId }: { weddingId: string }) {
   const pendingId = billing.data?.pendingPayment?.paymentId ?? null;
   useEffect(() => {
     if (confirmingId === null || !billing.data) return;
-    if (payment?.status === 'paid' || billing.data.status === 'published') confirmed();
+    const done =
+      payment?.status === 'paid' || (kind === 'publication' && billing.data.status === 'published');
+    if (done) confirmed({ endDate: billing.data.endDate });
     else if (
       updatesBefore !== null &&
       billingUpdates() > updatesBefore &&
@@ -104,7 +132,7 @@ export function usePublishPayment({ weddingId }: { weddingId: string }) {
         headers: keys.headersFor({ target: weddingId, body }),
       });
       if (created.status === 'paid') {
-        confirmed();
+        confirmed({ endDate: body.endDate });
         return null;
       }
       if (created.status === 'failed') {
@@ -116,7 +144,7 @@ export function usePublishPayment({ weddingId }: { weddingId: string }) {
         // O Pix segue na tela dele (A3), com o copia e cola do GET …/billing.
         keys.reset();
         setState({ kind: 'idle' });
-        void navigate(paths.billingPix, { state: { endDate: body.endDate } });
+        void navigate(paths.billingPix, { state: { endDate: body.endDate, kind } });
         return null;
       }
       // A 1ª consulta já, sem esperar os 5 s: o cartão local confirma rápido.
@@ -155,19 +183,21 @@ export function usePublishPayment({ weddingId }: { weddingId: string }) {
           // O Pix trocado já tinha sido pago: o Kore aplicou o pagamento (RN07; Pena, item 2).
           void queryClient.invalidateQueries({ queryKey: getMeControllerMeV1QueryKey() });
           showToast({ tone: 'success', message: t('publish.toast.alreadyPaid') });
-          void navigate(paths.dashboard);
+          void navigate(kind === 'extension' ? paths.billing : paths.dashboard);
           return 'handled';
         case 'NOT_DRAFT':
+          if (kind === 'extension') break;
           showToast({ tone: 'success', message: t('publish.toast.alreadyPublished') });
           void queryClient.invalidateQueries({ queryKey: getMeControllerMeV1QueryKey() });
           void navigate(paths.dashboard);
           return 'handled';
-        default:
-          toastError(
-            `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
-          );
-          return 'generic';
+        case 'NOT_PUBLISHED':
+          // A extensão de quem saiu de publicado no meio (ex.: desistiu): a tela relê.
+          void queryClient.invalidateQueries({ queryKey: getMeControllerMeV1QueryKey() });
+          break;
       }
+      toastError(`${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`);
+      return 'generic';
     }
   }
 
