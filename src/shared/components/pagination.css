@@ -1,0 +1,21 @@
+/*
+ * Paginação: o resumo à esquerda em type.caption gray.700 e os dois botões de ícone à
+ * direita, com 4 px entre eles; 12 px acima da tabela. Desabilitado: com a opacidade de 45%
+ * do Button desabilitado do DS (o IconButton da lib não tem o estado; levar à lib fica com
+ * a promoção ao DS, decisão 321).
+ */
+.kore-pagination {
+  @apply mt-3 flex items-center justify-between gap-3;
+}
+
+.kore-pagination__summary {
+  @apply type-caption text-gray-700;
+}
+
+.kore-pagination__buttons {
+  @apply flex items-center gap-1;
+}
+
+.kore-pagination__buttons .kore-icon-button:disabled {
+  @apply cursor-not-allowed opacity-45;
+}
