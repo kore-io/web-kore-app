@@ -235,7 +235,7 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     expect(screen.queryByText(/66[.,]67/)).toBeNull();
   });
 
-  it('antes de publicar: Enviar convites desabilitado com o motivo, Envios com a frase e o Editor no lugar do Publicar (RN03, RN05; 243)', async () => {
+  it('antes de publicar: Enviar convites desabilitado com o motivo, Envios com a frase, o Montar é grátis e o Publicar (RN03, RN05; Publicar e pagar RN13; 243(c))', async () => {
     mockDashboard({
       data: dashboard({
         site: { slug: 'ana-e-marcos', publishedAt: null, endDate: null, status: 'draft' },
@@ -262,14 +262,19 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     expect(within(card('Envios')).queryAllByRole('link')).toHaveLength(0);
     expect(within(card('Envios')).getByText('6 grupos')).toBeInTheDocument();
     expect(within(card('Status do site')).getByText('Rascunho')).toBeInTheDocument();
-    // O Publicar volta com a tela paga do front da F3 (decisão 243): o Editor por enquanto.
-    expect(within(card('Status do site')).queryByRole('button', { name: 'Publicar' })).toBeNull();
+    // A5 do Penpot: a linha do preço e o Publicar no lugar do Editar site (decisão 243(c)).
     expect(
-      within(card('Status do site')).getByRole('button', { name: 'Editar site' }),
-    ).toBeEnabled();
+      within(card('Status do site')).getByText(
+        'Montar é grátis. Vocês só pagam quando publicarem.',
+      ),
+    ).toBeInTheDocument();
+    expect(within(card('Status do site')).getByRole('button', { name: 'Publicar' })).toBeEnabled();
+    expect(
+      within(card('Status do site')).queryByRole('button', { name: 'Editar site' }),
+    ).toBeNull();
     expect(
       within(card('Checklist')).getByRole('link', { name: 'Publicar o site' }),
-    ).toHaveAttribute('href', '/app/site');
+    ).toHaveAttribute('href', '/app/cobranca/publicar');
     expect(within(card('Checklist')).queryByText(/Lembrar os pendentes/)).toBeNull();
     expect(within(card('Checklist')).getByText('Publicar o site').closest('li')).toHaveAttribute(
       'data-state',
@@ -378,6 +383,36 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     expect(screen.getByRole('button', { name: 'Enviar convites' })).toHaveAccessibleDescription(
       'Os envios começam depois que o casal publicar o site.',
     );
+  });
+
+  it('a colaboradora antes de publicar: o Montar é grátis na versão dela e o Publicar (Publicar e pagar RN13; 323)', async () => {
+    const user = userEvent.setup();
+    profileUnderTest.current = 'planner';
+    mockDashboard({
+      data: dashboard({
+        role: 'collaborator',
+        site: { slug: 'ana-e-marcos', publishedAt: null, endDate: null, status: 'draft' },
+      }),
+    });
+    const { router } = renderAreaScreen({ url: '/app' });
+    await screen.findByText('Você colabora neste casamento.');
+    expect(
+      within(card('Status do site')).getByText('Montar é grátis. O casal só paga quando publicar.'),
+    ).toBeInTheDocument();
+    await user.click(within(card('Status do site')).getByRole('button', { name: 'Publicar' }));
+    // A tela de publicar mostra a ela o motivo (decisão 323).
+    await waitFor(() => expect(router.state.location.pathname).toMatch(/\/cobranca\/publicar$/));
+  });
+
+  it('publicado: sem o Montar é grátis, com o Editar site', async () => {
+    mockDashboard({ data: dashboard() });
+    renderRoute({ url: '/app' });
+    await screen.findByText('142');
+    expect(screen.queryByText(/^Montar é grátis/)).toBeNull();
+    expect(within(card('Status do site')).queryByRole('button', { name: 'Publicar' })).toBeNull();
+    expect(
+      within(card('Status do site')).getByRole('button', { name: 'Editar site' }),
+    ).toBeEnabled();
   });
 
   it('a colaboradora com o casamento aguardando o casal: o aviso no Status do site (Colaboradora RN04)', async () => {
