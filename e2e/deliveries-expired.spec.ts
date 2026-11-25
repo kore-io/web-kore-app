@@ -109,7 +109,9 @@ test('a carência segue o pós-evento; o expirado fecha com o texto da RN07 (332
   await expect(send).toBeDisabled();
   await expect(send).toHaveAccessibleDescription(RENEW);
   await page.goto('/app/envios/convites');
-  await expect(page.getByRole('button', { name: 'Continuar' })).toHaveAccessibleDescription(RENEW);
+  await expect(page.getByRole('button', { name: 'Continuar' })).toHaveAccessibleDescription(
+    `${RENEW} Renovar`,
+  );
   // O Renovar do casal leva a mudar a data (E11).
   await expect(
     page.locator('#kore-send-closed').getByRole('link', { name: 'Renovar' }),
