@@ -1,0 +1,37 @@
+/*
+ * Linhas de valor (Penpot 21, "Linha / …"): 12 px entre as linhas e, na linha, 12 px entre
+ * o rótulo (type.body.md gray.700, ocupa o resto) e o valor (type.label ink, à direita). A
+ * legenda em type.caption gray.700, 12 px abaixo da linha. O Total: divisor gray.300 de
+ * 1 px e 12 px acima, o rótulo em type.label ink e o valor em type.heading ink.
+ */
+.kore-value-list {
+  @apply flex flex-col gap-3;
+}
+
+.kore-value-list__row {
+  @apply flex flex-wrap items-baseline gap-x-3;
+}
+
+.kore-value-list__label {
+  @apply type-body-md min-w-0 flex-1 text-gray-700;
+}
+
+.kore-value-list__value {
+  @apply type-label shrink-0 text-right text-ink;
+}
+
+.kore-value-list__caption {
+  @apply type-caption mt-3 basis-full text-gray-700;
+}
+
+.kore-value-list__row--total {
+  @apply border-t border-gray-300 pt-3;
+}
+
+.kore-value-list__row--total .kore-value-list__label {
+  @apply type-label text-ink;
+}
+
+.kore-value-list__row--total .kore-value-list__value {
+  @apply type-heading;
+}

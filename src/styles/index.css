@@ -17,6 +17,7 @@
 @import '../shared/components/data-table.css' layer(components);
 @import '../shared/components/pagination.css' layer(components);
 @import '../shared/components/panel.css' layer(components);
+@import '../shared/components/value-list.css' layer(components);
 @import '../features/access/components/sign-up.css' layer(components);
 @import '../features/planner/planner.css' layer(components);
 @import '../features/planner/my-weddings/my-weddings.css' layer(components);
