@@ -346,7 +346,6 @@ function PublishForm({
                 price: { totalCents: shown.totalCents, endDate: debouncedEndDate },
               })}
           />
-          <Alert tone="info">{t('publish.contract.refund')}</Alert>
           <PublishActions reason={reason} />
         </div>
       </div>
