@@ -13,7 +13,7 @@
 }
 
 .kore-value-list__label {
-  @apply type-body-md min-w-0 flex-1 text-gray-700;
+  @apply type-body-md min-w-0 flex-1 break-words text-gray-700;
 }
 
 .kore-value-list__value {
