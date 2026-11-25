@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ApiError, apiErrorCode, httpClient } from './http-client';
+import { ApiError, apiErrorCode, httpClient, onWeddingBlocked } from './http-client';
 
 function mockFetch(response: Response) {
   const fetchMock = vi.fn().mockResolvedValue(response);
@@ -53,5 +53,22 @@ describe('httpClient (mutator do Orval)', () => {
     expect(error).toMatchObject({ status: 502, body: 'Bad Gateway' });
     expect(apiErrorCode({ error })).toBeUndefined();
     expect(apiErrorCode({ error: new Error('rede') })).toBeUndefined();
+  });
+
+  it('avisa cada 403 WEDDING_BLOCKED, e só ele (Bloqueado RN07)', async () => {
+    const listener = vi.fn();
+    const off = onWeddingBlocked(listener);
+    mockFetch(Response.json({ error: 'WEDDING_BLOCKED' }, { status: 403 }));
+    await expect(httpClient('/v1/weddings/w1/parties', { method: 'POST' })).rejects.toBeInstanceOf(
+      ApiError,
+    );
+    expect(listener).toHaveBeenCalledTimes(1);
+    mockFetch(Response.json({ error: 'ACTION_NOT_ALLOWED' }, { status: 403 }));
+    await httpClient('/v1/weddings/w1/parties', { method: 'POST' }).catch(() => undefined);
+    expect(listener).toHaveBeenCalledTimes(1);
+    off();
+    mockFetch(Response.json({ error: 'WEDDING_BLOCKED' }, { status: 403 }));
+    await httpClient('/v1/weddings/w1/parties', { method: 'POST' }).catch(() => undefined);
+    expect(listener).toHaveBeenCalledTimes(1);
   });
 });
