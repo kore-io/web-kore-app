@@ -138,6 +138,22 @@ describe('Mudar a data de saída do ar (Data de saída RN05; 289; 293; Penpot 21
     expect(calls).toEqual([{ body: { endDate: '2027-02-14' } }]);
   });
 
+  it('o caso B no ano corrente: o Alert com um ponto só, e a faixa sem o Voltar ao ar na própria tela', async () => {
+    mockEndDate({
+      lifecycle: {
+        status: 'expired',
+        endDate: '2026-11-20',
+        expiredAt: '2026-11-28',
+        paidThrough: '2026-12-25',
+      },
+    });
+    renderRoute({ url: URL_END_DATE });
+    expect(
+      await screen.findByText('Sem cobrança: vocês já pagaram até 25 de dez.'),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Voltar ao ar' })).toBeNull();
+  });
+
   it('o caso B depois da data paga: o Pagar e renovar desabilitado até o E11', async () => {
     mockEndDate({
       lifecycle: { status: 'expired', endDate: '2026-11-20', expiredAt: '2026-11-28' },
