@@ -116,7 +116,22 @@
       "paymentPending": "Já há um pagamento aguardando confirmação. Vejam em Pagamentos.",
       "refundInProgress": "O reembolso anterior ainda está em andamento. Publiquem de novo quando ele for concluído.",
       "gatewayUnavailable": "O serviço de pagamento não respondeu. Tentem de novo em alguns minutos. Se continuar, escrevam para suporte@kore.com.br.",
-      "alreadyPublished": "O site já está publicado."
+      "alreadyPublished": "O site já está publicado.",
+      "alreadyPaid": "Este Pix já foi pago. O pagamento foi confirmado e o site está no ar."
     }
+  },
+  "pix": {
+    "title": "Pagar com Pix",
+    "loading": "Carregando o Pix",
+    "instruction": "Abram o app do banco e leiam o QR Code, ou copiem o código.",
+    "qrAlt": "QR Code do Pix",
+    "copy": "Copiar código",
+    "copied": "Código copiado.",
+    "waiting": "Aguardando a confirmação do pagamento",
+    "dueAt": "O código vale até {{date}}.",
+    "effect": "O site vai ao ar assim que o pagamento for confirmado.",
+    "payWithCard": "Pagar com cartão",
+    "expired": "Este código Pix venceu. Gerem um novo para pagar.",
+    "newPix": "Gerar novo Pix"
   }
 }

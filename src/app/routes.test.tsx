@@ -55,6 +55,7 @@ describe('rotas do app (decisões 139, 146, 147 e 198)', () => {
       notifications: '/app/notificacoes',
       settingsNotifications: '/app/configuracoes/notificacoes',
       billingPublish: '/app/cobranca/publicar',
+      billingPix: '/app/cobranca/pix',
       site: '/app/site',
     });
     expect(guestParty({ partyId: 'p1' })).toBe('/app/convidados/grupos/p1');

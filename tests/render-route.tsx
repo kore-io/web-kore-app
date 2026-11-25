@@ -40,12 +40,12 @@ export function renderRoute({
  * decisão 198(2) pede as versões da cerimonialista em teste unitário: com este helper, o
  * /me de cerimonialista abre a tela, e o código escolhe o texto pelo perfil ativo.
  */
-export function renderAreaScreen({ url }: { url: string }) {
+export function renderAreaScreen({ url, state }: { url: string; state?: unknown }) {
   const area = findRoute(routes, 'couple-area');
   const screens: RouteObject[] = [
     { path: area?.path ?? '/app', element: <Outlet />, children: area?.children ?? [] },
   ];
-  const router = createMemoryRouter(screens, { initialEntries: [splitUrl(url)] });
+  const router = createMemoryRouter(screens, { initialEntries: [{ ...splitUrl(url), state }] });
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
