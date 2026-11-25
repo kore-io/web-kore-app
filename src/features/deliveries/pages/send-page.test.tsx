@@ -187,6 +187,10 @@ function preset(ids: string[], channel = 'whatsapp', kind = 'invite') {
 beforeEach(() => window.sessionStorage.clear());
 afterEach(() => vi.unstubAllGlobals());
 
+/** O motivo dos Envios fechados no pós-evento e na carência (337(1)). */
+const POST_EVENT =
+  'O casamento já aconteceu. Não dá mais para enviar convites, save the date nem lembretes.';
+
 describe('Envios › as abas e os grupos (Envios RN01, RN03, RN04, RN10; decisão 235)', () => {
   it('/app/envios abre em Enviar convites, com as 4 abas e o resumo', async () => {
     // O relógio fixo em 2026: o prazo de 2026 aparece sem o ano só dentro do mesmo ano.
@@ -778,8 +782,47 @@ describe('Envios › as versões e os textos que faltavam (DoD das F4 e F5; RN03
     mockSend({ status: 'post_event' });
     preset(['p1']);
     renderRoute({ url: '/app/envios/convites?etapa=fila' });
-    expect(await screen.findByRole('button', { name: 'Continuar' })).toBeDisabled();
+    const button = await screen.findByRole('button', { name: 'Continuar' });
+    expect(button).toBeDisabled();
+    // O motivo, sem link, nos dois perfis (337(1)).
+    expect(button).toHaveAccessibleDescription(POST_EVENT);
+    expect(
+      within(document.getElementById('kore-send-closed') as HTMLElement).queryByRole('link'),
+    ).toBeNull();
     expect(screen.queryByRole('textbox', { name: 'Mensagem' })).toBeNull();
+  });
+
+  it('no pós-evento, a colaboradora vê o mesmo motivo, sem link (337(1))', async () => {
+    profileUnderTest.current = 'planner';
+    mockSend({ status: 'post_event' });
+    renderAreaScreen({ url: '/app/envios/convites' });
+    expect(await screen.findByRole('button', { name: 'Continuar' })).toHaveAccessibleDescription(
+      POST_EVENT,
+    );
+  });
+
+  it('o 409 DELIVERIES_CLOSED post_event ao registrar o envio na fila: o Toast do pós-evento (337(1))', async () => {
+    const user = userEvent.setup();
+    mockSend({
+      markError: { status: 409, body: { error: 'DELIVERIES_CLOSED', reason: 'post_event' } },
+    });
+    preset(['p1'], 'link');
+    renderRoute({ url: '/app/envios/convites?etapa=fila' });
+    await user.click(await screen.findByRole('button', { name: 'Copiar mensagem' }));
+    expect(await screen.findByText(POST_EVENT)).toBeInTheDocument();
+    expect(screen.queryByText(/^Não foi possível continuar/)).toBeNull();
+  });
+
+  it('o 409 DELIVERIES_CLOSED post_event ao baixar os QR codes: o Toast do pós-evento (337(1))', async () => {
+    const user = userEvent.setup();
+    mockSend({
+      qrError: { status: 409, body: { error: 'DELIVERIES_CLOSED', reason: 'post_event' } },
+    });
+    preset(['p1', 'p2'], 'qr');
+    renderRoute({ url: '/app/envios/convites?etapa=fila' });
+    await user.click(await screen.findByRole('button', { name: 'Baixar PDF para impressão' }));
+    expect(await screen.findByText(POST_EVENT)).toBeInTheDocument();
+    expect(screen.queryByText(/^Não foi possível continuar/)).toBeNull();
   });
 });
 
@@ -794,7 +837,9 @@ describe('Envios no expirado e na carência (Data de saída RN07; 314(3); decis�
     preset(['p1']);
     renderRoute({ url: '/app/envios/convites?etapa=fila' });
     // Fechado, só a etapa dos grupos (a API recusa com DELIVERIES_CLOSED, reason post_event).
-    expect(await screen.findByRole('button', { name: 'Continuar' })).toBeDisabled();
+    expect(await screen.findByRole('button', { name: 'Continuar' })).toHaveAccessibleDescription(
+      POST_EVENT,
+    );
     expect(screen.queryByText(/^Publiquem o site|^O site está fora do ar/)).toBeNull();
   });
 
