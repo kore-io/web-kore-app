@@ -10,6 +10,7 @@ import { useSiteControllerGetV1 } from '../../shared/api/generated/site/site';
 import { LoadError } from '../../shared/components/load-error';
 import { areaPaths, COUPLE_AREA } from '../area';
 import { AppShell } from './app-shell';
+import { BlockedBanner, useWeddingBlockedRefetch } from '../../features/billing/lifecycle/blocked';
 import { LifecycleBadge, LifecycleBanner } from '../../features/billing/lifecycle/lifecycle-banner';
 import { WeddingNavigation } from './wedding-navigation';
 
@@ -29,6 +30,7 @@ export function CoupleAreaLayout() {
   // Músicas só com a pergunta de música ligada (Música RN03), pelo mesmo GET do Editor.
   const { weddingId, role } = useActiveWedding();
   const navigate = useNavigate();
+  useWeddingBlockedRefetch();
   // O sino dos donos (Central RN06): ao abrir, ao voltar à aba e a cada 60 s com a aba
   // visível. A colaboradora, até a F6, vê o sino sem contador.
   const owner = role === 'owner';
@@ -116,6 +118,8 @@ export function CoupleAreaLayout() {
       }}
       navigation={<WeddingNavigation area={AREA} songsEnabled={songsEnabled} />}
     >
+      {/* O bloqueio substitui as faixas do ciclo de vida (Bloqueado RN04; 329(4)). */}
+      {lifecycle?.lifecycle.blocked && <BlockedBanner />}
       {lifecycle && <LifecycleBanner source={lifecycle} audience="couple" />}
       <Outlet />
     </AppShell>

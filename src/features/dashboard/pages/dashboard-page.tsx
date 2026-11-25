@@ -33,6 +33,7 @@ import { formatRsvpPercent } from '../../../shared/rsvp-percent';
 import { canOpenPublish, publishWaitsCouple } from '../../billing/publish/publish-entry';
 import { lifecycleView } from '../../billing/lifecycle/lifecycle';
 import { deliveriesClosed, expiredClosedText } from '../../deliveries/delivery-closed';
+import { useWriteLock } from '../../billing/lifecycle/blocked';
 import {
   LifecycleBadge,
   lifecycleAction,
@@ -100,8 +101,11 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
   const closed = data ? closedKind !== null && closedKind !== 'post_event' : true;
   // O Enviar convites fecha também no pós-evento e na carência, com o texto dos Envios
   // (Dashboard RN05; Data de saída RN07; decisão 338, como a 331(3) no expirado).
-  const sendClosed = data ? closedKind !== null : true;
+  // O bloqueio fecha a escrita e vem à frente dos outros motivos (Bloqueado RN04).
+  const lock = useWriteLock();
+  const sendClosed = data ? lock.locked || closedKind !== null : true;
   const closedText =
+    lock.reason ??
     expiredClosedText({ closed: closedKind, audience, t: tDeliveries }) ??
     (closedKind === 'post_event'
       ? tDeliveries('closed.postEvent')
@@ -178,7 +182,22 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
             icon={<Users />}
             title={t(`guests.empty.${audience}`)}
             titleAs="h2"
-            action={<Button onClick={() => void navigate(area.guestNew)}>{t('guests.add')}</Button>}
+            action={
+              <div className="kore-dashboard__empty-action">
+                <Button
+                  disabled={lock.locked}
+                  {...(lock.locked && { 'aria-describedby': 'kore-dashboard-empty-locked' })}
+                  onClick={() => void navigate(area.guestNew)}
+                >
+                  {t('guests.add')}
+                </Button>
+                {lock.reason && (
+                  <p id="kore-dashboard-empty-locked" className="kore-dashboard__empty-help">
+                    {lock.reason}
+                  </p>
+                )}
+              </div>
+            }
           />
         ) : (
           <>
@@ -303,6 +322,7 @@ function SiteCard({
   const area = useAreaPaths();
   const { t } = useTranslation('dashboard');
   const { t: tSite } = useTranslation('site');
+  const lock = useWriteLock();
   const navigate = useNavigate();
   const status = siteStatus(data.site.status);
   const live = status === 'published' || status === 'post_event';
@@ -314,7 +334,8 @@ function SiteCard({
     eventDate: membership.eventDate,
     timezone: membership.timezone,
   };
-  const view = source ? lifecycleView({ ...source, now }) : null;
+  // Com o bloqueio, a faixa substitui o texto e a ação do ciclo de vida (Bloqueado RN04; 329(4)).
+  const view = source && !source.lifecycle.blocked ? lifecycleView({ ...source, now }) : null;
   const lifecycleCaption = view ? lifecycleText({ view, audience, now, t: tBilling }) : null;
   const action = view ? lifecycleAction({ view, audience }) : null;
   return (
@@ -356,16 +377,24 @@ function SiteCard({
       {beforePublish && (
         <p className="kore-dashboard__card-caption">{t(`site.freeToBuild.${audience}`)}</p>
       )}
+      {beforePublish && lock.reason && (
+        <p id="kore-dashboard-site-locked" className="kore-dashboard__card-text">
+          {lock.reason}
+        </p>
+      )}
       <div className="kore-dashboard__card-actions">
         {beforePublish ? (
           <Button
             size="sm"
             variant="secondary"
-            // Decisão 325: o casal ainda não aceitou; o motivo é o aviso acima.
-            disabled={publishWaitsCouple(data.site.status)}
-            {...(publishWaitsCouple(data.site.status) && {
-              'aria-describedby': 'kore-dashboard-site-waits',
-            })}
+            // Decisão 325: o casal ainda não aceitou; o motivo é o aviso acima. Bloqueado RN04:
+            // o motivo do bloqueio.
+            disabled={lock.locked || publishWaitsCouple(data.site.status)}
+            {...(lock.locked
+              ? { 'aria-describedby': 'kore-dashboard-site-locked' }
+              : publishWaitsCouple(data.site.status) && {
+                  'aria-describedby': 'kore-dashboard-site-waits',
+                })}
             onClick={() => void navigate(area.billingPublish)}
           >
             {t('site.publish')}

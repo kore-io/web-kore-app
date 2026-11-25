@@ -549,6 +549,62 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     await expectNoA11yViolations({ container });
   });
 
+  describe('o casamento bloqueado (Bloqueado RN04; 329(4))', () => {
+    const LOCKED = 'Indisponível enquanto o site está bloqueado.';
+
+    it('o Enviar convites desabilitado com o motivo do bloqueio, à frente dos outros', async () => {
+      mockDashboard({ lifecycle: { blocked: true } });
+      renderRoute({ url: '/app' });
+      await screen.findByText('142');
+      const send = screen.getByRole('button', { name: 'Enviar convites' });
+      expect(send).toBeDisabled();
+      expect(send).toHaveAccessibleDescription(LOCKED);
+      // Editar site continua: o Editor é leitura (RN03).
+      for (const edit of screen.getAllByRole('button', { name: 'Editar site' })) {
+        expect(edit).toBeEnabled();
+      }
+    });
+
+    it('o cartão Status: o selo de antes, sem o texto nem a ação do expirado', async () => {
+      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.setSystemTime(new Date('2027-03-01T15:00:00Z'));
+      mockDashboard({
+        data: dashboard({ site: { ...dashboard().site, status: 'expired' } }),
+        lifecycle: { status: 'expired', expiredAt: '2027-02-22', blocked: true },
+      });
+      renderRoute({ url: '/app' });
+      await screen.findByText('142');
+      const status = card('Status do site');
+      expect(within(status).getByText('Expirado')).toBeInTheDocument();
+      expect(within(status).queryByText(/^O site está fora do ar/)).toBeNull();
+      expect(within(status).queryByRole('button', { name: 'Renovar' })).toBeNull();
+      vi.useRealTimers();
+    });
+
+    it('no rascunho, o Publicar desabilitado com o motivo do bloqueio', async () => {
+      mockDashboard({
+        data: dashboard({ site: { ...dashboard().site, status: 'draft' } }),
+        lifecycle: { status: 'draft', blocked: true },
+      });
+      renderRoute({ url: '/app' });
+      await screen.findByText('142');
+      const publish = within(card('Status do site')).getByRole('button', { name: 'Publicar' });
+      expect(publish).toBeDisabled();
+      expect(publish).toHaveAccessibleDescription(LOCKED);
+    });
+
+    it('sem grupos, o Adicionar convidados desabilitado com o motivo', async () => {
+      mockDashboard({
+        data: dashboard({ stats: { ...dashboard().stats, partiesTotal: 0 } }),
+        lifecycle: { blocked: true },
+      });
+      renderRoute({ url: '/app' });
+      const add = await screen.findByRole('button', { name: 'Adicionar convidados' });
+      expect(add).toBeDisabled();
+      expect(add).toHaveAccessibleDescription(LOCKED);
+    });
+  });
+
   describe('o cartão Status pelo ciclo de vida (Penpot 03, A5; Data de saída RN06; E8)', () => {
     afterEach(() => {
       vi.useRealTimers();

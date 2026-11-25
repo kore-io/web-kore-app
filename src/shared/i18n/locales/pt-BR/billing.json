@@ -258,6 +258,10 @@
         "planner": "O site está fora do ar desde {{date}}. Ele chegou ao prazo máximo, 12 meses depois do casamento, e não pode mais ser renovado. Peça ao casal para exportar os convidados."
       }
     },
+    "blocked": {
+      "banner": "O site foi bloqueado. O suporte atende em <supportLink>{{supportEmail}}</supportLink>.",
+      "reason": "Indisponível enquanto o site está bloqueado."
+    },
     "exportGuests": "Exportar os convidados",
     "postpone": "Adiar a data",
     "renew": "Renovar"

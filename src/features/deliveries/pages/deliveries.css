@@ -30,6 +30,11 @@
   @apply rounded-sm font-semibold text-primary-dark underline focus-visible:shadow-focus-ring focus-visible:outline-none;
 }
 
+/* O motivo do bloqueio, junto dos botões (Bloqueado RN04). */
+.kore-deadline__locked {
+  @apply m-0 type-caption text-gray-700 md:text-right;
+}
+
 .kore-deadline__actions {
   @apply flex flex-col-reverse gap-3 md:flex-row md:justify-end;
 }

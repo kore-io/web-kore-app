@@ -42,7 +42,10 @@ function mockDeadline({
   deadline = dayFromToday(19),
   queue = { parties: 15, guests: 28, notReminded: 3 },
   put = () => Response.json({ rsvpDeadline: null }),
+  blocked = false,
 }: {
+  /** O casamento bloqueado, pelo lifecycle do /me (Bloqueado RN04). */
+  blocked?: boolean;
   deadline?: string | null;
   queue?: { parties: number; guests: number; notReminded: number };
   put?: (body: unknown) => Response;
@@ -50,7 +53,22 @@ function mockDeadline({
   const calls: Call[] = [];
   let current = deadline;
   mockApi(({ method, path, body }) => {
-    if (path === '/v1/me') return Response.json(meFor(me));
+    if (path === '/v1/me') {
+      if (!blocked) return Response.json(meFor(me));
+      const memberships = me.memberships.map((membership) => ({
+        ...membership,
+        lifecycle: {
+          status: 'published',
+          endDate: null,
+          graceUntil: null,
+          expiredAt: null,
+          paidThrough: null,
+          deletionScheduledFor: null,
+          blocked: true,
+        },
+      }));
+      return Response.json(meFor({ ...me, memberships }));
+    }
     if (path === '/v1/weddings/w1/dashboard') {
       return Response.json({
         role: 'owner',
@@ -270,5 +288,28 @@ describe('Envios › Prazo de resposta (Prazo e respostas RN01 a RN03; Penpot A7
     const { container } = renderRoute({ url: '/app/envios/prazo' });
     await screen.findByLabelText('Prazo de resposta');
     await expectNoA11yViolations({ container });
+  });
+
+  it('bloqueado: Salvar e Tirar o prazo desabilitados com o motivo (Bloqueado RN04)', async () => {
+    mockDeadline({ blocked: true });
+    renderRoute({ url: '/app/envios/prazo' });
+    for (const name of ['Salvar prazo', 'Tirar o prazo']) {
+      const button = await screen.findByRole('button', { name });
+      expect(button).toBeDisabled();
+      expect(button).toHaveAccessibleDescription('Indisponível enquanto o site está bloqueado.');
+    }
+  });
+
+  it('o 403 WEDDING_BLOCKED em corrida: o Toast com o motivo, no lugar do genérico (Bloqueado RN04)', async () => {
+    const user = userEvent.setup();
+    mockDeadline({
+      put: () => Response.json({ error: 'WEDDING_BLOCKED' }, { status: 403 }),
+    });
+    renderRoute({ url: '/app/envios/prazo' });
+    await user.click(await screen.findByRole('button', { name: 'Tirar o prazo' }));
+    expect(
+      await screen.findByText('Indisponível enquanto o site está bloqueado.'),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/^Não foi possível continuar/)).toBeNull();
   });
 });

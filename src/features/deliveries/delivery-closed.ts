@@ -10,9 +10,16 @@ import { lifecycleView } from '../billing/lifecycle/lifecycle';
  *   envios com o `DELIVERIES_CLOSED` de reason `post_event` (decisão 332, que revoga a 330);
  * - no expirado, `expired`; com mês pago à frente (caso B), `expired_paid_ahead` (331(1);
  *   `.prs/f3/pena-331.md`); no sem renovação, `expired_final` (314(3)).
+ * O `blocked` (Bloqueado RN04) vem da trava de escrita da tela, à frente de todos.
  */
 export type Closed =
-  'not_published' | 'post_event' | 'expired' | 'expired_paid_ahead' | 'expired_final' | null;
+  | 'blocked'
+  | 'not_published'
+  | 'post_event'
+  | 'expired'
+  | 'expired_paid_ahead'
+  | 'expired_final'
+  | null;
 
 export function deliveriesClosed({
   status,

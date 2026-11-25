@@ -22,6 +22,7 @@ import {
 } from '../delivery-texts';
 import { useDeliverySelection } from '../hooks/use-delivery-selection';
 import type { Closed } from './send-page';
+import { useBlockedToast } from '../../billing/lifecycle/blocked';
 
 const BODY_MAX = 1000;
 const SUBJECT_MAX = 120;
@@ -72,6 +73,7 @@ function ChannelForm({
   const { t } = useTranslation('deliveries');
   const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
+  const blockedToast = useBlockedToast();
   const queryClient = useQueryClient();
   const [, setSearch] = useSearchParams();
   const radioName = useId();
@@ -104,7 +106,9 @@ function ChannelForm({
     });
   }
 
-  function failed() {
+  function failed(error?: unknown) {
+    // O bloqueio em corrida (Bloqueado RN04): o Toast com o motivo, no lugar do genérico.
+    if (blockedToast(error)) return;
     showToast({
       tone: 'danger',
       message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
@@ -116,8 +120,8 @@ function ChannelForm({
     try {
       await messageTemplatesControllerPutV1(weddingId, kind, { reset: true });
       await refresh();
-    } catch {
-      failed();
+    } catch (error) {
+      failed(error);
     } finally {
       setSaving(false);
     }
@@ -138,7 +142,7 @@ function ChannelForm({
       setSearch({ etapa: 'fila' });
     } catch (error) {
       if (apiErrorCode({ error }) === 'LINK_PLACEHOLDER_MISSING') return;
-      failed();
+      failed(error);
     } finally {
       setSaving(false);
     }

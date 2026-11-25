@@ -97,6 +97,7 @@ function mockSend({
   let current = template;
   mockApi(({ method, path, body }) => {
     if (path === '/v1/me') {
+      calls.push({ method, path, body });
       if (!lifecycle) return Response.json(meFor(me));
       const memberships = me.memberships.map((membership) => ({
         ...membership,
@@ -823,6 +824,37 @@ describe('Envios › as versões e os textos que faltavam (DoD das F4 e F5; RN03
     await user.click(await screen.findByRole('button', { name: 'Baixar PDF para impressão' }));
     expect(await screen.findByText(POST_EVENT)).toBeInTheDocument();
     expect(screen.queryByText(/^Não foi possível continuar/)).toBeNull();
+  });
+});
+
+describe('Envios no casamento bloqueado (Bloqueado RN04 e RN07)', () => {
+  const LOCKED = 'Indisponível enquanto o site está bloqueado.';
+
+  it('só a etapa Grupos, com o Continuar desabilitado e o motivo, à frente do expirado', async () => {
+    mockSend({ status: 'expired', lifecycle: { expiredAt: '2026-12-01', blocked: true } });
+    preset(['p1']);
+    renderRoute({ url: '/app/envios/convites?etapa=fila' });
+    const button = await screen.findByRole('button', { name: 'Continuar' });
+    expect(button).toBeDisabled();
+    expect(button).toHaveAccessibleDescription(LOCKED);
+    expect(
+      within(document.getElementById('kore-send-closed') as HTMLElement).queryByRole('link'),
+    ).toBeNull();
+  });
+
+  it('o 403 WEDDING_BLOCKED ao registrar o envio: o Toast com o motivo e o /me relido', async () => {
+    const user = userEvent.setup();
+    const calls = mockSend({
+      markError: { status: 403, body: { error: 'WEDDING_BLOCKED' } },
+    });
+    preset(['p1'], 'link');
+    renderRoute({ url: '/app/envios/convites?etapa=fila' });
+    await user.click(await screen.findByRole('button', { name: 'Copiar mensagem' }));
+    expect(await screen.findByText(LOCKED)).toBeInTheDocument();
+    expect(screen.queryByText(/^Não foi possível continuar/)).toBeNull();
+    await waitFor(() =>
+      expect(calls.filter((call) => call.path === '/v1/me').length).toBeGreaterThan(1),
+    );
   });
 });
 

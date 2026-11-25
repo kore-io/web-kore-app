@@ -15,6 +15,7 @@ import { apiErrorCode } from '../../../shared/api/http-client';
 import { useDeliveriesPostEvent, useSiteExpired, useSiteExpiredRead } from '../use-site-expired';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { DELIVERY_LIMIT, useDeliverySelection } from '../hooks/use-delivery-selection';
+import { useBlockedToast } from '../../billing/lifecycle/blocked';
 
 /**
  * A fila do QR code (Envios RN09; Penpot A6 "QR code" e "QR code baixado"): sem cartões,
@@ -38,6 +39,7 @@ export function QrStep({ weddingId }: { weddingId: string }) {
   const [downloading, setDownloading] = useState(false);
   const siteExpired = useSiteExpired({ weddingId });
   const postEvent = useDeliveriesPostEvent({ weddingId });
+  const blockedToast = useBlockedToast();
   const expiredRead = useSiteExpiredRead({ weddingId, error: queue.error });
 
   if (queue.isError && !expiredRead)
@@ -77,6 +79,8 @@ export function QrStep({ weddingId }: { weddingId: string }) {
     } catch (error) {
       // O site expirou no meio (RN07): o texto dos Envios no expirado, e a tela relê.
       if (siteExpired(error)) return;
+      // O bloqueio em corrida (Bloqueado RN04): o Toast com o motivo.
+      if (blockedToast(error)) return;
       // Depois do casamento (pós-evento ou carência), o texto dos Envios fechados (337(1)).
       if (postEvent(error)) return;
       // Fechou no meio (despublicado ou depois do casamento): o painel relê o status (RN01).
