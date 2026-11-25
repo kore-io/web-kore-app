@@ -849,12 +849,14 @@ describe('Envios no casamento bloqueado (Bloqueado RN04 e RN07)', () => {
     });
     preset(['p1'], 'link');
     renderRoute({ url: '/app/envios/convites?etapa=fila' });
-    await user.click(await screen.findByRole('button', { name: 'Copiar mensagem' }));
+    const copy = await screen.findByRole('button', { name: 'Copiar mensagem' });
+    // As leituras do /me antes do clique: o 403 numa chamada direta pede mais uma (RN07).
+    const reads = () => calls.filter((call) => call.path === '/v1/me').length;
+    const before = reads();
+    await user.click(copy);
     expect(await screen.findByText(LOCKED)).toBeInTheDocument();
     expect(screen.queryByText(/^Não foi possível continuar/)).toBeNull();
-    await waitFor(() =>
-      expect(calls.filter((call) => call.path === '/v1/me').length).toBeGreaterThan(1),
-    );
+    await waitFor(() => expect(reads()).toBeGreaterThan(before));
   });
 });
 
