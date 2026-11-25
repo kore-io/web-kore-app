@@ -1,0 +1,17 @@
+/*
+ * Forma de pagamento (Penpot 21, "Formas" e "Opção / Cartão de crédito"): as opções em
+ * linha com 24 px entre elas (quebram quando não cabem, com 16 px entre as linhas); a
+ * opção é uma coluna com 4 px entre o Radio e a legenda; a legenda em type.caption gray.700,
+ * alinhada ao início do rótulo (o controle de 20 px e os 10 px do Radio).
+ */
+.kore-payment-option-group {
+  @apply flex flex-wrap items-start gap-x-6 gap-y-4;
+}
+
+.kore-payment-option {
+  @apply flex flex-col gap-1;
+}
+
+.kore-payment-option__caption {
+  @apply type-caption pl-7.5 text-gray-700;
+}
