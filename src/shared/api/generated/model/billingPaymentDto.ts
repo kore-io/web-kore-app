@@ -32,4 +32,13 @@ export interface BillingPaymentDto {
    * @nullable
    */
   disputeDeadline: string | null;
+  /**
+   * Só na extensão desistível (com `refundableUntil`): a data de saída do ar
+   * para onde a `endDate` volta se ela for desistida, AAAA-MM-DD, já com a
+   * regra da RN03 (`min(endDate atual, a data anterior gravada na
+   * confirmação)`; decisão 327(2)). Nulo na publicação e no que não é
+   * desistível.
+   * @nullable
+   */
+  refundEndDate: string | null;
 }
