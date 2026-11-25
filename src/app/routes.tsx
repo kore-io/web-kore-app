@@ -16,6 +16,7 @@ import { PlannerSignUpPage } from '../features/planner/pages/planner-sign-up-pag
 import { ReferralLinkPage } from '../features/planner/referral/referral-link-page';
 import { TemplatesPage } from '../features/planner/templates/templates-page';
 import { CollaboratorsPage } from '../features/collaborators/pages/collaborators-page';
+import { PaymentsPage } from '../features/billing/payments/payments-page';
 import { PixPage } from '../features/billing/pix/pix-page';
 import { PublishPage } from '../features/billing/publish/publish-page';
 import { DashboardPage } from '../features/dashboard/pages/dashboard-page';
@@ -82,8 +83,9 @@ function areaRoutes({ prefix }: { prefix: 'couple' | 'planner' }): RouteObject[]
       ),
     },
     { id: 'songs', path: 'musicas', element: <SongsPage /> },
-    // Publicar o site (E2 da F3): entra pelo Editor, pelo Dashboard e por Envios (E5); o item
-    // da Sidebar entra com Pagamentos, no E6 (decisão 322).
+    // Cobrança e publicação (E6): Pagamentos, com o item da Sidebar (decisão 322); o Publicar
+    // o site entra também pelo Editor, pelo Dashboard e por Envios (E5).
+    { id: 'billing', path: 'cobranca', element: <PaymentsPage /> },
     { id: 'billing-publish', path: 'cobranca/publicar', element: <PublishPage /> },
     { id: 'billing-pix', path: 'cobranca/pix', element: <PixPage /> },
     { id: 'collaborators', path: 'colaboradores', element: <CollaboratorsPage /> },

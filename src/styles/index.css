@@ -21,6 +21,7 @@
 @import '../shared/components/payment-option.css' layer(components);
 @import '../features/billing/publish/publish.css' layer(components);
 @import '../features/billing/pix/pix.css' layer(components);
+@import '../features/billing/payments/payments.css' layer(components);
 @import '../features/access/components/sign-up.css' layer(components);
 @import '../features/planner/planner.css' layer(components);
 @import '../features/planner/my-weddings/my-weddings.css' layer(components);

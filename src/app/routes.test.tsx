@@ -54,6 +54,7 @@ describe('rotas do app (decisões 139, 146, 147 e 198)', () => {
       collaborators: '/app/colaboradores',
       notifications: '/app/notificacoes',
       settingsNotifications: '/app/configuracoes/notificacoes',
+      billing: '/app/cobranca',
       billingPublish: '/app/cobranca/publicar',
       billingPix: '/app/cobranca/pix',
       site: '/app/site',
@@ -76,6 +77,7 @@ describe('rotas do app (decisões 139, 146, 147 e 198)', () => {
     ['/cerimonialista/casamentos/w9/site/dados-basicos', 'planner-site-editor'],
     ['/cerimonialista/casamentos/w9/musicas', 'planner-songs'],
     ['/cerimonialista/casamentos/w9/colaboradores', 'planner-collaborators'],
+    ['/cerimonialista/casamentos/w9/cobranca', 'planner-billing'],
     ['/cerimonialista/casamentos/w9/cobranca/publicar', 'planner-billing-publish'],
   ])('%s abre a mesma tela na área da colaboradora (%s)', (url, id) => {
     expect(routeIdAt({ url })).toBe(id);
