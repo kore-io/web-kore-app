@@ -1,7 +1,7 @@
 import { Alert, Button, DateField, PageHeader, Select, Spinner } from '@kore-io/design';
 import { keepPreviousData } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
-import { useId, useState, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate } from 'react-router';
 import { useAreaPaths } from '../../../app/area';
@@ -252,6 +252,13 @@ function PublishForm({
   const [card, setCard] = useState<CardValues>(EMPTY_CARD);
   const [payer, setPayer] = useState<PayerValues>(EMPTY_PAYER);
   const [errors, setErrors] = useState<PayErrors>({});
+  // Depois do Pagar com erros, o foco vai ao 1º campo inválido (sugestão do Crivo no E3).
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [focusRequest, setFocusRequest] = useState(0);
+  useEffect(() => {
+    if (focusRequest === 0) return;
+    rootRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus();
+  }, [focusRequest]);
   const payment = usePublishPayment({ weddingId });
   const debouncedEndDate = useDebouncedValue({ value: endDate, delayMs: QUOTE_DEBOUNCE_MS });
   const free = pricing.installments.interestFreeUpTo;
@@ -330,7 +337,10 @@ function PublishForm({
       t,
     });
     setErrors(found);
-    if (Object.keys(found).length > 0) return;
+    if (Object.keys(found).length > 0) {
+      setFocusRequest((count) => count + 1);
+      return;
+    }
     const payerId = previousPayerId({ payer, previousPayer: payment.previousPayer });
     const failure = await payment.pay({
       body: {
@@ -354,7 +364,7 @@ function PublishForm({
   }
 
   return (
-    <div className="kore-publish">
+    <div className="kore-publish" ref={rootRef}>
       <PublishHeader />
       <div className="kore-publish__columns">
         <div className="kore-publish__choices">
