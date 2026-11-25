@@ -12,6 +12,7 @@ import {
   useDeliveriesControllerGetQueueV1,
 } from '../../../shared/api/generated/rsvp/rsvp';
 import { apiErrorCode } from '../../../shared/api/http-client';
+import { useSiteExpired, useSiteExpiredRead } from '../use-site-expired';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { DELIVERY_LIMIT, useDeliverySelection } from '../hooks/use-delivery-selection';
 
@@ -35,9 +36,12 @@ export function QrStep({ weddingId }: { weddingId: string }) {
     { query: { enabled: ids.length > 0, refetchOnWindowFocus: false } },
   );
   const [downloading, setDownloading] = useState(false);
+  const siteExpired = useSiteExpired({ weddingId });
+  const expiredRead = useSiteExpiredRead({ weddingId, error: queue.error });
 
-  if (queue.isError) return <LoadErrorNotice onRetry={() => void queue.refetch()} />;
-  if (!queue.data) {
+  if (queue.isError && !expiredRead)
+    return <LoadErrorNotice onRetry={() => void queue.refetch()} />;
+  if (!queue.data || expiredRead) {
     return (
       <div className="kore-send__loading">
         <Spinner label={t('title')} />
@@ -70,6 +74,8 @@ export function QrStep({ weddingId }: { weddingId: string }) {
         }),
       ]);
     } catch (error) {
+      // O site expirou no meio (RN07): o texto dos Envios no expirado, e a tela relê.
+      if (siteExpired(error)) return;
       // Fechou no meio (despublicado ou depois do casamento): o painel relê o status (RN01).
       if (apiErrorCode({ error }) === 'DELIVERIES_CLOSED') {
         void queryClient.invalidateQueries({

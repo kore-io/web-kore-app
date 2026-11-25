@@ -32,6 +32,7 @@ import { useArea, useAreaPaths, type AreaPaths } from '../../../app/area';
 import { formatRsvpPercent } from '../../../shared/rsvp-percent';
 import { canOpenPublish, publishWaitsCouple } from '../../billing/publish/publish-entry';
 import { lifecycleView } from '../../billing/lifecycle/lifecycle';
+import { deliveriesClosed } from '../../deliveries/delivery-closed';
 import { LifecycleBadge, lifecycleText } from '../../billing/lifecycle/lifecycle-banner';
 
 /** O caminho de cada item do Checklist (RN03), na área da tela. */
@@ -73,6 +74,7 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
   const area = useAreaPaths();
   const { kind } = useArea();
   const { t } = useTranslation('dashboard');
+  const { t: tDeliveries } = useTranslation('deliveries');
   const navigate = useNavigate();
   const { data: me } = useMeControllerMeV1();
   const dashboard = useDashboardControllerGetV1(weddingId, {
@@ -81,9 +83,21 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
   const firstName = me?.user.name?.trim().split(/\s+/)[0];
   const now = new Date();
   const data = dashboard.data;
-  const closed = data
-    ? data.site.status !== 'published' && data.site.status !== 'post_event'
-    : true;
+  // Envios RN01 e Data de saída RN07: a carência segue o pós-evento (332), como antes.
+  const closedKind = data
+    ? deliveriesClosed({
+        status: data.site.status,
+        membership: me?.memberships.find((item) => item.weddingId === weddingId),
+        now,
+      })
+    : null;
+  const closed = data ? closedKind !== null && closedKind !== 'post_event' : true;
+  const closedText =
+    closedKind === 'expired'
+      ? tDeliveries(`closed.expired.${audience}`)
+      : closedKind === 'expired_final'
+        ? tDeliveries('closed.expiredFinal')
+        : t(`actions.closed.${audience}`);
 
   const header = (
     <PageHeader
@@ -112,7 +126,7 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
           </Button>
           {data && closed && (
             <p id="kore-dashboard-closed" className="kore-dashboard__help">
-              {t(`actions.closed.${audience}`)}
+              {closedText}
             </p>
           )}
         </div>
@@ -189,7 +203,11 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
                 )}
               />
             </Link>
-            <DeliveryCard data={data} closed={closed} />
+            <DeliveryCard
+              data={data}
+              closed={closed}
+              beforePublish={closedKind === 'not_published'}
+            />
           </>
         )}
         <SiteCard
@@ -206,7 +224,16 @@ function Dashboard({ weddingId, audience }: { weddingId: string; audience: Audie
 }
 
 /** Envios (RN02): os grupos por status; cada um abre Enviar convites com o filtro. */
-function DeliveryCard({ data, closed }: { data: DashboardResponse; closed: boolean }) {
+function DeliveryCard({
+  data,
+  closed,
+  beforePublish,
+}: {
+  data: DashboardResponse;
+  closed: boolean;
+  /** A legenda "Os envios começam depois de publicar o site." só antes de publicar (331(3)). */
+  beforePublish: boolean;
+}) {
   const area = useAreaPaths();
   const { t } = useTranslation('dashboard');
   return (
@@ -247,7 +274,7 @@ function DeliveryCard({ data, closed }: { data: DashboardResponse; closed: boole
           );
         })}
       </ul>
-      {closed && <p className="kore-dashboard__card-caption">{t('delivery.closed')}</p>}
+      {beforePublish && <p className="kore-dashboard__card-caption">{t('delivery.closed')}</p>}
     </section>
   );
 }

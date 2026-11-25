@@ -17,6 +17,7 @@ import { useWeddingTimezone } from '../../../shared/use-wedding-timezone';
 import { deliveryStatusText, sentAtOf, type DeliveryKind } from '../delivery-texts';
 import { DELIVERY_LIMIT, useDeliverySelection } from '../hooks/use-delivery-selection';
 import { QrStep } from './qr-step';
+import { useSiteExpired, useSiteExpiredRead } from '../use-site-expired';
 import type { Closed } from './send-page';
 import { useAreaPaths } from '../../../app/area';
 
@@ -80,9 +81,13 @@ function ChannelQueue({
     },
   );
   const [sent, setSent] = useState<Sent>({});
+  const siteExpired = useSiteExpired({ weddingId });
+  // O expirado na leitura da fila: o Toast, e o Dashboard relido fecha a etapa (RN07).
+  const expiredRead = useSiteExpiredRead({ weddingId, error: queue.error });
 
-  if (queue.isError) return <LoadErrorNotice onRetry={() => void queue.refetch()} />;
-  if (!queue.data) {
+  if (queue.isError && !expiredRead)
+    return <LoadErrorNotice onRetry={() => void queue.refetch()} />;
+  if (!queue.data || expiredRead) {
     return (
       <div className="kore-send__loading">
         <Spinner label={t('title')} />
@@ -110,12 +115,14 @@ function ChannelQueue({
           queryKey: getPartiesControllerListV1InfiniteQueryKey(weddingId),
         });
       })
-      .catch(() =>
+      .catch((error: unknown) => {
+        // O site expirou no meio da fila (RN07): o texto dos Envios no expirado.
+        if (siteExpired(error)) return;
         showToast({
           tone: 'danger',
           message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
-        }),
-      );
+        });
+      });
   }
 
   function send(item: DeliveryQueueItemResponse) {
