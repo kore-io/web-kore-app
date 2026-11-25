@@ -44,7 +44,7 @@ export interface PaymentOptionProps extends Omit<RadioProps, 'children'> {
  * O toque na legenda escolhe a opção, como o toque no rótulo (sugestão do Crivo no L3); ela
  * não vira um 2º rótulo, que entraria no nome do Radio.
  */
-export function PaymentOption({ label, caption, ...radio }: PaymentOptionProps) {
+export function PaymentOption({ label, caption, ref, ...radio }: PaymentOptionProps) {
   const captionId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const describedBy = [radio['aria-describedby'], caption !== undefined && captionId]
@@ -53,8 +53,14 @@ export function PaymentOption({ label, caption, ...radio }: PaymentOptionProps) 
   return (
     <div className="kore-payment-option">
       <Radio
-        ref={inputRef}
         {...radio}
+        // O ref da tela e o da legenda juntos: o da tela não desliga o toque na legenda
+        // (cobrança do Crivo no E2).
+        ref={(node: HTMLInputElement | null) => {
+          inputRef.current = node;
+          if (typeof ref === 'function') ref(node);
+          else if (ref) ref.current = node;
+        }}
         {...(describedBy !== '' && { 'aria-describedby': describedBy })}
       >
         {label}
