@@ -181,6 +181,10 @@ describe('Publicar o site, a versão do casal (Publicar RN01; Preço RN03, RN04 
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Publicar o site' }),
     ).toBeInTheDocument();
+    // O casal vê o subtítulo (a colaboradora, não: acréscimo à 323).
+    expect(
+      screen.getByText('Escolham até quando o site fica no ar. O pagamento é um só, feito agora.'),
+    ).toBeInTheDocument();
     expect(
       await screen.findByText(
         'Depois do casamento e até 14 de nov. de 2027. O mês incompleto conta como mês inteiro.',
@@ -364,6 +368,8 @@ describe('Publicar o site, a versão da colaboradora (decisão 323)', () => {
     renderAreaScreen({ url: URL_PUBLISH });
     expect(await screen.findByText('Só o casal pode publicar e pagar.')).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 1, name: 'Publicar o site' })).toBeInTheDocument();
+    // O título sem o subtítulo do casal (acréscimo à 323).
+    expect(screen.queryByText(/^Escolham até quando o site fica no ar/)).toBeNull();
     expect(screen.getByRole('region', { name: 'Resumo do contrato' })).toBeInTheDocument();
     expect(payButton()).toBeDisabled();
     expect(payButton()).toHaveAccessibleDescription('Só o casal pode publicar e pagar.');
