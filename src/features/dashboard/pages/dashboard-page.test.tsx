@@ -623,6 +623,27 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
       expect(within(card('Status do site')).queryByRole('button', { name: /Renovar/ })).toBeNull();
     });
 
+    it('caso B: o Voltar ao ar no cartão e o motivo da Pena no Enviar convites (E10; 333(2); pena-331)', async () => {
+      const user = userEvent.setup();
+      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.setSystemTime(new Date('2026-12-01T15:00:00Z'));
+      mockDashboard({
+        data: dashboard({ site: { ...dashboard().site, status: 'expired' } }),
+        lifecycle: { status: 'expired', expiredAt: '2026-11-28', paidThrough: '2027-02-14' },
+      });
+      const { router } = renderRoute({ url: '/app' });
+      await screen.findByText('142');
+      expect(screen.getByRole('button', { name: 'Enviar convites' })).toHaveAccessibleDescription(
+        'O site está fora do ar. Voltem o site ao ar, sem custo, para enviar.',
+      );
+      await user.click(
+        within(card('Status do site')).getByRole('button', { name: 'Voltar ao ar' }),
+      );
+      await waitFor(() =>
+        expect(router.state.location.pathname).toBe('/app/cobranca/data-de-saida'),
+      );
+    });
+
     it('sem renovação: o Exportar os convidados do casal no cartão (314(1))', async () => {
       const user = userEvent.setup();
       vi.useFakeTimers({ toFake: ['Date'] });

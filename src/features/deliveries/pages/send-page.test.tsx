@@ -815,6 +815,36 @@ describe('Envios no expirado e na carência (Data de saída RN07; 314(3); decis�
     );
   });
 
+  it('caso B: o texto da Pena e o Voltar ao ar do casal; a colaboradora sem link (331(1); pena-331)', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-12-01T15:00:00Z'));
+    onTestFinished(() => {
+      vi.useRealTimers();
+    });
+    const lifecycle = { expiredAt: '2026-11-28', paidThrough: '2027-02-14' };
+    mockSend({ status: 'expired', lifecycle });
+    preset(['p1']);
+    const view = renderRoute({ url: '/app/envios/convites' });
+    expect(await screen.findByRole('button', { name: 'Continuar' })).toHaveAccessibleDescription(
+      /^O site está fora do ar\. Voltem o site ao ar, sem custo, para enviar\./,
+    );
+    const notice = document.getElementById('kore-send-closed') as HTMLElement;
+    expect(within(notice).getByRole('link', { name: 'Voltar ao ar' })).toHaveAttribute(
+      'href',
+      '/app/cobranca/data-de-saida',
+    );
+    view.unmount();
+    profileUnderTest.current = 'planner';
+    mockSend({ status: 'expired', lifecycle });
+    renderAreaScreen({ url: '/app/envios/convites' });
+    expect(
+      await screen.findByText('O site está fora do ar. Peça ao casal para voltar o site ao ar.'),
+    ).toBeInTheDocument();
+    expect(
+      within(document.getElementById('kore-send-closed') as HTMLElement).queryByRole('link'),
+    ).toBeNull();
+  });
+
   it('sem renovação: um texto só; o casal com o Exportar os convidados, a colaboradora sem (314(3))', async () => {
     vi.useFakeTimers({ toFake: ['Date'] });
     // O casamento de 14/11/2026 passou de 12 meses.
