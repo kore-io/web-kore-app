@@ -76,6 +76,8 @@ export function LifecycleBanner({
   const view = lifecycleView({ ...source, now });
   const text = lifecycleText({ view, audience, now, t });
   if (!text) return null;
+  // Na A7 (o sem renovação, na tela da data) a faixa fica oculta: a tela já é o destino (314(5)).
+  if (onEndDate && view.kind === 'expired' && view.variant === 'final') return null;
   const exportLink = view.kind === 'expired' && view.variant === 'final' && audience === 'couple';
   // O Voltar ao ar do caso B entra no E10 (333(2)); o Adiar a data e o Renovar, no E11.
   const backOnline =

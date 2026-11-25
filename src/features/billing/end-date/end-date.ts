@@ -72,8 +72,10 @@ export function endDateChoice({
   return 'extend';
 }
 
-/** Quem tem o que mudar aqui no E10: no ar, pós-evento, ou com mês pago à frente (333(2)). */
-export function canChangeEndDateFree({ source, now }: { source: EndDateSource; now: Date }) {
-  if (source.status === 'published' || source.status === 'post_event') return true;
-  return paidAhead({ source, now }) !== null;
+/**
+ * Quem abre o Mudar a data (E11): o site publicado em qualquer fase (no ar, pós-evento,
+ * carência e expirado; o sem renovação mostra a A7).
+ */
+export function canChangeEndDate({ status }: { status: string }): boolean {
+  return ['published', 'post_event', 'grace', 'expired'].includes(status);
 }

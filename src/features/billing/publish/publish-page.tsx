@@ -409,7 +409,11 @@ function PublishForm({
               label={t('publish.endDate.label')}
               {...(max !== null && {
                 hint: fieldError
-                  ? t('publish.endDate.outOfRange', { max: maxText })
+                  ? // A data mínima e o limite, com o ano (decisão 335; pena-e11).
+                    t('publish.endDate.outOfRange', {
+                      min: limits?.endDateMin ? shortDate(limits.endDateMin) : '',
+                      max: maxText,
+                    })
                   : t('publish.endDate.help', { max: maxText }),
                 hintTone: fieldError ? 'danger' : 'neutral',
               })}
