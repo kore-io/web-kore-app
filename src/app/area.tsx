@@ -63,6 +63,8 @@ export function areaPaths(base: string) {
     notifications: `${base}/notificacoes`,
     /** Configurações › Notificações (decisão 221). */
     settingsNotifications: `${base}/configuracoes/notificacoes`,
+    /** Cobrança e publicação › Publicar o site (Publicar e pagar RN01; decisão 316(2)). */
+    billingPublish: `${base}/cobranca/publicar`,
     /** Site › Editor (decisão 214): abre os Dados básicos. */
     site: `${base}/site`,
     /** O Painel de um grupo: link próprio, para compartilhar e para o voltar (198). */

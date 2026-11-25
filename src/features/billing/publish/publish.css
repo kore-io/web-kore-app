@@ -1,0 +1,57 @@
+/*
+ * Publicar o site (Penpot 21, "Screen / Publicar"): o Page Header e, abaixo, 24 px. No
+ * computador (≥ 1024 px), as duas colunas com 24 px entre elas: as escolhas (o resto) e o
+ * resumo (400 px), com 16 px entre os painéis. No celular e no tablet, uma coluna, na ordem
+ * do DOM (as escolhas, depois o resumo). Os botões: à direita no computador; no celular, a
+ * largura toda, com o Pagar e publicar em cima. O motivo acima deles, à direita, em
+ * type.caption gray.700.
+ */
+.kore-publish {
+  @apply flex flex-col gap-6;
+}
+
+.kore-publish__loading {
+  @apply flex justify-center py-10;
+}
+
+.kore-publish__columns {
+  @apply flex flex-col gap-6 lg:flex-row lg:items-start;
+}
+
+.kore-publish__choices {
+  @apply flex min-w-0 flex-1 flex-col gap-6;
+}
+
+.kore-publish__summary,
+.kore-publish__planner {
+  @apply flex min-w-0 flex-col gap-4;
+}
+
+.kore-publish__summary {
+  @apply lg:w-100 lg:shrink-0;
+}
+
+.kore-publish__planner {
+  @apply max-w-100;
+}
+
+.kore-publish__contract-text,
+.kore-publish__empty {
+  @apply type-body-md text-gray-700;
+}
+
+.kore-publish__terms {
+  @apply type-body-md self-start text-primary-dark underline-offset-2 hover:underline;
+}
+
+.kore-publish__actions {
+  @apply flex flex-col gap-3;
+}
+
+.kore-publish__reason {
+  @apply type-caption text-gray-700 lg:text-right;
+}
+
+.kore-publish__buttons {
+  @apply flex flex-col-reverse gap-3 lg:flex-row lg:justify-end;
+}

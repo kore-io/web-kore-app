@@ -1,0 +1,69 @@
+{
+  "publish": {
+    "title": "Publicar o site",
+    "description": "Escolham até quando o site fica no ar. O pagamento é um só, feito agora.",
+    "loading": "Carregando o Publicar",
+    "endDate": {
+      "label": "Data de saída do ar",
+      "help": "Depois do casamento e até {{max}}. O mês incompleto conta como mês inteiro.",
+      "outOfRange": "Escolham uma data depois do casamento e até {{max}}."
+    },
+    "monthsAlert": "Na publicação, o preço para em {{cap}}. Depois de publicar, cada mês a mais custa {{monthly}}, sem esse limite.",
+    "method": {
+      "title": "Forma de pagamento",
+      "pix": "Pix à vista · {{percent}}% de desconto",
+      "card": "Cartão de crédito",
+      "cardCaption": "Em até {{max}}x. Até {{free}}x, sem juros."
+    },
+    "installments": {
+      "label": "Parcelas",
+      "noDate": "Escolham a data para ver as parcelas.",
+      "even": "{{count}}x de {{amount}} sem juros",
+      "uneven": "{{count}}x sem juros: 1ª de {{first}} e as outras de {{rest}}",
+      "evenInterest": "{{count}}x de {{amount}} com juros (total {{total}})",
+      "unevenInterest": "{{count}}x com juros: 1ª de {{first}} e as outras de {{rest}} (total {{total}})"
+    },
+    "interestAlert": "Em {{count}}x, o cartão cobra juros de {{interest}} ({{rate}} + {{fixed}} sobre o valor). Vocês pagam {{total}} no total. Até {{free}}x, não há juros.",
+    "summary": {
+      "title": "Resumo",
+      "empty": "Escolham a data de saída do ar para ver o resumo.",
+      "activation": "Ativação",
+      "months_one": "{{count}} mês × {{monthly}}",
+      "months_other": "{{count}} meses × {{monthly}}",
+      "cap": "Preço máximo do Kore",
+      "capCaption": "A publicação custa no máximo {{cap}}, a partir de {{months}} meses.",
+      "referral": {
+        "assessoria": "Desconto da assessoria ({{percent}}%)",
+        "indicacao": "Desconto de indicação ({{percent}}%)"
+      },
+      "pix": "Desconto do Pix ({{percent}}%)",
+      "interest": "Juros do cartão ({{count}}x)",
+      "total": "Total"
+    },
+    "compare": {
+      "title": "Comparar as formas de pagamento",
+      "empty": "Escolham a data de saída do ar para comparar as formas de pagamento.",
+      "pix": "Pix à vista",
+      "cardFree": "Cartão em até {{free}}x, sem juros",
+      "cardInterest": "Cartão em {{count}}x, com juros"
+    },
+    "contract": {
+      "title": "Resumo do contrato",
+      "included": "Incluso: o site do casamento, a lista de convidados com as confirmações, os envios pelo WhatsApp e a lista de presentes por Pix.",
+      "price": "Preço: {{total}}, pago uma vez. O site fica no ar até {{date}}.",
+      "refund": "Vocês podem desistir em até 7 dias depois de pagar e recebem tudo de volta, inclusive os juros do cartão.",
+      "terms": "Termos de uso"
+    },
+    "pay": "Pagar e publicar",
+    "cancel": "Cancelar",
+    "reason": {
+      "planner": "Só o casal pode publicar e pagar.",
+      "blocked": "Indisponível enquanto o site está bloqueado.",
+      "noSlug": "Escolham o endereço do site em Dados básicos para publicar.",
+      "noEventDate": "Informem a data do casamento em Dados básicos para publicar.",
+      "noEventDateAndState": "Informem a data e a UF do casamento em Dados básicos para publicar.",
+      "awaitingCouple": "O casal ainda não aceitou o convite.",
+      "noDate": "Escolham a data de saída do ar para publicar."
+    }
+  }
+}
