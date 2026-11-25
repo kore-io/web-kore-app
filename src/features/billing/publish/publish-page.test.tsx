@@ -500,6 +500,7 @@ describe('Publicar o site, o pagar com o cartão (E3; Publicar RN02 a RN07; deci
               amountCents: 33710,
               dueAt: null,
               pixCopyPaste: null,
+              endDate: '2027-02-14',
             }
           : null,
     });
@@ -649,6 +650,7 @@ describe('Publicar o site, o pagar com o cartão (E3; Publicar RN02 a RN07; deci
               amountCents: 32699,
               dueAt: '2026-11-25T15:00:00Z',
               pixCopyPaste: '00020126LOCALPIX',
+              endDate: '2027-02-14',
             }
           : null,
       pay: () =>
@@ -706,12 +708,13 @@ describe('Publicar o site, o pagar com o cartão (E3; Publicar RN02 a RN07; deci
         amountCents: 32699,
         dueAt: '2026-11-25T15:00:00Z',
         pixCopyPaste: '00020126LOCALPIX',
+        endDate: '2027-03-14',
       }),
     });
     const { router } = renderAreaScreen({ url: URL_PUBLISH });
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/cobranca/pix'));
-    // Sem a data no app (a tela recém-aberta), vai sem ela (324).
-    expect(router.state.location.state).toEqual({});
+    // A data do pendente vai junto (324(3)).
+    expect(router.state.location.state).toEqual({ endDate: '2027-03-14' });
   });
 
   it('reabrir com o cartão pendente retoma o Confirmando (decisão 324; cobrança do Crivo)', async () => {
@@ -724,6 +727,7 @@ describe('Publicar o site, o pagar com o cartão (E3; Publicar RN02 a RN07; deci
         amountCents: 33710,
         dueAt: null,
         pixCopyPaste: null,
+        endDate: '2027-02-14',
       }),
     });
     renderAreaScreen({ url: URL_PUBLISH });

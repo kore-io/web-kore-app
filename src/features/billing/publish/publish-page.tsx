@@ -394,8 +394,8 @@ function PublishForm({
 
   // Reabrir com o Pix pendente: a tela do Pix (324).
   if (resumable?.method === 'pix') {
-    // A data vai junto quando o app a tem (o Gerar novo Pix volta com ela; 324).
-    const state: PublishLocationState = endDate !== '' ? { endDate } : {};
+    // A data do pendente vai junto (o Gerar novo Pix volta com ela; 324(3)).
+    const state: PublishLocationState = { endDate: resumable.endDate };
     return <Navigate to={paths.billingPix} replace state={state} />;
   }
 

@@ -86,7 +86,8 @@ function Pix({ weddingId }: { weddingId: string }) {
   const backToPublish = (method: 'pix' | 'card') => {
     const state: PublishLocationState = {
       method,
-      ...(endDate !== undefined && { endDate }),
+      // A data do pendente (o billing traz desde o #213; 324(3)); a da navegação, se faltar.
+      ...((shown.endDate ?? endDate) !== undefined && { endDate: shown.endDate ?? endDate }),
       // Troca o pendente que o servidor ainda tem (RN07); o já cancelado não precisa.
       ...(pending && { replacesPaymentId: pending.paymentId }),
     };

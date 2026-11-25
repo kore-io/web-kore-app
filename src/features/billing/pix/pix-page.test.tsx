@@ -50,6 +50,8 @@ const PENDING = {
   // 15h em UTC é meio-dia em São Paulo, no dia do relógio fixo.
   dueAt: '2026-11-25T15:00:00Z',
   pixCopyPaste: '00020126LOCALPIX',
+  // A data pedida, no pendente desde o #213 (324(3)).
+  endDate: '2027-03-14',
 };
 
 /** O billing a cada consulta: a função recebe o número da consulta (1, 2, …). */
@@ -156,9 +158,10 @@ describe('Pagar com Pix (Publicar RN03, RN07, RN11 e RN13; Penpot 21, A3)', () =
     expect(screen.queryByRole('button', { name: 'Copiar código' })).toBeNull();
     await user.click(screen.getByRole('button', { name: 'Gerar novo Pix' }));
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/cobranca/publicar'));
+    // A data do pendente vale sobre a da navegação.
     expect(router.state.location.state).toEqual({
       method: 'pix',
-      endDate: '2027-02-14',
+      endDate: '2027-03-14',
       replacesPaymentId: 'p1',
     });
   });
@@ -182,7 +185,7 @@ describe('Pagar com Pix (Publicar RN03, RN07, RN11 e RN13; Penpot 21, A3)', () =
     ).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Gerar novo Pix' }));
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/cobranca/publicar'));
-    expect(router.state.location.state).toEqual({ method: 'pix' });
+    expect(router.state.location.state).toEqual({ method: 'pix', endDate: '2027-03-14' });
   }, 10_000);
 
   it('Pagar com cartão volta ao Publicar no cartão, com o pendente a trocar (RN07; 324)', async () => {
@@ -193,7 +196,7 @@ describe('Pagar com Pix (Publicar RN03, RN07, RN11 e RN13; Penpot 21, A3)', () =
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/cobranca/publicar'));
     expect(router.state.location.state).toEqual({
       method: 'card',
-      endDate: '2027-02-14',
+      endDate: '2027-03-14',
       replacesPaymentId: 'p1',
     });
   });
