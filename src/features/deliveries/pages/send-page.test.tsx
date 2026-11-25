@@ -77,7 +77,16 @@ function mockSend({
     isDefault: true,
   },
   qrError,
+  lifecycle,
+  markError,
+  queueError,
 }: {
+  /** O lifecycle do /me (o sem renovação; E9). */
+  lifecycle?: Record<string, unknown>;
+  /** A resposta do POST …/deliveries (o registro do envio) com erro. */
+  markError?: { status: number; body: Record<string, unknown> };
+  /** A leitura da fila com erro. */
+  queueError?: { status: number; body: Record<string, unknown> };
   status?: string;
   parties?: object[];
   queue?: object[];
@@ -87,7 +96,24 @@ function mockSend({
   const calls: Call[] = [];
   let current = template;
   mockApi(({ method, path, body }) => {
-    if (path === '/v1/me') return Response.json(meFor(me));
+    if (path === '/v1/me') {
+      if (!lifecycle) return Response.json(meFor(me));
+      const memberships = me.memberships.map((membership) => ({
+        ...membership,
+        timezone: 'America/Sao_Paulo',
+        lifecycle: {
+          status,
+          endDate: null,
+          graceUntil: null,
+          expiredAt: null,
+          paidThrough: null,
+          deletionScheduledFor: null,
+          blocked: false,
+          ...lifecycle,
+        },
+      }));
+      return Response.json(meFor({ ...me, memberships }));
+    }
     if (path === '/v1/weddings/w1/dashboard') {
       return Response.json({
         rsvpDeadline: '2026-10-15',
@@ -124,6 +150,7 @@ function mockSend({
     }
     if (path.startsWith('/v1/weddings/w1/deliveries/queue')) {
       calls.push({ method, path, body });
+      if (queueError) return apiError(queueError);
       const ids = new URLSearchParams(path.split('?')[1]).get('partyIds')?.split(',') ?? [];
       return Response.json({
         kind: 'invite',
@@ -145,6 +172,7 @@ function mockSend({
     }
     if (path === '/v1/weddings/w1/deliveries' && method === 'POST') {
       calls.push({ method, path, body });
+      if (markError) return apiError(markError);
       return Response.json({ parties: [] });
     }
     return apiError({ status: 404, body: { error: 'NOT_FOUND' } });
@@ -752,5 +780,84 @@ describe('Envios › as versões e os textos que faltavam (DoD das F4 e F5; RN03
     renderRoute({ url: '/app/envios/convites?etapa=fila' });
     expect(await screen.findByRole('button', { name: 'Continuar' })).toBeDisabled();
     expect(screen.queryByRole('textbox', { name: 'Mensagem' })).toBeNull();
+  });
+});
+
+describe('Envios no expirado e na carência (Data de saída RN07; 314(3); decisões 330 e 331)', () => {
+  const SITE_EXPIRED = { status: 409, body: { error: 'SITE_EXPIRED' } };
+  const RENEW = 'O site está fora do ar. Renovem o site para enviar.';
+  const FINAL =
+    'O site está fora do ar e não pode mais ser renovado. Não dá para enviar convites, save the date nem lembretes.';
+
+  it('na carência os envios seguem abertos (330)', async () => {
+    mockSend({ status: 'grace' });
+    preset(['p1']);
+    renderRoute({ url: '/app/envios/convites' });
+    expect(await screen.findByRole('button', { name: 'Continuar' })).toBeEnabled();
+    expect(screen.queryByText(/^O site está fora do ar/)).toBeNull();
+  });
+
+  it('expirado: Continuar desabilitado com o texto de cada versão, sem o Renovar até o E10 (331(2))', async () => {
+    mockSend({ status: 'expired', lifecycle: { expiredAt: '2026-12-01' } });
+    preset(['p1']);
+    const view = renderRoute({ url: '/app/envios/convites' });
+    const button = await screen.findByRole('button', { name: 'Continuar' });
+    expect(button).toBeDisabled();
+    expect(button).toHaveAccessibleDescription(RENEW);
+    expect(screen.queryByRole('link', { name: 'Renovar' })).toBeNull();
+    view.unmount();
+    profileUnderTest.current = 'planner';
+    mockSend({ status: 'expired', lifecycle: { expiredAt: '2026-12-01' } });
+    renderAreaScreen({ url: '/app/envios/convites' });
+    expect(await screen.findByRole('button', { name: 'Continuar' })).toHaveAccessibleDescription(
+      'O site está fora do ar. Peça ao casal para renovar.',
+    );
+  });
+
+  it('sem renovação: um texto só; o casal com o Exportar os convidados, a colaboradora sem (314(3))', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    // O casamento de 14/11/2026 passou de 12 meses.
+    vi.setSystemTime(new Date('2027-11-20T15:00:00Z'));
+    onTestFinished(() => {
+      vi.useRealTimers();
+    });
+    mockSend({ status: 'expired', lifecycle: { expiredAt: '2027-11-10' } });
+    preset(['p1']);
+    const view = renderRoute({ url: '/app/envios/convites' });
+    expect(await screen.findByRole('button', { name: 'Continuar' })).toHaveAccessibleDescription(
+      new RegExp(`^${FINAL}`),
+    );
+    // Na legenda dos Envios (a faixa do E8 também leva ao Exportar).
+    const notice = document.getElementById('kore-send-closed') as HTMLElement;
+    expect(within(notice).getByRole('link', { name: 'Exportar os convidados' })).toHaveAttribute(
+      'href',
+      '/app/convidados/exportar',
+    );
+    view.unmount();
+    profileUnderTest.current = 'planner';
+    mockSend({ status: 'expired', lifecycle: { expiredAt: '2027-11-10' } });
+    renderAreaScreen({ url: '/app/envios/convites' });
+    expect(await screen.findByText(FINAL)).toBeInTheDocument();
+    expect(
+      within(document.getElementById('kore-send-closed') as HTMLElement).queryByRole('link'),
+    ).toBeNull();
+  });
+
+  it('o 409 SITE_EXPIRED ao registrar o envio na fila: o Toast com o texto do expirado (RN07)', async () => {
+    const user = userEvent.setup();
+    mockSend({ markError: SITE_EXPIRED });
+    preset(['p1'], 'link');
+    renderRoute({ url: '/app/envios/convites?etapa=fila' });
+    await user.click(await screen.findByRole('button', { name: 'Copiar mensagem' }));
+    expect(await screen.findByText(RENEW)).toBeInTheDocument();
+    expect(screen.queryByText(/^Não foi possível continuar/)).toBeNull();
+  });
+
+  it('o 409 SITE_EXPIRED na leitura da fila: o Toast, sem o aviso de erro de leitura', async () => {
+    mockSend({ queueError: SITE_EXPIRED });
+    preset(['p1']);
+    renderRoute({ url: '/app/envios/convites?etapa=fila' });
+    expect(await screen.findByText(RENEW)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Tentar de novo' })).toBeNull();
   });
 });
