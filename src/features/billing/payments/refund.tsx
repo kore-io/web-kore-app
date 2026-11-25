@@ -62,8 +62,8 @@ export function refundDescription({
 }): string {
   const amount = formatCents({ cents: refundTotal({ payment, payments }) });
   if (payment.kind === 'extension') {
-    // A data de volta: o início da extensão, até o previousEndDate da API (327(2)).
-    const date = shortDayMonth({ day: payment.periodStart, now });
+    // A data de volta, calculada pela API com o min(endDate, previousEndDate) da RN03 (327(2)).
+    const date = payment.refundEndDate ? shortDayMonth({ day: payment.refundEndDate, now }) : '';
     return oneDot(t(`refund.extension.${methodKey(payment)}`, { date, amount }));
   }
   const extensions = extensionsPaid(payments);
