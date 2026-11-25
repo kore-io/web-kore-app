@@ -291,7 +291,9 @@ describe('Notificações (Central RN04 a RN06)', () => {
     renderRoute({ url: '/app/notificacoes' });
     expect(await screen.findByText('Ainda não há notificações')).toBeInTheDocument();
     expect(
-      screen.getByText('Elas aparecem aqui quando um grupo responder o convite.'),
+      screen.getByText(
+        'Elas aparecem aqui quando um grupo responder o convite ou houver um aviso sobre o site e os pagamentos.',
+      ),
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Marcar todas como lidas' })).toBeDisabled();
   });

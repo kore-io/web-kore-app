@@ -178,7 +178,7 @@ export function GroupsStep({
         <ClosedNotice audience={audience} closed={closed} />
         <Button
           disabled={blocked}
-          {...(closed !== null && closed !== 'post_event'
+          {...(closed !== null
             ? { 'aria-describedby': 'kore-send-closed' }
             : over && { 'aria-describedby': 'kore-send-limit' })}
           onClick={() => {

@@ -61,6 +61,7 @@
       "planner": "Os envios começam depois que o casal publicar o site."
     },
     "publish": "Publicar o site",
+    "postEvent": "O casamento já aconteceu. Não dá mais para enviar convites, save the date nem lembretes.",
     "expired": {
       "couple": "O site está fora do ar. Renovem o site para enviar.",
       "planner": "O site está fora do ar. Peça ao casal para renovar."

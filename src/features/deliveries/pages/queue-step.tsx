@@ -17,7 +17,7 @@ import { useWeddingTimezone } from '../../../shared/use-wedding-timezone';
 import { deliveryStatusText, sentAtOf, type DeliveryKind } from '../delivery-texts';
 import { DELIVERY_LIMIT, useDeliverySelection } from '../hooks/use-delivery-selection';
 import { QrStep } from './qr-step';
-import { useSiteExpired, useSiteExpiredRead } from '../use-site-expired';
+import { useDeliveriesPostEvent, useSiteExpired, useSiteExpiredRead } from '../use-site-expired';
 import type { Closed } from './send-page';
 import { useAreaPaths } from '../../../app/area';
 
@@ -82,6 +82,7 @@ function ChannelQueue({
   );
   const [sent, setSent] = useState<Sent>({});
   const siteExpired = useSiteExpired({ weddingId });
+  const postEvent = useDeliveriesPostEvent({ weddingId });
   // O expirado na leitura da fila: o Toast, e o Dashboard relido fecha a etapa (RN07).
   const expiredRead = useSiteExpiredRead({ weddingId, error: queue.error });
 
@@ -118,6 +119,8 @@ function ChannelQueue({
       .catch((error: unknown) => {
         // O site expirou no meio da fila (RN07): o texto dos Envios no expirado.
         if (siteExpired(error)) return;
+        // Depois do casamento (pós-evento ou carência), o texto dos Envios fechados (337(1)).
+        if (postEvent(error)) return;
         showToast({
           tone: 'danger',
           message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,

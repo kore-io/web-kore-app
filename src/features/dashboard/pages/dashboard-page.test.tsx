@@ -571,18 +571,27 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
       expect(within(card('Status do site')).queryByText(/^No ar até/)).toBeNull();
     });
 
-    it('carência: como no pós-evento, sem o "Publiquem o site" (332)', async () => {
-      vi.useFakeTimers({ toFake: ['Date'] });
-      vi.setSystemTime(new Date('2027-02-18T15:00:00Z'));
-      mockDashboard({
-        data: dashboard({ site: { ...dashboard().site, status: 'grace' } }),
-        lifecycle: { status: 'grace', graceUntil: '2027-02-21' },
-      });
-      renderRoute({ url: '/app' });
-      await screen.findByText('142');
-      expect(screen.getByRole('button', { name: 'Enviar convites' })).toBeEnabled();
-      expect(screen.queryByText('Publiquem o site para começar os envios.')).toBeNull();
-    });
+    it.each(['grace', 'post_event'] as const)(
+      '%s: o Enviar convites desabilitado com o motivo do pós-evento, sem o "Publiquem o site" (332; 337(1); 338)',
+      async (status) => {
+        vi.useFakeTimers({ toFake: ['Date'] });
+        vi.setSystemTime(new Date('2027-02-18T15:00:00Z'));
+        mockDashboard({
+          data: dashboard({ site: { ...dashboard().site, status } }),
+          lifecycle: { status, graceUntil: status === 'grace' ? '2027-02-21' : null },
+        });
+        renderRoute({ url: '/app' });
+        await screen.findByText('142');
+        const send = screen.getByRole('button', { name: 'Enviar convites' });
+        expect(send).toBeDisabled();
+        expect(send).toHaveAccessibleDescription(
+          'O casamento já aconteceu. Não dá mais para enviar convites, save the date nem lembretes.',
+        );
+        expect(screen.queryByText('Publiquem o site para começar os envios.')).toBeNull();
+        // O cartão Envios segue levando aos Envios, só leitura.
+        expect(within(card('Envios')).getAllByRole('link').length).toBeGreaterThan(0);
+      },
+    );
 
     it('expirado: o Enviar convites desabilitado com o texto da RN07, e o cartão Envios sem a legenda de publicar (331(3))', async () => {
       vi.useFakeTimers({ toFake: ['Date'] });

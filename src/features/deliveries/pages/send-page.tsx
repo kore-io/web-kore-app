@@ -104,7 +104,7 @@ function Stepper({ step }: { step: Step }) {
  * A legenda dos envios fechados (Envios RN01, A2; Data de saída RN07, A8, Penpot 07), nas duas
  * vozes; só o casal ganha o link: antes de publicar, Publicar o site; no caso B, Voltar ao ar
  * (331(1); pena-331); no expirado comum, Renovar (RN07; E11); no sem renovação, Exportar os
- * convidados (314(3)).
+ * convidados (314(3)). No pós-evento e na carência, um texto só e sem link (337(1)).
  */
 export function ClosedNotice({ audience, closed }: { audience: Audience; closed: Closed }) {
   const { t } = useTranslation('deliveries');
@@ -130,6 +130,14 @@ export function ClosedNotice({ audience, closed }: { audience: Audience; closed:
             <Link to={link.to}>{link.label}</Link>
           </>
         )}
+      </p>
+    );
+  }
+  // Pós-evento e carência (332): um texto só, sem link, nos dois perfis (337(1)).
+  if (closed === 'post_event') {
+    return (
+      <p className="kore-send__closed" id="kore-send-closed">
+        {t('closed.postEvent')}
       </p>
     );
   }
