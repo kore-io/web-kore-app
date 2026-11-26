@@ -605,6 +605,15 @@ describe('Dashboard do casal (RN01 a RN08)', () => {
     });
   });
 
+  it('a exclusão agendada: o selo de antes, sem o "No ar até" (o site está fora do ar; Retenção RN05)', async () => {
+    mockDashboard({ lifecycle: { deletionScheduledFor: '2027-02-25' } });
+    renderRoute({ url: '/app' });
+    await screen.findByText('142');
+    const status = card('Status do site');
+    expect(within(status).getByText('Publicado')).toBeInTheDocument();
+    expect(within(status).queryByText(/^No ar até/)).toBeNull();
+  });
+
   describe('o cartão Status pelo ciclo de vida (Penpot 03, A5; Data de saída RN06; E8)', () => {
     afterEach(() => {
       vi.useRealTimers();

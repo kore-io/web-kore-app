@@ -367,11 +367,15 @@ function SiteCard({
         <p className="kore-dashboard__site-address">{tSite('address', { slug: data.site.slug })}</p>
       )}
       {lifecycleCaption && <p className="kore-dashboard__card-caption">{lifecycleCaption}</p>}
-      {!lifecycleCaption && live && data.site.endDate && (
-        <p className="kore-dashboard__card-caption">
-          {oneDot(t('site.endDate', { date: longDate({ day: data.site.endDate, now }) }))}
-        </p>
-      )}
+      {/* Com a exclusão agendada o site está fora do ar (Retenção RN05): sem o "No ar até". */}
+      {!lifecycleCaption &&
+        live &&
+        data.site.endDate &&
+        !source?.lifecycle.deletionScheduledFor && (
+          <p className="kore-dashboard__card-caption">
+            {oneDot(t('site.endDate', { date: longDate({ day: data.site.endDate, now }) }))}
+          </p>
+        )}
       {status === 'awaiting_couple' && (
         <p id="kore-dashboard-site-waits" className="kore-dashboard__card-text">
           {t('site.awaitingCouple')}
