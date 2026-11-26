@@ -26,6 +26,7 @@ describe('rotas do app (decisões 139, 146, 147 e 198)', () => {
       plannerNewWedding: '/cerimonialista/casamentos/novo',
       plannerReferral: '/cerimonialista/link-de-indicacao',
       plannerTemplates: '/cerimonialista/modelos',
+      plannerCommissions: '/cerimonialista/comissoes',
       plannerNotifications: '/cerimonialista/notificacoes',
       plannerProfile: '/cerimonialista/perfil',
       plannerSettings: '/cerimonialista/configuracoes',

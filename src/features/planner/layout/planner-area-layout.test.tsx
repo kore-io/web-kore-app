@@ -38,7 +38,7 @@ async function openMenu(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe('a moldura da Área do cerimonialista (D3; Cadastro e perfil RN07 e RN08)', () => {
-  it('a Sidebar sem Comissões, a Topbar com a assessoria e o sino sem contador (Penpot 03, sem a F3)', async () => {
+  it('a Sidebar com Comissões (F3; Comissões RN07), a Topbar com a assessoria e o sino sem contador (Penpot 03)', async () => {
     mockApi(({ path }) => meOnly(path));
     const { container } = renderRoute({ url: '/cerimonialista' });
     expect(
@@ -49,12 +49,15 @@ describe('a moldura da Área do cerimonialista (D3; Cadastro e perfil RN07 e RN0
       within(nav as HTMLElement)
         .getAllByRole('link')
         .map((link) => link.textContent),
-    ).toEqual(['Meus casamentos', 'Novo casamento', 'Link de indicação', 'Modelos']);
+    ).toEqual(['Meus casamentos', 'Novo casamento', 'Comissões', 'Link de indicação', 'Modelos']);
     expect(screen.getAllByRole('link', { name: 'Meus casamentos' })[0]).toHaveAttribute(
       'aria-current',
       'page',
     );
-    expect(screen.queryByText('Comissões')).toBeNull();
+    expect(screen.getAllByRole('link', { name: 'Comissões' })[0]).toHaveAttribute(
+      'href',
+      '/cerimonialista/comissoes',
+    );
     expect(screen.getByRole('button', { name: 'Notificações' })).toBeInTheDocument();
     await expectNoA11yViolations({ container });
   });
