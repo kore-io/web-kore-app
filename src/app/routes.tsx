@@ -46,6 +46,7 @@ import { FIRST_SECTION_SLUG } from '../features/site/sections';
 import { PlannerWeddingArea } from './layout/planner-wedding-area';
 import { paths } from './paths';
 import { WeddingSettingsPage } from '../features/billing/deletion/wedding-settings-page';
+import { CommissionsPage } from '../features/planner/commissions/commissions-page';
 
 /**
  * As telas do casamento, com caminhos relativos ao caminho-base da área (Colaboradora
@@ -182,6 +183,7 @@ export const routes: RouteObject[] = [
           { id: 'planner-area-new-wedding', path: 'casamentos/novo', element: <NewWeddingPage /> },
           { id: 'planner-area-referral', path: 'link-de-indicacao', element: <ReferralLinkPage /> },
           { id: 'planner-area-templates', path: 'modelos', element: <TemplatesPage /> },
+          { id: 'planner-area-commissions', path: 'comissoes', element: <CommissionsPage /> },
           {
             id: 'planner-area-notifications',
             path: 'notificacoes',

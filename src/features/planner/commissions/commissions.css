@@ -1,0 +1,40 @@
+/*
+ * Comissões (Comissões do indicador RN07; Penpot 07 da Área do Cerimonialista): os três
+ * saldos lado a lado no computador, o Extrato com as abas e a tabela, a legenda abaixo do selo
+ * e o ajuste negativo em vermelho.
+ */
+.kore-commissions {
+  @apply flex flex-col gap-6;
+}
+
+.kore-commissions__loading {
+  @apply flex justify-center py-6;
+}
+
+.kore-commissions__balances {
+  @apply grid grid-cols-1 gap-4 md:grid-cols-3;
+}
+
+.kore-commissions__statement {
+  @apply flex flex-col gap-4;
+}
+
+.kore-commissions__title {
+  @apply m-0 type-heading text-ink;
+}
+
+.kore-commissions__status {
+  @apply flex flex-col items-start gap-1;
+}
+
+.kore-commissions__caption {
+  @apply type-caption text-gray-700;
+}
+
+.kore-commissions__negative {
+  @apply text-danger-text;
+}
+
+.kore-commissions__wedding {
+  @apply text-ink underline-offset-2 hover:underline;
+}

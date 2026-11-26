@@ -36,6 +36,8 @@ export const paths = {
   plannerReferral: '/cerimonialista/link-de-indicacao',
   /** Modelos (D8). */
   plannerTemplates: '/cerimonialista/modelos',
+  /** Comissões, a rota dos e-mails da comissão (Comissões do indicador RN07; E16). */
+  plannerCommissions: '/cerimonialista/comissoes',
   /** Notificações da cerimonialista, pelo sino (D9; decisão 254(2)). */
   plannerNotifications: '/cerimonialista/notificacoes',
   /** Meu perfil (Cadastro e perfil RN09). */

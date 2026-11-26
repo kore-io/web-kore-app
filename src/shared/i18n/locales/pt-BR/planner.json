@@ -3,7 +3,8 @@
     "myWeddings": "Meus casamentos",
     "newWedding": "Novo casamento",
     "referral": "Link de indicação",
-    "templates": "Modelos"
+    "templates": "Modelos",
+    "commissions": "Comissões"
   },
   "menu": {
     "activeProfile": "Cerimonialista · {{organization}}",
@@ -460,6 +461,74 @@
       "digest": "Este aviso chega só no resumo diário.",
       "noPush": "Este aviso não chega por push.",
       "centralOnly": "Este aviso aparece só na central."
+    }
+  },
+  "commissions": {
+    "title": "Comissões",
+    "loading": "Carregando as comissões",
+    "balances": {
+      "available": "Disponível",
+      "pending": "Aguardando liberação",
+      "received": "Já recebido",
+      "inPayout": "{{available}} ({{inPayout}} em repasse)",
+      "canRequest": "já pode pedir o repasse",
+      "nothingPending": "nada a liberar agora"
+    },
+    "statement": "Extrato",
+    "tabs": {
+      "label": "Extrato",
+      "payment": "Por pagamento",
+      "wedding": "Por casamento"
+    },
+    "columns": {
+      "wedding": "Casamento",
+      "payment": "Pagamento de origem",
+      "base": "Valor pago (sem juros)",
+      "commission": "Comissão",
+      "status": "Status",
+      "date": "Data",
+      "pending": "Aguardando liberação",
+      "available": "Disponível"
+    },
+    "paymentKind": {
+      "publication": "Publicação",
+      "extension": "Extensão"
+    },
+    "adjustment": {
+      "refund": "Ajuste (estorno)",
+      "chargeback": "Ajuste (estorno)",
+      "manual": "Ajuste",
+      "next": "Desconta no próximo repasse"
+    },
+    "status": {
+      "pending": "Aguardando liberação",
+      "available": "Disponível",
+      "paid": "Paga em {{date}}",
+      "reversed": "Estornada",
+      "blocked": "Bloqueada",
+      "held": "Retida"
+    },
+    "caption": {
+      "pending": "Libera em {{date}}",
+      "blocked": "Comissão em análise pelo Kore. Para saber mais, escreva para suporte@kore.com.br.",
+      "held": "O pagamento foi contestado no banco do cartão. A comissão fica retida até a decisão."
+    },
+    "wedding": {
+      "canRequest": "já pode pedir o repasse",
+      "releases_one": "Libera em {{dates}}",
+      "releases_other": "libera em {{dates}}",
+      "nothing": "nada a liberar agora"
+    },
+    "purged": "Casamento apagado",
+    "empty": {
+      "title": "Você ainda não tem comissões.",
+      "description": "Elas aparecem aqui quando um casal que você indicou pagar a publicação do site."
+    },
+    "pagination": {
+      "navigation": "Páginas do extrato",
+      "summary": "Mostrando {{from}} a {{to}} de {{total}}",
+      "previous": "Página anterior",
+      "next": "Próxima página"
     }
   }
 }
