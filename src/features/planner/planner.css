@@ -265,6 +265,11 @@ button.kore-planner-wedding__awaiting-link {
   @apply cursor-pointer border-0 bg-transparent p-0;
 }
 
+/* Desabilitado no casamento bloqueado (Bloqueado RN04), como os botões da lib. */
+button.kore-planner-wedding__awaiting-link:disabled {
+  @apply cursor-not-allowed opacity-45;
+}
+
 .kore-planner-wedding__awaiting-text {
   @apply m-0;
 }
