@@ -4,6 +4,7 @@
  * Kore API
  * OpenAPI spec version: 1
  */
+import type { WeddingCommissionsResponseReferralSource } from './weddingCommissionsResponseReferralSource';
 
 export interface WeddingCommissionsResponse {
   /** @nullable */
@@ -12,7 +13,12 @@ export interface WeddingCommissionsResponse {
   coupleNames: string | null;
   weddingPurged: boolean;
   clickable: boolean;
+  /** @nullable */
+  referralSource: WeddingCommissionsResponseReferralSource;
+  paymentsCount: number;
   availableCents: number;
   pendingCents: number;
+  receivedCents: number;
+  totalCents: number;
   releaseDates: string[];
 }

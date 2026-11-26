@@ -24862,6 +24862,14 @@
             "type": "string",
             "format": "uuid"
           },
+          "coupleNames": {
+            "type": "string",
+            "nullable": true,
+            "example": "Ana & Marcos"
+          },
+          "weddingPurged": {
+            "type": "boolean"
+          },
           "amountCents": {
             "type": "number",
             "example": -6742
@@ -24893,6 +24901,8 @@
         "required": [
           "kind",
           "adjustmentId",
+          "coupleNames",
+          "weddingPurged",
           "amountCents",
           "reason",
           "createdAt",
@@ -24917,6 +24927,22 @@
           "clickable": {
             "type": "boolean"
           },
+          "referralSource": {
+            "type": "string",
+            "enum": [
+              "created_by_planner",
+              "created_by_seller",
+              "referral_link",
+              "invited_before_payment",
+              "admin_reassigned"
+            ],
+            "nullable": true,
+            "example": "referral_link"
+          },
+          "paymentsCount": {
+            "type": "number",
+            "example": 2
+          },
           "availableCents": {
             "type": "number",
             "example": 6742
@@ -24924,6 +24950,14 @@
           "pendingCents": {
             "type": "number",
             "example": 1740
+          },
+          "receivedCents": {
+            "type": "number",
+            "example": 0
+          },
+          "totalCents": {
+            "type": "number",
+            "example": 8482
           },
           "releaseDates": {
             "type": "array",
@@ -24938,8 +24972,12 @@
           "coupleNames",
           "weddingPurged",
           "clickable",
+          "referralSource",
+          "paymentsCount",
           "availableCents",
           "pendingCents",
+          "receivedCents",
+          "totalCents",
           "releaseDates"
         ]
       },
@@ -24961,13 +24999,23 @@
           "inPayoutCents": {
             "type": "number",
             "example": 0
+          },
+          "adjustmentsCents": {
+            "type": "number",
+            "example": -5002
+          },
+          "paidPayouts": {
+            "type": "number",
+            "example": 3
           }
         },
         "required": [
           "availableCents",
           "pendingCents",
           "receivedCents",
-          "inPayoutCents"
+          "inPayoutCents",
+          "adjustmentsCents",
+          "paidPayouts"
         ]
       },
       "ReferrerCommissionsResponse": {
@@ -26181,7 +26229,7 @@
           "refundableUntil": {
             "type": "string",
             "nullable": true,
-            "description": "O último instante para desistir, no fuso do casamento (Pagamentos e\narrependimento RN02); nulo fora do prazo ou fora de `paid`. O app mostra\no dia: \"Vocês podem desistir até 17 de ago.\".",
+            "description": "O último instante para desistir, no fuso do casamento (Pagamentos e\narrependimento RN02); nulo fora do prazo, fora de `paid` e no que o\nDesistir recusa (a extensão que não é a última, ou com cortesia concedida\ndepois; RN03, decisão 345(1)). O app mostra\no dia: \"Vocês podem desistir até 17 de ago.\".",
             "format": "date-time"
           },
           "disputeDeadline": {

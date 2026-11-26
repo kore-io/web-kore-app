@@ -1122,6 +1122,7 @@ export * from './weddingBlockedErrorBody';
 export * from './weddingBlockedErrorBodyError';
 export * from './weddingBlockedErrorBodyStatusCode';
 export * from './weddingCommissionsResponse';
+export * from './weddingCommissionsResponseReferralSource';
 export * from './weddingDeletionBody';
 export * from './weddingDeletionCanceledResponse';
 export * from './weddingDeletionScheduledErrorBody';
