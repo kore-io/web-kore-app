@@ -20,7 +20,12 @@ export interface BillingEntryResponse {
   graceUntil?: string;
   /** Expirado: desde quando e até quando dá para renovar. */
   expiredAt?: string;
-  /** @nullable */
+  /**
+   * Expirado: até quando dá para renovar (12 meses depois do casamento); nulo
+   * sem data possível dentro do limite, o expirado sem renovação (Data de saída
+   * do ar RN03; decisão 338(2)).
+   * @nullable
+   */
   renewUntil?: string | null;
   /**
    * Expirado, versão B (Data de saída do ar RN03; decisão 293(7)): o

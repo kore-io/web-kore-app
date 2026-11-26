@@ -2,6 +2,7 @@ import { Button, Dialog, Input, useToast } from '@kore-io/design';
 import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { CoupleInvitationResponse } from '../../../shared/api/generated/model';
+import { lockedProps } from '../../billing/lifecycle/blocked';
 
 /**
  * O bloco Link para o casal no detalhe (RN09; Voz, Link do casal; Penpot 03): o link que o
@@ -14,11 +15,14 @@ export function CoupleLinkBlock({
   busy,
   onRegenerate,
   onCancel,
+  lockedReason = null,
 }: {
   link: CoupleInvitationResponse;
   busy: boolean;
   onRegenerate: () => void;
   onCancel: () => void;
+  /** O motivo do casamento bloqueado (Bloqueado RN04; 344): gerar e cancelar o link travam. */
+  lockedReason?: string | null;
 }) {
   const { t } = useTranslation('planner');
   const { t: tAccess } = useTranslation('access');
@@ -26,6 +30,13 @@ export function CoupleLinkBlock({
   const [confirming, setConfirming] = useState(false);
   const fieldId = useId();
   const expired = link.state === 'expired' || !link.url;
+  const lockId = `${fieldId}-locked`;
+  const locked = lockedProps({ locked: lockedReason !== null, id: lockId });
+  const reason = lockedReason && (
+    <p id={lockId} className="kore-write-lock">
+      {lockedReason}
+    </p>
+  );
 
   function copy(url: string) {
     void navigator.clipboard
@@ -47,9 +58,16 @@ export function CoupleLinkBlock({
       {expired ? (
         <>
           <p className="kore-wedding-detail__block-text">{t('myWeddings.detail.link.expired')}</p>
-          <Button type="button" variant="secondary" disabled={busy} onClick={onRegenerate}>
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={busy}
+            onClick={onRegenerate}
+            {...locked}
+          >
             {t('myWeddings.detail.link.regenerate')}
           </Button>
+          {reason}
         </>
       ) : (
         <>
@@ -82,12 +100,13 @@ export function CoupleLinkBlock({
           >
             {t('myWeddings.detail.link.whatsapp')}
           </Button>
-          <Button type="button" variant="ghost" disabled={busy} onClick={onRegenerate}>
+          <Button type="button" variant="ghost" disabled={busy} onClick={onRegenerate} {...locked}>
             {t('myWeddings.detail.link.regenerate')}
           </Button>
-          <Button type="button" variant="ghost" onClick={() => setConfirming(true)}>
+          <Button type="button" variant="ghost" onClick={() => setConfirming(true)} {...locked}>
             {t('myWeddings.detail.link.cancel')}
           </Button>
+          {reason}
           <Dialog
             open={confirming}
             onOpenChange={setConfirming}

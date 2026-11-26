@@ -163,6 +163,15 @@ test('a colaboradora: a faixa do bloqueio acima de "Você colabora neste casamen
   await expect(page.getByRole('button', { name: 'Enviar convites' })).toHaveAccessibleDescription(
     LOCKED,
   );
+  // O detalhe de Meus casamentos sabe do bloqueio (decisão 344), e o Sair continua (RN03).
+  const detail = await page.request.get(`${API_URL}/v1/me/weddings/${weddingId}`, {
+    headers: APP,
+  });
+  expect(await detail.json()).toMatchObject({ blocked: true });
+  await page.goto(`/cerimonialista?casamento=${weddingId}`);
+  await expect(
+    page.getByRole('dialog').getByRole('button', { name: 'Sair deste casamento' }),
+  ).toBeEnabled();
 });
 
 test('Convidados e o Editor em leitura: o Novo grupo, o 403 ao criar e os campos (RN02 a RN04)', async ({

@@ -406,4 +406,61 @@ describe('Detalhe do casamento (Meus casamentos RN08 a RN11; decisão 260)', () 
     expect(await screen.findByText('Este casamento não está mais disponível.')).toBeInTheDocument();
     await waitFor(() => expect(router.state.location.search).toBe(''));
   });
+
+  describe('o casamento bloqueado (Bloqueado RN04; decisão 344)', () => {
+    const LOCKED = 'Indisponível enquanto o site está bloqueado.';
+
+    it('pelo e-mail: Reenviar, Convidar outro e-mail e Excluir desabilitados com o motivo', async () => {
+      api({ detail: awaiting([emailInvitation], { blocked: true }) });
+      renderRoute({ url: URL });
+      const dialog = await screen.findByRole('dialog', { name: 'Fernanda e João' });
+      for (const name of ['Reenviar convite', /^Convidar outro e/, 'Excluir este casamento']) {
+        const button = within(dialog).getByRole('button', { name });
+        expect(button).toBeDisabled();
+        expect(button).toHaveAccessibleDescription(LOCKED);
+      }
+    });
+
+    it('pelo link: Gerar novo link e Cancelar link desabilitados; o Copiar link continua', async () => {
+      api({ detail: awaiting([linkInvitation()], { blocked: true }) });
+      renderRoute({ url: URL });
+      const dialog = await screen.findByRole('dialog', { name: 'Fernanda e João' });
+      for (const name of ['Gerar novo link', 'Cancelar link']) {
+        const button = within(dialog).getByRole('button', { name });
+        expect(button).toBeDisabled();
+        expect(button).toHaveAccessibleDescription(LOCKED);
+      }
+      expect(within(dialog).getByRole('button', { name: 'Copiar link' })).toBeEnabled();
+    });
+
+    it('no rascunho sem convite, Convidar o casal desabilitado; Montar o site continua (sugestão do Crivo)', async () => {
+      api({ detail: awaiting([], { status: 'draft', canEditIdentity: true, blocked: true }) });
+      renderRoute({ url: URL });
+      const dialog = await screen.findByRole('dialog', { name: 'Fernanda e João' });
+      const invite = within(dialog).getByRole('button', { name: 'Convidar o casal' });
+      expect(invite).toBeDisabled();
+      expect(invite).toHaveAccessibleDescription(LOCKED);
+      expect(within(dialog).getByRole('button', { name: 'Montar o site' })).toBeEnabled();
+    });
+
+    it('com dono, o Sair deste casamento continua (RN03)', async () => {
+      api({ detail: { ...published, blocked: true } });
+      renderRoute({ url: URL });
+      const dialog = await screen.findByRole('dialog', { name: 'Ana e Marcos' });
+      expect(within(dialog).getByRole('button', { name: 'Sair deste casamento' })).toBeEnabled();
+    });
+
+    it('o 403 WEDDING_BLOCKED em corrida no reenvio: o motivo no Toast, no lugar do erro do reenvio', async () => {
+      const user = userEvent.setup();
+      api({
+        detail: awaiting([emailInvitation]),
+        write: () => apiError({ status: 403, body: { error: 'WEDDING_BLOCKED' } }),
+      });
+      renderRoute({ url: URL });
+      const dialog = await screen.findByRole('dialog', { name: 'Fernanda e João' });
+      await user.click(within(dialog).getByRole('button', { name: 'Reenviar convite' }));
+      expect(await screen.findByText(LOCKED)).toBeInTheDocument();
+      expect(screen.queryByText(/^Não foi possível reenviar agora/)).toBeNull();
+    });
+  });
 });

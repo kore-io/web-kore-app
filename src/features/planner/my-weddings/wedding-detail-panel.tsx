@@ -26,7 +26,7 @@ import { coupleName } from './my-weddings-filters';
 import { useCoupleLinkActions } from './use-couple-link-actions';
 import { WeddingStatusBadge } from './wedding-status-badge';
 import { coupleInvitations, deleteCase, longWeddingDate, sentDay } from './wedding-detail-texts';
-import { useErrorMessage } from '../../billing/lifecycle/blocked';
+import { isWeddingBlocked, lockedProps, useErrorMessage } from '../../billing/lifecycle/blocked';
 
 /**
  * O Detalhe do casamento (Meus casamentos RN08 a RN11; Penpot 03; decisão 260): o painel
@@ -103,7 +103,6 @@ function DetailContent({
   onClose: () => void;
 }) {
   const { t } = useTranslation('planner');
-  const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
   const queryClient = useQueryClient();
   const send = useAccessInvitationsControllerSendV1();
@@ -123,10 +122,15 @@ function DetailContent({
   const withoutInvitation =
     detail.status === 'draft' && !detail.hasOwner && detail.createdByMe && !email && !link;
 
-  const genericError = () =>
+  // O casamento bloqueado (Bloqueado RN04; decisão 344): as escritas do detalhe travam com o
+  // motivo, e o 403 em corrida vira o Toast com o mesmo texto. O Sair continua (RN03).
+  const errorMessage = useErrorMessage();
+  const { t: tBilling } = useTranslation('billing');
+  const lockReason = detail.blocked ? tBilling('lifecycle.blocked.reason') : null;
+  const genericError = (error?: unknown) =>
     showToast({
       tone: 'danger',
-      message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
+      message: errorMessage(error),
     });
   const refresh = () =>
     queryClient.invalidateQueries({ queryKey: getMyWeddingsControllerDetailV1QueryKey(weddingId) });
@@ -149,7 +153,13 @@ function DetailContent({
             message: t('myWeddings.detail.resent', { email: address }),
           });
         },
-        onError: () => showToast({ tone: 'danger', message: t('myWeddings.detail.resendError') }),
+        onError: (error) =>
+          showToast({
+            tone: 'danger',
+            message: isWeddingBlocked(error)
+              ? errorMessage(error)
+              : t('myWeddings.detail.resendError'),
+          }),
       },
     );
   }
@@ -160,9 +170,9 @@ function DetailContent({
       { weddingId, id: membershipId },
       {
         onSuccess: () => backToList(t('myWeddings.detail.leaveDialog.done', { couple })),
-        onError: () => {
+        onError: (error) => {
           setDialog(null);
-          genericError();
+          genericError(error);
         },
       },
     );
@@ -181,7 +191,7 @@ function DetailContent({
             showToast({ tone: 'danger', message: t('myWeddings.detail.deleteDialog.hasOwner') });
             return;
           }
-          genericError();
+          genericError(error);
         },
       },
     );
@@ -294,6 +304,7 @@ function DetailContent({
           busy={send.isPending || linkActions.busy}
           onRegenerate={linkActions.regenerate}
           onCancel={() => linkActions.cancelLink({ id: link.id })}
+          lockedReason={lockReason}
         />
       )}
 
@@ -317,6 +328,7 @@ function DetailContent({
                     `${paths.plannerNewWedding}?casamento=${encodeURIComponent(weddingId)}`,
                   )
                 }
+                {...lockedProps({ locked: detail.blocked, id: 'kore-detail-locked' })}
               >
                 {t('myWeddings.detail.inviteCouple')}
               </Button>
@@ -331,22 +343,45 @@ function DetailContent({
               size="lg"
               disabled={send.isPending}
               onClick={() => resend(email.email ?? '')}
+              {...lockedProps({ locked: detail.blocked, id: 'kore-detail-locked' })}
             >
               {t('myWeddings.detail.resend')}
             </Button>
-            <Button type="button" variant="ghost" onClick={() => setDialog('invite')}>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setDialog('invite')}
+              {...lockedProps({ locked: detail.blocked, id: 'kore-detail-locked' })}
+            >
               {t('myWeddings.detail.inviteAnother')}
             </Button>
           </>
+        )}
+        {lockReason && (withoutInvitation || (email?.email && !detail.hasOwner)) && (
+          <p id="kore-detail-locked" className="kore-write-lock">
+            {lockReason}
+          </p>
         )}
       </div>
 
       {(toDelete || (detail.hasOwner && membershipId)) && (
         <div className="kore-wedding-detail__secondary">
           {toDelete ? (
-            <Button type="button" variant="ghost" onClick={() => setDialog('delete')}>
-              {t('myWeddings.detail.delete')}
-            </Button>
+            <>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setDialog('delete')}
+                {...lockedProps({ locked: detail.blocked, id: 'kore-detail-delete-locked' })}
+              >
+                {t('myWeddings.detail.delete')}
+              </Button>
+              {lockReason && (
+                <p id="kore-detail-delete-locked" className="kore-write-lock">
+                  {lockReason}
+                </p>
+              )}
+            </>
           ) : (
             <Button type="button" variant="ghost" onClick={() => setDialog('leave')}>
               {t('myWeddings.detail.leave')}
