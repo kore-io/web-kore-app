@@ -349,6 +349,10 @@ describe('Comissões (Comissões do indicador RN07)', () => {
     expect(within(row('Lívia e Bruno')).getByText('Libera em 15/12')).toBeInTheDocument();
     expect(within(row('Bianca e Henrique')).getAllByText('R$ 44,22')).toHaveLength(2);
     expect(paths.at(-1)).toBe('/v1/me/referrer/commissions?view=wedding&page=1');
+    // As 7 colunas viram cartões até 1280 px (bloqueante do Crivo no PR da 346).
+    expect(screen.getByRole('table', { name: 'Por casamento' })).toHaveClass(
+      'kore-data-table--wide',
+    );
   });
 
   it('o vazio (textos-f3 B6)', async () => {

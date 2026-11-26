@@ -410,12 +410,14 @@ function ByWedding({
   };
   const money = (cents: number) => (cents > 0 ? formatCents({ cents }) : '—');
   return (
+    // As 7 colunas não cabem no computador estreito com a Sidebar: cartões até 1280 px.
     <DataTable
+      wide
       label={t('commissions.tabs.wedding')}
       columns={[
         { id: 'wedding', header: header.wedding },
         { id: 'origin', header: header.origin, size: 'sm' },
-        { id: 'payments', header: header.payments, size: 'xs', align: 'end' },
+        { id: 'payments', header: header.payments, size: 'sm', align: 'end' },
         { id: 'pending', header: header.pending, size: 'sm', align: 'end' },
         { id: 'available', header: header.available, size: 'sm', align: 'end' },
         { id: 'received', header: header.received, size: 'sm', align: 'end' },

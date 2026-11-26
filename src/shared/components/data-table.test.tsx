@@ -58,8 +58,19 @@ describe('DataTable (no molde da GroupTable do DS v0.18)', () => {
   it('as larguras das colunas vão para o grid, pelo size', () => {
     renderTable();
     expect(screen.getByRole('table').style.getPropertyValue('--kore-data-table-columns')).toBe(
-      'minmax(0, 1fr) 140px 140px 72px',
+      'minmax(8rem, 1fr) minmax(4.5rem, 140px) minmax(4.5rem, 140px) minmax(3.5rem, 72px)',
     );
+  });
+
+  it('a tabela larga (wide) ganha a classe que mantém os cartões até 1280 px', () => {
+    const { rerender } = renderTable();
+    expect(screen.getByRole('table')).not.toHaveClass('kore-data-table--wide');
+    rerender(
+      <DataTable label="Pagamentos" columns={columns} wide>
+        {payment()}
+      </DataTable>,
+    );
+    expect(screen.getByRole('table')).toHaveClass('kore-data-table--wide');
   });
 
   it('o cabeçalho fica na árvore acessível também no cartão (só fora da vista)', () => {
