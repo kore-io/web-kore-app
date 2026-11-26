@@ -19,6 +19,7 @@ import { RefundSection } from './refund';
 import { canChangeEndDate } from '../end-date/end-date';
 import { lifecycleView } from '../lifecycle/lifecycle';
 import { graceLabel } from '../lifecycle/lifecycle-banner';
+import { useWriteLock } from '../lifecycle/blocked';
 
 /** O Selo de pagamento do DS (Penpot 04 e 21, A9), por situação. */
 const STATUS_TONES: Record<VisibleStatus, BadgeTone> = {
@@ -48,6 +49,7 @@ function Payments({ weddingId, owner }: { weddingId: string; owner: boolean }) {
   const paths = useAreaPaths();
   const { data: me } = useMeControllerMeV1();
   const membership = me?.memberships.find((item) => item.weddingId === weddingId);
+  const lock = useWriteLock();
   const timezone = membership?.timezone ?? null;
   const billing = usePaymentsControllerBillingV1(weddingId);
   const now = new Date();
@@ -104,7 +106,7 @@ function Payments({ weddingId, owner }: { weddingId: string; owner: boolean }) {
           weddingId={weddingId}
           payments={data.payments ?? []}
           timezone={timezone}
-          blocked={membership?.lifecycle.blocked ?? false}
+          locked={lock.kind}
           now={now}
         />
       )}
