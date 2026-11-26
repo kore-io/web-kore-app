@@ -27,6 +27,12 @@ export interface MyWeddingDetailResponse {
   /** Só quando ela criou o casamento. */
   coupleInvitations: CoupleInvitationResponse[];
   hasOwner: boolean;
+  /**
+   * Bloqueado pelo suporte (Casamento bloqueado RN04; decisão 344): Reenviar,
+   * Convidar outro e-mail, Cancelar convite e Excluir casamento ficam
+   * desabilitados; o Sair deste casamento continua (RN03).
+   */
+  blocked: boolean;
   /** A data, a UF e o endereço (Novo casamento RN08). */
   canEditIdentity: boolean;
   weddingId: string;

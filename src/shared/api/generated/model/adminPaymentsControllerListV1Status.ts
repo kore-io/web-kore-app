@@ -12,6 +12,7 @@ export const AdminPaymentsControllerListV1Status = {
   pending: 'pending',
   paid: 'paid',
   failed: 'failed',
+  canceled: 'canceled',
   refund_requested: 'refund_requested',
   refunded: 'refunded',
   disputed: 'disputed',
