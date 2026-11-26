@@ -58,6 +58,8 @@ function Upload({
   onPaste: () => void;
 }) {
   const { t } = useTranslation('guests');
+  // Bloqueado RN04: as duas prévias já são escrita na API (manage_guests).
+  const lock = useWriteLock();
   return (
     <section className="kore-import">
       <h2 className="kore-import__step">{t('importSheet.step1')}</h2>
@@ -66,13 +68,21 @@ function Upload({
         {t('importSheet.download')}
       </a>
       <h2 className="kore-import__step">{t('importSheet.step2')}</h2>
-      <FileUpload
-        title={t(`importSheet.drop.${audience}`)}
-        hint={t('importSheet.dropHint')}
-        accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        disabled={sheet.isReading}
-        onFile={sheet.send}
-      />
+      {/* O FileUpload da lib não leva aria-describedby: o grupo é descrito pelo motivo. */}
+      <div
+        role="group"
+        aria-label={t('importSheet.step2')}
+        {...(lock.locked && { 'aria-describedby': 'kore-import-upload-locked' })}
+      >
+        <FileUpload
+          title={t(`importSheet.drop.${audience}`)}
+          hint={t('importSheet.dropHint')}
+          accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          disabled={sheet.isReading || lock.locked}
+          onFile={sheet.send}
+        />
+      </div>
+      <WriteLockReason id="kore-import-upload-locked" />
       {sheet.isReading && (
         <div className="kore-import__reading">
           <Spinner label={t('importSheet.reading')} />
@@ -84,7 +94,11 @@ function Upload({
         </Alert>
       )}
       <p className="kore-import__note">{t('importSheet.previewNote')}</p>
-      <Button variant="secondary" onClick={onPaste}>
+      <Button
+        variant="secondary"
+        onClick={onPaste}
+        {...lockedProps({ locked: lock.locked, id: 'kore-import-upload-locked' })}
+      >
         {t('pasteList.open')}
       </Button>
     </section>

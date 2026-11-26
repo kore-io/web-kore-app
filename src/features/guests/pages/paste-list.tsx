@@ -39,6 +39,8 @@ export function PasteText({
 }) {
   const { t } = useTranslation('guests');
   const titleId = useId();
+  // Bloqueado RN04: ler a lista colada já é escrita na API (manage_guests).
+  const lock = useWriteLock();
   return (
     <section className="kore-import" aria-labelledby={titleId}>
       <h2 id={titleId} className="kore-import__step">
@@ -63,10 +65,15 @@ export function PasteText({
         <Button variant="secondary" onClick={onBack}>
           {t('pasteList.back')}
         </Button>
-        <Button disabled={!paste.text.trim() || paste.isReading} onClick={paste.send}>
+        <Button
+          disabled={!paste.text.trim() || paste.isReading}
+          onClick={paste.send}
+          {...lockedProps({ locked: lock.locked, id: 'kore-paste-text-locked' })}
+        >
           {t('pasteList.continue')}
         </Button>
       </div>
+      <WriteLockReason id="kore-paste-text-locked" className="kore-import-preview__lock" />
     </section>
   );
 }
