@@ -12,7 +12,7 @@ const lifecycle = {
   graceUntil: null,
   expiredAt: null,
   paidThrough: null,
-  deletionScheduledFor: null,
+  deletionScheduledFor: null as string | null,
   blocked: false,
 };
 
@@ -389,6 +389,11 @@ describe('Publicar o site, a versão do casal (Publicar RN01; Preço RN03, RN04 
 
   it.each([
     [{ lifecycleOverrides: { blocked: true } }, 'Indisponível enquanto o site está bloqueado.'],
+    // A exclusão agendada (323(e); Retenção RN05; 318(11)).
+    [
+      { lifecycleOverrides: { deletionScheduledFor: '2026-12-08' } },
+      'Indisponível enquanto a exclusão está agendada.',
+    ],
     [
       { site: { slug: null, eventDate: '2026-11-14', state: 'SP' } },
       'Escolham o endereço do site em Dados básicos para publicar.',

@@ -99,7 +99,8 @@ export function LifecycleBanner({
   const now = new Date();
   // Na própria tela de mudar a data, a faixa fica sem o link (Penpot 21, A6 caso B).
   const onEndDate = useMatch({ path: paths.billingEndDate, end: true }) !== null;
-  if (source.lifecycle.blocked) return null;
+  // O bloqueio e a exclusão agendada têm as faixas deles, que substituem estas (329(4); 316(8)).
+  if (source.lifecycle.blocked || source.lifecycle.deletionScheduledFor) return null;
   const view = lifecycleView({ ...source, now });
   const text = lifecycleText({ view, audience, now, t });
   if (!text) return null;

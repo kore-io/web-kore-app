@@ -55,7 +55,7 @@ describe('httpClient (mutator do Orval)', () => {
     expect(apiErrorCode({ error: new Error('rede') })).toBeUndefined();
   });
 
-  it('avisa cada 403 WEDDING_BLOCKED, e só ele (Bloqueado RN07)', async () => {
+  it('avisa cada 403 WEDDING_BLOCKED e 409 WEDDING_DELETION_SCHEDULED, e só eles (Bloqueado RN07; Retenção RN05)', async () => {
     const listener = vi.fn();
     const off = onWeddingBlocked(listener);
     mockFetch(Response.json({ error: 'WEDDING_BLOCKED' }, { status: 403 }));
@@ -66,9 +66,13 @@ describe('httpClient (mutator do Orval)', () => {
     mockFetch(Response.json({ error: 'ACTION_NOT_ALLOWED' }, { status: 403 }));
     await httpClient('/v1/weddings/w1/parties', { method: 'POST' }).catch(() => undefined);
     expect(listener).toHaveBeenCalledTimes(1);
+    // O 409 da exclusão agendada também avisa (Retenção RN05).
+    mockFetch(Response.json({ error: 'WEDDING_DELETION_SCHEDULED' }, { status: 409 }));
+    await httpClient('/v1/weddings/w1/parties', { method: 'POST' }).catch(() => undefined);
+    expect(listener).toHaveBeenCalledTimes(2);
     off();
     mockFetch(Response.json({ error: 'WEDDING_BLOCKED' }, { status: 403 }));
     await httpClient('/v1/weddings/w1/parties', { method: 'POST' }).catch(() => undefined);
-    expect(listener).toHaveBeenCalledTimes(1);
+    expect(listener).toHaveBeenCalledTimes(2);
   });
 });

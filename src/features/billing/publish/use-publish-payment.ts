@@ -14,6 +14,7 @@ import type { CreatePaymentBody } from '../../../shared/api/generated/model';
 import { apiErrorCode } from '../../../shared/api/http-client';
 import { oneDot, shortDayMonth } from '../../../shared/date-texts';
 import { useIdempotencyKeys } from '../../../shared/idempotency';
+import { useErrorMessage } from '../lifecycle/blocked';
 
 /** O polling da confirmação do cartão: o mesmo do Pix, a cada 5 s, sem limite (316(4)). */
 export const CONFIRM_POLL_MS = 5000;
@@ -120,6 +121,7 @@ export function usePublishPayment({
     void billing.refetch();
   }
 
+  const errorMessage = useErrorMessage();
   function toastError(message: string) {
     showToast({ tone: 'danger', message });
   }
@@ -174,10 +176,11 @@ export function usePublishPayment({
           toastError(t('publish.toast.gatewayUnavailable'));
           return 'handled';
         case 'WEDDING_BLOCKED':
-          // O pagar não passa pelo MutationCache do E1: refaz o /me aqui (Bloqueado RN07),
-          // e o /me novo mostra o motivo ao lado do botão e desabilita a tela.
+        case 'WEDDING_DELETION_SCHEDULED':
+          // O pagar não passa pelo MutationCache do E1: refaz o /me aqui (Bloqueado RN07;
+          // Retenção RN05), e o /me novo mostra o motivo ao lado do botão e desabilita a tela.
           void queryClient.invalidateQueries({ queryKey: getMeControllerMeV1QueryKey() });
-          toastError(t('publish.reason.blocked'));
+          toastError(errorMessage(error));
           return 'handled';
         case 'PAYMENT_ALREADY_PAID':
           // O Pix trocado já tinha sido pago: o Kore aplicou o pagamento (RN07; Pena, item 2).

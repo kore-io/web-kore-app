@@ -26,8 +26,9 @@ type Listener = () => void;
 const weddingBlockedListeners = new Set<Listener>();
 
 /**
- * Avisa quando uma resposta da API traz o `403 WEDDING_BLOCKED` (Bloqueado RN07), venha ela
- * de um hook ou de uma chamada direta. Devolve a função que desliga o aviso.
+ * Avisa quando uma resposta da API traz o `403 WEDDING_BLOCKED` (Bloqueado RN07) ou o `409
+ * WEDDING_DELETION_SCHEDULED` (Retenção RN05), venha ela de um hook ou de uma chamada direta.
+ * Devolve a função que desliga o aviso.
  */
 export function onWeddingBlocked(listener: Listener): () => void {
   weddingBlockedListeners.add(listener);
@@ -70,7 +71,8 @@ export async function httpClient<T>(path: string, init: RequestInit = {}): Promi
   const body = await readBody(response);
   if (!response.ok) {
     const error = new ApiError({ status: response.status, body });
-    if (apiErrorCode({ error }) === 'WEDDING_BLOCKED') {
+    const code = apiErrorCode({ error });
+    if (code === 'WEDDING_BLOCKED' || code === 'WEDDING_DELETION_SCHEDULED') {
       weddingBlockedListeners.forEach((listener) => listener());
     }
     throw error;

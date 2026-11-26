@@ -12,7 +12,7 @@ import {
 import { InviteAnotherDialog } from '../my-weddings/wedding-detail-panel';
 import { coupleInvitations, sentDay } from '../my-weddings/wedding-detail-texts';
 import {
-  isWeddingBlocked,
+  isWriteLocked,
   lockedProps,
   useErrorMessage,
   useWriteLock,
@@ -59,7 +59,7 @@ export function AwaitingCoupleBanner({ weddingId }: { weddingId: string }) {
         onError: (error) =>
           showToast({
             tone: 'danger',
-            message: isWeddingBlocked(error)
+            message: isWriteLocked(error)
               ? errorMessage(error)
               : t('myWeddings.detail.resendError'),
           }),

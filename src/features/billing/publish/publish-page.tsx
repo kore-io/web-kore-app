@@ -196,11 +196,13 @@ function CouplePublish({
   const paths = useAreaPaths();
   const site = useSiteControllerGetV1(weddingId);
   const pricing = usePricingControllerPricingV1();
-  const { status, blocked } = membership.lifecycle;
+  const { status, blocked, deletionScheduledFor } = membership.lifecycle;
   const ready = site.data !== undefined && pricing.data !== undefined;
   // O que impede a cotação antes de qualquer escolha (RN01; Cortesia RN03 e RN04).
   const blocker = ((): string | undefined => {
     if (blocked) return t('publish.reason.blocked');
+    // A exclusão agendada (323(e); Retenção RN05; 318(11)).
+    if (deletionScheduledFor) return t('lifecycle.deletion.reason');
     if (status === 'awaiting_couple') return t('publish.reason.awaitingCouple');
     if (!site.data) return undefined;
     if (!site.data.eventDate) {

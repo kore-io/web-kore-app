@@ -26,7 +26,7 @@ import { coupleName } from './my-weddings-filters';
 import { useCoupleLinkActions } from './use-couple-link-actions';
 import { WeddingStatusBadge } from './wedding-status-badge';
 import { coupleInvitations, deleteCase, longWeddingDate, sentDay } from './wedding-detail-texts';
-import { isWeddingBlocked, lockedProps, useErrorMessage } from '../../billing/lifecycle/blocked';
+import { isWriteLocked, lockedProps, useErrorMessage } from '../../billing/lifecycle/blocked';
 
 /**
  * O Detalhe do casamento (Meus casamentos RN08 a RN11; Penpot 03; decisão 260): o painel
@@ -156,7 +156,7 @@ function DetailContent({
         onError: (error) =>
           showToast({
             tone: 'danger',
-            message: isWeddingBlocked(error)
+            message: isWriteLocked(error)
               ? errorMessage(error)
               : t('myWeddings.detail.resendError'),
           }),
