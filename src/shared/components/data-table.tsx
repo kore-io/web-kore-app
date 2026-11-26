@@ -27,15 +27,15 @@ export interface DataTableColumn {
 /**
  * As larguras das colunas: cada tamanho encolhe até um mínimo quando o quadro aperta (o
  * computador estreito com a Sidebar, de 1024 px em diante; bloqueante do Crivo no PR da 346),
- * e a coluna flexível nunca fica abaixo do dela. Com espaço, as fixas chegam ao máximo e a
+ * e a coluna flexível nunca fica abaixo da dela. Com espaço, as fixas chegam ao máximo e a
  * flexível fica com o resto.
  */
 const TRACKS: Record<DataTableColumnSize, string> = {
-  fill: 'minmax(8rem, 1fr)',
+  fill: 'minmax(7.5rem, 1fr)',
   xs: 'minmax(3.5rem, 72px)',
   sm: 'minmax(4.5rem, 140px)',
   md: 'minmax(7rem, 220px)',
-  lg: 'minmax(9rem, 300px)',
+  lg: 'minmax(10.25rem, 300px)',
 };
 
 function classNames(...names: (string | false | undefined)[]) {

@@ -58,7 +58,7 @@ describe('DataTable (no molde da GroupTable do DS v0.18)', () => {
   it('as larguras das colunas vão para o grid, pelo size', () => {
     renderTable();
     expect(screen.getByRole('table').style.getPropertyValue('--kore-data-table-columns')).toBe(
-      'minmax(8rem, 1fr) minmax(4.5rem, 140px) minmax(4.5rem, 140px) minmax(3.5rem, 72px)',
+      'minmax(7.5rem, 1fr) minmax(4.5rem, 140px) minmax(4.5rem, 140px) minmax(3.5rem, 72px)',
     );
   });
 
