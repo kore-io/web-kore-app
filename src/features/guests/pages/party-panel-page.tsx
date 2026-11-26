@@ -440,6 +440,8 @@ function GuestItem({
                       {
                         id: 'move',
                         label: t('panel.move.action'),
+                        // Bloqueado RN04: mover de grupo é escrita.
+                        ...(reason && { disabled: true, disabledReason: reason }),
                         onSelect: () =>
                           onMove({
                             guest: { id: guest.id, name },
