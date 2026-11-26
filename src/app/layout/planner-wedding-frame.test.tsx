@@ -324,6 +324,59 @@ describe('a moldura da colaboradora dentro do casamento (Colaboradora RN01 a RN0
     expect(screen.getByRole('button', { name: /^Convidar outro e/ })).toBeInTheDocument();
   });
 
+  describe('Aguardando o casal no casamento bloqueado (Bloqueado RN04)', () => {
+    const LOCKED = 'Indisponível enquanto o site está bloqueado.';
+    const invitation = {
+      id: 'i1',
+      type: 'email',
+      email: 'fernanda.alves@gmail.com',
+      sentAt: '2026-09-20T03:30:00Z',
+      expiresAt: '2026-10-20T15:00:00Z',
+    };
+    const blockedMe = (blocked: boolean) =>
+      me({
+        memberships: [
+          {
+            ...membership('w3', 'collaborator', 'Fernanda & João', '2027-01-30', 'awaiting_couple'),
+            lifecycle: { ...lifecycle('awaiting_couple'), blocked },
+          },
+        ],
+      });
+
+    it('Reenviar convite e Convidar outro e-mail desabilitados com o motivo', async () => {
+      api({
+        meBody: blockedMe(true),
+        handler: ({ path }) =>
+          path === '/v1/me/weddings/w3' ? Response.json(detail([invitation])) : undefined,
+      });
+      renderRoute({ url: '/cerimonialista/casamentos/w3' });
+      const resend = await screen.findByRole('button', { name: 'Reenviar convite' });
+      expect(resend).toBeDisabled();
+      expect(resend).toHaveAccessibleDescription(LOCKED);
+      const another = screen.getByRole('button', { name: /^Convidar outro e/ });
+      expect(another).toBeDisabled();
+      expect(another).toHaveAccessibleDescription(LOCKED);
+    });
+
+    it('o 403 WEDDING_BLOCKED em corrida no reenvio: o motivo no Toast, no lugar do erro do reenvio', async () => {
+      const user = userEvent.setup();
+      api({
+        meBody: blockedMe(false),
+        handler: ({ method, path }) => {
+          if (path === '/v1/me/weddings/w3') return Response.json(detail([invitation]));
+          if (method === 'POST') {
+            return Response.json({ error: 'WEDDING_BLOCKED' }, { status: 403 });
+          }
+          return undefined;
+        },
+      });
+      renderRoute({ url: '/cerimonialista/casamentos/w3' });
+      await user.click(await screen.findByRole('button', { name: 'Reenviar convite' }));
+      const region = await screen.findByRole('region', { name: /^Avisos/ });
+      expect(await within(region).findByText(LOCKED)).toBeInTheDocument();
+    });
+  });
+
   it('Aguardando o casal pelo link: "vale até" e Ver o link para o casal, que abre o detalhe (RN04)', async () => {
     api({
       handler: ({ path }) =>
