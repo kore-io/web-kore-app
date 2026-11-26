@@ -296,6 +296,18 @@ describe('Site › Editor no casamento bloqueado (Bloqueado RN02 a RN04)', () =>
     expect(screen.getByRole('button', { name: 'Pré-visualizar' })).toBeEnabled();
   });
 
+  it('as fotos: a capa e a Nossa história sem envio, com o motivo (gravam na hora)', async () => {
+    mockBlocked();
+    const { router } = renderRoute({ url: '/app/site/dados-basicos' });
+    const cover = await screen.findByRole('group', { name: 'Foto de capa' });
+    expect(cover).toHaveAccessibleDescription(LOCKED);
+    expect(cover.querySelector('input[type="file"]')).toBeDisabled();
+    await router.navigate('/app/site/nossa-historia');
+    const photos = await screen.findByRole('group', { name: /^Fotos do casal/ });
+    expect(photos).toHaveAccessibleDescription(LOCKED);
+    expect(photos.querySelector('input[type="file"]')).toBeDisabled();
+  });
+
   it('o 403 WEDDING_BLOCKED em corrida ao salvar: o Toast com o motivo, no lugar do genérico', async () => {
     const user = userEvent.setup();
     mockBlocked({
