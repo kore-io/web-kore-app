@@ -85,6 +85,24 @@ describe('Pages Function do site do casal (Site público RN01 a RN03, RN09)', ()
     expect(html).toContain('<meta property="og:image:width" content="1200" />');
   });
 
+  it.each([
+    [410, 'SITE_EXPIRED'],
+    [423, 'SITE_UNAVAILABLE'],
+  ])(
+    'site fora do ar (%i %s): a prévia genérica, sem nome, e o no-store (Data de saída RN08; Bloqueado RN05)',
+    async (status, error) => {
+      const response = await handleSitePage({
+        request: new Request('https://kore.com.br/ana-e-marcos'),
+        env: env(),
+        fetchImpl: api({ statusCode: status, error, ...published }, status),
+      });
+      const html = await response.text();
+      expect(html).toContain(`<meta property="og:title" content="${GENERIC_PREVIEW.title}" />`);
+      expect(html).not.toContain('Ana');
+      expect(response.headers.get('Cache-Control')).toBe('private, no-store');
+    },
+  );
+
   it('publicado sem capa: os nomes, com a imagem padrão', async () => {
     const response = await handleSitePage({
       request: new Request('https://kore.com.br/ana-e-marcos'),
