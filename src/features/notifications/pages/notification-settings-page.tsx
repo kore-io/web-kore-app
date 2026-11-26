@@ -38,6 +38,7 @@ function NotificationSettings({ weddingId }: { weddingId: string }) {
   const area = useAreaPaths();
   const { t } = useTranslation('notifications');
   const { t: tAccess } = useTranslation('access');
+  const { t: tBilling } = useTranslation('billing');
   const { showToast } = useToast();
   const queryClient = useQueryClient();
   const emailId = useId();
@@ -106,6 +107,10 @@ function NotificationSettings({ weddingId }: { weddingId: string }) {
       <Tabs aria-label={t('settings.tabs')}>
         <Tab asChild current>
           <Link to={area.settingsNotifications}>{t('settings.tab')}</Link>
+        </Tab>
+        {/* Configurações › Casamento (Retenção RN05; A11; E14). */}
+        <Tab asChild>
+          <Link to={area.settingsWedding}>{tBilling('weddingSettings.tab')}</Link>
         </Tab>
       </Tabs>
       {preferences.isError ? (

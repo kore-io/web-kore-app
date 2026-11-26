@@ -23,6 +23,7 @@
 @import '../features/billing/pix/pix.css' layer(components);
 @import '../features/billing/payments/payments.css' layer(components);
 @import '../features/billing/lifecycle/lifecycle.css' layer(components);
+@import '../features/billing/deletion/deletion.css' layer(components);
 @import '../features/billing/end-date/end-date.css' layer(components);
 @import '../features/access/components/sign-up.css' layer(components);
 @import '../features/planner/planner.css' layer(components);

@@ -63,6 +63,8 @@ export function areaPaths(base: string) {
     notifications: `${base}/notificacoes`,
     /** Configurações › Notificações (decisão 221). */
     settingsNotifications: `${base}/configuracoes/notificacoes`,
+    /** Configurações › Casamento, a rota do e-mail da exclusão (Retenção RN05; A11; E14). */
+    settingsWedding: `${base}/configuracoes/casamento`,
     /** Cobrança e publicação › Pagamentos (Pagamentos e arrependimento RN01; decisão 326). */
     billing: `${base}/cobranca`,
     /** Cobrança e publicação › Publicar o site (Publicar e pagar RN01; decisão 316(2)). */
