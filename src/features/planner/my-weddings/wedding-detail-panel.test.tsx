@@ -433,6 +433,16 @@ describe('Detalhe do casamento (Meus casamentos RN08 a RN11; decisão 260)', () 
       expect(within(dialog).getByRole('button', { name: 'Copiar link' })).toBeEnabled();
     });
 
+    it('no rascunho sem convite, Convidar o casal desabilitado; Montar o site continua (sugestão do Crivo)', async () => {
+      api({ detail: awaiting([], { status: 'draft', canEditIdentity: true, blocked: true }) });
+      renderRoute({ url: URL });
+      const dialog = await screen.findByRole('dialog', { name: 'Fernanda e João' });
+      const invite = within(dialog).getByRole('button', { name: 'Convidar o casal' });
+      expect(invite).toBeDisabled();
+      expect(invite).toHaveAccessibleDescription(LOCKED);
+      expect(within(dialog).getByRole('button', { name: 'Montar o site' })).toBeEnabled();
+    });
+
     it('com dono, o Sair deste casamento continua (RN03)', async () => {
       api({ detail: { ...published, blocked: true } });
       renderRoute({ url: URL });
