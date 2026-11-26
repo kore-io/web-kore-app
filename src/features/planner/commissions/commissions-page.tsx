@@ -10,6 +10,7 @@ import {
 } from '@kore-io/design';
 import type { TFunction } from 'i18next';
 import { CreditCard } from 'lucide-react';
+import { keepPreviousData } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
@@ -18,10 +19,12 @@ import type {
   AdjustmentLineResponse,
   CommissionBalancesResponse,
   CommissionLineResponse,
+  PayoutsResponse,
   ReferrerCommissionsControllerListV1View,
   WeddingCommissionsResponse,
 } from '../../../shared/api/generated/model';
 import { useReferrerCommissionsControllerListV1 } from '../../../shared/api/generated/planner/planner';
+import { usePayoutsControllerListV1 } from '../../../shared/api/generated/referral/referral';
 import { DataTable, DataTableCell, DataTableRow } from '../../../shared/components/data-table';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { Pagination } from '../../../shared/components/pagination';
@@ -50,6 +53,12 @@ const STATUS_TONES: Record<Status, BadgeTone> = {
 /** O dia curto de um instante, no fuso das comissões: "09/09", com o ano fora do corrente. */
 function shortDay({ at, now }: { at: string; now: Date }): string {
   return numericDay({ day: dayIn({ at, timezone: TIMEZONE }), timezone: TIMEZONE, now });
+}
+
+/** "28/09", sem o ano, como no "Paga em" (Voz, Comissões). */
+function dayMonth({ at }: { at: string }): string {
+  const [, month, date] = dayIn({ at, timezone: TIMEZONE }).split('-');
+  return `${date}/${month}`;
 }
 
 /** O nome do casamento, ou a lápide do expurgado (Retenção RN03; revisão técnica B5-8). */
@@ -88,7 +97,14 @@ export function CommissionsPage() {
   const { t } = useTranslation('planner');
   const [view, setView] = useState<ReferrerCommissionsControllerListV1View>('payment');
   const [page, setPage] = useState(1);
-  const list = useReferrerCommissionsControllerListV1({ view, page });
+  // Ao trocar de aba ou de página, a tela segue com os dados de antes até os novos chegarem:
+  // as abas não somem e o foco fica no botão (sugestão do Crivo).
+  const list = useReferrerCommissionsControllerListV1(
+    { view, page },
+    { query: { placeholderData: keepPreviousData } },
+  );
+  // O que o Pedir repasse exige (Repasse RN04): o mínimo, os repasses ligados e o intervalo.
+  const payouts = usePayoutsControllerListV1();
   const data = list.data;
 
   return (
@@ -102,7 +118,7 @@ export function CommissionsPage() {
         </div>
       ) : (
         <>
-          <Balances balances={data.balances} />
+          <Balances balances={data.balances} payouts={payouts.data} />
           <section
             className="kore-commissions__statement"
             aria-labelledby="kore-commissions-statement"
@@ -131,12 +147,17 @@ export function CommissionsPage() {
                 title={t('commissions.empty.title')}
                 description={t('commissions.empty.description')}
               />
-            ) : view === 'payment' ? (
+            ) : data.view === 'payment' ? (
+              // A tabela segue a resposta, e não a aba: na troca, os dados de antes ficam na
+              // tela até os novos chegarem (keepPreviousData).
               <ByPayment
                 items={data.items as (CommissionLineResponse | AdjustmentLineResponse)[]}
               />
             ) : (
-              <ByWedding items={data.items as WeddingCommissionsResponse[]} />
+              <ByWedding
+                items={data.items as WeddingCommissionsResponse[]}
+                canRequest={canRequestPayout({ balances: data.balances, payouts: payouts.data })}
+              />
             )}
             {data.total > data.pageSize && (
               <Pagination
@@ -159,8 +180,35 @@ export function CommissionsPage() {
   );
 }
 
+/**
+ * "já pode pedir o repasse" só quando o pedido é possível (Repasse RN04; bloqueante do Crivo
+ * no E16): os repasses ligados, o saldo a partir do mínimo, sem repasse em aberto e fora do
+ * intervalo entre pedidos. Sem a leitura dos repasses, a legenda não aparece.
+ */
+export function canRequestPayout({
+  balances,
+  payouts,
+}: {
+  balances: CommissionBalancesResponse;
+  payouts: PayoutsResponse | undefined;
+}): boolean {
+  if (!payouts) return false;
+  return (
+    payouts.payoutsEnabled &&
+    balances.inPayoutCents === 0 &&
+    balances.availableCents >= payouts.minimumCents &&
+    payouts.nextRequestAt === null
+  );
+}
+
 /** Os saldos (Comissões RN02 e RN07; 266(2); 346(2)). */
-function Balances({ balances }: { balances: CommissionBalancesResponse }) {
+function Balances({
+  balances,
+  payouts,
+}: {
+  balances: CommissionBalancesResponse;
+  payouts: PayoutsResponse | undefined;
+}) {
   const { t } = useTranslation('planner');
   const available = formatCents({ cents: balances.availableCents });
   return (
@@ -175,7 +223,9 @@ function Balances({ balances }: { balances: CommissionBalancesResponse }) {
               })
             : available
         }
-        detail={balances.availableCents > 0 ? t('commissions.balances.canRequest') : undefined}
+        detail={
+          canRequestPayout({ balances, payouts }) ? t('commissions.balances.canRequest') : undefined
+        }
       />
       <StatCard
         label={t('commissions.balances.pending')}
@@ -211,7 +261,7 @@ function statusCaption({
     case 'paid':
       return {
         label: t('commissions.status.paid', {
-          date: item.paidAt ? shortDay({ at: item.paidAt, now }).slice(0, 5) : '',
+          date: item.paidAt ? dayMonth({ at: item.paidAt }) : '',
         }),
         caption: null,
       };
@@ -324,7 +374,14 @@ function CommissionRow({
  * repasse", "Libera em 09/09" (com várias, "libera em 02/10 e em 10/10") e "nada a liberar
  * agora". Origem, Pagamentos, Já recebido e Total vêm num PR curto, com os campos da API.
  */
-function ByWedding({ items }: { items: WeddingCommissionsResponse[] }) {
+function ByWedding({
+  items,
+  canRequest,
+}: {
+  items: WeddingCommissionsResponse[];
+  /** O pedido é possível pelo saldo total (347(3)): senão, a linha disponível fica só no valor. */
+  canRequest: boolean;
+}) {
   const { t } = useTranslation('planner');
   const now = new Date();
   const header = {
@@ -344,20 +401,22 @@ function ByWedding({ items }: { items: WeddingCommissionsResponse[] }) {
       {items.map((item, index) => {
         const dates = item.releaseDates.map((at) => shortDay({ at, now }));
         const legend =
-          item.availableCents > 0
+          item.availableCents > 0 && canRequest
             ? t('commissions.wedding.canRequest')
             : dates.length > 0
               ? t('commissions.wedding.releases', {
                   count: dates.length,
                   dates: dates.join(' e em '),
                 })
-              : t('commissions.wedding.nothing');
+              : item.availableCents > 0
+                ? null
+                : t('commissions.wedding.nothing');
         return (
           <DataTableRow key={item.weddingId ?? `apagado-${index}`}>
             <DataTableCell primary>
               <span className="kore-commissions__status">
                 <WeddingName item={item} />
-                <span className="kore-commissions__caption">{legend}</span>
+                {legend && <span className="kore-commissions__caption">{legend}</span>}
               </span>
             </DataTableCell>
             <DataTableCell label={header.pending} align="end">

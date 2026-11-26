@@ -135,12 +135,23 @@ const byWedding = [
   },
 ];
 
+const payoutsBody = {
+  nextRequestAt: null,
+  pixKeyActiveFrom: null,
+  minimumCents: 5000,
+  items: [],
+  payoutsEnabled: true,
+};
+
 function mockCommissions({
   balancesBody = balances,
   payment = byPayment,
   wedding = byWedding,
   total,
+  payouts = payoutsBody,
 }: {
+  /** O GET dos repasses: o mínimo, o intervalo e os repasses ligados (Repasse RN04). */
+  payouts?: object;
   balancesBody?: object;
   payment?: object[];
   wedding?: object[];
@@ -149,6 +160,7 @@ function mockCommissions({
   const paths: string[] = [];
   mockApi(({ path }) => {
     if (path === '/v1/me') return Response.json(me);
+    if (path === '/v1/me/referrer/payouts') return Response.json(payouts);
     if (path.startsWith('/v1/me/referrer/commissions')) {
       paths.push(path);
       const view = new URLSearchParams(path.split('?')[1]).get('view') ?? 'payment';
@@ -273,7 +285,10 @@ describe('Comissões (Comissões do indicador RN07)', () => {
     const paths = mockCommissions();
     renderRoute({ url: URL });
     await user.click(await screen.findByRole('button', { name: 'Por casamento' }));
+    // A aba não some na troca: o foco fica no botão (sugestão do Crivo).
+    expect(screen.getByRole('button', { name: 'Por casamento' })).toHaveFocus();
     expect(await screen.findByText('libera em 02/12 e em 10/12')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Por casamento' })).toHaveFocus();
     expect(screen.getAllByRole('columnheader').map((header) => header.textContent)).toEqual([
       'Casamento',
       'Aguardando liberação',
@@ -304,5 +319,34 @@ describe('Comissões (Comissões do indicador RN07)', () => {
     mockCommissions({ total: 60 });
     renderRoute({ url: URL });
     expect(await screen.findByText('Mostrando 1 a 50 de 60')).toBeInTheDocument();
+  });
+
+  describe('"já pode pedir o repasse" só quando o pedido é possível (Repasse RN04; 347)', () => {
+    it.each([
+      ['abaixo do mínimo', { balancesBody: { ...balances, availableCents: 1740 } }],
+      [
+        'antes do próximo pedido',
+        { payouts: { ...payoutsBody, nextRequestAt: '2026-12-10T03:00:00Z' } },
+      ],
+      ['com os repasses desligados', { payouts: { ...payoutsBody, payoutsEnabled: false } }],
+      ['com um repasse em aberto', { balancesBody: { ...balances, inPayoutCents: 2000 } }],
+    ])('%s: o cartão sem a legenda', async (_name, setup) => {
+      mockCommissions(setup);
+      renderRoute({ url: URL });
+      await screen.findByText('Retida');
+      expect(screen.queryByText('já pode pedir o repasse')).toBeNull();
+    });
+
+    it('abaixo do mínimo, na aba Por casamento: a linha disponível só com o valor', async () => {
+      const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+      mockCommissions({ balancesBody: { ...balances, availableCents: 1740 } });
+      renderRoute({ url: URL });
+      await user.click(await screen.findByRole('button', { name: 'Por casamento' }));
+      const ana = await screen.findByText('R$ 67,42');
+      expect(
+        within(ana.closest('[role="row"]') as HTMLElement).queryByText('já pode pedir o repasse'),
+      ).toBeNull();
+      expect(screen.queryByText('já pode pedir o repasse')).toBeNull();
+    });
   });
 });
