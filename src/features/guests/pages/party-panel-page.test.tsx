@@ -581,3 +581,59 @@ describe('Mover de grupo (RN10; decisão 201)', () => {
     await expectNoA11yViolations({ container: document.body, disabledRules: ['region'] });
   });
 });
+
+describe('o Painel no casamento bloqueado (Bloqueado RN04)', () => {
+  const LOCKED = 'Indisponível enquanto o site está bloqueado.';
+  const blockedMe = {
+    ...me,
+    memberships: me.memberships.map((membership) => ({
+      ...membership,
+      timezone: 'America/Sao_Paulo',
+      lifecycle: {
+        status: 'published',
+        endDate: '2028-02-14',
+        graceUntil: null,
+        expiredAt: null,
+        paidThrough: '2028-02-14',
+        deletionScheduledFor: null,
+        blocked: true,
+      },
+    })),
+  };
+
+  it('Regenerar link, Editar grupo e Mover para a lixeira desabilitados; Ver como este grupo continua', async () => {
+    mockApi(({ method, path }) => {
+      if (path === '/v1/me') return Response.json(meFor(blockedMe));
+      if (method === 'GET' && path === '/v1/weddings/w1/parties/p1') {
+        return Response.json(moreira());
+      }
+      return apiError({ status: 404, body: { error: 'NOT_FOUND' } });
+    });
+    renderRoute({ url: '/app/convidados/grupos/p1' });
+    await screen.findByRole('heading', { name: 'Família Moreira', level: 1 });
+    for (const name of ['Regenerar link', 'Editar grupo', 'Mover para a lixeira']) {
+      const button = screen.getByRole('button', { name });
+      expect(button).toBeDisabled();
+      expect(button).toHaveAccessibleDescription(LOCKED);
+    }
+    expect(screen.getByRole('button', { name: 'Ver como este grupo' })).toBeEnabled();
+  });
+
+  it('no ⋮ do convidado, Alterar resposta, Mover de grupo e Mover para a lixeira com o motivo', async () => {
+    const user = userEvent.setup();
+    mockApi(({ method, path }) => {
+      if (path === '/v1/me') return Response.json(meFor(blockedMe));
+      if (method === 'GET' && path === '/v1/weddings/w1/parties/p1') {
+        return Response.json(moreira());
+      }
+      return apiError({ status: 404, body: { error: 'NOT_FOUND' } });
+    });
+    renderRoute({ url: '/app/convidados/grupos/p1' });
+    await user.click(await screen.findByRole('button', { name: 'Ações de Célia Moreira' }));
+    for (const name of ['Alterar resposta', 'Mover de grupo', 'Mover para a lixeira']) {
+      const item = screen.getByRole('menuitem', { name });
+      expect(item).toHaveAttribute('aria-disabled', 'true');
+      expect(item).toHaveAccessibleDescription(LOCKED);
+    }
+  });
+});

@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { meFor } from '../../../../tests/profile';
@@ -158,5 +158,55 @@ describe('Convidados no casamento bloqueado (Bloqueado RN02 a RN04)', () => {
     const region = await screen.findByRole('region', { name: /^Avisos/ });
     expect(await within(region).findByText(LOCKED)).toBeInTheDocument();
     expect(within(region).queryByText(/^Não foi possível continuar/)).toBeNull();
+  });
+
+  it('no Novo grupo, o Salvar grupo desabilitado com o motivo', async () => {
+    mockGuests();
+    renderRoute({ url: '/app/convidados/novo' });
+    const save = await screen.findByRole('button', { name: 'Salvar grupo' });
+    expect(save).toBeDisabled();
+    expect(save).toHaveAccessibleDescription(LOCKED);
+    // Os campos em leitura (sugestão do Crivo), e o Cancelar continua.
+    expect(screen.getByRole('textbox', { name: 'Nome do grupo' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Cancelar' })).toBeEnabled();
+  });
+
+  it('no Importar, o campo da planilha e o Colar a lista desabilitados com o motivo (as prévias já gravam)', async () => {
+    mockGuests();
+    renderRoute({ url: '/app/convidados/importar' });
+    const paste = await screen.findByRole('button', { name: 'Colar a lista' });
+    expect(paste).toBeDisabled();
+    expect(paste).toHaveAccessibleDescription(LOCKED);
+    const upload = screen.getByRole('group', { name: '2. Enviar a planilha preenchida' });
+    expect(upload).toHaveAccessibleDescription(LOCKED);
+    expect(upload.querySelector('input[type="file"]')).toBeDisabled();
+  });
+
+  it('a lista colada: a prévia recusada em corrida vira o Toast, e o Continuar trava pelo /me relido', async () => {
+    const user = userEvent.setup();
+    let blocked = false;
+    mockApi(({ method, path }) => {
+      if (path === '/v1/me') return Response.json(meFor(me(blocked)));
+      if (method === 'GET' && path.startsWith('/v1/weddings/w1/parties')) {
+        return Response.json({ summary, total: 1, data: [PARTY], nextCursor: null });
+      }
+      if (method === 'GET' && path === '/v1/weddings/w1/tags') {
+        return Response.json({ limit: 10, data: [] });
+      }
+      if (method === 'POST' && path === '/v1/weddings/w1/guest-imports/paste/preview') {
+        blocked = true;
+        return Response.json({ error: 'WEDDING_BLOCKED' }, { status: 403 });
+      }
+      return apiError({ status: 404, body: { error: 'NOT_FOUND' } });
+    });
+    renderRoute({ url: '/app/convidados/importar' });
+    await user.click(await screen.findByRole('button', { name: 'Colar a lista' }));
+    await user.type(screen.getByRole('textbox', { name: 'Colar a lista' }), 'Família Moreira');
+    const next = screen.getByRole('button', { name: 'Continuar' });
+    await user.click(next);
+    const region = await screen.findByRole('region', { name: /^Avisos/ });
+    expect(await within(region).findByText(LOCKED)).toBeInTheDocument();
+    await waitFor(() => expect(next).toBeDisabled());
+    expect(next).toHaveAccessibleDescription(LOCKED);
   });
 });
