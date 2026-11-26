@@ -164,3 +164,39 @@ test('a colaboradora: a faixa do bloqueio acima de "Você colabora neste casamen
     LOCKED,
   );
 });
+
+test('Convidados e o Editor em leitura: o Novo grupo, o 403 ao criar e os campos (RN02 a RN04)', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const email = newEmail({ label: `bloqueado-telas-${unique()}` });
+  const ownerId = await createUser({ db, email, name: 'Ana Souza' });
+  const weddingId = await published({ ownerId });
+  await signIn({ page, email });
+  // Um grupo antes do bloqueio, para a lista ter linha.
+  const created = await page.request.post(`${API_URL}/v1/weddings/${weddingId}/parties`, {
+    headers: APP,
+    data: { name: 'Família Moreira', guests: [{ name: 'Célia Moreira' }] },
+  });
+  expect(created.ok()).toBe(true);
+  await block(weddingId);
+  await page.goto('/app/convidados');
+  await expect(page.locator('.kore-lifecycle-banner')).toHaveText(BANNER);
+  await expect(page.getByText('Família Moreira')).toBeVisible();
+  const add = page.getByRole('button', { name: 'Novo grupo' });
+  await expect(add).toBeDisabled();
+  await expect(add).toHaveAccessibleDescription(LOCKED);
+  await expect(page.getByRole('checkbox', { name: 'Selecionar Família Moreira' })).toBeDisabled();
+  // A API recusa criar o grupo (o cenário da spec).
+  const refused = await page.request.post(`${API_URL}/v1/weddings/${weddingId}/parties`, {
+    headers: APP,
+    data: { name: 'Tio Jorge', guests: [{ name: 'Jorge Moreira' }] },
+  });
+  expect(refused.status()).toBe(403);
+  expect(await refused.json()).toMatchObject({ error: 'WEDDING_BLOCKED' });
+  // O Editor abre em leitura: os campos desabilitados e o Salvar com o motivo.
+  await page.goto('/app/site/dados-basicos');
+  await expect(page.getByRole('textbox', { name: 'Cidade' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Salvar' })).toHaveAccessibleDescription(LOCKED);
+  await expect(page.getByRole('button', { name: 'Pré-visualizar' })).toBeEnabled();
+});

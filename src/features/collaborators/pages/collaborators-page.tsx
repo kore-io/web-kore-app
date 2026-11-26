@@ -23,6 +23,12 @@ import { useActiveWedding } from '../../guests/hooks/use-active-wedding';
 import { coupleName } from '../../planner/my-weddings/my-weddings-filters';
 import { InviteButton, InvitePlanner, PendingInvitation } from '../components/access-invitation';
 import { availableAtText, initials, memberGroups, cardDate } from '../collaborators-texts';
+import {
+  lockedProps,
+  useErrorMessage,
+  useWriteLock,
+  WriteLockReason,
+} from '../../billing/lifecycle/blocked';
 
 /**
  * Colaboradores (Papéis RN02, RN03 e RN06a; Colaboradora RN05; decisões 270 e 271), nas
@@ -84,7 +90,6 @@ function MemberRow({
 
 function CoupleCollaborators({ weddingId }: { weddingId: string }) {
   const { t } = useTranslation('collaborators');
-  const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
   const queryClient = useQueryClient();
   const { members, timezone } = useMembers({ weddingId });
@@ -92,6 +97,10 @@ function CoupleCollaborators({ weddingId }: { weddingId: string }) {
   const [removing, setRemoving] = useState<WeddingMemberResponse | null>(null);
   const ownersId = useId();
   const plannersId = useId();
+  const errorMessage = useErrorMessage();
+  // Bloqueado RN04: remover a cerimonialista é escrita.
+  const lock = useWriteLock();
+  const lockId = `${plannersId}-locked`;
 
   function confirmRemove() {
     if (!removing) return;
@@ -119,7 +128,7 @@ function CoupleCollaborators({ weddingId }: { weddingId: string }) {
           }
           showToast({
             tone: 'danger',
-            message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
+            message: errorMessage(error),
           });
         },
       },
@@ -191,6 +200,7 @@ function CoupleCollaborators({ weddingId }: { weddingId: string }) {
                         variant="destructive"
                         aria-label={t('couple.removeName', { name: member.name ?? '' })}
                         onClick={() => setRemoving(member)}
+                        {...lockedProps({ locked: lock.locked, id: lockId })}
                       >
                         {t('couple.remove')}
                       </Button>
@@ -198,6 +208,9 @@ function CoupleCollaborators({ weddingId }: { weddingId: string }) {
                   />
                 ))}
               </ul>
+            )}
+            {planners.length > 0 && (
+              <WriteLockReason id={lockId} className="kore-collaborators__help" />
             )}
             {planners.length > 0 ? (
               <p className="kore-collaborators__help">{t('couple.plannersHelp')}</p>

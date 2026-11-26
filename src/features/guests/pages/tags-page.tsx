@@ -6,6 +6,7 @@ import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { EditTagDialog, TAG_NAME_MAX_LENGTH } from '../components/edit-tag-dialog';
 import { useActiveWedding, type Audience } from '../hooks/use-active-wedding';
 import { useTags, type TagNameError } from '../hooks/use-tags';
+import { lockedProps, useWriteLock, WriteLockReason } from '../../billing/lifecycle/blocked';
 
 /** Aba Tags (Tags dos convidados, RN01 a RN06), dentro do GuestsLayout. */
 export function TagsPage() {
@@ -18,6 +19,8 @@ function TagsView({ weddingId, audience }: { weddingId: string; audience: Audien
   const { t } = useTranslation('guests');
   const tags = useTags({ weddingId });
   const hintId = useId();
+  // Bloqueado RN04: criar, editar e excluir tags são escrita.
+  const lock = useWriteLock();
   const [newName, setNewName] = useState('');
   const [createError, setCreateError] = useState<TagNameError>(null);
   const [editing, setEditing] = useState<TagResponse | null>(null);
@@ -95,10 +98,15 @@ function TagsView({ weddingId, audience }: { weddingId: string; audience: Audien
             setCreateError(null);
           }}
         />
-        <Button type="submit" disabled={limitReached || !newName.trim() || tags.isSaving}>
+        <Button
+          type="submit"
+          disabled={limitReached || !newName.trim() || tags.isSaving}
+          {...lockedProps({ locked: lock.locked, id: 'kore-tags-locked' })}
+        >
           {t('tags.create')}
         </Button>
       </form>
+      <WriteLockReason id="kore-tags-locked" className="kore-tags__hint" />
       {hint && (
         <p
           id={hintId}
@@ -124,6 +132,11 @@ function TagsView({ weddingId, audience }: { weddingId: string; audience: Audien
                 editButton.current = event.currentTarget;
                 setEditing(tag);
               }}
+              {...lockedProps({
+                locked: lock.locked,
+                id: 'kore-tags-locked',
+                describedBy: `tag-${tag.id}`,
+              })}
             >
               {t('tags.edit')}
             </Button>

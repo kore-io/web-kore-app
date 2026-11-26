@@ -53,3 +53,18 @@
 .kore-party-form-page {
   @apply flex flex-col gap-6;
 }
+
+/* O motivo do bloqueio, embaixo do Salvar (Bloqueado RN04). */
+.kore-party-form__lock {
+  @apply md:text-right;
+}
+
+/* Os campos em leitura no casamento bloqueado (Bloqueado RN04): o fieldset sem moldura, e a
+   caixa do campo com o visual de desabilitado da lib, que ela só aplica pela prop. */
+.kore-party-form__fieldset {
+  @apply m-0 flex min-w-0 flex-col gap-5 border-0 p-0;
+}
+
+.kore-party-form__fieldset:disabled .kore-field-box {
+  @apply bg-gray-100 opacity-60;
+}

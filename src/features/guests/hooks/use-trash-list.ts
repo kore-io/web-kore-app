@@ -10,6 +10,7 @@ import {
 import type { RestoreTrashItemBodyType } from '../../../shared/api/generated/model';
 import { ApiError, apiErrorCode } from '../../../shared/api/http-client';
 import type { Audience } from './use-active-wedding';
+import { useErrorMessage } from '../../billing/lifecycle/blocked';
 
 /**
  * Lixeira (Lixeira de convidados, RN08 e RN09): os itens ainda não expurgados e o
@@ -18,8 +19,8 @@ import type { Audience } from './use-active-wedding';
  */
 export function useTrashList({ weddingId, audience }: { weddingId: string; audience: Audience }) {
   const { t } = useTranslation('guests');
-  const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
+  const errorMessage = useErrorMessage();
   const queryClient = useQueryClient();
   const list = useTrashControllerListV1(weddingId);
   const restore = useTrashControllerRestoreV1();
@@ -42,7 +43,7 @@ export function useTrashList({ weddingId, audience }: { weddingId: string; audie
         ? t(`trashPage.tagLimit.${audience}`)
         : code === 'TAG_NAME_TAKEN'
           ? t(`trashPage.tagNameTaken.${audience}`, { name: body.conflictName ?? '' })
-          : `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`;
+          : errorMessage(error);
     showToast({ tone: 'danger', message });
   }
 

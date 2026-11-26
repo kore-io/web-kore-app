@@ -29,6 +29,7 @@ import { useResponseLock } from '../hooks/use-response-lock';
 import { useTrash } from '../hooks/use-trash';
 import { usePartyPanel } from '../hooks/use-party-panel';
 import { useAreaPaths } from '../../../app/area';
+import { lockedProps, useWriteLock, WriteLockReason } from '../../billing/lifecycle/blocked';
 
 /** Selo da resposta do convidado, como os Badges do DS. */
 const rsvpBadges: Record<PartyGuestResponseRsvpStatus, { tone: BadgeTone; icon: ReactNode }> = {
@@ -38,6 +39,9 @@ const rsvpBadges: Record<PartyGuestResponseRsvpStatus, { tone: BadgeTone; icon: 
 };
 
 /** Painel do grupo (RN14 de Grupos e convidados), em /app/convidados/grupos/:partyId. */
+/** O motivo dos botões de escrita do cabeçalho do Painel (Bloqueado RN04). */
+const PANEL_LOCK_ID = 'kore-party-panel-locked';
+
 export function PartyPanelPage() {
   const { partyId = '' } = useParams();
   const { weddingId, audience, role } = useActiveWedding();
@@ -64,6 +68,7 @@ function PartyPanel({
   const trash = useTrash({ weddingId, audience });
   const openPreview = useOpenPreview({ weddingId });
   const navigate = useNavigate();
+  const writeLock = useWriteLock();
   const [trashingParty, setTrashingParty] = useState(false);
   const [trashingGuest, setTrashingGuest] = useState<{ id: string; name: string } | null>(null);
   const [confirming, setConfirming] = useState(false);
@@ -86,14 +91,23 @@ function PartyPanel({
         title={party.name}
         description={panelSummary({ t, party })}
         actions={
-          <>
-            <Button variant="secondary" onClick={() => setConfirming(true)}>
+          <div className="kore-guests__actions">
+            {/* Bloqueado RN04: gerar outro link e editar são escrita. */}
+            <Button
+              variant="secondary"
+              onClick={() => setConfirming(true)}
+              {...lockedProps({ locked: writeLock.locked, id: PANEL_LOCK_ID })}
+            >
               {t('panel.regenerate')}
             </Button>
-            <Button onClick={() => void navigate(area.guestPartyEdit({ partyId: party.id }))}>
+            <Button
+              onClick={() => void navigate(area.guestPartyEdit({ partyId: party.id }))}
+              {...lockedProps({ locked: writeLock.locked, id: PANEL_LOCK_ID })}
+            >
               {t('partyForm.editButton')}
             </Button>
-          </>
+            <WriteLockReason id={PANEL_LOCK_ID} className="kore-guests__lock" />
+          </div>
         }
       />
       <div className="kore-party-panel__cards">
@@ -361,13 +375,15 @@ function GuestItem({
 }) {
   const { t } = useTranslation('guests');
   // A colaboradora: sem alterar depois do prazo (RN04) e sem excluir quem respondeu (RN08).
+  // Bloqueado RN04: as três ações são escrita, e o bloqueio vem à frente.
+  const { locked, reason } = useWriteLock();
   const responseLock = {
-    disabled: afterDeadline,
-    disabledReason: t('panel.response.afterDeadline'),
+    disabled: locked || afterDeadline,
+    disabledReason: reason ?? t('panel.response.afterDeadline'),
   };
   const trashLock = {
-    disabled: collaborator && guest.rsvpStatus !== 'pending',
-    disabledReason: t('trash.alreadyResponded.guest'),
+    disabled: locked || (collaborator && guest.rsvpStatus !== 'pending'),
+    disabledReason: reason ?? t('trash.alreadyResponded.guest'),
   };
   const actions = useRef<HTMLSpanElement>(null);
   const badge = rsvpBadges[guest.rsvpStatus];
@@ -424,6 +440,8 @@ function GuestItem({
                       {
                         id: 'move',
                         label: t('panel.move.action'),
+                        // Bloqueado RN04: mover de grupo é escrita.
+                        ...(reason && { disabled: true, disabledReason: reason }),
                         onSelect: () =>
                           onMove({
                             guest: { id: guest.id, name },
@@ -497,6 +515,7 @@ function LinkCard({
   const { url } = party.link;
   const helpId = useId();
   const trashHelpId = useId();
+  const lock = useWriteLock();
   return (
     <Card title={t('panel.link.title')}>
       <p className="kore-party-panel__link">{url ?? '—'}</p>
@@ -527,10 +546,12 @@ function LinkCard({
           disabled={trashLocked}
           {...(trashLocked && { 'aria-describedby': trashHelpId })}
           onClick={onTrash}
+          {...lockedProps({ locked: lock.locked, id: `${trashHelpId}-locked` })}
         >
           {t('trash.action')}
         </Button>
       </div>
+      <WriteLockReason id={`${trashHelpId}-locked`} className="kore-party-panel__note" />
       {trashLocked && (
         <p id={trashHelpId} className="kore-party-panel__note">
           {t('trash.alreadyResponded.party')}

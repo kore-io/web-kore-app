@@ -8,6 +8,15 @@
   @apply flex flex-col gap-6;
 }
 
+/* Os botões do cabeçalho, com o motivo do bloqueio embaixo (Bloqueado RN04). */
+.kore-guests__actions {
+  @apply flex flex-wrap items-center gap-3 lg:justify-end;
+}
+
+.kore-guests__lock {
+  @apply basis-full lg:text-right;
+}
+
 .kore-guests__tabs {
   @apply flex flex-col;
 }

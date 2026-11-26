@@ -576,3 +576,45 @@ describe('Colaboradores › versão da colaboradora (Papéis RN03; Colaboradora 
     expect(screen.queryByText('Este casamento não está mais disponível.')).toBeNull();
   });
 });
+
+describe('Colaboradores no casamento bloqueado (Bloqueado RN02 a RN04)', () => {
+  const LOCKED = 'Indisponível enquanto o site está bloqueado.';
+  const blockedMe = {
+    ...coupleMe,
+    memberships: [
+      { ...membership('w1', 'owner', 'Ana & Marcos'), lifecycle: { ...lifecycle, blocked: true } },
+    ],
+  };
+
+  it('Remover a cerimonialista desabilitado com o motivo', async () => {
+    api({ me: blockedMe, meId: 'm1' });
+    renderRoute({ url: '/app/colaboradores' });
+    const remove = await screen.findByRole('button', { name: 'Remover Juliana Prado' });
+    expect(remove).toBeDisabled();
+    expect(remove).toHaveAccessibleDescription(LOCKED);
+  });
+
+  it('sem cerimonialista, o Convidar desabilitado com o motivo', async () => {
+    api({ me: blockedMe, meId: 'm1', withPlanner: false });
+    renderRoute({ url: '/app/colaboradores' });
+    const invite = await screen.findByRole('button', { name: /^Convidar/ });
+    expect(invite).toBeDisabled();
+    expect(invite).toHaveAccessibleDescription(LOCKED);
+  });
+
+  it('o 403 WEDDING_BLOCKED em corrida ao remover: o Toast com o motivo', async () => {
+    const user = userEvent.setup();
+    api({
+      me: coupleMe,
+      meId: 'm1',
+      remove: () => Response.json({ error: 'WEDDING_BLOCKED' }, { status: 403 }),
+    });
+    renderRoute({ url: '/app/colaboradores' });
+    await user.click(await screen.findByRole('button', { name: 'Remover Juliana Prado' }));
+    const dialog = screen.getByRole('alertdialog', { name: 'Remover Juliana Prado?' });
+    await user.click(within(dialog).getByRole('button', { name: 'Remover' }));
+    const region = await screen.findByRole('region', { name: /^Avisos/ });
+    expect(await within(region).findByText(LOCKED)).toBeInTheDocument();
+    expect(within(region).queryByText(/^Não foi possível continuar/)).toBeNull();
+  });
+});

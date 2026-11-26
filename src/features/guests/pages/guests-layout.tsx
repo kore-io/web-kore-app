@@ -6,12 +6,16 @@ import { useTagsControllerListV1 } from '../../../shared/api/generated/tags/tags
 import { useActiveWedding } from '../hooks/use-active-wedding';
 import { summaryText } from '../party-texts';
 import { useAreaPaths } from '../../../app/area';
+import { lockedProps, useWriteLock, WriteLockReason } from '../../billing/lifecycle/blocked';
 
 /**
  * Convidados (IA da Área do Casal): o título, o resumo do casamento (RN13) e as abas
  * Grupos e convidados · Importar · Exportar · Tags · n de 10 (Tags RN04) · Lixeira, em volta
  * da aba aberta, e o Importar planilha (Importação RN01) e o Novo grupo (RN03) no topo.
  */
+/** O motivo dos botões de escrita do cabeçalho, com o bloqueio (Bloqueado RN04). */
+const LOCK_ID = 'kore-guests-locked';
+
 export function GuestsLayout() {
   const { weddingId } = useActiveWedding();
   if (!weddingId) return null;
@@ -26,6 +30,7 @@ function GuestsFrame({ weddingId }: { weddingId: string }) {
   const onImport = useMatch(area.guestImport) !== null;
   const onExport = useMatch(area.guestExport) !== null;
   const navigate = useNavigate();
+  const lock = useWriteLock();
   // O resumo é do casamento inteiro, sem filtros: basta um grupo na página (limit 1).
   const parties = usePartiesControllerListV1(weddingId, { limit: 1 });
   const tags = useTagsControllerListV1(weddingId);
@@ -37,12 +42,23 @@ function GuestsFrame({ weddingId }: { weddingId: string }) {
         title={t('title')}
         description={summary && summaryText({ t, summary })}
         actions={
-          <>
-            <Button variant="secondary" onClick={() => void navigate(area.guestImport)}>
+          <div className="kore-guests__actions">
+            {/* Bloqueado RN04: importar e criar grupos são escrita. */}
+            <Button
+              variant="secondary"
+              onClick={() => void navigate(area.guestImport)}
+              {...lockedProps({ locked: lock.locked, id: LOCK_ID })}
+            >
               {t('importSheet.headerButton')}
             </Button>
-            <Button onClick={() => void navigate(area.guestNew)}>{t('partyForm.newButton')}</Button>
-          </>
+            <Button
+              onClick={() => void navigate(area.guestNew)}
+              {...lockedProps({ locked: lock.locked, id: LOCK_ID })}
+            >
+              {t('partyForm.newButton')}
+            </Button>
+            <WriteLockReason id={LOCK_ID} className="kore-guests__lock" />
+          </div>
         }
       />
       <div className="kore-guests__tabs">

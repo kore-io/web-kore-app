@@ -31,6 +31,7 @@ import { shortDate } from '../../../shared/date-texts';
 import { useSectionForm } from '../section-form';
 import { ImageField } from './image-field';
 import { timezoneLabelKey } from '../timezones';
+import { useErrorMessage } from '../../billing/lifecycle/blocked';
 
 /** A mesma pausa do Cadastro antes de conferir o endereço (RN06). */
 const SLUG_CHECK_DELAY_MS = 400;
@@ -50,8 +51,8 @@ export function BasicsSection({
 }) {
   const { t } = useTranslation('site');
   const { t: tGuests } = useTranslation('guests');
-  const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
+  const errorMessage = useErrorMessage();
   const queryClient = useQueryClient();
   const patch = useSiteControllerPatchV1();
   const [original, setOriginal] = useState(() => draftFromSite(site));
@@ -129,7 +130,7 @@ export function BasicsSection({
         .catch(() =>
           showToast({
             tone: 'danger',
-            message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
+            message: errorMessage(),
           }),
         );
       return;
@@ -160,7 +161,7 @@ export function BasicsSection({
     }
     showToast({
       tone: 'danger',
-      message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
+      message: errorMessage(error),
     });
   }
 

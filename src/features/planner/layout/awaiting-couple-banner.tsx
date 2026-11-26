@@ -11,6 +11,13 @@ import {
 } from '../../../shared/api/generated/planner/planner';
 import { InviteAnotherDialog } from '../my-weddings/wedding-detail-panel';
 import { coupleInvitations, sentDay } from '../my-weddings/wedding-detail-texts';
+import {
+  isWeddingBlocked,
+  lockedProps,
+  useErrorMessage,
+  useWriteLock,
+  WriteLockReason,
+} from '../../billing/lifecycle/blocked';
 
 /**
  * A faixa Aguardando o casal dentro do casamento (Colaboradora RN04; Penpot 17; Voz), lida
@@ -27,6 +34,9 @@ export function AwaitingCoupleBanner({ weddingId }: { weddingId: string }) {
   const detail = useMyWeddingsControllerDetailV1(weddingId, { query: { retry: false } });
   const send = useAccessInvitationsControllerSendV1();
   const [inviting, setInviting] = useState(false);
+  // Bloqueado RN04: reenviar e convidar outro e-mail são escrita.
+  const lock = useWriteLock();
+  const errorMessage = useErrorMessage();
   if (!detail.data) return null;
   const { email, link } = coupleInvitations({ detail: detail.data });
   if (!email && !link) return null;
@@ -46,7 +56,13 @@ export function AwaitingCoupleBanner({ weddingId }: { weddingId: string }) {
             message: t('myWeddings.detail.resent', { email: address }),
           });
         },
-        onError: () => showToast({ tone: 'danger', message: t('myWeddings.detail.resendError') }),
+        onError: (error) =>
+          showToast({
+            tone: 'danger',
+            message: isWeddingBlocked(error)
+              ? errorMessage(error)
+              : t('myWeddings.detail.resendError'),
+          }),
       },
     );
   }
@@ -68,6 +84,7 @@ export function AwaitingCoupleBanner({ weddingId }: { weddingId: string }) {
                 variant="secondary"
                 disabled={send.isPending}
                 onClick={() => resend(email.email ?? '')}
+                {...lockedProps({ locked: lock.locked, id: 'kore-awaiting-locked' })}
               >
                 {t('myWeddings.detail.resend')}
               </Button>
@@ -76,10 +93,15 @@ export function AwaitingCoupleBanner({ weddingId }: { weddingId: string }) {
                 type="button"
                 className="kore-planner-wedding__awaiting-link"
                 onClick={() => setInviting(true)}
+                {...lockedProps({ locked: lock.locked, id: 'kore-awaiting-locked' })}
               >
                 {t('myWeddings.detail.inviteAnother')}
               </button>
             </div>
+            <WriteLockReason
+              id="kore-awaiting-locked"
+              className="kore-planner-wedding__awaiting-text"
+            />
             <InviteAnotherDialog
               open={inviting}
               weddingId={weddingId}

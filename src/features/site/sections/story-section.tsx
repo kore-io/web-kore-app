@@ -9,6 +9,7 @@ import { IMAGE_ACCEPT, useSiteImageUpload } from '../images/use-site-image-uploa
 import { useSectionTemplateActions } from './template-actions';
 import { SectionFrame, TextWithCounter } from './section-forms';
 import { useSiteSection } from './use-site-section';
+import { useWriteLock, WriteLockReason } from '../../billing/lifecycle/blocked';
 
 export const STORY_PHOTOS_MAX = 12;
 const STORY_TEXT_MAX = 5000;
@@ -62,6 +63,7 @@ export function StorySection({
     blocked: (content) => content.text.length > STORY_TEXT_MAX,
   });
   const labelId = useId();
+  const lock = useWriteLock();
   const { text, photos } = state.draft.content;
   const room = STORY_PHOTOS_MAX - photos.length;
   const full = room <= 0;
@@ -112,7 +114,14 @@ export function StorySection({
         max={STORY_TEXT_MAX}
         onChange={(value) => state.setContent((content) => ({ ...content, text: value }))}
       />
-      <div className="kore-site-story" role="group" aria-labelledby={labelId}>
+      <div
+        className="kore-site-story"
+        role="group"
+        aria-labelledby={labelId}
+        // O FileUpload da lib não leva aria-describedby: o grupo é descrito pelo motivo
+        // (sugestão do Crivo).
+        {...(lock.locked && { 'aria-describedby': 'kore-site-story-locked' })}
+      >
         <span id={labelId} className="kore-site-cover__label">
           {t('section.story.photos', { count: photos.length, max: STORY_PHOTOS_MAX })}
         </span>
@@ -167,9 +176,11 @@ export function StorySection({
           title={full ? t(`section.story.limit.${audience}`) : t(`section.story.drop.${audience}`)}
           hint={t('section.story.dropHint')}
           accept={IMAGE_ACCEPT}
-          disabled={full || sending.length > 0}
+          disabled={lock.locked || full || sending.length > 0}
           onFiles={(files) => void send(files)}
         />
+        {/* Bloqueado RN04: enviar fotos é escrita. */}
+        <WriteLockReason id="kore-site-story-locked" className="kore-site-cover__help" />
         <p className="kore-site-cover__help">{t('section.story.help')}</p>
       </div>
     </SectionFrame>

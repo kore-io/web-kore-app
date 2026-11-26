@@ -11,6 +11,7 @@ import { apiErrorCode } from '../../../shared/api/http-client';
 import { draftFromPreview, draftToBody, removeGuest, type PasteDraft } from '../paste-draft';
 import type { Audience } from './use-active-wedding';
 import { useAreaPaths } from '../../../app/area';
+import { useErrorMessage } from '../../billing/lifecycle/blocked';
 
 /**
  * Colar a lista (Importação RN10 a RN12): o texto vai para a prévia (nada é gravado), o
@@ -22,8 +23,8 @@ import { useAreaPaths } from '../../../app/area';
 export function usePasteImport({ weddingId, audience }: { weddingId: string; audience: Audience }) {
   const area = useAreaPaths();
   const { t } = useTranslation('guests');
-  const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
+  const errorMessage = useErrorMessage();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const preview = useGuestImportsControllerPastePreviewV1();
@@ -40,7 +41,7 @@ export function usePasteImport({ weddingId, audience }: { weddingId: string; aud
     }
     showToast({
       tone: 'danger',
-      message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
+      message: errorMessage(error),
     });
   }
 

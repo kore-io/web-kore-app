@@ -15,6 +15,7 @@ import {
   type GuestDraft,
   type PartyDraft,
 } from '../party-form';
+import { lockedProps, useWriteLock, WriteLockReason } from '../../billing/lifecycle/blocked';
 
 /** O texto de um erro de campo, pelo código e pelo perfil (RN04; 189(5); 213(3)). */
 export function fieldErrorText({
@@ -84,6 +85,7 @@ export function PartyForm({
   onCancel,
 }: PartyFormProps) {
   const { t } = useTranslation('guests');
+  const lock = useWriteLock();
   const text = (
     error: FieldError | undefined,
     field: Parameters<typeof fieldErrorText>[0]['field'],
@@ -105,119 +107,129 @@ export function PartyForm({
         onSubmit();
       }}
     >
-      <FormField
-        label={t('partyForm.groupName')}
-        hint={text(errors.name, 'groupName')}
-        hintTone="danger"
-      >
-        {({ id, describedBy, invalid }) => (
-          <Input
-            id={id}
-            aria-describedby={describedBy}
-            invalid={invalid}
-            value={draft.name}
-            onChange={(event) => onChange({ ...draft, name: event.target.value })}
-          />
-        )}
-      </FormField>
-
-      <fieldset className="kore-party-form__guests">
-        <legend className="kore-party-form__legend">{t('partyForm.guests')}</legend>
-        {draft.guests.map((guest) => (
-          <GuestFields
-            key={guest.key}
-            guest={guest}
-            errors={errors}
-            text={text}
-            isContact={draft.contactKey === guest.key}
-            onChange={(patch) => setGuest(guest.key, patch)}
-            onContact={(checked) => onChange({ ...draft, contactKey: checked ? guest.key : null })}
-          />
-        ))}
-        <Button
-          type="button"
-          variant="ghost"
-          className="kore-party-form__add"
-          onClick={() => onChange({ ...draft, guests: [...draft.guests, emptyGuest()] })}
+      {/* Bloqueado RN04 (sugestão do Crivo): os campos em leitura, como no Editor do site. */}
+      <fieldset className="kore-party-form__fieldset" disabled={lock.locked}>
+        <FormField
+          label={t('partyForm.groupName')}
+          hint={text(errors.name, 'groupName')}
+          hintTone="danger"
         >
-          {t('partyForm.addGuest')}
-        </Button>
-      </fieldset>
+          {({ id, describedBy, invalid }) => (
+            <Input
+              id={id}
+              aria-describedby={describedBy}
+              invalid={invalid}
+              value={draft.name}
+              onChange={(event) => onChange({ ...draft, name: event.target.value })}
+            />
+          )}
+        </FormField>
 
-      <FormField
-        label={t('partyForm.plusOnes')}
-        hint={plusOnesError ?? t('partyForm.plusOnesHint')}
-        hintTone={plusOnesError ? 'danger' : 'neutral'}
-      >
-        {({ id, describedBy, invalid }) => (
-          <Select
-            id={id}
-            aria-describedby={describedBy}
-            invalid={invalid}
-            value={String(draft.plusOneSlots)}
-            onChange={(event) => onChange({ ...draft, plusOneSlots: Number(event.target.value) })}
+        <fieldset className="kore-party-form__guests">
+          <legend className="kore-party-form__legend">{t('partyForm.guests')}</legend>
+          {draft.guests.map((guest) => (
+            <GuestFields
+              key={guest.key}
+              guest={guest}
+              errors={errors}
+              text={text}
+              isContact={draft.contactKey === guest.key}
+              onChange={(patch) => setGuest(guest.key, patch)}
+              onContact={(checked) =>
+                onChange({ ...draft, contactKey: checked ? guest.key : null })
+              }
+            />
+          ))}
+          <Button
+            type="button"
+            variant="ghost"
+            className="kore-party-form__add"
+            onClick={() => onChange({ ...draft, guests: [...draft.guests, emptyGuest()] })}
           >
-            {Array.from({ length: PLUS_ONES_MAX + 1 }, (_, count) => (
-              <option key={count} value={count}>
-                {count === 0
-                  ? t('partyForm.plusOnesNone')
-                  : t('partyForm.plusOnesCount', { count })}
-              </option>
-            ))}
-          </Select>
-        )}
-      </FormField>
-
-      {tags.length > 0 && (
-        <fieldset className="kore-party-form__tags">
-          <legend className="kore-party-form__legend">{t('partyForm.tags')}</legend>
-          <div className="kore-party-form__tag-list">
-            {tags.map((tag) => (
-              <Checkbox
-                key={tag.id}
-                checked={draft.tagIds.includes(tag.id)}
-                onChange={(event) =>
-                  onChange({
-                    ...draft,
-                    tagIds: event.target.checked
-                      ? [...draft.tagIds, tag.id]
-                      : draft.tagIds.filter((id) => id !== tag.id),
-                  })
-                }
-              >
-                {tag.name}
-              </Checkbox>
-            ))}
-          </div>
+            {t('partyForm.addGuest')}
+          </Button>
         </fieldset>
-      )}
 
-      <FormField
-        label={t('partyForm.note')}
-        hint={text(errors.internalNote, 'note')}
-        hintTone="danger"
-      >
-        {({ id, describedBy, invalid }) => (
-          <Textarea
-            id={id}
-            aria-describedby={describedBy}
-            invalid={invalid}
-            rows={3}
-            placeholder={t('partyForm.notePlaceholder')}
-            value={draft.internalNote}
-            onChange={(event) => onChange({ ...draft, internalNote: event.target.value })}
-          />
+        <FormField
+          label={t('partyForm.plusOnes')}
+          hint={plusOnesError ?? t('partyForm.plusOnesHint')}
+          hintTone={plusOnesError ? 'danger' : 'neutral'}
+        >
+          {({ id, describedBy, invalid }) => (
+            <Select
+              id={id}
+              aria-describedby={describedBy}
+              invalid={invalid}
+              value={String(draft.plusOneSlots)}
+              onChange={(event) => onChange({ ...draft, plusOneSlots: Number(event.target.value) })}
+            >
+              {Array.from({ length: PLUS_ONES_MAX + 1 }, (_, count) => (
+                <option key={count} value={count}>
+                  {count === 0
+                    ? t('partyForm.plusOnesNone')
+                    : t('partyForm.plusOnesCount', { count })}
+                </option>
+              ))}
+            </Select>
+          )}
+        </FormField>
+
+        {tags.length > 0 && (
+          <fieldset className="kore-party-form__tags">
+            <legend className="kore-party-form__legend">{t('partyForm.tags')}</legend>
+            <div className="kore-party-form__tag-list">
+              {tags.map((tag) => (
+                <Checkbox
+                  key={tag.id}
+                  checked={draft.tagIds.includes(tag.id)}
+                  onChange={(event) =>
+                    onChange({
+                      ...draft,
+                      tagIds: event.target.checked
+                        ? [...draft.tagIds, tag.id]
+                        : draft.tagIds.filter((id) => id !== tag.id),
+                    })
+                  }
+                >
+                  {tag.name}
+                </Checkbox>
+              ))}
+            </div>
+          </fieldset>
         )}
-      </FormField>
 
+        <FormField
+          label={t('partyForm.note')}
+          hint={text(errors.internalNote, 'note')}
+          hintTone="danger"
+        >
+          {({ id, describedBy, invalid }) => (
+            <Textarea
+              id={id}
+              aria-describedby={describedBy}
+              invalid={invalid}
+              rows={3}
+              placeholder={t('partyForm.notePlaceholder')}
+              value={draft.internalNote}
+              onChange={(event) => onChange({ ...draft, internalNote: event.target.value })}
+            />
+          )}
+        </FormField>
+      </fieldset>
       <div className="kore-party-form__actions">
         <Button type="button" variant="secondary" onClick={onCancel}>
           {t('partyForm.cancel')}
         </Button>
-        <Button type="submit" disabled={isSaving}>
+        {/* Bloqueado RN04: salvar o grupo é escrita. */}
+        <Button
+          type="submit"
+          disabled={isSaving}
+          {...lockedProps({ locked: lock.locked, id: 'kore-party-form-locked' })}
+        >
           {submitLabel}
         </Button>
       </div>
+      <WriteLockReason id="kore-party-form-locked" className="kore-party-form__lock" />
     </form>
   );
 }

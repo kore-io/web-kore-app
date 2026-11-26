@@ -26,6 +26,7 @@ import { coupleName } from './my-weddings-filters';
 import { useCoupleLinkActions } from './use-couple-link-actions';
 import { WeddingStatusBadge } from './wedding-status-badge';
 import { coupleInvitations, deleteCase, longWeddingDate, sentDay } from './wedding-detail-texts';
+import { useErrorMessage } from '../../billing/lifecycle/blocked';
 
 /**
  * O Detalhe do casamento (Meus casamentos RN08 a RN11; Penpot 03; decisão 260): o painel
@@ -420,6 +421,8 @@ export function InviteAnotherDialog({
   const { t } = useTranslation('planner');
   const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
+  // O bloqueio em corrida (Bloqueado RN04): o motivo, no lugar do genérico.
+  const errorMessage = useErrorMessage();
   const send = useAccessInvitationsControllerSendV1();
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string>();
@@ -451,7 +454,7 @@ export function InviteAnotherDialog({
           }
           showToast({
             tone: 'danger',
-            message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
+            message: errorMessage(failure),
           });
         },
       },

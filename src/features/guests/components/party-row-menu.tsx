@@ -2,6 +2,7 @@ import { ActionMenu } from '@kore-io/design';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { PartyListItemResponse } from '../../../shared/api/generated/model';
+import { useWriteLock } from '../../billing/lifecycle/blocked';
 
 export type RowAction = 'open' | 'edit' | 'copy' | 'trash';
 
@@ -25,6 +26,8 @@ export function PartyRowMenu({
   }) => void;
 }) {
   const { t } = useTranslation('guests');
+  // Bloqueado RN04: editar e mover para a lixeira são escrita; abrir e copiar, leitura.
+  const lock = useWriteLock();
   const wrapper = useRef<HTMLSpanElement>(null);
   function select(action: RowAction) {
     onAction({ action, party, trigger: wrapper.current?.querySelector('button') ?? null });
@@ -36,7 +39,12 @@ export function PartyRowMenu({
         groups={[
           [
             { id: 'open', label: t('row.menu.open'), onSelect: () => select('open') },
-            { id: 'edit', label: t('partyForm.editButton'), onSelect: () => select('edit') },
+            {
+              id: 'edit',
+              label: t('partyForm.editButton'),
+              ...(lock.reason && { disabled: true, disabledReason: lock.reason }),
+              onSelect: () => select('edit'),
+            },
             { id: 'copy', label: t('panel.link.copy'), onSelect: () => select('copy') },
           ],
           [
@@ -44,8 +52,8 @@ export function PartyRowMenu({
               id: 'trash',
               label: t('trash.action'),
               destructive: true,
-              disabled: trashLocked,
-              disabledReason: t('trash.alreadyResponded.party'),
+              disabled: lock.locked || trashLocked,
+              disabledReason: lock.reason ?? t('trash.alreadyResponded.party'),
               onSelect: () => select('trash'),
             },
           ],
