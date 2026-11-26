@@ -11,6 +11,7 @@ import { LoadError } from '../../shared/components/load-error';
 import { areaPaths, COUPLE_AREA } from '../area';
 import { AppShell } from './app-shell';
 import { BlockedBanner, useWeddingBlockedRefetch } from '../../features/billing/lifecycle/blocked';
+import { DeletionBanner } from '../../features/billing/lifecycle/deletion';
 import { LifecycleBadge, LifecycleBanner } from '../../features/billing/lifecycle/lifecycle-banner';
 import { WeddingNavigation } from './wedding-navigation';
 
@@ -120,6 +121,13 @@ export function CoupleAreaLayout() {
     >
       {/* O bloqueio substitui as faixas do ciclo de vida (Bloqueado RN04; 329(4)). */}
       {lifecycle?.lifecycle.blocked && <BlockedBanner />}
+      {lifecycle && ownMembership && (
+        <DeletionBanner
+          weddingId={ownMembership.weddingId}
+          lifecycle={lifecycle.lifecycle}
+          audience="couple"
+        />
+      )}
       {lifecycle && <LifecycleBanner source={lifecycle} audience="couple" />}
       <Outlet />
     </AppShell>

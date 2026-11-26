@@ -17,6 +17,7 @@ import { AreaProvider, areaPaths, plannerWeddingBase } from '../area';
 import { paths } from '../paths';
 import { AppShell } from './app-shell';
 import { BlockedBanner, useWeddingBlockedRefetch } from '../../features/billing/lifecycle/blocked';
+import { DeletionBanner } from '../../features/billing/lifecycle/deletion';
 import { LifecycleBadge, LifecycleBanner } from '../../features/billing/lifecycle/lifecycle-banner';
 import { WeddingNavigation } from './wedding-navigation';
 
@@ -161,6 +162,13 @@ export function PlannerWeddingArea() {
       >
         {/* Empilhadas: a do bloqueio acima de "Você colabora neste casamento." (Bloqueado RN04). */}
         {membership.lifecycle?.blocked && <BlockedBanner />}
+        {membership.lifecycle && (
+          <DeletionBanner
+            weddingId={weddingId}
+            lifecycle={membership.lifecycle}
+            audience="planner"
+          />
+        )}
         <div className="kore-planner-wedding__banner">
           <div>
             <p className="kore-planner-wedding__banner-title">{t('weddingArea.banner')}</p>
