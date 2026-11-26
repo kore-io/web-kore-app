@@ -10,4 +10,6 @@ export interface CommissionBalancesResponse {
   pendingCents: number;
   receivedCents: number;
   inPayoutCents: number;
+  adjustmentsCents: number;
+  paidPayouts: number;
 }

@@ -11,6 +11,9 @@ import type { AdjustmentLineResponseReason } from './adjustmentLineResponseReaso
 export interface AdjustmentLineResponse {
   kind: AdjustmentLineResponseKind;
   adjustmentId: string;
+  /** @nullable */
+  coupleNames: string | null;
+  weddingPurged: boolean;
   amountCents: number;
   reason: AdjustmentLineResponseReason;
   createdAt: string;

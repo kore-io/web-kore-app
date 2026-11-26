@@ -224,7 +224,14 @@ function Balances({
             : available
         }
         detail={
-          canRequestPayout({ balances, payouts }) ? t('commissions.balances.canRequest') : undefined
+          // O ajuste sem repasse já está no saldo (346(2)): ele vem antes da legenda do pedido.
+          balances.adjustmentsCents !== 0
+            ? t('commissions.balances.withAdjustment', {
+                amount: formatCents({ cents: balances.adjustmentsCents }),
+              })
+            : canRequestPayout({ balances, payouts })
+              ? t('commissions.balances.canRequest')
+              : undefined
         }
       />
       <StatCard
@@ -235,6 +242,11 @@ function Balances({
       <StatCard
         label={t('commissions.balances.received')}
         value={formatCents({ cents: balances.receivedCents })}
+        detail={
+          balances.paidPayouts > 0
+            ? t('commissions.balances.payouts', { count: balances.paidPayouts })
+            : undefined
+        }
       />
     </div>
   );
@@ -302,7 +314,10 @@ function ByPayment({ items }: { items: (CommissionLineResponse | AdjustmentLineR
         item.kind === 'adjustment' ? (
           // O ajuste: linha negativa, em vermelho, sem selo (Comissões RN07).
           <DataTableRow key={item.adjustmentId} className="kore-commissions__adjustment">
-            <DataTableCell primary>—</DataTableCell>
+            {/* O casal do ajuste (347(2)); o manual não tem casamento, e fica "—". */}
+            <DataTableCell primary>
+              {item.weddingPurged ? t('commissions.purged') : (item.coupleNames ?? '—')}
+            </DataTableCell>
             <DataTableCell label={header.payment}>
               {t(`commissions.adjustment.${item.reason}`)}
             </DataTableCell>
@@ -372,7 +387,7 @@ function CommissionRow({
 /**
  * Por casamento (Comissões RN07; 346(1)): a soma por casal, com as legendas "já pode pedir o
  * repasse", "Libera em 09/09" (com várias, "libera em 02/10 e em 10/10") e "nada a liberar
- * agora". Origem, Pagamentos, Já recebido e Total vêm num PR curto, com os campos da API.
+ * agora"; e Origem, Pagamentos, Já recebido e o Total em destaque (346(1); Penpot 07).
  */
 function ByWedding({
   items,
@@ -386,16 +401,27 @@ function ByWedding({
   const now = new Date();
   const header = {
     wedding: t('commissions.columns.wedding'),
+    origin: t('commissions.columns.origin'),
+    payments: t('commissions.columns.payments'),
     pending: t('commissions.columns.pending'),
     available: t('commissions.columns.available'),
+    received: t('commissions.columns.received'),
+    total: t('commissions.columns.total'),
   };
+  const money = (cents: number) => (cents > 0 ? formatCents({ cents }) : '—');
   return (
+    // As 7 colunas não cabem no computador estreito com a Sidebar: cartões até 1280 px.
     <DataTable
+      wide
       label={t('commissions.tabs.wedding')}
       columns={[
         { id: 'wedding', header: header.wedding },
-        { id: 'pending', header: header.pending, size: 'md', align: 'end' },
-        { id: 'available', header: header.available, size: 'md', align: 'end' },
+        { id: 'origin', header: header.origin, size: 'sm' },
+        { id: 'payments', header: header.payments, size: 'sm', align: 'end' },
+        { id: 'pending', header: header.pending, size: 'sm', align: 'end' },
+        { id: 'available', header: header.available, size: 'sm', align: 'end' },
+        { id: 'received', header: header.received, size: 'sm', align: 'end' },
+        { id: 'total', header: header.total, size: 'sm', align: 'end' },
       ]}
     >
       {items.map((item, index) => {
@@ -419,11 +445,25 @@ function ByWedding({
                 {legend && <span className="kore-commissions__caption">{legend}</span>}
               </span>
             </DataTableCell>
+            <DataTableCell label={header.origin}>
+              {item.referralSource ? t(`commissions.origin.${item.referralSource}`) : '—'}
+            </DataTableCell>
+            <DataTableCell label={header.payments} align="end">
+              {item.paymentsCount}
+            </DataTableCell>
             <DataTableCell label={header.pending} align="end">
-              {item.pendingCents > 0 ? formatCents({ cents: item.pendingCents }) : '—'}
+              {money(item.pendingCents)}
             </DataTableCell>
             <DataTableCell label={header.available} align="end">
-              {item.availableCents > 0 ? formatCents({ cents: item.availableCents }) : '—'}
+              {money(item.availableCents)}
+            </DataTableCell>
+            <DataTableCell label={header.received} align="end">
+              {money(item.receivedCents)}
+            </DataTableCell>
+            <DataTableCell label={header.total} align="end">
+              <strong className="kore-commissions__total">
+                {formatCents({ cents: item.totalCents })}
+              </strong>
             </DataTableCell>
           </DataTableRow>
         );

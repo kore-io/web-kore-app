@@ -145,3 +145,59 @@
 .kore-data-table__row--interactive :is(button, a:not([data-row-link]), input, select) {
   @apply relative z-10;
 }
+
+/*
+ * A tabela larga (`wide`): cartões até 1280 px e a tabela só daí para cima, quando
+ * as colunas não cabem no computador estreito com a Sidebar (ex.: as 7 colunas de Comissões
+ * › Por casamento; bloqueante do Crivo no PR da 346). Entre 1024 e 1279 px, desfaz o leiaute
+ * de tabela do `lg` e volta ao do cartão.
+ */
+@media (width >= 64rem) and (width < 80rem) {
+  .kore-data-table--wide {
+    @apply overflow-visible rounded-none border-0 bg-transparent;
+  }
+
+  .kore-data-table--wide .kore-data-table__head {
+    @apply sr-only;
+  }
+
+  .kore-data-table--wide .kore-data-table__body {
+    @apply grid grid-cols-2 gap-6;
+  }
+
+  .kore-data-table--wide .kore-data-table__row {
+    @apply flex min-h-0 flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-gray-300 p-4;
+  }
+
+  .kore-data-table--wide .kore-data-table__row:last-child {
+    @apply border-b;
+  }
+
+  .kore-data-table--wide .kore-data-table__cell {
+    @apply order-3 flex min-h-6;
+  }
+
+  .kore-data-table--wide .kore-data-table__cell--primary {
+    @apply order-1 min-h-11;
+  }
+
+  .kore-data-table--wide .kore-data-table__cell--actions {
+    @apply order-2;
+  }
+
+  .kore-data-table--wide .kore-data-table__details {
+    @apply order-4;
+  }
+
+  .kore-data-table--wide .kore-data-table__cell-label {
+    @apply inline;
+  }
+
+  .kore-data-table--wide .kore-data-table__cell-value {
+    @apply text-right;
+  }
+
+  .kore-data-table--wide .kore-data-table__cell--primary .kore-data-table__cell-value {
+    @apply text-left;
+  }
+}

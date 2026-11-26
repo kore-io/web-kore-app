@@ -24,12 +24,18 @@ export interface DataTableColumn {
   hideHeader?: boolean;
 }
 
+/**
+ * As larguras das colunas: cada tamanho encolhe até um mínimo quando o quadro aperta (o
+ * computador estreito com a Sidebar, de 1024 px em diante; bloqueante do Crivo no PR da 346),
+ * e a coluna flexível nunca fica abaixo da dela. Com espaço, as fixas chegam ao máximo e a
+ * flexível fica com o resto.
+ */
 const TRACKS: Record<DataTableColumnSize, string> = {
-  fill: 'minmax(0, 1fr)',
-  xs: '72px',
-  sm: '140px',
-  md: '220px',
-  lg: '300px',
+  fill: 'minmax(7.5rem, 1fr)',
+  xs: 'minmax(3.5rem, 72px)',
+  sm: 'minmax(4.5rem, 140px)',
+  md: 'minmax(7rem, 220px)',
+  lg: 'minmax(10.25rem, 300px)',
 };
 
 function classNames(...names: (string | false | undefined)[]) {
@@ -46,6 +52,11 @@ export interface DataTableProps {
   /** As linhas (DataTableRow). */
   children: ReactNode;
   className?: string;
+  /**
+   * A tabela de muitas colunas, que não cabe no computador estreito com a Sidebar: cartões até
+   * 1280 px, e a tabela só daí para cima (o padrão vira tabela em 1024 px, o `lg`).
+   */
+  wide?: boolean;
 }
 
 /**
@@ -55,7 +66,7 @@ export interface DataTableProps {
  * valor continua lido com o nome da sua coluna. O rótulo visível do cartão é `aria-hidden`,
  * para não ler o nome duas vezes.
  */
-export function DataTable({ label, columns, children, className }: DataTableProps) {
+export function DataTable({ label, columns, children, className, wide = false }: DataTableProps) {
   const style = {
     '--kore-data-table-columns': columns.map((column) => TRACKS[column.size ?? 'fill']).join(' '),
   } as CSSProperties;
@@ -66,7 +77,7 @@ export function DataTable({ label, columns, children, className }: DataTableProp
         aria-label={label}
         aria-colcount={columns.length}
         style={style}
-        className={classNames('kore-data-table', className)}
+        className={classNames('kore-data-table', wide && 'kore-data-table--wide', className)}
       >
         <div role="rowgroup" className="kore-data-table__head">
           <div role="row" className="kore-data-table__header-row">
