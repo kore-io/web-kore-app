@@ -312,6 +312,49 @@ describe('Colaboradores › Convidar cerimonialista do casal (Convites de acesso
     expect(screen.queryByRole('dialog', { name: 'Convidar cerimonialista' })).toBeNull();
   });
 
+  describe('o 409 WEDDING_DELETION_SCHEDULED em corrida: o texto da exclusão agendada (Retenção RN05; 318(12))', () => {
+    const SCHEDULED =
+      'Indisponível enquanto a exclusão está agendada. Cancelem a exclusão para voltar a editar.';
+
+    it('no Convidar, no lugar do erro do envio', async () => {
+      const user = userEvent.setup();
+      api({
+        me: coupleMe,
+        meId: 'm1',
+        withPlanner: false,
+        send: () => apiError({ status: 409, body: { error: 'WEDDING_DELETION_SCHEDULED' } }),
+      });
+      renderRoute({ url: '/app/colaboradores' });
+      await user.click(await screen.findByRole('button', { name: 'Convidar cerimonialista' }));
+      const dialog = screen.getByRole('dialog', { name: 'Convidar cerimonialista' });
+      await user.type(emailBox(dialog), 'bia@exemplo.com');
+      await user.click(within(dialog).getByRole('button', { name: 'Enviar convite' }));
+      expect(await screen.findByText(SCHEDULED)).toBeInTheDocument();
+    });
+
+    it('no Reenviar convite pendente', async () => {
+      const user = userEvent.setup();
+      api({
+        me: coupleMe,
+        meId: 'm1',
+        withPlanner: false,
+        pendingInvitations: [
+          {
+            id: 'i9',
+            kind: 'planner',
+            email: 'juliana@prado.com.br',
+            expiresAt: '2026-12-16T15:00:00Z',
+          },
+        ],
+        send: () => apiError({ status: 409, body: { error: 'WEDDING_DELETION_SCHEDULED' } }),
+      });
+      renderRoute({ url: '/app/colaboradores' });
+      const planners = await screen.findByRole('region', { name: 'Cerimonialista' });
+      await user.click(await within(planners).findByRole('button', { name: 'Reenviar convite' }));
+      expect(await screen.findByText(SCHEDULED)).toBeInTheDocument();
+    });
+  });
+
   it('o convite pendente: "vale até", Reenviar e Cancelar convite sem confirmação', async () => {
     const user = userEvent.setup();
     const calls = api({

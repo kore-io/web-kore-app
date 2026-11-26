@@ -21,6 +21,11 @@ export function isDeletionScheduled(error: unknown): boolean {
   return apiErrorCode({ error }) === 'WEDDING_DELETION_SCHEDULED';
 }
 
+/** A escrita recusada pela trava: o bloqueio ou a exclusão agendada (o motivo vem da trava). */
+export function isWriteLocked(error: unknown): boolean {
+  return isWeddingBlocked(error) || isDeletionScheduled(error);
+}
+
 /**
  * A faixa fixa do casamento bloqueado (Bloqueado RN04; textos-f3 B5, P5): tom Erro, sem
  * fechar e sem o motivo, com o e-mail do suporte como link dentro da frase. Ela substitui

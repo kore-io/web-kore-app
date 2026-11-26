@@ -15,7 +15,7 @@ import { FormField } from '../../../shared/components/form-field';
 import { isValidEmail } from '../../access/email';
 import { cardDate } from '../collaborators-texts';
 import {
-  isWeddingBlocked,
+  isWriteLocked,
   lockedProps,
   useErrorMessage,
   useWriteLock,
@@ -180,9 +180,7 @@ function InviteDialog({
           showToast({
             tone: 'danger',
             // O bloqueio em corrida (Bloqueado RN04): o motivo, no lugar do erro do envio.
-            message: isWeddingBlocked(failure)
-              ? errorMessage(failure)
-              : t('couple.invite.sendError'),
+            message: isWriteLocked(failure) ? errorMessage(failure) : t('couple.invite.sendError'),
           });
         },
       },
@@ -268,7 +266,7 @@ export function PendingInvitation({
       showToast({ tone: 'danger', message: t('couple.invite.notPending') });
       return;
     }
-    showToast({ tone: 'danger', message: isWeddingBlocked(error) ? errorMessage(error) : message });
+    showToast({ tone: 'danger', message: isWriteLocked(error) ? errorMessage(error) : message });
   }
 
   function resend() {
