@@ -6,6 +6,7 @@ import {
   useAccessInvitationsControllerSendV1,
 } from '../../../shared/api/generated/access-invitations/access-invitations';
 import { getMyWeddingsControllerDetailV1QueryKey } from '../../../shared/api/generated/planner/planner';
+import { useErrorMessage } from '../../billing/lifecycle/blocked';
 
 /**
  * Gerar novo link e Cancelar link do bloco Link para o casal (Meus casamentos RN09; Novo
@@ -14,7 +15,6 @@ import { getMyWeddingsControllerDetailV1QueryKey } from '../../../shared/api/gen
  */
 export function useCoupleLinkActions({ weddingId }: { weddingId: string }) {
   const { t } = useTranslation('planner');
-  const { t: tAccess } = useTranslation('access');
   const { showToast } = useToast();
   const queryClient = useQueryClient();
   const send = useAccessInvitationsControllerSendV1();
@@ -22,10 +22,12 @@ export function useCoupleLinkActions({ weddingId }: { weddingId: string }) {
 
   const refresh = () =>
     queryClient.invalidateQueries({ queryKey: getMyWeddingsControllerDetailV1QueryKey(weddingId) });
-  const genericError = () =>
+  // O bloqueio em corrida (Bloqueado RN04; 344): o motivo, no lugar do genérico.
+  const errorMessage = useErrorMessage();
+  const genericError = (error?: unknown) =>
     showToast({
       tone: 'danger',
-      message: `${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`,
+      message: errorMessage(error),
     });
 
   function regenerate() {
