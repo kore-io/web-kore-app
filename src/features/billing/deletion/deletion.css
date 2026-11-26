@@ -1,0 +1,7 @@
+/*
+ * Configurações › Casamento (Retenção RN05; A11, Penpot 27): o botão da seção Excluir o
+ * casamento no começo da linha, sem esticar no painel.
+ */
+.kore-wedding-delete__button {
+  @apply self-start;
+}

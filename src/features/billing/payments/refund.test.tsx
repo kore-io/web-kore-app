@@ -24,12 +24,17 @@ const membership = {
   },
 };
 
-function me({ blocked = false }: { blocked?: boolean } = {}) {
+function me({
+  blocked = false,
+  deletionScheduledFor = null,
+}: { blocked?: boolean; deletionScheduledFor?: string | null } = {}) {
   return {
     user: { id: 'u1', name: 'Ana Beatriz Moreira', email: 'ana@exemplo.com', platformRole: 'none' },
     activeProfile: 'couple',
     authenticatedAt: '2026-11-24T12:00:00Z',
-    memberships: [{ ...membership, lifecycle: { ...membership.lifecycle, blocked } }],
+    memberships: [
+      { ...membership, lifecycle: { ...membership.lifecycle, blocked, deletionScheduledFor } },
+    ],
     profiles: ['couple'],
     lastProfileOnDevice: 'couple',
     planner: null,
@@ -101,8 +106,11 @@ function mockRefund({
   refund = () =>
     Response.json({ status: 'refund_requested', refundsPaymentIds: ['p1'] }, { status: 202 }),
   blocked = false,
+  deletionScheduledFor = null,
   billingFails = () => false,
 }: {
+  /** A exclusão agendada (Retenção RN05). */
+  deletionScheduledFor?: string | null;
   data?: (calls: number) => Record<string, unknown>;
   /** A leitura do billing falha (a rede), pelo número da leitura. */
   billingFails?: (calls: number) => boolean;
@@ -112,7 +120,7 @@ function mockRefund({
   const calls: Call[] = [];
   let reads = 0;
   mockApi(({ method, path, body }) => {
-    if (path === '/v1/me') return Response.json(meFor(me({ blocked })));
+    if (path === '/v1/me') return Response.json(meFor(me({ blocked, deletionScheduledFor })));
     if (path === '/v1/weddings/w1/site') {
       siteReads.count += 1;
       return apiError({ status: 404, body: { error: 'NOT_FOUND' } });
@@ -334,6 +342,14 @@ describe('Desistir e pedir reembolso (Pagamentos RN02 a RN07; Penpot 21, A9; dec
     expect(button).toHaveAccessibleDescription(
       'Indisponível enquanto o site está bloqueado. Para desistir da compra, escrevam para suporte@kore.com.br.',
     );
+  });
+
+  it('com a exclusão agendada: o Desistir desabilitado com o motivo dela (Retenção RN05)', async () => {
+    mockRefund({ deletionScheduledFor: '2026-12-08' });
+    renderRoute({ url: URL_BILLING });
+    const button = await screen.findByRole('button', { name: ACTION });
+    expect(button).toBeDisabled();
+    expect(button).toHaveAccessibleDescription('Indisponível enquanto a exclusão está agendada.');
   });
 
   it('a contestação: a legenda, sem o Desistir (RN06)', async () => {

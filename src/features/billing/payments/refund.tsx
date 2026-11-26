@@ -14,6 +14,7 @@ import { getSiteControllerGetV1QueryKey } from '../../../shared/api/generated/si
 import type { BillingPaymentDto } from '../../../shared/api/generated/model';
 import { dayMonthIn, oneDot, shortDayMonth } from '../../../shared/date-texts';
 import { formatCents } from '../../../shared/money';
+import { useErrorMessage, type WriteLockKind } from '../lifecycle/blocked';
 
 /** De 7x a 12x, o cartão tem os juros do gateway, que voltam junto (322(2); 327(5)). */
 const INTEREST_FROM = 7;
@@ -160,15 +161,20 @@ export function RefundSection({
   weddingId,
   payments,
   timezone,
-  blocked,
+  locked,
   now,
 }: {
   weddingId: string;
   payments: BillingPaymentDto[];
   timezone: string | null;
-  blocked: boolean;
+  /**
+   * A trava do casamento: no bloqueio, o motivo com o caminho do suporte (P6); na exclusão
+   * agendada, o motivo dela (Retenção RN05; sugestão do Crivo no E14).
+   */
+  locked: WriteLockKind;
   now: Date;
 }) {
+  const blocked = locked !== null;
   const { t } = useTranslation('billing');
   const [open, setOpen] = useState<BillingPaymentDto | null>(null);
   const blockedId = useId();
@@ -192,7 +198,7 @@ export function RefundSection({
           </Button>
           {blocked && (
             <p id={`${blockedId}-${payment.id}`} className="kore-payments__help">
-              {t('refund.blocked')}
+              {locked === 'blocked' ? t('refund.blocked') : t('lifecycle.deletion.reason')}
             </p>
           )}
         </div>
@@ -248,6 +254,7 @@ function RefundDialog({
       }),
     ]);
   const toastError = (message: string) => showToast({ tone: 'danger', message });
+  const errorMessage = useErrorMessage();
 
   /**
    * O pedido aceito (202) sempre fecha o Dialog e mostra o Toast, mesmo se a releitura
@@ -320,6 +327,10 @@ function RefundDialog({
       case 'WEDDING_BLOCKED':
         // O /me novo desabilita o botão com o motivo (RN02; Bloqueado RN07).
         toastError(t('refund.blocked'));
+        break;
+      case 'WEDDING_DELETION_SCHEDULED':
+        // A exclusão agendada em outra aba (Retenção RN05): o texto da trava, por perfil.
+        toastError(errorMessage(error));
         break;
       default:
         toastError(`${tAccess('alerts.generic.title')}. ${tAccess('alerts.generic.description')}`);

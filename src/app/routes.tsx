@@ -45,6 +45,7 @@ import { CoupleAreaLayout } from './layout/couple-area-layout';
 import { FIRST_SECTION_SLUG } from '../features/site/sections';
 import { PlannerWeddingArea } from './layout/planner-wedding-area';
 import { paths } from './paths';
+import { WeddingSettingsPage } from '../features/billing/deletion/wedding-settings-page';
 
 /**
  * As telas do casamento, com caminhos relativos ao caminho-base da área (Colaboradora
@@ -114,6 +115,9 @@ function areaRoutes({ prefix }: { prefix: 'couple' | 'planner' }): RouteObject[]
           <Navigate to={paths.plannerSettingsNotifications} replace />
         ),
     },
+    // Configurações › Casamento (Retenção RN05; A11; E14): o casal exclui; a colaboradora lê
+    // que só o casal pode excluir.
+    { id: 'settings-wedding', path: 'configuracoes/casamento', element: <WeddingSettingsPage /> },
     {
       path: 'envios',
       element: <DeliveriesLayout />,

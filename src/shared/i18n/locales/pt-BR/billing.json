@@ -316,5 +316,27 @@
       "exportGuests": "Exportar os convidados"
     },
     "offAirSinceFull": "Fora do ar desde {{date}}"
+  },
+  "weddingSettings": {
+    "tab": "Casamento",
+    "section": "Excluir o casamento",
+    "text": "O site sai do ar na hora. Os convidados, as respostas e o site são apagados em 7 dias, e até lá vocês podem cancelar. Os registros de pagamento ficam guardados pelo prazo da lei.",
+    "delete": "Excluir o casamento",
+    "dialog": {
+      "title": "Excluir o casamento de {{couple}}?",
+      "text": "O site sai do ar agora, e tudo é apagado em {{date}}. Até lá, vocês podem cancelar.",
+      "field": "Digitem <strong>{{couple}}</strong> para confirmar",
+      "mismatch": "O nome não confere. Digitem {{couple}} do jeito que aparece acima.",
+      "confirm": "Excluir o casamento",
+      "cancel": "Cancelar"
+    },
+    "cdc": "Vocês ainda podem desistir da publicação e receber tudo de volta. Façam isso antes de excluir.",
+    "goPayments": "Ir para Pagamentos",
+    "pixPending": "Há um Pix aguardando pagamento. Se excluírem o casamento, ele é cancelado.",
+    "refundInProgress": "Indisponível enquanto há um reembolso em andamento.",
+    "disputed": "Indisponível enquanto há um pagamento em contestação.",
+    "planner": "Só o casal pode excluir o casamento.",
+    "reauth": "Por segurança, entrem de novo para excluir o casamento.",
+    "scheduled": "O casamento será apagado em {{date}}."
   }
 }

@@ -54,6 +54,7 @@ describe('rotas do app (decisões 139, 146, 147 e 198)', () => {
       collaborators: '/app/colaboradores',
       notifications: '/app/notificacoes',
       settingsNotifications: '/app/configuracoes/notificacoes',
+      settingsWedding: '/app/configuracoes/casamento',
       billing: '/app/cobranca',
       billingPublish: '/app/cobranca/publicar',
       billingEndDate: '/app/cobranca/data-de-saida',

@@ -4,7 +4,8 @@ import { useId, type ReactNode } from 'react';
 export type FormFieldHintTone = 'neutral' | 'success' | 'danger';
 
 export interface FormFieldProps {
-  label: string;
+  /** O rótulo; pode ter marcação (ex.: o nome do casal em negrito no Excluir, textos-f3 B8). */
+  label: ReactNode;
   /** Marca de opcional ao lado do rótulo, vinda da Voz. */
   optionalText?: string;
   /** Ajuda abaixo do campo (Penpot "Ajuda": caption gray.700; success.text; danger.text). */
