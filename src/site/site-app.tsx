@@ -17,6 +17,7 @@ import { usePartySession } from './use-party-session';
 import { SimulatorPage } from './simulator/simulator-page';
 import { usePreviewSession } from './use-preview-session';
 import { usePublicSite } from './use-public-site';
+import type { SiteOff } from './site-off';
 
 /** O site do casal (Site público): o endereço, os estados e o Início. */
 export function SiteApp({
@@ -59,6 +60,16 @@ function NotFoundPage() {
   );
 }
 
+/**
+ * O site fora do ar (Data de saída RN08, B1; Bloqueado RN05, Penpot 03 "Site bloqueado"): o
+ * ícone Globe, uma frase só, sem nome nem dado do casal e sem botão. O bloqueado não diz que
+ * foi bloqueado.
+ */
+function SiteOffPage({ kind }: { kind: SiteOff }) {
+  const { t } = useTranslation('publicSite');
+  return <SystemPage icon={<Globe />} title={t(`states.${kind}.title`)} />;
+}
+
 function DraftPage() {
   const { t } = useTranslation('publicSite');
   return (
@@ -93,6 +104,9 @@ function PartyEntry({ slug, token }: { slug: string; token: string }) {
   if (entry.state === 'loading') return <SiteSkeleton />;
   if (entry.state === 'draft') return <DraftPage />;
   if (entry.state === 'notFound') return <NotFoundPage />;
+  if (entry.state === 'expired' || entry.state === 'unavailable') {
+    return <SiteOffPage kind={entry.state} />;
+  }
   if (entry.state === 'linkInvalid') {
     return (
       <SystemPage
@@ -111,6 +125,9 @@ function PreviewEntry({ slug, token }: { slug: string; token: string }) {
   const { t } = useTranslation('publicSite');
   const entry = usePreviewSession({ slug, token });
   if (entry.state === 'loading') return <SiteSkeleton />;
+  if (entry.state === 'expired' || entry.state === 'unavailable') {
+    return <SiteOffPage kind={entry.state} />;
+  }
   if (entry.state === 'invalid') {
     return (
       <SystemPage
@@ -131,6 +148,7 @@ function SitePage({ slug, view = 'home' }: { slug: string; view?: SiteView }) {
   if (state === 'loading') return <SiteSkeleton />;
   if (state === 'notFound') return <NotFoundPage />;
   if (state === 'draft') return <DraftPage />;
+  if (state === 'expired' || state === 'unavailable') return <SiteOffPage kind={state} />;
   if (state === 'error' || !site) return <LoadErrorPage retry={retry} />;
   if (view === 'rsvp' && !site.viewer.party) return <BackToHome slug={slug} />;
   return <SiteHome site={site} view={view} />;

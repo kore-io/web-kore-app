@@ -15,7 +15,8 @@ export function SystemPage({
 }: {
   icon: ReactNode;
   title: string;
-  description: string;
+  /** A linha de apoio; o site fora do ar não tem (Penpot 03 e B1). */
+  description?: string;
   action?: ReactNode;
 }) {
   const { t } = useTranslation('publicSite');
@@ -26,7 +27,7 @@ export function SystemPage({
           {icon}
         </span>
         <h1 className="kore-site-system__title">{title}</h1>
-        <p className="kore-site-system__description">{description}</p>
+        {description && <p className="kore-site-system__description">{description}</p>}
         {action}
       </main>
       <footer className="kore-site-system__footer">

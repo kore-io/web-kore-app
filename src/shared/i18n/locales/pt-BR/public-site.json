@@ -40,6 +40,12 @@
     "previewInvalid": {
       "title": "Esta prévia não vale mais.",
       "description": "Cada prévia vale uma vez só, por poucos minutos. O botão Pré-visualizar do Editor do site abre uma nova."
+    },
+    "expired": {
+      "title": "Este site não está mais disponível."
+    },
+    "unavailable": {
+      "title": "Este site não está disponível no momento."
     }
   },
   "sections": {

@@ -156,6 +156,12 @@ function RsvpBody({
       void queryClient.invalidateQueries({ queryKey: rsvpQueryKey(slug) });
       return;
     }
+    // O site saiu do ar no meio (Data de saída RN08; Bloqueado RN05): o site é relido e
+    // mostra a página do site fora do ar.
+    if (result.kind === 'siteOff') {
+      void queryClient.invalidateQueries({ queryKey: ['public-site', slug] });
+      return;
+    }
     if (result.kind === 'invalid') {
       setErrors(
         serverRsvpErrors({

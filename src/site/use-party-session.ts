@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { publicSiteControllerPartySessionV1 } from '../shared/api/generated/sites/sites';
 import { ApiError, apiErrorCode } from '../shared/api/http-client';
+import { siteOff } from './site-off';
 
-export type PartyEntryState = 'loading' | 'ready' | 'draft' | 'notFound' | 'linkInvalid' | 'error';
+export type PartyEntryState =
+  'loading' | 'ready' | 'draft' | 'notFound' | 'expired' | 'unavailable' | 'linkInvalid' | 'error';
 
 /**
  * A entrada pelo link do grupo (Site público RN06): troca o token pelo cookie do grupo
@@ -35,12 +37,14 @@ export function usePartySession({ slug, token }: { slug: string; token: string }
     ? 'loading'
     : query.isSuccess
       ? 'ready'
-      : code === 'SITE_DRAFT'
-        ? 'draft'
-        : code === 'SITE_NOT_FOUND'
-          ? 'notFound'
-          : code === 'LINK_INVALID' || status === 429 || status === 400
-            ? 'linkInvalid'
-            : 'error';
+      : siteOff(query.error)
+        ? (siteOff(query.error) as PartyEntryState)
+        : code === 'SITE_DRAFT'
+          ? 'draft'
+          : code === 'SITE_NOT_FOUND'
+            ? 'notFound'
+            : code === 'LINK_INVALID' || status === 429 || status === 400
+              ? 'linkInvalid'
+              : 'error';
   return { state, slug: query.data?.slug ?? slug, retry: () => void query.refetch() };
 }
