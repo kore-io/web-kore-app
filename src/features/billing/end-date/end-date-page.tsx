@@ -55,6 +55,7 @@ import {
   type EndDateChoice,
   type EndDateSource,
 } from './end-date';
+import { useBlockedToast, useWriteLock } from '../lifecycle/blocked';
 
 /** O tempo de espera da data digitada antes de pedir a cotação (o mesmo do Publicar). */
 const QUOTE_DEBOUNCE_MS = 300;
@@ -182,6 +183,9 @@ function EndDate({
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const paths = useAreaPaths();
+  // O bloqueio e a exclusão agendada fecham a tela (Bloqueado RN04; Retenção RN05).
+  const lock = useWriteLock();
+  const lockedToast = useBlockedToast();
   const location = useLocation();
   const from = (location.state ?? {}) as PublishLocationState;
   const reasonId = useId();
@@ -262,7 +266,7 @@ function EndDate({
   }
 
   const day = (value: string) => shortDayMonth({ day: value, now });
-  const blocked = membership.lifecycle.blocked;
+  const blocked = lock.locked;
   const busy = payment.state.kind === 'sending' || payment.state.kind === 'confirming';
   const shown = extending ? quote.data : undefined;
   const quoteFailed = extending && quote.isError;
@@ -354,9 +358,8 @@ function EndDate({
         void queryClient.invalidateQueries({ queryKey: getMeControllerMeV1QueryKey() });
         return;
       }
-      if (code === 'WEDDING_BLOCKED') {
+      if (lockedToast(error)) {
         void queryClient.invalidateQueries({ queryKey: getMeControllerMeV1QueryKey() });
-        showToast({ tone: 'danger', message: t('publish.reason.blocked') });
         return;
       }
       showToast({
@@ -511,7 +514,7 @@ function EndDate({
           ) : (
             blocked && (
               <p id={reasonId} className="kore-end-date__reason">
-                {t('publish.reason.blocked')}
+                {lock.reason}
               </p>
             )
           )}

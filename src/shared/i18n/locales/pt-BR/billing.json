@@ -262,6 +262,20 @@
       "banner": "O site foi bloqueado. O suporte atende em <supportLink>{{supportEmail}}</supportLink>.",
       "reason": "Indisponível enquanto o site está bloqueado."
     },
+    "deletion": {
+      "banner": {
+        "couple": "O casamento será apagado em {{date}}. O site está fora do ar.",
+        "planner": "O casamento será apagado em {{date}}. Só o casal pode cancelar a exclusão."
+      },
+      "cancel": "Cancelar a exclusão",
+      "reason": "Indisponível enquanto a exclusão está agendada.",
+      "toast": {
+        "couple": "Indisponível enquanto a exclusão está agendada. Cancelem a exclusão para voltar a editar.",
+        "planner": "Indisponível enquanto a exclusão está agendada. Só o casal pode cancelar a exclusão."
+      },
+      "canceled": "Exclusão cancelada.",
+      "canceledBackOnline": "Exclusão cancelada. O site voltou ao ar."
+    },
     "exportGuests": "Exportar os convidados",
     "postpone": "Adiar a data",
     "renew": "Renovar"

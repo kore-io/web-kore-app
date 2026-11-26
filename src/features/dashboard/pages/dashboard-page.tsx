@@ -334,8 +334,12 @@ function SiteCard({
     eventDate: membership.eventDate,
     timezone: membership.timezone,
   };
-  // Com o bloqueio, a faixa substitui o texto e a ação do ciclo de vida (Bloqueado RN04; 329(4)).
-  const view = source && !source.lifecycle.blocked ? lifecycleView({ ...source, now }) : null;
+  // Com o bloqueio ou a exclusão agendada, a faixa substitui o texto e a ação do ciclo de vida
+  // (Bloqueado RN04; 329(4); Retenção RN05; 316(8)).
+  const view =
+    source && !source.lifecycle.blocked && !source.lifecycle.deletionScheduledFor
+      ? lifecycleView({ ...source, now })
+      : null;
   const lifecycleCaption = view ? lifecycleText({ view, audience, now, t: tBilling }) : null;
   const action = view ? lifecycleAction({ view, audience }) : null;
   return (
