@@ -38,3 +38,8 @@
 .kore-commissions__wedding {
   @apply text-ink underline-offset-2 hover:underline;
 }
+
+/* O Total por casamento em destaque (Penpot 07, "por casamento"). */
+.kore-commissions__total {
+  @apply type-label text-ink;
+}

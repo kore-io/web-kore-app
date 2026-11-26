@@ -472,7 +472,10 @@
       "received": "Já recebido",
       "inPayout": "{{available}} ({{inPayout}} em repasse)",
       "canRequest": "já pode pedir o repasse",
-      "nothingPending": "nada a liberar agora"
+      "nothingPending": "nada a liberar agora",
+      "withAdjustment": "já com o ajuste de {{amount}}",
+      "payouts_one": "em {{count}} repasse",
+      "payouts_other": "em {{count}} repasses"
     },
     "statement": "Extrato",
     "tabs": {
@@ -488,7 +491,11 @@
       "status": "Status",
       "date": "Data",
       "pending": "Aguardando liberação",
-      "available": "Disponível"
+      "available": "Disponível",
+      "origin": "Origem",
+      "payments": "Pagamentos",
+      "received": "Já recebido",
+      "total": "Total"
     },
     "paymentKind": {
       "publication": "Publicação",
@@ -529,6 +536,13 @@
       "summary": "Mostrando {{from}} a {{to}} de {{total}}",
       "previous": "Página anterior",
       "next": "Próxima página"
+    },
+    "origin": {
+      "created_by_planner": "Criado por você",
+      "created_by_seller": "Criado por você",
+      "referral_link": "Pelo seu link",
+      "admin_reassigned": "Pelo seu link",
+      "invited_before_payment": "Convite do casal"
     }
   }
 }

@@ -28,6 +28,8 @@ const balances = {
   pendingCents: 0,
   receivedCents: 17906,
   inPayoutCents: 0,
+  adjustmentsCents: 0,
+  paidPayouts: 3,
 };
 
 function commission(overrides: Record<string, unknown> = {}) {
@@ -66,6 +68,8 @@ const byPayment = [
   {
     kind: 'adjustment',
     adjustmentId: 'a1',
+    coupleNames: 'Aline e Gustavo',
+    weddingPurged: false,
     amountCents: -5002,
     reason: 'refund',
     createdAt: '2026-11-09T15:00:00Z',
@@ -99,6 +103,10 @@ const byPayment = [
 const byWedding = [
   {
     weddingId: 'w3',
+    referralSource: 'referral_link',
+    paymentsCount: 2,
+    receivedCents: 0,
+    totalCents: 4422,
     coupleNames: 'Bianca e Henrique',
     weddingPurged: false,
     clickable: true,
@@ -108,6 +116,10 @@ const byWedding = [
   },
   {
     weddingId: 'w4',
+    referralSource: 'admin_reassigned',
+    paymentsCount: 1,
+    receivedCents: 0,
+    totalCents: 6742,
     coupleNames: 'Ana e Marcos',
     weddingPurged: false,
     clickable: true,
@@ -117,6 +129,10 @@ const byWedding = [
   },
   {
     weddingId: 'w5',
+    referralSource: 'created_by_planner',
+    paymentsCount: 1,
+    receivedCents: 6162,
+    totalCents: 6162,
     coupleNames: 'Paula e Diego',
     weddingPurged: false,
     clickable: false,
@@ -126,6 +142,10 @@ const byWedding = [
   },
   {
     weddingId: 'w6',
+    referralSource: 'invited_before_payment',
+    paymentsCount: 1,
+    receivedCents: 0,
+    totalCents: 1740,
     coupleNames: 'Lívia e Bruno',
     weddingPurged: false,
     clickable: true,
@@ -199,6 +219,7 @@ describe('Comissões (Comissões do indicador RN07)', () => {
     expect(screen.getByText('já pode pedir o repasse')).toBeInTheDocument();
     expect(screen.getByText('nada a liberar agora')).toBeInTheDocument();
     expect(screen.getByText('R$ 179,06')).toBeInTheDocument();
+    expect(screen.getByText('em 3 repasses')).toBeInTheDocument();
     expect(screen.queryByText(/%/)).toBeNull();
     expect(screen.queryByText(/prazo de liberação/)).toBeNull();
     expect(screen.getAllByRole('columnheader').map((header) => header.textContent)).toEqual([
@@ -255,12 +276,26 @@ describe('Comissões (Comissões do indicador RN07)', () => {
     ).toHaveAttribute('href', '/cerimonialista?casamento=w1');
   });
 
+  it('o casal na linha do ajuste (347(2)) e "já com o ajuste de …" no Disponível (346(2))', async () => {
+    mockCommissions({ balancesBody: { ...balances, adjustmentsCents: -5002, paidPayouts: 1 } });
+    renderRoute({ url: URL });
+    const adjustment = (await screen.findByText('Ajuste (estorno)')).closest(
+      '[role="row"]',
+    ) as HTMLElement;
+    expect(within(adjustment).getByText('Aline e Gustavo')).toBeInTheDocument();
+    expect(screen.getByText('já com o ajuste de −R$ 50,02')).toBeInTheDocument();
+    expect(screen.queryByText('já pode pedir o repasse')).toBeNull();
+    expect(screen.getByText('em 1 repasse')).toBeInTheDocument();
+  });
+
   it('o ajuste manual é "Ajuste" (346(3))', async () => {
     mockCommissions({
       payment: [
         {
           kind: 'adjustment',
           adjustmentId: 'a2',
+          coupleNames: null,
+          weddingPurged: false,
           amountCents: 1000,
           reason: 'manual',
           createdAt: '2026-11-09T15:00:00Z',
@@ -291,13 +326,28 @@ describe('Comissões (Comissões do indicador RN07)', () => {
     expect(screen.getByRole('button', { name: 'Por casamento' })).toHaveFocus();
     expect(screen.getAllByRole('columnheader').map((header) => header.textContent)).toEqual([
       'Casamento',
+      'Origem',
+      'Pagamentos',
       'Aguardando liberação',
       'Disponível',
+      'Já recebido',
+      'Total',
     ]);
+    // A Origem (346(1)): o reatribuído pelo Admin conta como pelo link (Link de indicação RN02).
+    expect(within(row('Bianca e Henrique')).getByText('Pelo seu link')).toBeInTheDocument();
+    expect(within(row('Ana e Marcos')).getByText('Pelo seu link')).toBeInTheDocument();
+    expect(within(row('Paula e Diego')).getByText('Criado por você')).toBeInTheDocument();
+    expect(within(row('Lívia e Bruno')).getByText('Convite do casal')).toBeInTheDocument();
+    expect(
+      within(row('Paula e Diego'))
+        .getAllByText('R$ 61,62')
+        .map((cell) => cell.tagName),
+    ).toContain('STRONG');
+    expect(within(row('Bianca e Henrique')).getByText('2')).toBeInTheDocument();
     expect(within(row('Ana e Marcos')).getByText('já pode pedir o repasse')).toBeInTheDocument();
     expect(within(row('Paula e Diego')).getByText('nada a liberar agora')).toBeInTheDocument();
     expect(within(row('Lívia e Bruno')).getByText('Libera em 15/12')).toBeInTheDocument();
-    expect(within(row('Bianca e Henrique')).getByText('R$ 44,22')).toBeInTheDocument();
+    expect(within(row('Bianca e Henrique')).getAllByText('R$ 44,22')).toHaveLength(2);
     expect(paths.at(-1)).toBe('/v1/me/referrer/commissions?view=wedding&page=1');
   });
 
@@ -342,9 +392,9 @@ describe('Comissões (Comissões do indicador RN07)', () => {
       mockCommissions({ balancesBody: { ...balances, availableCents: 1740 } });
       renderRoute({ url: URL });
       await user.click(await screen.findByRole('button', { name: 'Por casamento' }));
-      const ana = await screen.findByText('R$ 67,42');
+      const [ana] = await screen.findAllByText('R$ 67,42');
       expect(
-        within(ana.closest('[role="row"]') as HTMLElement).queryByText('já pode pedir o repasse'),
+        within(ana?.closest('[role="row"]') as HTMLElement).queryByText('já pode pedir o repasse'),
       ).toBeNull();
       expect(screen.queryByText('já pode pedir o repasse')).toBeNull();
     });
