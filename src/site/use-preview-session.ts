@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { publicSiteControllerPreviewSessionV1 } from '../shared/api/generated/sites/sites';
 import { ApiError } from '../shared/api/http-client';
+import { siteOff } from './site-off';
 
-export type PreviewEntryState = 'loading' | 'ready' | 'invalid' | 'error';
+export type PreviewEntryState =
+  'loading' | 'ready' | 'invalid' | 'expired' | 'unavailable' | 'error';
 
 /**
  * A entrada pela prévia (Pré-visualização RN03 e RN04): tira o token do endereço na hora
@@ -26,8 +28,10 @@ export function usePreviewSession({ slug, token }: { slug: string; token: string
     ? 'loading'
     : query.isSuccess
       ? 'ready'
-      : status === 404 || status === 400 || status === 429
-        ? 'invalid'
-        : 'error';
+      : siteOff(query.error)
+        ? (siteOff(query.error) as PreviewEntryState)
+        : status === 404 || status === 400 || status === 429
+          ? 'invalid'
+          : 'error';
   return { state, slug: query.data?.slug ?? slug, retry: () => void query.refetch() };
 }

@@ -3,6 +3,7 @@ import type { PutRsvpBody, RsvpResponse } from '../../shared/api/generated/model
 import { rsvpControllerGetV1, rsvpControllerPutV1 } from '../../shared/api/generated/sites/sites';
 import { ApiError, apiErrorCode } from '../../shared/api/http-client';
 import { shortDayMonth } from '../../shared/date-texts';
+import { siteOff } from '../site-off';
 
 export const rsvpQueryKey = (slug: string) => ['rsvp', slug] as const;
 
@@ -30,6 +31,7 @@ export type SendResult =
   | { kind: 'previewReadOnly' }
   | { kind: 'limit' }
   | { kind: 'rateLimited' }
+  | { kind: 'siteOff' }
   | { kind: 'failed' };
 
 /** O `PUT /v1/sites/{slug}/rsvp`, com cada recusa do contrato no resultado. */
@@ -50,6 +52,8 @@ function failure(error: unknown): SendResult {
     reason?: 'deadline_passed' | 'post_event';
   };
   if (error.status === 400 && body.errors) return { kind: 'invalid', errors: body.errors };
+  // O site saiu do ar no meio (expirado, exclusão ou bloqueio): a página dele (RN08; RN05).
+  if (siteOff(error)) return { kind: 'siteOff' };
   if (code === 'RSVP_CHANGED' && body.current) return { kind: 'changed', rsvp: body.current };
   if (code === 'RSVP_CLOSED') return { kind: 'closed', reason: body.reason ?? 'deadline_passed' };
   if (error.status === 401) return { kind: 'linkInvalid' };

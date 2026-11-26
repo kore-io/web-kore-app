@@ -18,6 +18,10 @@ describe('o envio do RSVP (Confirmar presença RN07 a RN11, RN14)', () => {
     [429, { statusCode: 429, error: 'RSVP_LIMIT' }, 'limit'],
     [429, { statusCode: 429, error: 'RSVP_RATE_LIMITED' }, 'rateLimited'],
     [429, { statusCode: 429, error: 'Too Many Requests' }, 'failed'],
+    // O site saiu do ar no meio (Data de saída RN08; Bloqueado RN05). O PUT do RSVP responde
+    // 409 SITE_EXPIRED no expirado (sugestão do Crivo no E15) e 423 no bloqueado.
+    [409, { statusCode: 409, error: 'SITE_EXPIRED' }, 'siteOff'],
+    [423, { statusCode: 423, error: 'SITE_UNAVAILABLE' }, 'siteOff'],
     [500, { statusCode: 500 }, 'failed'],
   ])('%i %j → %s', async (status, error, kind) => {
     mockApi(() => apiError({ status, body: error }));
