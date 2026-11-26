@@ -276,6 +276,15 @@ describe('Configurações › Casamento (Retenção RN05 e RN06)', () => {
     expect(within(section).queryByRole('button', { name: 'Excluir o casamento' })).toBeNull();
   });
 
+  it('com a exclusão agendada e o bloqueio: o Cancelar desabilitado com o motivo do bloqueio (sugestão do Crivo)', async () => {
+    mockSettings({ lifecycle: { deletionScheduledFor: '2027-02-25', blocked: true } });
+    renderRoute({ url: URL });
+    const section = await screen.findByRole('region', { name: 'Excluir o casamento' });
+    const cancel = await within(section).findByRole('button', { name: 'Cancelar a exclusão' });
+    expect(cancel).toBeDisabled();
+    expect(cancel).toHaveAccessibleDescription('Indisponível enquanto o site está bloqueado.');
+  });
+
   it('a colaboradora: o Excluir desabilitado com "Só o casal pode excluir o casamento."', async () => {
     profileUnderTest.current = 'planner';
     mockSettings();
