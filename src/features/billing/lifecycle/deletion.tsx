@@ -82,7 +82,6 @@ export function DeletionBanner({
       {audience === 'couple' && (
         <Button
           variant="secondary"
-          size="sm"
           className="kore-lifecycle-banner__action"
           disabled={pending}
           onClick={cancel}

@@ -16,7 +16,8 @@
   @apply m-0 type-caption text-gray-700;
 }
 
-/* O Cancelar a exclusão, na faixa da exclusão agendada (Retenção RN05). */
+/* O Cancelar a exclusão, na faixa da exclusão agendada (Retenção RN05), com o alvo de toque
+   de 44 px. */
 .kore-lifecycle-banner__action {
-  @apply mt-2;
+  @apply mt-2 min-h-11;
 }
