@@ -114,7 +114,14 @@ export function StorySection({
         max={STORY_TEXT_MAX}
         onChange={(value) => state.setContent((content) => ({ ...content, text: value }))}
       />
-      <div className="kore-site-story" role="group" aria-labelledby={labelId}>
+      <div
+        className="kore-site-story"
+        role="group"
+        aria-labelledby={labelId}
+        // O FileUpload da lib não leva aria-describedby: o grupo é descrito pelo motivo
+        // (sugestão do Crivo).
+        {...(lock.locked && { 'aria-describedby': 'kore-site-story-locked' })}
+      >
         <span id={labelId} className="kore-site-cover__label">
           {t('section.story.photos', { count: photos.length, max: STORY_PHOTOS_MAX })}
         </span>

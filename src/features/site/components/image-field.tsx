@@ -47,7 +47,13 @@ export function ImageField({
   }
 
   return (
-    <div className="kore-site-cover" role="group" aria-labelledby={labelId}>
+    <div
+      className="kore-site-cover"
+      role="group"
+      aria-labelledby={labelId}
+      // O FileUpload da lib não leva aria-describedby: o grupo é descrito pelo motivo.
+      {...(lock.locked && { 'aria-describedby': lockId })}
+    >
       <span id={labelId} className="kore-site-cover__label">
         {label}
       </span>
