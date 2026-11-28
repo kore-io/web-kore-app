@@ -95,7 +95,7 @@ describe('Link de indicação (Link de indicação RN01 a RN06; Penpot 09; decis
     ).toBeInTheDocument();
     expect(screen.queryByText(/20%/)).toBeNull();
     expect(screen.getByText('kore.com.br/i/juliana-prado')).toBeInTheDocument();
-    const list = screen.getByRole('region', { name: 'Casais que vieram pelo seu link' });
+    const list = screen.getByRole('region', { name: 'Casais com a sua indicação' });
     const table = within(list).getByRole('table');
     expect(
       within(table)
@@ -117,7 +117,7 @@ describe('Link de indicação (Link de indicação RN01 a RN06; Penpot 09; decis
     const user = userEvent.setup();
     api();
     const { router } = renderRoute({ url: URL });
-    const list = await screen.findByRole('region', { name: 'Casais que vieram pelo seu link' });
+    const list = await screen.findByRole('region', { name: 'Casais com a sua indicação' });
     const table = within(list).getByRole('table');
     expect(within(table).queryByRole('link', { name: 'Tatiane e Leandro' })).toBeNull();
     expect(within(table).queryByRole('link', { name: 'Bianca e Henrique' })).toBeNull();
@@ -142,7 +142,7 @@ describe('Link de indicação (Link de indicação RN01 a RN06; Penpot 09; decis
       ],
     });
     renderRoute({ url: URL });
-    const list = await screen.findByRole('region', { name: 'Casais que vieram pelo seu link' });
+    const list = await screen.findByRole('region', { name: 'Casais com a sua indicação' });
     expect(within(list).queryAllByRole('link')).toEqual([]);
   });
 
@@ -190,7 +190,7 @@ describe('Link de indicação (Link de indicação RN01 a RN06; Penpot 09; decis
     vi.stubGlobal('open', open);
     api({ weddings: [] });
     const { container } = renderRoute({ url: URL });
-    const list = await screen.findByRole('region', { name: 'Casais que vieram pelo seu link' });
+    const list = await screen.findByRole('region', { name: 'Casais com a sua indicação' });
     expect(
       within(list).getByText('Nenhum casal se cadastrou pelo seu link ainda.'),
     ).toBeInTheDocument();
