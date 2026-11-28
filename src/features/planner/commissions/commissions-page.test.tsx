@@ -30,6 +30,7 @@ const balances = {
   inPayoutCents: 0,
   adjustmentsCents: 0,
   paidPayouts: 3,
+  nextReleaseAt: null,
 };
 
 function commission(overrides: Record<string, unknown> = {}) {
@@ -211,6 +212,21 @@ afterEach(() => {
 });
 
 describe('Comissões (Comissões do indicador RN07)', () => {
+  it('o Aguardando liberação dá a próxima liberação (349(1)), com o ano fora do corrente', async () => {
+    mockCommissions({
+      balancesBody: { ...balances, pendingCents: 1740, nextReleaseAt: '2026-12-21' },
+    });
+    const { unmount } = renderRoute({ url: URL });
+    expect(await screen.findByText('Libera em 21/12')).toBeInTheDocument();
+    expect(screen.queryByText('nada a liberar agora')).toBeNull();
+    unmount();
+    mockCommissions({
+      balancesBody: { ...balances, pendingCents: 1740, nextReleaseAt: '2027-01-05' },
+    });
+    renderRoute({ url: URL });
+    expect(await screen.findByText('Libera em 05/01/2027')).toBeInTheDocument();
+  });
+
   it('os saldos e o Extrato Por pagamento, sem subtítulo e sem percentual', async () => {
     const paths = mockCommissions();
     const { container } = renderRoute({ url: URL });
@@ -344,13 +360,16 @@ describe('Comissões (Comissões do indicador RN07)', () => {
         .map((cell) => cell.tagName),
     ).toContain('STRONG');
     expect(within(row('Bianca e Henrique')).getByText('2')).toBeInTheDocument();
+    // No cartão, a frase da Voz no lugar do rótulo e do número (350(13)).
+    expect(within(row('Bianca e Henrique')).getByText('2 pagamentos')).toBeInTheDocument();
+    expect(within(row('Lívia e Bruno')).getByText('1 pagamento')).toBeInTheDocument();
     expect(within(row('Ana e Marcos')).getByText('já pode pedir o repasse')).toBeInTheDocument();
     expect(within(row('Paula e Diego')).getByText('nada a liberar agora')).toBeInTheDocument();
     expect(within(row('Lívia e Bruno')).getByText('Libera em 15/12')).toBeInTheDocument();
     expect(within(row('Bianca e Henrique')).getAllByText('R$ 44,22')).toHaveLength(2);
     expect(paths.at(-1)).toBe('/v1/me/referrer/commissions?view=wedding&page=1');
     // As 7 colunas viram cartões até 1280 px (bloqueante do Crivo no PR da 346).
-    expect(screen.getByRole('table', { name: 'Por casamento' })).toHaveClass(
+    expect(screen.getByRole('table', { name: 'Por casamento' }).parentElement).toHaveClass(
       'kore-data-table--wide',
     );
   });

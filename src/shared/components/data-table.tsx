@@ -1,4 +1,5 @@
-import { createContext, useContext, type CSSProperties, type ReactNode } from 'react';
+import { createContext, useContext, useId, type CSSProperties, type ReactNode } from 'react';
+import { useHorizontalOverflow } from '../hooks/use-horizontal-overflow';
 
 /**
  * Tabela de dados das listas da F3 (Pagamentos, Comissões, Repasses e o Backoffice), no
@@ -22,6 +23,11 @@ export interface DataTableColumn {
   align?: 'start' | 'end';
   /** Só para o leitor de tela (ex.: a coluna do ⋮); o cabeçalho não mostra. */
   hideHeader?: boolean;
+  /**
+   * A coluna das ações da linha (o ⋮, com `DataTableCell actions`): quando o quadro rola,
+   * ela fica presa à direita, como a 1ª coluna à esquerda (decisão 348).
+   */
+  actions?: boolean;
 }
 
 /**
@@ -30,13 +36,32 @@ export interface DataTableColumn {
  * e a coluna flexível nunca fica abaixo da dela. Com espaço, as fixas chegam ao máximo e a
  * flexível fica com o resto.
  */
-const TRACKS: Record<DataTableColumnSize, string> = {
-  fill: 'minmax(7.5rem, 1fr)',
-  xs: 'minmax(3.5rem, 72px)',
-  sm: 'minmax(4.5rem, 140px)',
-  md: 'minmax(7rem, 220px)',
-  lg: 'minmax(10.25rem, 300px)',
+const MINIMUMS_REM: Record<DataTableColumnSize, number> = {
+  fill: 7.5,
+  xs: 3.5,
+  sm: 4.5,
+  md: 7,
+  lg: 10.25,
 };
+
+const TRACKS: Record<DataTableColumnSize, string> = {
+  fill: `minmax(${MINIMUMS_REM.fill}rem, 1fr)`,
+  xs: `minmax(${MINIMUMS_REM.xs}rem, 72px)`,
+  sm: `minmax(${MINIMUMS_REM.sm}rem, 140px)`,
+  md: `minmax(${MINIMUMS_REM.md}rem, 220px)`,
+  lg: `minmax(${MINIMUMS_REM.lg}rem, 300px)`,
+};
+
+/**
+ * A largura mínima do cabeçalho e das linhas (decisão 348): os mínimos das colunas, os 16 px
+ * entre elas e os 16 px de respiro em cada ponta. Abaixo dela, o quadro rola na horizontal,
+ * e nenhuma coluna encolhe além do seu mínimo.
+ */
+function minimumWidth({ columns }: { columns: DataTableColumn[] }): string {
+  const rem = columns.reduce((sum, column) => sum + MINIMUMS_REM[column.size ?? 'fill'], 0);
+  const gapsRem = Math.max(columns.length - 1, 0) + 2;
+  return `${rem + gapsRem}rem`;
+}
 
 function classNames(...names: (string | false | undefined)[]) {
   return names.filter(Boolean).join(' ');
@@ -65,42 +90,64 @@ export interface DataTableProps {
  * o cabeçalho fica só para o leitor de tela (fora da vista, mas na árvore acessível): cada
  * valor continua lido com o nome da sua coluna. O rótulo visível do cartão é `aria-hidden`,
  * para não ler o nome duas vezes.
+ * Quando as colunas não cabem (o computador estreito com a Sidebar), o quadro rola na
+ * horizontal, e a página não (decisão 348, como a tabela de grupos da lib): a 1ª coluna e a
+ * das ações ficam presas, com a sombra do lado em que há colunas escondidas, e o quadro vira
+ * uma região nomeada pela tabela, na ordem do Tab, para as setas rolarem (WCAG 2.1.1).
  */
 export function DataTable({ label, columns, children, className, wide = false }: DataTableProps) {
+  const { ref, overflow } = useHorizontalOverflow<HTMLDivElement>();
+  const tableId = useId();
   const style = {
     '--kore-data-table-columns': columns.map((column) => TRACKS[column.size ?? 'fill']).join(' '),
+    '--kore-data-table-min-width': minimumWidth({ columns }),
   } as CSSProperties;
   return (
     <ColumnCount.Provider value={columns.length}>
       <div
-        role="table"
-        aria-label={label}
-        aria-colcount={columns.length}
-        style={style}
-        className={classNames('kore-data-table', wide && 'kore-data-table--wide', className)}
+        ref={ref}
+        {...(overflow.scrolls ? { role: 'region', 'aria-labelledby': tableId, tabIndex: 0 } : {})}
+        className={classNames(
+          'kore-data-table',
+          wide && 'kore-data-table--wide',
+          overflow.scrolls && 'kore-data-table--scrolls',
+          overflow.hiddenStart && 'kore-data-table--hidden-start',
+          overflow.hiddenEnd && 'kore-data-table--hidden-end',
+          className,
+        )}
       >
-        <div role="rowgroup" className="kore-data-table__head">
-          <div role="row" className="kore-data-table__header-row">
-            {columns.map((column) => (
-              <div
-                key={column.id}
-                role="columnheader"
-                className={classNames(
-                  'kore-data-table__header',
-                  column.align === 'end' && 'kore-data-table__header--end',
-                )}
-              >
-                {column.hideHeader === true ? (
-                  <span className="kore-data-table__sr-only">{column.header}</span>
-                ) : (
-                  column.header
-                )}
-              </div>
-            ))}
+        <div
+          id={tableId}
+          role="table"
+          aria-label={label}
+          aria-colcount={columns.length}
+          style={style}
+          className="kore-data-table__table"
+        >
+          <div role="rowgroup" className="kore-data-table__head">
+            <div role="row" className="kore-data-table__header-row">
+              {columns.map((column) => (
+                <div
+                  key={column.id}
+                  role="columnheader"
+                  className={classNames(
+                    'kore-data-table__header',
+                    column.align === 'end' && 'kore-data-table__header--end',
+                    column.actions === true && 'kore-data-table__header--actions',
+                  )}
+                >
+                  {column.hideHeader === true ? (
+                    <span className="kore-data-table__sr-only">{column.header}</span>
+                  ) : (
+                    column.header
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-        <div role="rowgroup" className="kore-data-table__body">
-          {children}
+          <div role="rowgroup" className="kore-data-table__body">
+            {children}
+          </div>
         </div>
       </div>
     </ColumnCount.Provider>
@@ -158,6 +205,11 @@ export interface DataTableCellProps {
   /** As ações da linha (o ⋮): no cartão, no topo, ao lado do título, sem rótulo. */
   actions?: boolean;
   align?: 'start' | 'end';
+  /**
+   * O texto do cartão, no lugar do rótulo e do valor da tabela, quando a Voz dá uma frase
+   * própria (ex.: "1 pagamento"; decisão 350(13)). A tabela segue com o `children`.
+   */
+  cardText?: string;
   children?: ReactNode;
   className?: string;
 }
@@ -168,6 +220,7 @@ export function DataTableCell({
   primary = false,
   actions = false,
   align = 'start',
+  cardText,
   children,
   className,
 }: DataTableCellProps) {
@@ -180,10 +233,12 @@ export function DataTableCell({
         primary && 'kore-data-table__cell--primary',
         actions && 'kore-data-table__cell--actions',
         align === 'end' && 'kore-data-table__cell--end',
+        cardText !== undefined && 'kore-data-table__cell--card-text',
         className,
       )}
     >
-      {!primary && !actions && label !== undefined && (
+      {cardText !== undefined && <span className="kore-data-table__card-text">{cardText}</span>}
+      {!primary && !actions && cardText === undefined && label !== undefined && (
         <span className="kore-data-table__cell-label" aria-hidden="true">
           {label}
         </span>

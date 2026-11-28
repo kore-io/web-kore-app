@@ -1,5 +1,5 @@
-import { render, screen, within } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { fireEvent, render, screen, within } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { expectNoA11yViolations } from '../../../tests/a11y';
 import { Badge } from '@kore-io/design';
 import { DataTable, DataTableCell, DataTableRow, type DataTableColumn } from './data-table';
@@ -8,7 +8,7 @@ const columns: DataTableColumn[] = [
   { id: 'couple', header: 'Casal' },
   { id: 'status', header: 'Status', size: 'sm' },
   { id: 'amount', header: 'Valor', size: 'sm', align: 'end' },
-  { id: 'actions', header: 'Ações', size: 'xs', hideHeader: true },
+  { id: 'actions', header: 'Ações', size: 'xs', hideHeader: true, actions: true },
 ];
 
 function payment({ details }: { details?: string } = {}) {
@@ -60,17 +60,81 @@ describe('DataTable (no molde da GroupTable do DS v0.18)', () => {
     expect(screen.getByRole('table').style.getPropertyValue('--kore-data-table-columns')).toBe(
       'minmax(7.5rem, 1fr) minmax(4.5rem, 140px) minmax(4.5rem, 140px) minmax(3.5rem, 72px)',
     );
+    // A soma dos mínimos (20 rem), os 3 espaços entre as colunas e as 2 pontas (decisão 348).
+    expect(screen.getByRole('table').style.getPropertyValue('--kore-data-table-min-width')).toBe(
+      '25rem',
+    );
   });
 
   it('a tabela larga (wide) ganha a classe que mantém os cartões até 1280 px', () => {
     const { rerender } = renderTable();
-    expect(screen.getByRole('table')).not.toHaveClass('kore-data-table--wide');
+    const frame = () => screen.getByRole('table').parentElement;
+    expect(frame()).not.toHaveClass('kore-data-table--wide');
     rerender(
       <DataTable label="Pagamentos" columns={columns} wide>
         {payment()}
       </DataTable>,
     );
-    expect(screen.getByRole('table')).toHaveClass('kore-data-table--wide');
+    expect(frame()).toHaveClass('kore-data-table', 'kore-data-table--wide');
+  });
+
+  it('a coluna das ações marca o cabeçalho, para ficar presa quando o quadro rola', () => {
+    renderTable();
+    expect(screen.getByRole('columnheader', { name: 'Ações' })).toHaveClass(
+      'kore-data-table__header--actions',
+    );
+    expect(screen.getByRole('columnheader', { name: 'Casal' })).not.toHaveClass(
+      'kore-data-table__header--actions',
+    );
+  });
+
+  describe('o quadro que rola (decisão 348)', () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    function frameWidths({
+      scrollWidth,
+      clientWidth,
+    }: {
+      scrollWidth: number;
+      clientWidth: number;
+    }) {
+      vi.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockReturnValue(scrollWidth);
+      vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(clientWidth);
+    }
+
+    it('sem rolagem, o quadro não é região nem entra no Tab', () => {
+      frameWidths({ scrollWidth: 960, clientWidth: 960 });
+      renderTable();
+      expect(screen.queryByRole('region')).toBeNull();
+      const frame = screen.getByRole('table', { name: 'Pagamentos' }).parentElement;
+      expect(frame).not.toHaveAttribute('tabindex');
+      expect(frame?.className).toBe('kore-data-table');
+    });
+
+    it('com rolagem, vira a região nomeada pela tabela, no Tab, e marca o lado escondido', async () => {
+      frameWidths({ scrollWidth: 900, clientWidth: 700 });
+      renderTable();
+      const region = screen.getByRole('region', { name: 'Pagamentos' });
+      const table = within(region).getByRole('table', { name: 'Pagamentos' });
+      expect(region).toHaveAttribute('tabindex', '0');
+      // O nome vem da tabela (aria-labelledby), sem repetir o aria-label (decisão 352(2)).
+      expect(region).not.toHaveAttribute('aria-label');
+      expect(region).toHaveAttribute('aria-labelledby', table.id);
+      expect(region).toHaveClass('kore-data-table--scrolls', 'kore-data-table--hidden-end');
+      expect(region).not.toHaveClass('kore-data-table--hidden-start');
+
+      region.scrollLeft = 100;
+      fireEvent.scroll(region);
+      expect(region).toHaveClass('kore-data-table--hidden-start', 'kore-data-table--hidden-end');
+
+      region.scrollLeft = 200;
+      fireEvent.scroll(region);
+      expect(region).toHaveClass('kore-data-table--hidden-start');
+      expect(region).not.toHaveClass('kore-data-table--hidden-end');
+      await expectNoA11yViolations({ container: document.body });
+    });
   });
 
   it('o cabeçalho fica na árvore acessível também no cartão (só fora da vista)', () => {
@@ -99,6 +163,24 @@ describe('DataTable (no molde da GroupTable do DS v0.18)', () => {
     expect(actions).toHaveClass('kore-data-table__cell--actions');
     expect(title?.querySelector('.kore-data-table__cell-label')).toBeNull();
     expect(actions?.querySelector('.kore-data-table__cell-label')).toBeNull();
+  });
+
+  it('a frase própria do cartão fica no lugar do rótulo, e a tabela segue com o valor', () => {
+    render(
+      <DataTable label="Pagamentos" columns={columns.slice(0, 2)}>
+        <DataTableRow>
+          <DataTableCell primary>Ana & Marcos</DataTableCell>
+          <DataTableCell label="Pagamentos" cardText="1 pagamento">
+            1
+          </DataTableCell>
+        </DataTableRow>
+      </DataTable>,
+    );
+    const cell = screen.getByText('1 pagamento').closest('[role="cell"]') as HTMLElement;
+    expect(cell).toHaveClass('kore-data-table__cell--card-text');
+    expect(screen.getByText('1 pagamento')).toHaveClass('kore-data-table__card-text');
+    expect(within(cell).getByText('1')).toHaveClass('kore-data-table__cell-value');
+    expect(within(cell).queryByText('Pagamentos')).toBeNull();
   });
 
   it('a célula vazia mostra o traço', () => {

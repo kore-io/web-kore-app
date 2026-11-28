@@ -57,12 +57,17 @@
 }
 
 /* Busca e filtros: celular com a busca e o botão Filtros; tablet e computador em linha. */
+/*
+ * No computador estreito com a Sidebar (1024 px), a busca ficava com 42 px ao lado dos três
+ * filtros de 200 px (varredura do Crivo, decisão 348). A busca não fica abaixo de 240 px:
+ * quando não cabe, os filtros descem para a linha de baixo, e a busca ocupa a de cima.
+ */
 .kore-party-filters {
-  @apply flex gap-3;
+  @apply flex flex-wrap gap-3;
 }
 
 .kore-party-filters__search {
-  @apply min-w-0 flex-1;
+  @apply min-w-0 flex-1 lg:min-w-60;
 }
 
 .kore-party-filters__selects {

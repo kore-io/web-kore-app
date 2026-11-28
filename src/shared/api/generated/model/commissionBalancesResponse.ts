@@ -12,4 +12,6 @@ export interface CommissionBalancesResponse {
   inPayoutCents: number;
   adjustmentsCents: number;
   paidPayouts: number;
+  /** @nullable */
+  nextReleaseAt: string | null;
 }

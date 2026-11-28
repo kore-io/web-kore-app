@@ -25007,6 +25007,12 @@
           "paidPayouts": {
             "type": "number",
             "example": 3
+          },
+          "nextReleaseAt": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "example": "2026-09-09"
           }
         },
         "required": [
@@ -25015,7 +25021,8 @@
           "receivedCents",
           "inPayoutCents",
           "adjustmentsCents",
-          "paidPayouts"
+          "paidPayouts",
+          "nextReleaseAt"
         ]
       },
       "ReferrerCommissionsResponse": {

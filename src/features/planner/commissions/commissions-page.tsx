@@ -210,6 +210,7 @@ function Balances({
   payouts: PayoutsResponse | undefined;
 }) {
   const { t } = useTranslation('planner');
+  const now = new Date();
   const available = formatCents({ cents: balances.availableCents });
   return (
     <div className="kore-commissions__balances">
@@ -237,7 +238,17 @@ function Balances({
       <StatCard
         label={t('commissions.balances.pending')}
         value={formatCents({ cents: balances.pendingCents })}
-        detail={balances.pendingCents === 0 ? t('commissions.balances.nothingPending') : undefined}
+        detail={
+          // A próxima liberação (346(2); 349(1)): a data mais próxima das comissões que ainda
+          // aguardam, que a API manda pronta no fuso de São Paulo (nextReleaseAt).
+          balances.pendingCents === 0
+            ? t('commissions.balances.nothingPending')
+            : balances.nextReleaseAt
+              ? t('commissions.caption.pending', {
+                  date: numericDay({ day: balances.nextReleaseAt, timezone: TIMEZONE, now }),
+                })
+              : undefined
+        }
       />
       <StatCard
         label={t('commissions.balances.received')}
@@ -448,7 +459,12 @@ function ByWedding({
             <DataTableCell label={header.origin}>
               {item.referralSource ? t(`commissions.origin.${item.referralSource}`) : '—'}
             </DataTableCell>
-            <DataTableCell label={header.payments} align="end">
+            {/* No cartão, "1 pagamento" (Voz; decisão 350(13)); na tabela, o número. */}
+            <DataTableCell
+              label={header.payments}
+              align="end"
+              cardText={t('commissions.wedding.payments', { count: item.paymentsCount })}
+            >
               {item.paymentsCount}
             </DataTableCell>
             <DataTableCell label={header.pending} align="end">
