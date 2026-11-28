@@ -27,9 +27,11 @@ import { apiErrorCode } from '../../../shared/api/http-client';
 import { FormField } from '../../../shared/components/form-field';
 import { LoadErrorNotice } from '../../../shared/components/load-error';
 import { oneDot, shortDayMonth } from '../../../shared/date-texts';
+import { useMyWeddingsControllerDetailV1 } from '../../../shared/api/generated/planner/planner';
 import { useRequestReauth } from '../../access/hooks/use-request-reauth';
 import { isReauthRequired } from '../../access/reauth';
 import { useActiveWedding } from '../../guests/hooks/use-active-wedding';
+import { deleteCase } from '../../planner/my-weddings/wedding-detail-texts';
 import { todayIn } from '../../site/site-texts';
 import { useErrorMessage, useWriteLock } from '../lifecycle/blocked';
 import { useCancelDeletion } from '../lifecycle/deletion';
@@ -63,7 +65,7 @@ function deleteGuard({ billing }: { billing: BillingResponse }): DeleteGuard {
 /**
  * Configurações › Casamento (`/app/configuracoes/casamento`, a rota do e-mail da exclusão;
  * Retenção RN05, RN06 e RN08; A11, Penpot 27; textos-f3 B8): a seção Excluir o casamento.
- * - Só o dono exclui; a colaboradora lê "Só o casal pode excluir o casamento.".
+ * - Só o dono exclui; a colaboradora lê a voz dela, com o motivo (CollaboratorSection).
  * - O Dialog pede o nome do casal digitado; o `422 CONFIRM_NAME_MISMATCH` vai à ajuda do campo.
  * - As travas: o bloqueio, o prazo de desistir com Ir para Pagamentos, o reembolso em
  *   andamento e a contestação; o Pix pendente só avisa que será cancelado.
@@ -112,25 +114,80 @@ function WeddingSettings({
       {owner ? (
         <DeleteSection weddingId={weddingId} membership={membership} />
       ) : (
-        <section className="kore-settings__panel" aria-labelledby="kore-wedding-delete">
-          <h2 id="kore-wedding-delete" className="kore-settings__section">
-            {t('weddingSettings.section')}
-          </h2>
-          <p className="kore-settings__subtitle">{t('weddingSettings.text')}</p>
-          <Button
-            variant="destructive"
-            className="kore-wedding-delete__button"
-            disabled
-            aria-describedby="kore-wedding-delete-planner"
-          >
-            {t('weddingSettings.delete')}
-          </Button>
-          <p id="kore-wedding-delete-planner" className="kore-write-lock">
-            {t('weddingSettings.planner')}
-          </p>
-        </section>
+        <CollaboratorSection weddingId={weddingId} membership={membership} />
       )}
     </div>
+  );
+}
+
+/**
+ * A colaboradora (Papéis RN03; Retenção RN05 a RN07; decisões 351(4) e (7) e 353(4)): a seção
+ * aparece pela URL, na voz dela ("o casal pode cancelar"), com o botão desabilitado e o motivo.
+ * - Com a exclusão agendada: a data e o Cancelar a exclusão desabilitado ("Só o casal pode
+ *   cancelar a exclusão."; no bloqueio, o motivo do bloqueio).
+ * - No casamento sem dono que ela criou (rascunho ou aguardando o casal), o motivo leva a Meus
+ *   casamentos, onde ela pode excluir; o detalhe vem do GET de Meus casamentos.
+ */
+function CollaboratorSection({
+  weddingId,
+  membership,
+}: {
+  weddingId: string;
+  membership: MeMembershipResponse;
+}) {
+  const { t } = useTranslation('billing');
+  const { kind } = useArea();
+  const lock = useWriteLock();
+  const detail = useMyWeddingsControllerDetailV1(weddingId, {
+    query: { enabled: kind === 'planner', retry: false },
+  });
+  const now = new Date();
+  const scheduled = membership.lifecycle.deletionScheduledFor;
+  const reasonId = 'kore-wedding-delete-planner';
+
+  if (scheduled) {
+    return (
+      <section className="kore-settings__panel" aria-labelledby="kore-wedding-delete">
+        <h2 id="kore-wedding-delete" className="kore-settings__section">
+          {t('weddingSettings.section')}
+        </h2>
+        <p className="kore-settings__subtitle">
+          {oneDot(t('weddingSettings.scheduled', { date: shortDayMonth({ day: scheduled, now }) }))}
+        </p>
+        <Button
+          variant="secondary"
+          className="kore-wedding-delete__button"
+          disabled
+          aria-describedby={reasonId}
+        >
+          {t('lifecycle.deletion.cancel')}
+        </Button>
+        <p id={reasonId} className="kore-write-lock">
+          {lock.kind === 'blocked' ? lock.reason : t('weddingSettings.plannerCancel')}
+        </p>
+      </section>
+    );
+  }
+
+  const ownerless = detail.data !== undefined && deleteCase({ detail: detail.data }) !== null;
+  return (
+    <section className="kore-settings__panel" aria-labelledby="kore-wedding-delete">
+      <h2 id="kore-wedding-delete" className="kore-settings__section">
+        {t('weddingSettings.section')}
+      </h2>
+      <p className="kore-settings__subtitle">{t('weddingSettings.textPlanner')}</p>
+      <Button
+        variant="destructive"
+        className="kore-wedding-delete__button"
+        disabled
+        aria-describedby={reasonId}
+      >
+        {t('weddingSettings.delete')}
+      </Button>
+      <p id={reasonId} className="kore-write-lock">
+        {ownerless ? t('weddingSettings.useMyWeddings') : t('weddingSettings.planner')}
+      </p>
+    </section>
   );
 }
 

@@ -335,7 +335,10 @@
     "pixPending": "Há um Pix aguardando pagamento. Se excluírem o casamento, ele é cancelado.",
     "refundInProgress": "Indisponível enquanto há um reembolso em andamento.",
     "disputed": "Indisponível enquanto há um pagamento em contestação.",
+    "textPlanner": "O site sai do ar na hora. Os convidados, as respostas e o site são apagados em 7 dias, e até lá o casal pode cancelar. Os registros de pagamento ficam guardados pelo prazo da lei.",
     "planner": "Só o casal pode excluir o casamento.",
+    "plannerCancel": "Só o casal pode cancelar a exclusão.",
+    "useMyWeddings": "Para excluir este casamento, use Meus casamentos.",
     "reauth": "Por segurança, entrem de novo para excluir o casamento.",
     "scheduled": "O casamento será apagado em {{date}}."
   }
