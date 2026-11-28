@@ -521,6 +521,8 @@
       "held": "O pagamento foi contestado no banco do cartão. A comissão fica retida até a decisão."
     },
     "wedding": {
+      "payments_one": "{{count}} pagamento",
+      "payments_other": "{{count}} pagamentos",
       "canRequest": "já pode pedir o repasse",
       "releases_one": "Libera em {{dates}}",
       "releases_other": "libera em {{dates}}",
