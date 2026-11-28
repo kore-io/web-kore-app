@@ -350,7 +350,7 @@ describe('Comissões (Comissões do indicador RN07)', () => {
     expect(within(row('Bianca e Henrique')).getAllByText('R$ 44,22')).toHaveLength(2);
     expect(paths.at(-1)).toBe('/v1/me/referrer/commissions?view=wedding&page=1');
     // As 7 colunas viram cartões até 1280 px (bloqueante do Crivo no PR da 346).
-    expect(screen.getByRole('table', { name: 'Por casamento' })).toHaveClass(
+    expect(screen.getByRole('table', { name: 'Por casamento' }).parentElement).toHaveClass(
       'kore-data-table--wide',
     );
   });

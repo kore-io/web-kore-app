@@ -11,9 +11,17 @@
  * entre elas e de respiro nas pontas. Cabeçalho: 40 px, 10/16 px, fundo gray.100,
  * type.overline em gray.700. Linha: 56 px ou mais, 12/16 px, borda gray.300 entre as
  * linhas; a linha clicável ganha o fundo gray.100 no hover. Vazio: "—" em gray.500.
+ * Quando as colunas não cabem (decisão 348), o quadro rola na horizontal, e a página não:
+ * o cabeçalho e as linhas têm a largura mínima das colunas (`--kore-data-table-min-width`),
+ * a 1ª coluna e a das ações ficam presas, com a sombra do lado escondido, e o quadro que
+ * rola ganha o anel de foco do DS (ele entra no Tab).
  */
 .kore-data-table {
-  @apply lg:overflow-hidden lg:rounded-lg lg:border lg:border-gray-300 lg:bg-white;
+  @apply lg:min-w-0 lg:max-w-full lg:overflow-x-auto lg:rounded-lg lg:border lg:border-gray-300 lg:bg-white;
+}
+
+.kore-data-table:focus-visible {
+  @apply shadow-focus-ring outline-2 outline-paper;
 }
 
 /* No cartão, o cabeçalho sai da vista, mas fica na árvore acessível (o leitor de tela lê
@@ -71,6 +79,16 @@
 
 .kore-data-table__cell--primary .kore-data-table__cell-value {
   @apply type-label text-left;
+}
+
+/* A frase própria do cartão (ex.: "1 pagamento"; decisão 350(13)), sem o rótulo e no lugar
+   do valor da tabela. */
+.kore-data-table__card-text {
+  @apply type-body-md text-ink lg:hidden;
+}
+
+.kore-data-table__cell--card-text .kore-data-table__cell-value {
+  @apply hidden lg:block;
 }
 
 .kore-data-table__empty {
@@ -141,6 +159,66 @@
   @apply lg:col-span-full;
 }
 
+/*
+ * O quadro que rola (decisão 348; o mesmo desenho da tabela de grupos da lib). O cabeçalho e
+ * as linhas não encolhem abaixo da soma dos mínimos. Só enquanto o quadro rola, a 1ª coluna
+ * fica presa à esquerda e a das ações à direita, com o fundo da linha, a altura dela e o
+ * respiro da ponta, para o que rola passar por baixo; sem rolagem, a linha clicável segue
+ * com o link cobrindo a linha inteira (preso, ele cobriria só a 1ª célula).
+ */
+.kore-data-table__header-row,
+.kore-data-table__row {
+  @apply lg:min-w-(--kore-data-table-min-width);
+}
+
+.kore-data-table--scrolls .kore-data-table__header-row > :first-child,
+.kore-data-table--scrolls .kore-data-table__row > :first-child,
+.kore-data-table--scrolls .kore-data-table__header--actions,
+.kore-data-table--scrolls .kore-data-table__cell--actions {
+  @apply lg:sticky lg:z-10 lg:flex lg:items-center lg:self-stretch lg:bg-inherit;
+}
+
+.kore-data-table--scrolls .kore-data-table__header-row > :first-child,
+.kore-data-table--scrolls .kore-data-table__row > :first-child {
+  @apply lg:left-0 lg:-ml-4 lg:pl-4;
+}
+
+.kore-data-table--scrolls .kore-data-table__header--actions,
+.kore-data-table--scrolls .kore-data-table__cell--actions {
+  @apply lg:right-0 lg:-mr-4 lg:justify-end lg:pr-4;
+}
+
+/*
+ * A sombra das colunas presas, do lado em que há colunas fora do quadro: um degradê de 12 px
+ * da Tinta a 8 % (a cor e o desfoque do shadow md do DS), fora da célula, sem mudar as
+ * larguras; com menos movimento, sem a transição (decisão 352).
+ */
+.kore-data-table--scrolls .kore-data-table__header-row > :first-child,
+.kore-data-table--scrolls .kore-data-table__row > :first-child,
+.kore-data-table--scrolls .kore-data-table__header--actions,
+.kore-data-table--scrolls .kore-data-table__cell--actions {
+  @apply lg:after:pointer-events-none lg:after:absolute lg:after:inset-y-0 lg:after:w-3;
+  @apply lg:after:from-ink/8 lg:after:to-transparent lg:after:opacity-0 lg:after:transition-opacity;
+  @apply lg:motion-reduce:after:transition-none;
+}
+
+.kore-data-table--scrolls .kore-data-table__header-row > :first-child,
+.kore-data-table--scrolls .kore-data-table__row > :first-child {
+  @apply lg:after:left-full lg:after:bg-linear-to-r;
+}
+
+.kore-data-table--scrolls .kore-data-table__header--actions,
+.kore-data-table--scrolls .kore-data-table__cell--actions {
+  @apply lg:after:right-full lg:after:bg-linear-to-l;
+}
+
+.kore-data-table--hidden-start .kore-data-table__header-row > :first-child,
+.kore-data-table--hidden-start .kore-data-table__row > :first-child,
+.kore-data-table--hidden-end .kore-data-table__header--actions,
+.kore-data-table--hidden-end .kore-data-table__cell--actions {
+  @apply lg:after:opacity-100;
+}
+
 /* Os outros controles da linha clicável (ex.: o ⋮) ficam acima do link que a cobre. */
 .kore-data-table__row--interactive :is(button, a:not([data-row-link]), input, select) {
   @apply relative z-10;
@@ -159,6 +237,11 @@
 
   .kore-data-table--wide .kore-data-table__head {
     @apply sr-only;
+  }
+
+  .kore-data-table--wide .kore-data-table__header-row,
+  .kore-data-table--wide .kore-data-table__row {
+    @apply min-w-0;
   }
 
   .kore-data-table--wide .kore-data-table__body {
@@ -191,6 +274,14 @@
 
   .kore-data-table--wide .kore-data-table__cell-label {
     @apply inline;
+  }
+
+  .kore-data-table--wide .kore-data-table__card-text {
+    @apply inline;
+  }
+
+  .kore-data-table--wide .kore-data-table__cell--card-text .kore-data-table__cell-value {
+    @apply hidden;
   }
 
   .kore-data-table--wide .kore-data-table__cell-value {
