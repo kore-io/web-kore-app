@@ -138,8 +138,11 @@ function CollaboratorSection({
   const { t } = useTranslation('billing');
   const { kind } = useArea();
   const lock = useWriteLock();
+  // Só o rascunho e o aguardando o casal podem estar sem dono (357(2)): nos outros, não lê.
+  const mayBeOwnerless =
+    membership.lifecycle.status === 'draft' || membership.lifecycle.status === 'awaiting_couple';
   const detail = useMyWeddingsControllerDetailV1(weddingId, {
-    query: { enabled: kind === 'planner', retry: false },
+    query: { enabled: kind === 'planner' && mayBeOwnerless, retry: false },
   });
   const now = new Date();
   const scheduled = membership.lifecycle.deletionScheduledFor;

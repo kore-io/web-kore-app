@@ -333,6 +333,8 @@ describe('Comissões (Comissões do indicador RN07)', () => {
     });
     renderRoute({ url: URL });
     expect(await screen.findByText('Soma no próximo repasse')).toBeInTheDocument();
+    // O valor com o "+" (357(1)).
+    expect(screen.getByText('+R$ 10,00')).toBeInTheDocument();
     expect(screen.queryByText('Desconta no próximo repasse')).toBeNull();
   });
 
