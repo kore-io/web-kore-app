@@ -99,7 +99,7 @@ test('os casais que vieram pelo link, só a colaboração abre o detalhe, e o Co
   await expect(
     page.getByText('Quem se cadastrar por este link ganha', { exact: false }),
   ).toBeVisible();
-  const list = page.getByRole('region', { name: 'Casais que vieram pelo seu link' });
+  const list = page.getByRole('region', { name: 'Casais com a sua indicação' });
   // No celular (Pixel 7), os cartões; a ordem é a do servidor, do cadastro mais recente.
   const cards = list.getByRole('listitem');
   await expect(cards).toHaveText([
@@ -122,7 +122,7 @@ test('o vazio com o Compartilhar no WhatsApp (RN06)', async ({ page }) => {
   const { email } = await planner();
   await signIn({ page, email });
   await page.goto('/cerimonialista/link-de-indicacao');
-  const list = page.getByRole('region', { name: 'Casais que vieram pelo seu link' });
+  const list = page.getByRole('region', { name: 'Casais com a sua indicação' });
   await expect(list.getByText('Nenhum casal se cadastrou pelo seu link ainda.')).toBeVisible();
   await expect(list.getByRole('button', { name: 'Compartilhar no WhatsApp' })).toBeVisible();
 });

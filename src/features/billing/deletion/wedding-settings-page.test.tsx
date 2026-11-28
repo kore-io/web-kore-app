@@ -91,16 +91,20 @@ function mockSettings({
   lifecycle = {},
   billingBody = billing(),
   request,
+  detail,
 }: {
   lifecycle?: Record<string, unknown>;
   billingBody?: object;
   request?: () => Response;
+  /** O GET de Meus casamentos (a colaboradora): sem ele, 404. */
+  detail?: object;
 } = {}) {
   const calls: Call[] = [];
   let current = lifecycle;
   mockApi(({ method, path, body }) => {
     if (path === '/v1/me') return Response.json(meFor(me(current)));
     if (method === 'GET' && path === '/v1/weddings/w1/billing') return Response.json(billingBody);
+    if (method === 'GET' && path === '/v1/me/weddings/w1' && detail) return Response.json(detail);
     if (method === 'POST' && path === '/v1/weddings/w1/deletion') {
       calls.push({ method, path, body });
       const response = request?.();
@@ -292,5 +296,75 @@ describe('Configurações › Casamento (Retenção RN05 e RN06)', () => {
     const button = await deleteButton();
     expect(button).toBeDisabled();
     expect(button).toHaveAccessibleDescription('Só o casal pode excluir o casamento.');
+    // A voz dela (351(4)): o casal pode cancelar, e não "vocês".
+    expect(
+      screen.getByText(
+        'O site sai do ar na hora. Os convidados, as respostas e o site são apagados em 7 dias, e até lá o casal pode cancelar. Os registros de pagamento ficam guardados pelo prazo da lei.',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/vocês podem cancelar/)).toBeNull();
+  });
+
+  it('a colaboradora com a exclusão agendada: a data e o Cancelar desabilitado (351(4))', async () => {
+    profileUnderTest.current = 'planner';
+    mockSettings({ lifecycle: { deletionScheduledFor: '2027-02-25' } });
+    renderRoute({ url: '/cerimonialista/casamentos/w1/configuracoes/casamento' });
+    expect(await screen.findByText('O casamento será apagado em 25 de fev.')).toBeInTheDocument();
+    const cancel = screen.getByRole('button', { name: 'Cancelar a exclusão' });
+    expect(cancel).toBeDisabled();
+    expect(cancel).toHaveAccessibleDescription('Só o casal pode cancelar a exclusão.');
+    expect(screen.queryByRole('button', { name: 'Excluir o casamento' })).toBeNull();
+  });
+
+  it('a colaboradora com a exclusão agendada e o bloqueio: o motivo do bloqueio (351(4))', async () => {
+    profileUnderTest.current = 'planner';
+    mockSettings({ lifecycle: { deletionScheduledFor: '2027-02-25', blocked: true } });
+    renderRoute({ url: '/cerimonialista/casamentos/w1/configuracoes/casamento' });
+    const cancel = await screen.findByRole('button', { name: 'Cancelar a exclusão' });
+    expect(cancel).toBeDisabled();
+    expect(cancel).toHaveAccessibleDescription('Indisponível enquanto o site está bloqueado.');
+  });
+
+  it.each(['awaiting_couple', 'draft'])(
+    'o casamento sem dono que ela criou (%s): o motivo leva a Meus casamentos (351(7); 353(4))',
+    async (status) => {
+      profileUnderTest.current = 'planner';
+      mockSettings({
+        lifecycle: { status },
+        detail: {
+          weddingId: 'w1',
+          status,
+          hasOwner: false,
+          createdByMe: true,
+          coupleInvitations: [],
+        },
+      });
+      renderRoute({ url: '/cerimonialista/casamentos/w1/configuracoes/casamento' });
+      const button = await deleteButton();
+      expect(button).toBeDisabled();
+      await waitFor(() =>
+        expect(button).toHaveAccessibleDescription(
+          'Para excluir este casamento, use Meus casamentos.',
+        ),
+      );
+    },
+  );
+
+  it('com dono, a colaboradora segue com "Só o casal pode excluir o casamento."', async () => {
+    profileUnderTest.current = 'planner';
+    mockSettings({
+      detail: {
+        weddingId: 'w1',
+        status: 'published',
+        hasOwner: true,
+        createdByMe: true,
+        coupleInvitations: [],
+      },
+    });
+    renderRoute({ url: '/cerimonialista/casamentos/w1/configuracoes/casamento' });
+    const button = await deleteButton();
+    await waitFor(() =>
+      expect(button).toHaveAccessibleDescription('Só o casal pode excluir o casamento.'),
+    );
   });
 });

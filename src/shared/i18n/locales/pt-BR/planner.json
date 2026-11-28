@@ -307,7 +307,7 @@
     "copy": "Copiar link",
     "copied": "Link copiado.",
     "whatsapp": "Compartilhar no WhatsApp",
-    "listTitle": "Casais que vieram pelo seu link",
+    "listTitle": "Casais com a sua indicação",
     "columns": {
       "couple": "Casal",
       "status": "Status"
@@ -474,6 +474,7 @@
       "canRequest": "já pode pedir o repasse",
       "nothingPending": "nada a liberar agora",
       "withAdjustment": "já com o ajuste de {{amount}}",
+      "withAdjustmentCanRequest": "já com o ajuste de {{amount}} · já pode pedir o repasse",
       "payouts_one": "em {{count}} repasse",
       "payouts_other": "em {{count}} repasses"
     },
@@ -505,7 +506,8 @@
       "refund": "Ajuste (estorno)",
       "chargeback": "Ajuste (estorno)",
       "manual": "Ajuste",
-      "next": "Desconta no próximo repasse"
+      "next": "Desconta no próximo repasse",
+      "nextAdd": "Soma no próximo repasse"
     },
     "status": {
       "pending": "Aguardando liberação",
@@ -543,7 +545,7 @@
       "created_by_planner": "Criado por você",
       "created_by_seller": "Criado por você",
       "referral_link": "Pelo seu link",
-      "admin_reassigned": "Pelo seu link",
+      "admin_reassigned": "Indicação alterada",
       "invited_before_payment": "Convite do casal"
     }
   }
