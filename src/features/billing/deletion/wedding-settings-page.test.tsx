@@ -104,7 +104,10 @@ function mockSettings({
   mockApi(({ method, path, body }) => {
     if (path === '/v1/me') return Response.json(meFor(me(current)));
     if (method === 'GET' && path === '/v1/weddings/w1/billing') return Response.json(billingBody);
-    if (method === 'GET' && path === '/v1/me/weddings/w1' && detail) return Response.json(detail);
+    if (method === 'GET' && path === '/v1/me/weddings/w1') {
+      calls.push({ method, path, body });
+      if (detail) return Response.json(detail);
+    }
     if (method === 'POST' && path === '/v1/weddings/w1/deletion') {
       calls.push({ method, path, body });
       const response = request?.();
@@ -350,12 +353,22 @@ describe('Configurações › Casamento (Retenção RN05 e RN06)', () => {
     },
   );
 
+  it('publicado, não lê Meus casamentos: só o rascunho e o aguardando podem estar sem dono (357(2))', async () => {
+    profileUnderTest.current = 'planner';
+    const calls = mockSettings();
+    renderRoute({ url: '/cerimonialista/casamentos/w1/configuracoes/casamento' });
+    const button = await deleteButton();
+    expect(button).toHaveAccessibleDescription('Só o casal pode excluir o casamento.');
+    expect(calls.some((call) => call.path === '/v1/me/weddings/w1')).toBe(false);
+  });
+
   it('com dono, a colaboradora segue com "Só o casal pode excluir o casamento."', async () => {
     profileUnderTest.current = 'planner';
     mockSettings({
+      lifecycle: { status: 'draft' },
       detail: {
         weddingId: 'w1',
-        status: 'published',
+        status: 'draft',
         hasOwner: true,
         createdByMe: true,
         coupleInvitations: [],

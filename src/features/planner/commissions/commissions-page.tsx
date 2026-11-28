@@ -346,8 +346,9 @@ function ByPayment({ items }: { items: (CommissionLineResponse | AdjustmentLineR
               —
             </DataTableCell>
             <DataTableCell label={header.commission} align="end">
+              {/* O ajuste positivo leva o "+", como na legenda do Disponível (357(1)). */}
               <span className={item.amountCents < 0 ? 'kore-commissions__negative' : undefined}>
-                {formatCents({ cents: item.amountCents })}
+                {signedCents({ cents: item.amountCents })}
               </span>
             </DataTableCell>
             <DataTableCell label={header.status}>
