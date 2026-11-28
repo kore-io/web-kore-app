@@ -292,16 +292,48 @@ describe('Comissões (Comissões do indicador RN07)', () => {
     ).toHaveAttribute('href', '/cerimonialista?casamento=w1');
   });
 
-  it('o casal na linha do ajuste (347(2)) e "já com o ajuste de …" no Disponível (346(2))', async () => {
+  it('o casal na linha do ajuste (347(2)) e o ajuste junto do "já pode pedir o repasse" (350(9))', async () => {
     mockCommissions({ balancesBody: { ...balances, adjustmentsCents: -5002, paidPayouts: 1 } });
     renderRoute({ url: URL });
     const adjustment = (await screen.findByText('Ajuste (estorno)')).closest(
       '[role="row"]',
     ) as HTMLElement;
     expect(within(adjustment).getByText('Aline e Gustavo')).toBeInTheDocument();
-    expect(screen.getByText('já com o ajuste de −R$ 50,02')).toBeInTheDocument();
-    expect(screen.queryByText('já pode pedir o repasse')).toBeNull();
+    // O ajuste primeiro, a ação depois; o espaço sem quebra antes do "·" (351(2)).
+    const legend = await screen.findByText(
+      'já com o ajuste de −R$ 50,02 · já pode pedir o repasse',
+    );
+    expect(legend.textContent).toContain('50,02\u00a0· já');
     expect(screen.getByText('em 1 repasse')).toBeInTheDocument();
+  });
+
+  it('o ajuste sem o pedido possível fica sozinho, e o positivo leva o "+" (351(2))', async () => {
+    mockCommissions({
+      balancesBody: { ...balances, availableCents: 100, adjustmentsCents: 5002 },
+    });
+    renderRoute({ url: URL });
+    expect(await screen.findByText('já com o ajuste de +R$ 50,02')).toBeInTheDocument();
+    expect(screen.queryByText(/já pode pedir o repasse/)).toBeNull();
+  });
+
+  it('o ajuste positivo sem repasse: "Soma no próximo repasse" (351(6))', async () => {
+    mockCommissions({
+      payment: [
+        {
+          kind: 'adjustment',
+          adjustmentId: 'a3',
+          coupleNames: null,
+          weddingPurged: false,
+          amountCents: 1000,
+          reason: 'manual',
+          createdAt: '2026-11-09T15:00:00Z',
+          payoutStatus: null,
+        },
+      ],
+    });
+    renderRoute({ url: URL });
+    expect(await screen.findByText('Soma no próximo repasse')).toBeInTheDocument();
+    expect(screen.queryByText('Desconta no próximo repasse')).toBeNull();
   });
 
   it('o ajuste manual é "Ajuste" (346(3))', async () => {
@@ -349,9 +381,10 @@ describe('Comissões (Comissões do indicador RN07)', () => {
       'Já recebido',
       'Total',
     ]);
-    // A Origem (346(1)): o reatribuído pelo Admin conta como pelo link (Link de indicação RN02).
+    // A Origem (346(1)).
     expect(within(row('Bianca e Henrique')).getByText('Pelo seu link')).toBeInTheDocument();
-    expect(within(row('Ana e Marcos')).getByText('Pelo seu link')).toBeInTheDocument();
+    // O reatribuído pelo Admin: "Indicação alterada" (350(8); 351(1)).
+    expect(within(row('Ana e Marcos')).getByText('Indicação alterada')).toBeInTheDocument();
     expect(within(row('Paula e Diego')).getByText('Criado por você')).toBeInTheDocument();
     expect(within(row('Lívia e Bruno')).getByText('Convite do casal')).toBeInTheDocument();
     expect(
@@ -372,6 +405,36 @@ describe('Comissões (Comissões do indicador RN07)', () => {
     expect(screen.getByRole('table', { name: 'Por casamento' }).parentElement).toHaveClass(
       'kore-data-table--wide',
     );
+  });
+
+  it('Por casamento: o Disponível negativo em vermelho, sem legenda; o "—" só no zero (353(1))', async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+    mockCommissions({
+      wedding: [
+        {
+          weddingId: 'w9',
+          coupleNames: 'Aline e Gustavo',
+          weddingPurged: false,
+          clickable: false,
+          referralSource: 'referral_link',
+          paymentsCount: 1,
+          pendingCents: 0,
+          availableCents: -5002,
+          receivedCents: 5002,
+          totalCents: 0,
+          releaseDates: [],
+        },
+      ],
+    });
+    renderRoute({ url: URL });
+    await user.click(await screen.findByRole('button', { name: 'Por casamento' }));
+    const aline = (await screen.findByText('Aline e Gustavo')).closest(
+      '[role="row"]',
+    ) as HTMLElement;
+    expect(within(aline).getByText('−R$ 50,02')).toHaveClass('kore-commissions__negative');
+    // O Aguardando liberação zerado segue com o "—".
+    expect(within(aline).getByText('—')).toBeInTheDocument();
+    expect(within(aline).getByText('R$ 0,00')).toBeInTheDocument();
   });
 
   it('o vazio (textos-f3 B6)', async () => {

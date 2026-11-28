@@ -201,6 +201,12 @@ export function canRequestPayout({
   );
 }
 
+/** O ajuste com o sinal: "−R$ 50,02" e "+R$ 50,02" (351(2)). */
+function signedCents({ cents }: { cents: number }): string {
+  const text = formatCents({ cents });
+  return cents > 0 ? `+${text}` : text;
+}
+
 /** Os saldos (Comissões RN02 e RN07; 266(2); 346(2)). */
 function Balances({
   balances,
@@ -225,11 +231,15 @@ function Balances({
             : available
         }
         detail={
-          // O ajuste sem repasse já está no saldo (346(2)): ele vem antes da legenda do pedido.
+          // O ajuste sem repasse já está no saldo (346(2)) e vem antes da legenda do pedido,
+          // as duas juntas por " · " (350(9); 351(2)); o ajuste positivo leva o "+".
           balances.adjustmentsCents !== 0
-            ? t('commissions.balances.withAdjustment', {
-                amount: formatCents({ cents: balances.adjustmentsCents }),
-              })
+            ? t(
+                canRequestPayout({ balances, payouts })
+                  ? 'commissions.balances.withAdjustmentCanRequest'
+                  : 'commissions.balances.withAdjustment',
+                { amount: signedCents({ cents: balances.adjustmentsCents }) },
+              )
             : canRequestPayout({ balances, payouts })
               ? t('commissions.balances.canRequest')
               : undefined
@@ -341,9 +351,14 @@ function ByPayment({ items }: { items: (CommissionLineResponse | AdjustmentLineR
               </span>
             </DataTableCell>
             <DataTableCell label={header.status}>
-              {item.payoutStatus === null && item.amountCents < 0 && (
+              {/* Sem repasse, o ajuste desconta ou soma no próximo (RN07; 351(6)). */}
+              {item.payoutStatus === null && item.amountCents !== 0 && (
                 <span className="kore-commissions__caption">
-                  {t('commissions.adjustment.next')}
+                  {t(
+                    item.amountCents < 0
+                      ? 'commissions.adjustment.next'
+                      : 'commissions.adjustment.nextAdd',
+                  )}
                 </span>
               )}
             </DataTableCell>
@@ -471,7 +486,15 @@ function ByWedding({
               {money(item.pendingCents)}
             </DataTableCell>
             <DataTableCell label={header.available} align="end">
-              {money(item.availableCents)}
+              {/* O negativo (o ajuste do casal a descontar) em vermelho, sem legenda; o "—" só
+                  no zero (353(1)). */}
+              {item.availableCents < 0 ? (
+                <span className="kore-commissions__negative">
+                  {formatCents({ cents: item.availableCents })}
+                </span>
+              ) : (
+                money(item.availableCents)
+              )}
             </DataTableCell>
             <DataTableCell label={header.received} align="end">
               {money(item.receivedCents)}
